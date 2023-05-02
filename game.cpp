@@ -1,0 +1,221 @@
+#include "engine/engine.hpp"
+
+bool catchingCharacterB = false;
+
+// Engine::AudioSource jumpSFX(L"Assets/jump.wav");
+// Engine::AudioSource groundHitSFX(L"Assets/groundHit.wav");
+
+Engine::Map* pmap;
+
+struct Character
+{
+	const int jumpStreng = 4;
+
+	Engine::Object obj;
+	Engine::Camera cam;
+	bool onGround = false;
+	int yVelocity = 0;
+
+	void OnTick()
+	{
+		if (yVelocity < 1) {
+			yVelocity++;
+		}
+
+		/*
+		if (IsKeyDown(VK_UP)) {
+			if (onGround) {
+				yVelocity -= jumpStreng;
+				jumpSFX.Play(0, 0, 0, { 0.3f });
+			}
+		}
+		*/
+
+		bool left = false; // IsKeyDown(VK_LEFT);
+		bool right = false; // IsKeyDown(VK_RIGHT);
+		if (left && !right)
+			obj.Move({ -1 });
+		else if (right && !left)
+			obj.Move({ 1 });
+		
+		bool priorOnGround = onGround;
+
+		if (yVelocity < 0)
+			for (size_t i = 0; i < -yVelocity; i++)
+				onGround = !obj.Move({ 0, -1 });
+		else if (yVelocity == 1)
+			onGround = !obj.Move({ 0, 1 });
+
+		cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
+
+		// if (!priorOnGround && onGround) groundHitSFX.Play();
+	}
+
+	Character(Engine::Layer* layer)
+	{
+		obj.pos = { 5, 2 };
+		obj.textures.resize(1);
+		obj.textures[0].Write(
+			{
+				" O ",
+				"/|\\",
+				"/ \\"
+			}, { 0, 0, 0, 1.0f }, { 0, 0, 0, 0.0f }, { 0, 0 }
+		);
+		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 0, 1 }, 1));
+		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 1, 0 }, 1));
+		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 2, 1 }, 1));
+
+		cam = Engine::Camera({ 0, 0 }, { 15, 15 });
+
+		obj.OnTick = std::bind(&Character::OnTick, this);
+		layer->AddObject(&obj);
+	}
+};
+
+struct GravityBox
+{
+	Engine::Object obj;
+
+	bool onGround = false;
+
+	unsigned fallingSpeed;
+
+	void OnTick()
+	{
+		// If catched, do not fall.
+		for (size_t i = 0; i < fallingSpeed; i++)
+			obj.Move({ 0, 1 });
+	}
+
+	GravityBox(Engine::Layer* layer, Engine::Vector2D pos, unsigned fallingSpeed = 1U) : fallingSpeed(fallingSpeed)
+	{
+		obj.pos = pos;
+
+		obj.textures.resize(1);
+		obj.textures[0].Write(
+			{
+				"#-#",
+				"|G|",
+				"#-#"
+			}, { 100, 0, 200, 1.0f }, { 0, 0, 0, 0.1f }, { 0, 0 }
+		);
+
+		obj.colliders.push_back(Engine::Collider({ 3, 3 }, { 0, 0 }, 2));
+		
+		obj.OnTick = std::bind(&GravityBox::OnTick, this);
+		
+		layer->AddObject(&obj);
+	}
+};
+
+bool charCamOn = false;
+
+void TurnOnCharacterCamera() {
+	charCamOn = !charCamOn;
+}
+
+
+int main()
+{
+	Engine::colliderTypes = {
+		{ 0, 1, 1, 2 }, // Heavy - 0
+		{ 0, 1, 1, 2 }, // Normal - 1
+		{ 0, 0, 1, 2 }, // Light - 2
+		{ 2, 2, 2, 2 } // Overlappable - 3
+	};
+
+	Engine::Map map;
+	pmap = &map;
+
+	Engine::Layer layer;
+	map.AddLayer(&layer);
+
+	Engine::Camera camera({ 0, 0 }, { 50, 50 });
+	map.AddCamera(&camera, true);
+
+	Engine::Object worldProps({ 1, 1 }, "");
+	worldProps.textures.resize(3);
+	worldProps.textures[0].File("Assets/sky.kcget", { 0, 0 });
+	worldProps.textures[1].File("Assets/sky2.kcget", { 0, 30 });
+	worldProps.textures[2].File("Assets/land.kcget", { 0, 20 });
+	int base = 29;
+	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, base }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 1, base + 2 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 2, base + 3 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 3, base + 5 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 4, base + 6 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 6, base + 7 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 5, 50 }, { 8, base + 8 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 14, 50 }, { 13, base + 9 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 6, 50 }, { 27, base + 10 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 5, 50 }, { 33, base + 11 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 3, 50 }, { 38, base + 12 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 41, base + 13 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 43, base + 14 }, 0));
+	worldProps.colliders.push_back(Engine::Collider({ 3, 50 }, { 45, base + 15 }, 0));
+	layer.AddObject(&worldProps);
+
+	Engine::Object border({0, 0}, "L");
+	border.textures.resize(4);
+	border.textures[0].Block({ 50, 1 }, Engine::SuperChar('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
+	border.textures[1].Block({ 50, 1 }, Engine::SuperChar('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 49 });
+	border.textures[2].Block({ 1, 50 }, Engine::SuperChar('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
+	border.textures[3].Block({ 1, 50 }, Engine::SuperChar('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 49, 0 });
+	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 0 }, 0));
+	border.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, 0 }, 0));
+	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 49 }, 0));
+	border.colliders.push_back(Engine::Collider({ 1, 50 }, { 49, 0 }, 0));
+	layer.AddObject(&border);
+
+	// Character character(&layer);
+	Character character(&layer);
+	map.AddCamera(&character.cam);
+
+	GravityBox gbA(&layer, {10, 20}, 1);
+	GravityBox gbB(&layer, {15, 20}, 2);
+	GravityBox gbC(&layer, {30, 20}, 3);
+
+	Engine::Object house({ 20, 32 }, "");
+	house.textures.resize(1);
+	house.textures[0].File("Assets/house.kcget", { 0, 0 });
+	layer.AddObject(&house);
+
+	// Engine::RegisterInputHandler('M', true, TurnOnCharacterCamera);
+
+	Engine::Layer darkLayer;
+	darkLayer.brgba = { 0, 0, 0, 0.5f };
+	darkLayer.frgba = { 0, 0, 0, 0.5f };
+
+	system("clear");
+
+	Engine::PreparePrint({50, 50});
+	// Engine::InitializeConsole(13, 13, 50, 50, L"", L"Physics Test");
+	for (Engine::tps = 24; Engine::running; Engine::thisTickStartTP.SetToNow(), Engine::totalTicks++)
+	{
+		
+		// Engine::ManageInputs();
+		Engine::CallOnTicks(&map);
+
+		if (map.activeCameraI != -1 && map.activeCameraI < map.cameras.size())
+		{
+			// continue;
+			if (charCamOn) {
+				map.cameras[0]->Render({ &layer, &darkLayer });
+				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
+				map.cameras[1]->Render(map.layers);
+				map.cameras[1]->Draw({ 18, 18 }, 0, 0, 0, 0);
+			}
+			else {
+				map.cameras[0]->Render(map.layers);
+				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
+			}
+			Engine::Print();
+		}
+
+		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;
+		// std::cout << "x=" << Engine::terminalSize.ws_col << ", y=" << Engine::terminalSize.ws_row << std::endl;
+	
+		Engine::WaitUntilNextTick();
+	}
+}
