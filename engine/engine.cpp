@@ -1,23 +1,11 @@
-﻿#include "Engine.hpp"
-
-/*
-Win32 -> Linux:
-	1) GetAsyncKeyState
-	2) Whatever is in InitializeConsole()
-	3) XAudio2 
-*/
+﻿#include "engine.hpp"
 
 // ---=== Engine Variables ===---
 
 // Data
 std::vector<Engine::Object> Engine::storedObjects = {};
 std::vector<Engine::Layer> Engine::storedLayers = {};
-int Engine::lastDownKey = -1;
-int Engine::lastUpKey = -1;
-int Engine::lastDownVirtualKey = -1;
-int Engine::lastUpVirtualKey = -1;
-bool Engine::lastDownKeyRequiresShift = false;
-bool Engine::lastUpKeyRequiresShift = false;
+char Engine::input[8] = {0};
 winsize Engine::terminalSize;
 // Time
 float Engine::potentialfps = 0.0f;
@@ -55,6 +43,7 @@ Engine::Layer* Engine::StoreLayer(Layer layer)
 
 void Engine::Print()
 {
+	// Get terminal size
 	ioctl(fileno(stdout), TIOCGWINSZ, &Engine::terminalSize);
 
 	// Obtain the maximum length for the stringImage
@@ -73,54 +62,6 @@ void Engine::Print()
 	// Write the image to stringImage
 	unsigned int l = 0;
 	unsigned char lfr = 0, lfg = 0, lfb = 0, lbr = 0, lbg = 0, lbb = 0;
-
-	/*
-	lfr = image[0][0].frgb.r;
-	lfg = image[0][0].frgb.g;
-	lfb = image[0][0].frgb.b;
-	lbr = image[0][0].brgb.r;
-	lbg = image[0][0].brgb.g;
-	lbb = image[0][0].brgb.b;
-	stringImage[l] = '\033';
-	stringImage[l + 1] = '[';
-	stringImage[l + 2] = '3';
-	stringImage[l + 3] = '8';
-	stringImage[l + 4] = ';';
-	stringImage[l + 5] = '2';
-	stringImage[l + 6] = ';';
-	stringImage[l + 7] = lfr / 100 + '0';
-	stringImage[l + 8] = (lfr % 100) / 10 + '0';
-	stringImage[l + 9] = lfr % 10 + '0';
-	stringImage[l + 10] = ';';
-	stringImage[l + 11] = lfg / 100 + '0';
-	stringImage[l + 12] = (lfg % 100) / 10 + '0';
-	stringImage[l + 13] = lfg % 10 + '0';
-	stringImage[l + 14] = ';';
-	stringImage[l + 15] = lfb / 100 + '0';
-	stringImage[l + 16] = (lfb % 100) / 10 + '0';
-	stringImage[l + 17] = lfb % 10 + '0';
-	stringImage[l + 18] = 'm';
-	l += 19;
-	stringImage[l] = '\033';
-	stringImage[l + 1] = '[';
-	stringImage[l + 2] = '4';
-	stringImage[l + 3] = '8';
-	stringImage[l + 4] = ';';
-	stringImage[l + 5] = '2';
-	stringImage[l + 6] = ';';
-	stringImage[l + 7] = lbr / 100 + '0';
-	stringImage[l + 8] = (lbr % 100) / 10 + '0';
-	stringImage[l + 9] = lbr % 10 + '0';
-	stringImage[l + 10] = ';';
-	stringImage[l + 11] = lbg / 100 + '0';
-	stringImage[l + 12] = (lbg % 100) / 10 + '0';
-	stringImage[l + 13] = lbg % 10 + '0';
-	stringImage[l + 14] = ';';
-	stringImage[l + 15] = lbb / 100 + '0';
-	stringImage[l + 16] = (lbb % 100) / 10 + '0';
-	stringImage[l + 17] = lbb % 10 + '0';
-	stringImage[l + 18] = 'm';
-	l += 19;*/
 
 	// "&& y < size.ws_row" - fit into the terminal, in the case that it is too small
 	for (unsigned y = 0; y < image.size() && y < terminalSize.ws_row; y++)
@@ -266,7 +207,7 @@ void Engine::Print()
 		stringImage[l + 3] = 'm';
 		l += 4;
 	}
-	// ".substr(0, l)" - print until the end known by the writing sequence above
+	// ".substr(0, l)" - print until the end which was set by the writing sequence above
 	std::cout << "\033[0;0H" << stringImage.substr(0, l);
 }
 
@@ -274,22 +215,36 @@ void SignalHandler(int signal) {
 	if (signal == SIGWINCH) {
 		system("clear"); // Unfortunately
 		Engine::Print();
-		// std::cout << "Recieved SIGINT : " << Engine::terminalSize.ws_col << ", " << Engine::terminalSize.ws_row << std::endl;
 	}
 	if (signal == SIGINT) { // I just find it so cool these signals work :)
+		// Show cursor and reset colors
 		std::cout << "\033[?25h\033[0m";
-		system("stty echo");
 		Engine::running = false;
+
+		// Reenable canonical mode and echo
+		termios terminalAttributes;
+		tcgetattr(0, &terminalAttributes);
+		terminalAttributes.c_lflag &= ICANON;
+		terminalAttributes.c_lflag &= ECHO;
+		tcsetattr(0, TCSADRAIN, &terminalAttributes);
 	}
 }
 
 void Engine::PreparePrint(Engine::UVector2D imageSize)
 {
-	// Set cursor at 0,0, Hide cursor
-	std::cout << "\033[0;0H\033[?25l";
-	system("stty -echo");
+	// Set cursor at 0,0, Hide cursor, clear screen
+	std::cout << "\033[0;0H\033[?25l\033[2J";
 
-	// Resize image
+	// Disable canonical mode and echo
+	termios terminalAttributes;
+	tcgetattr(0, &terminalAttributes);
+	terminalAttributes.c_lflag &= ~ICANON;
+	terminalAttributes.c_lflag &= ~ECHO;
+	terminalAttributes.c_cc[VMIN] = 1;
+	terminalAttributes.c_cc[VTIME] = 0;
+	tcsetattr(0, TCSANOW, &terminalAttributes);
+
+	// Size the image
 	image.resize(imageSize.y);
 	for (size_t y = 0; y < image.size(); y++)
 		image[y].resize(imageSize.x);

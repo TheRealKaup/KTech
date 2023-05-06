@@ -1,6 +1,5 @@
 #pragma once
 
-#define IsKeyDown GetAsyncKeyState // Just a nicer name
 #define NowInSeconds() std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - Engine::engineStartTP.chornoTimePoint).count()
 #define NowInMilliseconds() std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - Engine::engineStartTP.chornoTimePoint).count()
 #define NowInMicroseconds() std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::engineStartTP.chornoTimePoint).count()

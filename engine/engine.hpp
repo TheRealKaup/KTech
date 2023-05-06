@@ -19,9 +19,9 @@
 #include <fstream> // Loading textures
 #include <sys/ioctl.h> // Linux..?
 #include <unistd.h> // Linux..?
-#include <signal.h> // Linux..?
-#include <linux/input.h>
-#include "Config.hpp"
+#include <signal.h> // For getting signals (like on quit)
+#include <termios.h> // For changing terminal attributes
+#include "config.hpp"
 
 namespace Engine
 {
@@ -52,15 +52,20 @@ namespace Engine
 	// B Can be pushed, can push (Normal)
 	// C Can be pushed, can't push (Light) */
 
-	extern int lastDownKey;
-	extern int lastUpKey;
-	extern int lastDownVirtualKey;
-	extern int lastUpVirtualKey;
-	// When you register a key that requires shift (for example '!' and 'W'), it will set lastDownKeyRequiresShift and lastUpKeyRequiresShift when triggered.
-	// Important: the engine will not check if shift is down if a key requires it. The user needs to check it themselves. The engien doesn't do it because it's way too complex, 
-	// resource costly and mostly unnecessary.
-	extern bool lastDownKeyRequiresShift;
-	extern bool lastUpKeyRequiresShift;
+	// Player input things
+	namespace Input
+	{
+		// The input as the engine recieved it, including escape codes.
+		extern char input[8];
+		// The length (in bytes) of the input as recieved by the engine.
+		extern unsigned char inputLength;
+		// The key in the input, unmodified (shift doesn't change the value).
+		extern unsigned char inputKey;
+		// The key in the input, modified by shift.
+		extern unsigned char modifiedInputKey;
+		// The alt modifier key state
+		extern bool alt;
+	}
 
 	extern winsize terminalSize;
 
@@ -245,15 +250,7 @@ namespace Engine
 		void Play(unsigned long start = 0, unsigned long length = 0, unsigned short loops = 0, std::vector<float> volumes = {});
 
 		// Pause playing the sound.
-		void Pause();
-
-		// Resume playing the sound.
-		void Resume();
-		
-		// Stop playing the sound.
-		void Stop();
-
-		// Change volume for all the channels.
+		void Pause();key modifiers (shift)e channels.
 		// volume - between 0.0f to 1.0f that will be the volume of all the channels.
 		void ChangeVolume(float volume);
 
@@ -317,8 +314,7 @@ namespace Engine
 
 	bool AreObjectsOverlapping(Engine::Object* objA, Engine::Object* objB, bool ignoreIrrelevancy = false);
 
-	// Use ASCII. For Virtual-Key Codes set vk to true, which if set, will not try to translte from ASCII to VK.
-	void RegisterInputHandler(int key, bool onKeyDown, std::function<void()> function, bool vk = false);
+	void GetInput();
 
 	// Storage, could be used for many things.
 	extern std::vector<Object> storedObjects;
