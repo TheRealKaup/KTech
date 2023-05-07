@@ -22,7 +22,7 @@ Engine::SuperChar::SuperChar(char32_t character, RGBA foreRGBA, RGBA backRGBA) :
 
 Engine::TimePoint::TimePoint()
 {
-		chornoTimePoint = std::chrono::high_resolution_clock::now();
+	chornoTimePoint = std::chrono::high_resolution_clock::now();
 }
 void Engine::TimePoint::SetToNow()
 {

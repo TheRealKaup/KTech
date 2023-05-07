@@ -65,6 +65,10 @@ namespace Engine
 		extern unsigned char modifiedInputKey;
 		// The alt modifier key state
 		extern bool alt;
+		// The control modifier key state
+		extern bool ctrl;
+		// Register a input handler which will call a function when the key is pressed
+		void RegisterInputHandler();
 	}
 
 	extern winsize terminalSize;

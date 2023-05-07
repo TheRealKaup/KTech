@@ -5,7 +5,6 @@
 // Data
 std::vector<Engine::Object> Engine::storedObjects = {};
 std::vector<Engine::Layer> Engine::storedLayers = {};
-char Engine::input[8] = {0};
 winsize Engine::terminalSize;
 // Time
 float Engine::potentialfps = 0.0f;
