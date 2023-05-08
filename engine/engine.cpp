@@ -119,35 +119,31 @@ void Engine::Print()
 		for (unsigned x = 1; x < image[y].size() && x < terminalSize.ws_col; x++)
 		{
 			// foreground
-			if (image[y][x].character != ' ')
+			if ((image[y][x].character != ' ') && (image[y][x].frgb.r != lfr || image[y][x].frgb.g != lfg || image[y][x].frgb.b != lfb))
 			{
-				if (image[y][x].frgb.r != lfr || image[y][x].frgb.g != lfg || image[y][x].frgb.b != lfb)
-				{
-					lfr = image[y][x].frgb.r;
-					lfg = image[y][x].frgb.g;
-					lfb = image[y][x].frgb.b;
-
-					stringImage[l] = '\033';
-					stringImage[l + 1] = '[';
-					stringImage[l + 2] = '3';
-					stringImage[l + 3] = '8';
-					stringImage[l + 4] = ';';
-					stringImage[l + 5] = '2';
-					stringImage[l + 6] = ';';
-					stringImage[l + 7] = lfr / 100 + '0';
-					stringImage[l + 8] = (lfr % 100) / 10 + '0';
-					stringImage[l + 9] = lfr % 10 + '0';
-					stringImage[l + 10] = ';';
-					stringImage[l + 11] = lfg / 100 + '0';
-					stringImage[l + 12] = (lfg % 100) / 10 + '0';
-					stringImage[l + 13] = lfg % 10 + '0';
-					stringImage[l + 14] = ';';
-					stringImage[l + 15] = lfb / 100 + '0';
-					stringImage[l + 16] = (lfb % 100) / 10 + '0';
-					stringImage[l + 17] = lfb % 10 + '0';
-					stringImage[l + 18] = 'm';
-					l += 19;
-				}
+				lfr = image[y][x].frgb.r;
+				lfg = image[y][x].frgb.g;
+				lfb = image[y][x].frgb.b;
+				stringImage[l] = '\033';
+				stringImage[l + 1] = '[';
+				stringImage[l + 2] = '3';
+				stringImage[l + 3] = '8';
+				stringImage[l + 4] = ';';
+				stringImage[l + 5] = '2';
+				stringImage[l + 6] = ';';
+				stringImage[l + 7] = lfr / 100 + '0';
+				stringImage[l + 8] = (lfr % 100) / 10 + '0';
+				stringImage[l + 9] = lfr % 10 + '0';
+				stringImage[l + 10] = ';';
+				stringImage[l + 11] = lfg / 100 + '0';
+				stringImage[l + 12] = (lfg % 100) / 10 + '0';
+				stringImage[l + 13] = lfg % 10 + '0';
+				stringImage[l + 14] = ';';
+				stringImage[l + 15] = lfb / 100 + '0';
+				stringImage[l + 16] = (lfb % 100) / 10 + '0';
+				stringImage[l + 17] = lfb % 10 + '0';
+				stringImage[l + 18] = 'm';
+				l += 19;
 			}
 			// background
 			if (image[y][x].brgb.r != lbr || image[y][x].brgb.g != lbg || image[y][x].brgb.b != lbb)
@@ -156,24 +152,7 @@ void Engine::Print()
 				lbg = image[y][x].brgb.g;
 				lbb = image[y][x].brgb.b;
 
-				if (lbr == 0 && lbg == 0 && lbb == 0)
-				{
-					stringImage[l] = '\033';
-					stringImage[l + 1] = '[';
-					stringImage[l + 2] = '4';
-					stringImage[l + 3] = '8';
-					stringImage[l + 4] = ';';
-					stringImage[l + 5] = '2';
-					/*stringImage[l + 6] = ';';
-					stringImage[l + 7] = '0';
-					stringImage[l + 8] = ';';
-					stringImage[l + 9] = '0';
-					stringImage[l + 10] = ';';
-					stringImage[l + 11] = '0';*/
-					stringImage[l + 6] = 'm';
-					l += 7;
-				}
-				else
+				if (lbr || lbg || lbb)
 				{
 					stringImage[l] = '\033';
 					stringImage[l + 1] = '[';
@@ -195,6 +174,17 @@ void Engine::Print()
 					stringImage[l + 17] = lbb % 10 + '0';
 					stringImage[l + 18] = 'm';
 					l += 19;
+				}
+				else
+				{
+					stringImage[l] = '\033';
+					stringImage[l + 1] = '[';
+					stringImage[l + 2] = '4';
+					stringImage[l + 3] = '8';
+					stringImage[l + 4] = ';';
+					stringImage[l + 5] = '2';
+					stringImage[l + 6] = 'm';
+					l += 7;
 				}
 			}
 			stringImage[l] = image[y][x].character;
