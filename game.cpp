@@ -187,10 +187,7 @@ int main()
 	darkLayer.brgba = { 0, 0, 0, 0.5f };
 	darkLayer.frgba = { 0, 0, 0, 0.5f };
 
-	system("clear");
-
-	Engine::PreparePrint({50, 50});
-	// Engine::InitializeConsole(13, 13, 50, 50, L"", L"Physics Test");
+	Engine::PrepareTerminal({50, 50});
 	for (Engine::tps = 24; Engine::running; Engine::thisTickStartTP.SetToNow(), Engine::totalTicks++)
 	{
 		

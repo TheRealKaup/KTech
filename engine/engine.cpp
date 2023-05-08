@@ -207,32 +207,36 @@ void Engine::Print()
 		l += 4;
 	}
 	// ".substr(0, l)" - print until the end which was set by the writing sequence above
-	std::cout << "\033[0;0H" << stringImage.substr(0, l);
+	std::cout << "\033[0;0H\033[2J" << stringImage.substr(0, l);
 }
 
-void SignalHandler(int signal) {
-	if (signal == SIGWINCH) {
+void SignalHandler(int signal)
+{
+	if (signal == SIGWINCH)
+	{
 		system("clear"); // Unfortunately
 		Engine::Print();
 	}
-	if (signal == SIGINT) { // I just find it so cool these signals work :)
+	if (signal == SIGINT) // I just find it so cool these signals work :)
+	{
 		// Show cursor and reset colors
 		std::cout << "\033[?25h\033[0m";
-		Engine::running = false;
-
 		// Reenable canonical mode and echo
 		termios terminalAttributes;
 		tcgetattr(0, &terminalAttributes);
-		terminalAttributes.c_lflag &= ICANON;
-		terminalAttributes.c_lflag &= ECHO;
+		terminalAttributes.c_lflag |= ICANON;
+		terminalAttributes.c_lflag |= ECHO;
 		tcsetattr(0, TCSADRAIN, &terminalAttributes);
+		Engine::running = false; // DO NOT REMOVE! I actually removed this once beacuse I thought it's meaningless, but no!
+		// Beacuse we are handling the quit signal, it will not force the engine to stop. So the engine must stop itself, and
+		// Engine::running stops the engine.
 	}
 }
 
-void Engine::PreparePrint(Engine::UVector2D imageSize)
+void Engine::PrepareTerminal(Engine::UVector2D imageSize)
 {
-	// Set cursor at 0,0, Hide cursor, clear screen
-	std::cout << "\033[0;0H\033[?25l\033[2J";
+	// Hide cursor
+	std::cout << "\033[?25l";
 
 	// Disable canonical mode and echo
 	termios terminalAttributes;

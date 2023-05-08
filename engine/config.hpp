@@ -5,18 +5,35 @@
 #define NowInMicroseconds() std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::engineStartTP.chornoTimePoint).count()
 #define NowInNanoseconds() std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - Engine::engineStartTP.chornoTimePoint).count()
 
-// Shift Ctrl Alt
-// 00    00   00  00
-// (outdated) There is no "False" macro since "False" is zero, which doesn't require a macro
-// (update) ACTUALLY - there is. It makes more sense that if the user doesn't care about the modifiers, they wouldn't have to change anything about them,
-// but if they care about the modifiers, then they will use a macro
-#define Shift_True 0x80 // 10000000
-#define Shift_False 0x40 // 01000000
-#define Ctrl_True 0x20 // 00100000
-#define Ctrl_False 0x10 // 00010000
-#define Alt_True 0x8 // 00001000
-#define Alt_False 0x4 // 00000100
-
+// Keys
+/*
+#define kUp "\033[A"
+#define kDown "\033[B"
+#define kRight "\033[C"
+#define kLeft "\033[D"
+#define kEnd "\033[F"
+#define kHome "\033[H"
+#define kBackspace 0x7f
+#define kPause 0x1a
+#define kEscape 0x1b
+#define kInsert "\033[2~"
+#define kInsert	"\033[2~"
+#define kDelete	"\033[3~"
+#define kPageUp	"\033[5~"
+#define kPageDown "\033[6~"
+#define kF1	"\033OP"
+#define kF2	"\033OQ"
+#define kF3	"\033OR"
+#define kF4	"\033OS"
+#define kF5	"\033[15~"
+#define kF6	"\033[17~"
+#define kF7	"\033[18~"
+#define kF8	"\033[19~"
+#define kF9	"\033[20~"
+#define kF10 "\033[21~"
+#define kF11 "\033[23~"
+#define kF12 "\033[24~"
+*/
 // Pragmas
 // #pragma execution_character_set( "utf-8" )
 // #pragma warning(disable:4996)

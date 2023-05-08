@@ -1,32 +1,22 @@
 #include "engine.hpp"
 
-// read https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+#define maxEscapeSequenceLength 7
 
-// The input as the engine recieved it, including escape codes.
-char Engine::Input::input[8] = {0};
-// The length (in bytes) of the input as recieved by the engine.
-unsigned char Engine::Input::inputLength = 0;
-// The key in the input, unmodified (shift doesn't change the value).
-unsigned char Engine::Input::inputKey = 0;
-// The key in the input, modified by shift.
-unsigned char Engine::Input::modifiedInputKey = 0;
-// The alt modifier key state
-bool Engine::Input::alt = false;
-// The control modifier key state
-bool Engine::Input::ctrl = false;
+char* Engine::Input::buf = new char[maxEscapeSequenceLength];
+unsigned char Engine::Input::length = 0;
 
-struct InputHandler {
-	std::function<void> call;
-	// This vector has strings of inputs. The reason inputs is plural, is that the input could come with an alt escape sequence that isn't relevant.
-	// There is probably a better way of doing this.
-	std::vector<char*> inputs; 
+struct InputHandler
+{
+	std::function<void()> call;
+	char* input;
 };
 std::vector<InputHandler> handlers;
 
 // Register a input handler which will call a function when the key is pressed 
-void Engine::Input::RegisterInputHandler(unsigned char key, char mode, std::function<void> call) {
-	handlers.push_back({call, key, mode});
-
+bool Engine::Input::RegisterHandler(char* input, std::function<void()> call)
+{
+	handlers.push_back({call, input});
+	return true;
 	// 3 main options:
 	// 	1) call on key that requires shift ('A', '#', '?') only when shift IS down
 	// 	2) call on key that doesn't require shift ('a', '3', '/') only when shift is NOT down
@@ -44,11 +34,22 @@ void Engine::Input::RegisterInputHandler(unsigned char key, char mode, std::func
 	// 	Shift_False | Ctrl_Irrelevant | Alt_False
 }
 
-void Engine::GetInput()
+void Engine::Input::Get()
 {
-	for (unsigned i = 0; i < 8; i++)
-		Input::input[i] = 0;
-	read(0, &Input::input, 8);
-	// process input, call the correct input handler
-	// or instead, process input only in RegisterInputHandler and here simpy compare input strings
+	// Clear previous buffer
+	for (unsigned i = 0; i < maxEscapeSequenceLength; i++)
+		buf[i] = 0;
+	// Read to buffer (blocking)
+	length = read(0, &buf, maxEscapeSequenceLength);
+	// Call handlers
+	for (unsigned i = 0; i < handlers.size(); i++)
+		if (std::strcmp(buf, handlers[i].input) == 0) // If the strings are equal
+			if (handlers[i].call) // If the call is not null
+				handlers[i].call(); // Call the handler's function
+}
+
+void Engine::Input::Loop()
+{
+	while (running)
+		Get();
 }

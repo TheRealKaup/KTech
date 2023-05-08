@@ -21,6 +21,7 @@
 #include <unistd.h> // Linux..?
 #include <signal.h> // For getting signals (like on quit)
 #include <termios.h> // For changing terminal attributes
+#include <cstring> // strcmp
 #include "config.hpp"
 
 namespace Engine
@@ -56,19 +57,24 @@ namespace Engine
 	namespace Input
 	{
 		// The input as the engine recieved it, including escape codes.
-		extern char input[8];
+		extern char* buf;
 		// The length (in bytes) of the input as recieved by the engine.
-		extern unsigned char inputLength;
-		// The key in the input, unmodified (shift doesn't change the value).
-		extern unsigned char inputKey;
-		// The key in the input, modified by shift.
-		extern unsigned char modifiedInputKey;
-		// The alt modifier key state
-		extern bool alt;
-		// The control modifier key state
-		extern bool ctrl;
-		// Register a input handler which will call a function when the key is pressed
-		void RegisterInputHandler();
+		extern unsigned char length;
+
+		// Register an input handler in order to get your function called on a keyboard input event.
+		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
+		// This means that the engine receives ASCII and asynchronous input. For example:
+		// When the player presses the `'a'` key, the engine will receive and set `Engine::Input::input` to the byte `'a'`.
+		// When the player presses the `'a'` key but also the `Shift` modifier key, the engine receives `'A'`.
+		// When the player presses a non ASCII key, such as `Arrow Up`, the engine receives what's called an escape sequence/code,
+		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
+		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
+		bool RegisterHandler(char* input, std::function<void()> call);
+		// Get inputs (calls registered input handlers)
+		void Get();
+		// A premade loop for automatically getting inputs and calling handlers.
+		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
+		void Loop();
 	}
 
 	extern winsize terminalSize;
@@ -318,8 +324,6 @@ namespace Engine
 
 	bool AreObjectsOverlapping(Engine::Object* objA, Engine::Object* objB, bool ignoreIrrelevancy = false);
 
-	void GetInput();
-
 	// Storage, could be used for many things.
 	extern std::vector<Object> storedObjects;
 	extern std::vector<Layer> storedLayers;
@@ -332,8 +336,8 @@ namespace Engine
 
 	// Prepare the audio library (XAudio2) for AudioSources.
 	void InitializeAudio();
-	// Prepare for printing
-	void PreparePrint(UVector2D imageSize);
+	// Prepare the terminal for printing and receiving input
+	void PrepareTerminal(UVector2D imageSize);
 	// Call OnKey functions according to key states.
 	void ManageInputs();
 	// Print the final image to the console.
