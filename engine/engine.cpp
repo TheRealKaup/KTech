@@ -1,4 +1,7 @@
 ﻿#include "engine.hpp"
+#include <chrono>
+#include <ratio>
+#include <thread>
 
 // ---=== Engine Variables ===---
 
@@ -16,6 +19,7 @@ Engine::TimePoint Engine::engineStartTP;
 long int Engine::totalTicks = 0;
 // Config
 std::function<void()> Engine::GlobalOnTick = NULL;
+std::function<void()> Engine::OnQuit = NULL;
 bool Engine::running = true;
 // Physics
 std::vector<std::vector<unsigned char>> Engine::colliderTypes = {
@@ -38,6 +42,30 @@ Engine::Layer* Engine::StoreLayer(Layer layer)
 {
 	storedLayers.push_back(layer);
 	return &storedLayers[storedLayers.size() - 1];
+}
+
+void BetterPrint()
+{
+	/*
+	Options:
+
+		1) Single string
+			1.1) Write to stringImage according to terminalSize (print whatever there is)
+		2) String for each row
+			2.1) Write to stringImage according to imageSize, print according to terminalSize
+				2.1.1) 2D Meta data vector stating where each chacater is (to know until where to print)
+				2.1.2) In printing, scan the line and figure out where each character is
+			2.2) Write to stringImage according to terminalSize
+				2.2.1)
+		3) String for each pixel, write to stringImage according to terminalSize.
+
+
+		Ok, so it makes sense to write to stringImage according to terminalSize in order to save processings.
+		stringImage though is kept at the maximum image size, because terminalSize is likely to change.
+
+		The issue with writing according to terminalSize is the stuttering when the terminal resizes, which are caused beacuse
+		the print isn't fast enough, so dark gaps are visible.
+	*/
 }
 
 void Engine::Print()
@@ -63,6 +91,7 @@ void Engine::Print()
 	unsigned char lfr = 0, lfg = 0, lfb = 0, lbr = 0, lbg = 0, lbb = 0;
 
 	// "&& y < size.ws_row" - fit into the terminal, in the case that it is too small
+	// "&& printRequests == 1" - stop working on a print if there is a newer print request
 	for (unsigned y = 0; y < image.size() && y < terminalSize.ws_row; y++)
 	{
 		if (y != 0) {
@@ -196,16 +225,16 @@ void Engine::Print()
 		stringImage[l + 3] = 'm';
 		l += 4;
 	}
-	// ".substr(0, l)" - print until the end which was set by the writing sequence above
-	std::cout << "\033[0;0H\033[2J" << stringImage.substr(0, l);
+	// ".substr(0, l)" - print until the end which was set by the writing sequence above.
+	std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
 }
 
 void SignalHandler(int signal)
 {
 	if (signal == SIGWINCH)
 	{
-		system("clear"); // Unfortunately
-		Engine::Print();
+		// std::cout << "\033[H\033[3J\033[2J#####" << std::flush;
+		// Engine::Print();
 	}
 	if (signal == SIGINT) // I just find it so cool these signals work :)
 	{
@@ -214,9 +243,9 @@ void SignalHandler(int signal)
 		// Reenable canonical mode and echo
 		termios terminalAttributes;
 		tcgetattr(0, &terminalAttributes);
-		terminalAttributes.c_lflag |= ICANON;
+		terminalAttributes.c_lflag |= ICANON; 
 		terminalAttributes.c_lflag |= ECHO;
-		tcsetattr(0, TCSADRAIN, &terminalAttributes);
+		tcsetattr(0, TCSANOW, &terminalAttributes);
 		Engine::running = false; // DO NOT REMOVE! I actually removed this once beacuse I thought it's meaningless, but no!
 		// Beacuse we are handling the quit signal, it will not force the engine to stop. So the engine must stop itself, and
 		// Engine::running stops the engine.

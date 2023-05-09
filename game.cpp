@@ -1,4 +1,5 @@
 #include "engine/engine.hpp"
+#include <thread>
 
 bool catchingCharacterB = false;
 
@@ -16,27 +17,32 @@ struct Character
 	bool onGround = false;
 	int yVelocity = 0;
 
+	void Jump()
+	{
+		if (onGround) {
+			yVelocity -= jumpStreng;
+			// jumpSFX.Play(0, 0, 0, { 0.3f });
+		}
+	}
+
+	void Right()
+	{
+		obj.Move({ 1 });
+	}
+
+	void Left()
+	{
+		obj.Move({ -1 });
+	}
+
 	void OnTick()
 	{
 		if (yVelocity < 1) {
 			yVelocity++;
 		}
 
-		/*
-		if (IsKeyDown(VK_UP)) {
-			if (onGround) {
-				yVelocity -= jumpStreng;
-				jumpSFX.Play(0, 0, 0, { 0.3f });
-			}
-		}
-		*/
-
 		bool left = false; // IsKeyDown(VK_LEFT);
 		bool right = false; // IsKeyDown(VK_RIGHT);
-		if (left && !right)
-			obj.Move({ -1 });
-		else if (right && !left)
-			obj.Move({ 1 });
 		
 		bool priorOnGround = onGround;
 
@@ -67,6 +73,19 @@ struct Character
 		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 2, 1 }, 1));
 
 		cam = Engine::Camera({ 0, 0 }, { 15, 15 });
+
+		Engine::Input::RegisterHandler("w", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterHandler("W", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterHandler(" ", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterHandler("\033[A", std::bind(&Character::Jump, this), true);
+
+		Engine::Input::RegisterHandler("d", std::bind(&Character::Right, this));
+		Engine::Input::RegisterHandler("D", std::bind(&Character::Right, this));
+		Engine::Input::RegisterHandler("\033[C", std::bind(&Character::Right, this));
+
+		Engine::Input::RegisterHandler("a", std::bind(&Character::Left, this));
+		Engine::Input::RegisterHandler("A", std::bind(&Character::Left, this));
+		Engine::Input::RegisterHandler("\033[D", std::bind(&Character::Left, this));
 
 		obj.OnTick = std::bind(&Character::OnTick, this);
 		layer->AddObject(&obj);
@@ -114,7 +133,6 @@ bool charCamOn = false;
 void TurnOnCharacterCamera() {
 	charCamOn = !charCamOn;
 }
-
 
 int main()
 {
@@ -181,17 +199,19 @@ int main()
 	house.textures[0].File("Assets/house.kcget", { 0, 0 });
 	layer.AddObject(&house);
 
-	// Engine::RegisterInputHandler('M', true, TurnOnCharacterCamera);
+	Engine::Input::RegisterHandler("m", TurnOnCharacterCamera);
 
 	Engine::Layer darkLayer;
 	darkLayer.brgba = { 0, 0, 0, 0.5f };
 	darkLayer.frgba = { 0, 0, 0, 0.5f };
 
 	Engine::PrepareTerminal({50, 50});
+
+	std::thread t_inputLoop(Engine::Input::Loop);
+
 	for (Engine::tps = 24; Engine::running; Engine::thisTickStartTP.SetToNow(), Engine::totalTicks++)
 	{
-		
-		// Engine::ManageInputs();
+		Engine::Input::Call();
 		Engine::CallOnTicks(&map);
 
 		if (map.activeCameraI != -1 && map.activeCameraI < map.cameras.size())

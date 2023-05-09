@@ -1,55 +1,77 @@
 #include "engine.hpp"
+#include <cstdio>
+#include <cstring>
 
 #define maxEscapeSequenceLength 7
 
 char* Engine::Input::buf = new char[maxEscapeSequenceLength];
 unsigned char Engine::Input::length = 0;
 
-struct InputHandler
+void Engine::Input::Handler::AddCall(std::function<void()> call, bool onTick)
 {
-	std::function<void()> call;
-	char* input;
-};
-std::vector<InputHandler> handlers;
+	onTicks.push_back(onTick);
+	calls.push_back(call);
+}
+Engine::Input::Handler::Handler(std::string input, std::function<void()> call, bool onTick) : input(input)
+{
+	onTicks.push_back(onTick);
+	calls.push_back(call);
+}
+std::vector<Engine::Input::Handler> Engine::Input::handlers = {};
+unsigned Engine::Input::handlerIndex = -1;
 
 // Register a input handler which will call a function when the key is pressed 
-bool Engine::Input::RegisterHandler(char* input, std::function<void()> call)
+void Engine::Input::RegisterHandler(std::string input, std::function<void()> call, bool onTick)
 {
-	handlers.push_back({call, input});
-	return true;
-	// 3 main options:
-	// 	1) call on key that requires shift ('A', '#', '?') only when shift IS down
-	// 	2) call on key that doesn't require shift ('a', '3', '/') only when shift is NOT down
-	// 	3) call on key no matter if it requires shift ('A', 'a', '#', '3', '?', '/'), no matter is shift is down
-	// To register option number...:
-	// 	1) "key" parameter should be modified by shift, and "shift" should be true
-	// 	2) "key" should be unmodified by shift, and "shift" should be false
-	// 	3) "key" should be unmodified or modified by shift, and "shift" should be true or false, respectively
-	// Or, "shift" will be an unsigned char and "key" can be modified or unmodified, and:
-	// 	1) "shift" == true
-	// 	2) "shift" == false
-	// 	3) "shift" == doesn't matter
-	// With this technique, both ctrl and alt can be compressed into a single byte with bitwise operations.
-	// For example:
-	// 	Shift_False | Ctrl_Irrelevant | Alt_False
+	// If a handler already exists for this input, add the call to the calls vector
+	for (unsigned i = 0; i < handlers.size(); i++)
+		if (handlers[i].input == input)
+		{
+			handlers[i].AddCall(call, onTick);
+			return;
+		}
+	handlers.push_back(Handler(input, call, onTick));
 }
 
-void Engine::Input::Get()
+void Engine::Input::Call()
+{
+	for (unsigned i = 0; i < handlers.size(); i++)
+		for (unsigned j = 0; j < handlers[i].calls.size(); j++)
+			if (handlers[i].onTicks[j] && handlers[i].timesPressed > 0 && handlers[i].calls[j])
+			{
+				handlers[i].calls[j]();
+				handlers[i].timesPressed = 0;
+			}
+}
+
+char* Engine::Input::Get()
 {
 	// Clear previous buffer
-	for (unsigned i = 0; i < maxEscapeSequenceLength; i++)
+	unsigned i;
+	for (i = 0; i < maxEscapeSequenceLength; i++)
 		buf[i] = 0;
+
 	// Read to buffer (blocking)
-	length = read(0, &buf, maxEscapeSequenceLength);
+	length = read(0, buf, maxEscapeSequenceLength);
+
 	// Call handlers
-	for (unsigned i = 0; i < handlers.size(); i++)
-		if (std::strcmp(buf, handlers[i].input) == 0) // If the strings are equal
-			if (handlers[i].call) // If the call is not null
-				handlers[i].call(); // Call the handler's function
+	for (i = 0; i < handlers.size(); i++)
+		if (strcmp(buf, handlers[i].input.c_str()) == 0) // If the strings are equal
+		{
+			handlers[i].timesPressed++;
+			for (unsigned j = 0; j < handlers[i].calls.size(); j++) // Call the calls
+				if (!handlers[i].onTicks[j] && handlers[i].calls[j]) // Check if the call shouldn't be called on tick and isn't null
+					handlers[i].calls[j](); // Call
+		}
+	
+	return buf;
 }
 
 void Engine::Input::Loop()
 {
-	while (running)
-		Get();
+	// `strcmp(Get(), "\03") != 0` - Quit if Ctrl+C was received 
+	while (strcmp(Get(), "\03") != 0);
+
+	if (OnQuit)
+		OnQuit();
 }

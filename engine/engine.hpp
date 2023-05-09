@@ -53,30 +53,6 @@ namespace Engine
 	// B Can be pushed, can push (Normal)
 	// C Can be pushed, can't push (Light) */
 
-	// Player input things
-	namespace Input
-	{
-		// The input as the engine recieved it, including escape codes.
-		extern char* buf;
-		// The length (in bytes) of the input as recieved by the engine.
-		extern unsigned char length;
-
-		// Register an input handler in order to get your function called on a keyboard input event.
-		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
-		// This means that the engine receives ASCII and asynchronous input. For example:
-		// When the player presses the `'a'` key, the engine will receive and set `Engine::Input::input` to the byte `'a'`.
-		// When the player presses the `'a'` key but also the `Shift` modifier key, the engine receives `'A'`.
-		// When the player presses a non ASCII key, such as `Arrow Up`, the engine receives what's called an escape sequence/code,
-		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
-		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
-		bool RegisterHandler(char* input, std::function<void()> call);
-		// Get inputs (calls registered input handlers)
-		void Get();
-		// A premade loop for automatically getting inputs and calling handlers.
-		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
-		void Loop();
-	}
-
 	extern winsize terminalSize;
 
 	extern int tps;
@@ -88,12 +64,60 @@ namespace Engine
 	extern long int totalTicks;
 
 	extern std::function<void()> GlobalOnTick;
+	extern std::function<void()> OnQuit;
 	extern bool running;
 
 	// The final image that will be printed. This allows multiple cameras to print at the same time
 	extern std::vector<std::vector<Pixel>> image;
 	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
 	extern std::string stringImage;
+
+	// Keyboard input things
+	namespace Input
+	{	
+		struct Handler
+		{
+			std::string input;
+			std::vector<std::function<void()>> calls;
+			std::vector<bool> onTicks;
+			unsigned timesPressed = 0;
+
+			void AddCall(std::function<void()> call, bool onTick);
+
+			Handler(std::string input, std::function<void()> call, bool onTick);
+		};
+
+		// The last input as the engine received it, including escape codes.
+		extern char* buf;
+		// The length (in bytes) of the last input as received by the engine.
+		extern unsigned char length;
+		// Input handlers.
+		extern std::vector<Handler> handlers;
+		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
+		extern unsigned handlerIndex;
+
+		// Register an input handler in order to get your function called on a keyboard input event.
+		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
+		// This means that the engine receives ASCII and asynchronous input. For example:
+		// When the player presses the `'a'` key, the engine will receive and set `Engine::Input::input` to the byte `'a'`.
+		// When the player presses the `'a'` key but also the `Shift` modifier key, the engine receives `'A'`.
+		// When the player presses a non ASCII key, such as `Arrow Up`, the engine receives what's called an escape sequence/code,
+		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
+		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
+		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
+		void RegisterHandler(std::string input, std::function<void()> call, bool onTick = false);
+		// Get inputs (and calls registered input handler accordingly).
+		// Returns the input (also updates Engine::Input::buf).
+		char* Get();
+		// Call this function in order to call all handlers who got their input received since the last time you called this function.
+		// This function also resets all `Engine::Input::handlers[].timesPressed`.
+		// Returns the amount of calls.
+		void Call();
+		// A premade loop for automatically getting inputs and calling handlers.
+		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
+		// Calls OnQuit automatically when Ctrl+C is received.
+		void Loop();
+	}
 
 	struct RGB
 	{
