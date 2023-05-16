@@ -20,7 +20,6 @@ Engine::Input::Handler::Handler(std::string input, std::function<void()> call, b
 std::vector<Engine::Input::Handler> Engine::Input::handlers = {};
 unsigned Engine::Input::handlerIndex = -1;
 
-// Register a input handler which will call a function when the key is pressed 
 void Engine::Input::RegisterHandler(std::string input, std::function<void()> call, bool onTick)
 {
 	// If a handler already exists for this input, add the call to the calls vector
@@ -31,6 +30,17 @@ void Engine::Input::RegisterHandler(std::string input, std::function<void()> cal
 			return;
 		}
 	handlers.push_back(Handler(input, call, onTick));
+}
+void Engine::Input::RegisterHandler(char input, std::function<void()> call, bool onTick)
+{
+	// If a handler already exists for this input, add the call to the calls vector
+	for (unsigned i = 0; i < handlers.size(); i++)
+		if (handlers[i].input.length() == 1 && handlers[i].input[0] == input)
+		{
+			handlers[i].AddCall(call, onTick);
+			return;
+		}
+	handlers.push_back(Handler({input}, call, onTick));
 }
 
 void Engine::Input::Call()
@@ -74,4 +84,24 @@ void Engine::Input::Loop()
 
 	if (OnQuit)
 		OnQuit();
+}
+
+bool Engine::Input::Equals(char const* stringKey)
+{
+	return strcmp(buf, stringKey) == 0;
+}
+
+bool Engine::Input::Equals(char charKey)
+{
+	return buf[0] == charKey && buf[1] == 0;
+}
+
+bool Engine::Input::Bigger(char charKey)
+{
+	return buf[0] >= charKey;
+}
+
+bool Engine::Input::Smaller(char charKey)
+{
+	return buf[0] <= charKey;
 }

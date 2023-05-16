@@ -5,10 +5,10 @@ Engine::Camera::Camera(Vector2D position, UVector2D resolution, std::string name
 
 // <400 before, >400 after second update, >1500 expected max potential before, 1300-2000 now. (20x20)
 
-Engine::Layer* layer;
-Engine::Object* obj;
-Engine::Texture* text;
-int t, o, l, x, y, finalY, finalX, baseX;
+static Engine::Layer* layer;
+static Engine::Object* obj;
+static Engine::Texture* text;
+static int t, o, l, x, y, finalY, finalX, baseX;
 
 void Engine::Camera::Render(std::vector<Layer*> layers)
 {

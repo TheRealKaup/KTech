@@ -105,7 +105,8 @@ namespace Engine
 		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
 		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
 		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
-		void RegisterHandler(std::string input, std::function<void()> call, bool onTick = false);
+		void RegisterHandler(std::string stringKey, std::function<void()> call, bool onTick = false);
+		void RegisterHandler(char charKey, std::function<void()> call, bool onTick = false);
 		// Get inputs (and calls registered input handler accordingly).
 		// Returns the input (also updates Engine::Input::buf).
 		char* Get();
@@ -117,6 +118,15 @@ namespace Engine
 		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
 		// Calls OnQuit automatically when Ctrl+C is received.
 		void Loop();
+		
+		// Returns true if the last input is equal to stringKey
+		bool Equals(char const* stringKey);
+		// Returns true if the last input is equal to charKey
+		bool Equals(char charKey);
+		// Returns true if the last input is BIGGER OR EQUAL than charKey
+		bool Bigger(char charKey);
+		// Return true if the last input is SMALLER OR EQUAL than charKEy
+		bool Smaller(char charKey);
 	}
 
 	struct RGB
@@ -362,8 +372,6 @@ namespace Engine
 	void InitializeAudio();
 	// Prepare the terminal for printing and receiving input
 	void PrepareTerminal(UVector2D imageSize);
-	// Call OnKey functions according to key states.
-	void ManageInputs();
 	// Print the final image to the console.
 	void Print();
 	// Wait the precise amount of time to fill the frame according to the ticks per second value.
