@@ -1,7 +1,4 @@
 ﻿#include "engine.hpp"
-#include <chrono>
-#include <ratio>
-#include <thread>
 
 // ---=== Engine Variables ===---
 
@@ -44,6 +41,7 @@ Engine::Layer* Engine::StoreLayer(Layer layer)
 	return &storedLayers[storedLayers.size() - 1];
 }
 
+// This is for a future update
 void BetterPrint()
 {
 	/*
@@ -78,7 +76,7 @@ void Engine::Print()
 		return;
 
 	// Resize the stringImage if needed
-	unsigned maxStringSize = image.size() * 4; // reserved for '\n'
+	unsigned maxStringSize = image.size() * 3; // reserved for '\n'
 	for (unsigned y = 0; y < image.size(); y++)
 		maxStringSize += image[y].size() * 39; // reserved for characters
 	if (maxStringSize == 0)
@@ -221,34 +219,46 @@ void Engine::Print()
 		}
 		stringImage[l] = '\033';
 		stringImage[l + 1] = '[';
-		stringImage[l + 2] = '0';
-		stringImage[l + 3] = 'm';
-		l += 4;
+		stringImage[l + 2] = 'm';
+		l += 3;
 	}
 	// ".substr(0, l)" - print until the end which was set by the writing sequence above.
 	std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
+}
+
+void Engine::ResetTerminal()
+{
+	// Reenable canonical mode and echo
+	termios terminalAttributes;
+	tcgetattr(0, &terminalAttributes);
+	terminalAttributes.c_lflag |= ICANON; 
+	terminalAttributes.c_lflag |= ECHO;
+	tcsetattr(0, TCSANOW, &terminalAttributes);
+	// Show cursor and reset colors
+	std::cout << "\033[?25h\033[0m" << std::flush;
 }
 
 void SignalHandler(int signal)
 {
 	if (signal == SIGWINCH)
 	{
+		// Currntly contains nothing until BetterPrint update
+
 		// std::cout << "\033[H\033[3J\033[2J#####" << std::flush;
 		// Engine::Print();
 	}
 	if (signal == SIGINT) // I just find it so cool these signals work :)
 	{
-		// Show cursor and reset colors
-		std::cout << "\033[?25h\033[0m";
-		// Reenable canonical mode and echo
-		termios terminalAttributes;
-		tcgetattr(0, &terminalAttributes);
-		terminalAttributes.c_lflag |= ICANON; 
-		terminalAttributes.c_lflag |= ECHO;
-		tcsetattr(0, TCSANOW, &terminalAttributes);
-		Engine::running = false; // DO NOT REMOVE! I actually removed this once beacuse I thought it's meaningless, but no!
-		// Beacuse we are handling the quit signal, it will not force the engine to stop. So the engine must stop itself, and
+		Engine::ResetTerminal();
+		// DO NOT REMOVE! I actually removed this once beacuse I thought it's meaningless, but no!
 		// Engine::running stops the engine.
+		// Beacuse we are handling the quit signal, it will not force the engine to stop. So the engine must stop itself, and
+		Engine::running = false;
+		// Terminate (deallocate) the PortAudio library
+		Engine::TerminateAudio();
+		// Call user-defined OnQuit
+		if (Engine::OnQuit)
+			Engine::OnQuit();
 	}
 }
 

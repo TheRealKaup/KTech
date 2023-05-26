@@ -1,154 +1,193 @@
-// Link: XAudio2.lib
-/*
-#include "engine.h"
+#include "engine.hpp"
 
-#pragma warning( disable : 6031 )
+static void Log(std::string string)
+{
+	std::cout << "\033[38;2;255;255;0m" << string << "\033[m" << std::endl << std::flush;
+}
+static void Log(std::string string, unsigned number)
+{
+	std::cout << "\033[38;2;255;255;0m" << string << number << "\033[m" << std::endl << std::flush;
+}
 
-IXAudio2* Engine::xAudio2 = nullptr;
-IXAudio2MasteringVoice* Engine::masterVoice = nullptr;
+PaStream* Engine::stream = nullptr;
+// default device info
+const PaDeviceInfo* ddi;
+PaStreamParameters outputParameters;
+unsigned char stream_SampleSize;
+unsigned char stream_Channels;
+unsigned char stream_BlockAlign;
+
+std::vector<Engine::AudioSource*> activeSources;
+
+int Callback(
+	const void *input,
+	void *output,
+	unsigned long framesPerBuffer, // samples/channels in this buffer
+	const PaStreamCallbackTimeInfo *timeInfo,
+	PaStreamCallbackFlags statusFlags,
+	void *userData)
+{
+	// Set output to 0
+	for (unsigned i = 0; i < framesPerBuffer * 4; i++)
+		((char*)(output))[i] = 0;
+
+	// Add all the active audio sources' data into the buffer
+	for (unsigned s = 0; s < activeSources.size(); s++)
+	{
+		// Add all the frames of each source one by one.
+		for (unsigned f = 0; f < framesPerBuffer; f++, activeSources[s]->cur++)
+		{
+			// Add the source's frame and make it fit in correctly with the stream's channel and sample size.
+			for (unsigned c = 0; c < outputParameters.channelCount; c++) // Per channels
+			{
+				for (unsigned b = 0; b < stream_SampleSize; b++) // Per sample byte
+				{
+					((char*)output)[f * stream_BlockAlign + c * stream_SampleSize + b];// = activeSources[s]->data[activeSources[s]->cur * activeSources[s]->blockAlign + j];
+				}
+			}
+			if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
+			{
+				if (activeSources[s]->loopsToPlay > 0)
+				{
+					activeSources[s]->loopsToPlay--;
+					activeSources[s]->cur = activeSources[s]->startPoint;
+				}
+				else
+				{
+					activeSources[s]->playing = false;
+					return paContinue;
+				}
+			}
+		}
+	}
+
+	return paContinue;
+}
 
 void Engine::InitializeAudio()
 {
-	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-	XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	xAudio2->CreateMasteringVoice(&masterVoice);
+	Pa_Initialize();
+
+	ddi = Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice());
+
+	// Open PortAudio stream
+	outputParameters.device = Pa_GetDefaultOutputDevice();
+	outputParameters.channelCount = ddi->maxOutputChannels >= 2 ? 2 : 1;
+	outputParameters.sampleFormat = paInt16;
+	outputParameters.suggestedLatency = ddi->defaultHighOutputLatency;
+	outputParameters.hostApiSpecificStreamInfo = NULL;
+	Pa_OpenStream(&stream, NULL, &outputParameters, ddi->defaultSampleRate, 256, paNoFlag, Callback, nullptr);
+	stream_SampleSize = Pa_GetSampleSize(paInt16);
+	stream_Channels = outputParameters.channelCount;
+	stream_BlockAlign = stream_SampleSize * stream_Channels;
+
+}
+void Engine::TerminateAudio()
+{
+	Pa_AbortStream(stream);
+	Pa_CloseStream(stream);
+	Pa_Terminate();
 }
 
-Engine::AudioSource::AudioSource(LPCWSTR fileName)
+bool Engine::AudioSource::LoadWavFile(std::string fileName)
 {
-	if (Engine::xAudio2 == nullptr || Engine::masterVoice == nullptr) {
-		InitializeAudio();
-		if (Engine::xAudio2 == nullptr || Engine::masterVoice == nullptr)
-			return;
-	}
-
-	unsigned long temp = 0UL; // 4 bytes
-	unsigned temp2 = 0UL; // 2 bytes
+	char32_t temp = 0UL;
+	char16_t temp2 = 0UL;
 	unsigned long read = 0UL;
 	
-	file = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if (GetLastError() == 2) // Couldn't find file
-		return;
+	std::ifstream file(fileName, std::ifstream::binary);
 
-	SetFilePointer(file, 0, NULL, FILE_BEGIN);
+	// Couldn't open file
+	if (!file.is_open())
+		return false;
 
-	// --== RIFF chunk ==--
-	while (temp != 'FFIR') {// find the chunk
-		ReadFile(file, &temp, 4, &read, NULL);
-		SetFilePointer(file, -3, NULL, FILE_CURRENT);
+	// RIFF chunk
+	while (true) // Find the chunk
+	{
+		file.read((char*)&temp, 4);
+		if (temp != 1179011410) // 'FFIR'
+			file.seekg(-3, std::ifstream::cur);
+		else
+			break;
 	}
-	SetFilePointer(file, 3, NULL, FILE_CURRENT);
-	ReadFile(file, &fileSize, 4, &read, NULL); // Get the file size
-	ReadFile(file, &temp, 4, &read, NULL); // Get the format ('WAVE' expected)
+	file.read((char*)&fileSize, 4); 
+	file.read((char*)&temp, 4); // "WAVE"
 
-	// --== FMT chunk ==--
-	while (temp != ' tmf') { // Find the chunk
-		ReadFile(file, &temp, 4, &read, NULL);
-		SetFilePointer(file, -3, NULL, FILE_CURRENT);
+	// FMT chunk
+	while (true) // Find the chunk
+	{
+		file.read((char*)&temp, 4);
+		if (temp != 544501094) // ' tmf'
+			file.seekg(-3, std::ifstream::cur);
+		else
+		 	break;
 	}
-	SetFilePointer(file, 3, NULL, FILE_CURRENT);
-	ReadFile(file, &temp, 4, &read, NULL); // FMT Size -8 (16)
+	file.read((char*)&temp, 4); // FMT size -8 (16)
 	if (temp != 16) // something something 16 is for PCM?
-		return;
-	ReadFile(file, &temp2, 2, &read, NULL); // Compression state
+		return false;
+	file.read((char*)&temp2, 2); // Compression state
 	if (temp2 != 1) // Other than 1 means some form of compression.
-		return;
-	ReadFile(file, &channels, 2, &read, NULL); // Channels
-	ReadFile(file, &sampleRate, 4, &read, NULL); // Sample rate
-	ReadFile(file, &byteRate, 4, &read, NULL); // Sample rate
-	ReadFile(file, &blockAlign, 2, &read, NULL); // Block align
-	ReadFile(file, &bitsPerSample, 2, &read, NULL); // Bits per sample
-
-	// --== Data chunk ==--
-	while (temp != 'atad') { // find the chunkXAudio2.lib;%(AdditionalDependencies)
-		ReadFile(file, &temp, 4, &read, NULL);
-		SetFilePointer(file, -3, NULL, FILE_CURRENT);
+		return false;
+	file.read((char*)&channels, 2); // Channels
+	file.read((char*)&sampleRate, 4); // Sample rate
+	file.read((char*)&byteRate, 4); // Byte rate
+	file.read((char*)&blockAlign, 2); // Block align
+	file.read((char*)&bitsPerSample, 2); // Bits per sample
+	
+	// Data chunk
+	while (true) // Find the chunk
+	{
+		file.read((char*)&temp, 4);
+		if (temp != 1635017060) // 'atad'
+			file.seekg(-3, std::ifstream::cur);
+		else
+		 	break;
 	}
-	SetFilePointer(file, 3, NULL, FILE_CURRENT);
-	ReadFile(file, &dataSize, 4, &read, NULL); // Data size
-	data = new unsigned char[dataSize]; // Resize data array to fit the data
-	ReadFile(file, data, dataSize, &read, NULL);// Read the data into the data array
+	file.read((char*)&dataSize, 4); // Data size
+	data = new char[dataSize]; // Resize data array to fit the data
+	file.read((char*)data, dataSize);// Read the data into the data array
 
-	// --== XAudio2 ==--
-	// Initialize "buffer"
-	buffer.Flags = 0;
-	buffer.AudioBytes = dataSize;
-	buffer.pAudioData = data;
-	// Initialize the source voice.
-	wfx.wFormatTag = WAVE_FORMAT_PCM;
-	wfx.nChannels = channels;
-	wfx.cbSize = sizeof(WAVEFORMATEX);
-	wfx.nSamplesPerSec = sampleRate;
-	wfx.nAvgBytesPerSec = byteRate;
-	wfx.nBlockAlign = blockAlign;
-	wfx.wBitsPerSample = bitsPerSample;
-	// Initialize the source voice.
-	Engine::xAudio2->CreateSourceVoice(&sourceVoice, &wfx);
+	dataSizeInSamples = dataSize / blockAlign;
+	
+	return true;
 }
- 
+
 void Engine::AudioSource::Play(unsigned long start, unsigned long length, unsigned short loops, std::vector<float> volumes)
 {
-	// Return if didn't manage to initialize.
-	if (sourceVoice == nullptr)
-		return;
-	// Stop playing.
-	sourceVoice->Stop();
-	// Clean the current buffer, if exists or not.
-	sourceVoice->FlushSourceBuffers();
-	// Change volumes
-	float* volumesArray = new float[channels];
-	for (unsigned int i = 0; i < channels; i++)
-		volumesArray[i] = (i < volumes.size() ? volumes[i] : (volumes.size() > 0 ? volumes[volumes.size() - 1] : 1.0f));
-	sourceVoice->SetChannelVolumes(channels, volumesArray); 
-	// If out of range (invalid) then play from start.
-	if (start > buffer.AudioBytes * 8 / bitsPerSample)
-		start = 0;
-	// Start and length.
-	buffer.PlayBegin = start;
-	buffer.PlayLength = length;
-	// Loop (this way works better than the integrated loop features).
-	if (loops == 0)
-		loops = 1;
-	for (unsigned short i = 0; i < loops; i++)
-		sourceVoice->SubmitSourceBuffer(&buffer);
-	// Play.
-	sourceVoice->Start();
+	Log("Playing");
+	playing = true;
+	if (length == 0)
+		endpointToPlay = dataSizeInSamples;
+	else	
+		endpointToPlay = length + start;
+	loopsToPlay = loops;
+	cur = start;
+	startPoint = cur;
+	Pa_StartStream(stream);
 }
+
+Engine::AudioSource::AudioSource() {}
 
 void Engine::AudioSource::Pause()
 {
-	if (sourceVoice == nullptr)
-		return;
-	sourceVoice->Stop();
+	Pa_StopStream(stream);
 }
 
 void Engine::AudioSource::Resume()
 {
-	if (sourceVoice == nullptr)
-		return;
-	sourceVoice->Start();
+	Pa_StartStream(stream);
 }
 
 void Engine::AudioSource::Stop()
 {
-	if (sourceVoice == nullptr)
-		return;
-	sourceVoice->Stop();
-	sourceVoice->FlushSourceBuffers();
+	Pa_StopStream(stream);
+	cur = 0;
 }
 
 void Engine::AudioSource::ChangeVolume(float volume)
 {
-	float* volumesArray = new float[channels];
-	for (unsigned int i = 0; i < channels; i++)
-		volumesArray[i] = volume;
-	sourceVoice->SetChannelVolumes(channels, volumesArray);
 }
 
 void Engine::AudioSource::ChangeVolumes(std::vector<float> volumes)
 {
-	float* volumesArray = new float[channels];
-	for (unsigned int i = 0; i < channels; i++)
-		volumesArray[i] = (i < volumes.size() ? volumes[i] : (volumes.size() > 0 ? volumes[volumes.size() - 1] : 1.0f));
-	sourceVoice->SetChannelVolumes(channels, volumesArray);
-}*/
+}

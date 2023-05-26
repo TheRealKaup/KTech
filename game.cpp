@@ -1,15 +1,23 @@
 #include "engine/engine.hpp"
+#include <chrono>
+#include <portaudio.h>
+#include <string>
 #include <thread>
 
 bool catchingCharacterB = false;
 
-// Engine::AudioSource jumpSFX(L"Assets/jump.wav");
-// Engine::AudioSource groundHitSFX(L"Assets/groundHit.wav");
-
 Engine::Map* pmap;
+
+static void Log(std::string string)
+{
+	std::cout << "\033[38;2;255;0;255m" << string << "\033[m" << std::endl << std::flush;
+}
 
 struct Character
 {
+	Engine::AudioSource jumpSFX;
+	Engine::AudioSource groundHitSFX;
+
 	const int jumpStreng = 4;
 
 	Engine::Object obj;
@@ -21,7 +29,7 @@ struct Character
 	{
 		if (onGround) {
 			yVelocity -= jumpStreng;
-			// jumpSFX.Play(0, 0, 0, { 0.3f });
+			jumpSFX.Play(0, 0, 0, { 0.3f });
 		}
 	}
 
@@ -54,12 +62,16 @@ struct Character
 
 		cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
 
-		// if (!priorOnGround && onGround) groundHitSFX.Play();
+		if (!priorOnGround && onGround)
+			groundHitSFX.Play();
 	}
 
 	Character(Engine::Layer* layer)
 	{
-		obj.pos = { 5, 2 };
+		groundHitSFX.LoadWavFile("Assets/groundHit.wav");
+		jumpSFX.LoadWavFile("Assets/jump.wav");
+
+		obj.pos = { 5, 2 };//
 		obj.textures.resize(1);
 		obj.textures[0].Write(
 			{
@@ -136,6 +148,8 @@ void TurnOnCharacterCamera() {
 
 int main()
 {
+	Engine::InitializeAudio();
+
 	Engine::colliderTypes = {
 		{ 0, 1, 1, 2 }, // Heavy - 0
 		{ 0, 1, 1, 2 }, // Normal - 1
@@ -235,4 +249,5 @@ int main()
 	
 		Engine::WaitUntilNextTick();
 	}
+	Engine::TerminateAudio();
 }

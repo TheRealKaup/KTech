@@ -16,13 +16,14 @@
 #include <functional> // For sharing functions with the engine for it to call on events
 #include <thread> // For sleeping, time management.
 #include <chrono> // Time management
-#include <fstream> // Loading textures
-#include <sys/ioctl.h> // Linux..?
-#include <unistd.h> // Linux..?
+#include <fstream> // Reading textures and audio files
+#include <cstring> // strcmp
+#include "config.hpp" // macros
+// Linux libraries
 #include <signal.h> // For getting signals (like on quit)
 #include <termios.h> // For changing terminal attributes
-#include <cstring> // strcmp
-#include "config.hpp"
+#include <sys/ioctl.h> // Contains some data types (winsize for termios.h)
+#include <portaudio.h> // PortAudio is a cross-platform audio library
 
 namespace Engine
 {
@@ -38,7 +39,7 @@ namespace Engine
 	struct Layer;
 	struct Camera;
 	struct Map;
-	// struct AudioSource;
+	struct AudioSource;
 	struct TimePoint;
 
 	extern std::vector<std::vector<unsigned char>> colliderTypes; /* Example:
@@ -71,6 +72,9 @@ namespace Engine
 	extern std::vector<std::vector<Pixel>> image;
 	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
 	extern std::string stringImage;
+
+	// Global PortAudio stream
+	extern PaStream* stream;
 
 	// Keyboard input things
 	namespace Input
@@ -259,9 +263,24 @@ namespace Engine
 		bool RemoveObject(int index);
 		bool RemoveObject(std::string name);
 	};
-	/*
+	
 	struct AudioSource
 	{
+		// PortAudio's opaque stream pointer
+		PaStream* stream;
+		// Current sample
+		unsigned long cur = 0UL;
+		// Amount of samples
+		unsigned long dataSizeInSamples = 0UL;
+		// The end point in samples
+		unsigned long endpointToPlay = 0UL;
+		// Loops to play
+		unsigned long loopsToPlay = 0UL;
+		// Start point to play in samples
+		unsigned long startPoint = 0UL;
+		// Playing
+		bool playing = false;
+
 		// Note that these variables don't do anything if changed, but can be used to access the data about the sound.
 
 		// The size of the .wav file itself (in bytes).
@@ -280,29 +299,34 @@ namespace Engine
 		unsigned long dataSize = 0UL;
 
 		// The audio in bytes after it was loaded.
-		unsigned char* data = nullptr;
+		char* data = nullptr;
 
+		// Default constructer, doesn't do anything.
+		AudioSource();
 		// Load .wav file.
-		// volumes - list of volumes to set for the channels. nullptr = full volume.
 		// fileName - the name of the file.
-		// loopCount - times to loop the sound. 0/1 means no loop, plays once.
-		AudioSource(LPCWSTR fileName);
-		
+		// Returns true if succeeded
+		bool LoadWavFile(std::string fileName);
+
 		// Play the sound from the beginning.
 		// start - the start point in samples. 0 means the first sample.
-		// length - the length in samples . 0 means the entire sound.
+		// length - the length in samples. 0 means the entire sound.
+		// loops - how many times to loop. 0 and 1 mean play once. 
+		// a vector of floats between 0.0f to 1.0f, each element will be the volume of each corresponding channel.
 		void Play(unsigned long start = 0, unsigned long length = 0, unsigned short loops = 0, std::vector<float> volumes = {});
-
 		// Pause playing the sound.
-		void Pause();key modifiers (shift)e channels.
+		void Pause();
+		// Resume playing the sound.
+		void Resume();
+		// Stop playing the sound.
+		void Stop();
 		// volume - between 0.0f to 1.0f that will be the volume of all the channels.
 		void ChangeVolume(float volume);
-
 		// Change volumes of every specific channel.
 		// volumes - a vector of floats between 0.0f to 1.0f, each element will be the volume of each corresponding channel.
 		void ChangeVolumes(std::vector<float> volumes = {});
 	};
-	*/
+	
 	struct Camera
 	{
 		std::function<void()> OnTick = NULL;
@@ -322,7 +346,7 @@ namespace Engine
 	};
 	
 	struct Map
-	{
+	{// 
 	public:
 		std::function<void()> OnTick = NULL;
 		std::vector<Camera*> cameras = {};
@@ -368,10 +392,14 @@ namespace Engine
 	// This is used by the engine when you load a map.
 	Layer* StoreLayer(Layer layer);
 
-	// Prepare the audio library (XAudio2) for AudioSources.
+	// Prepare the audio library (AudioPort) for AudioSources.
 	void InitializeAudio();
+	// Terminate (deallocate) the audio library (PortAudio).
+	void TerminateAudio();
 	// Prepare the terminal for printing and receiving input
 	void PrepareTerminal(UVector2D imageSize);
+	// Reset the terminal before exiting the game (turn in back to normal).
+	void ResetTerminal();
 	// Print the final image to the console.
 	void Print();
 	// Wait the precise amount of time to fill the frame according to the ticks per second value.
