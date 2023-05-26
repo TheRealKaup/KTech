@@ -24,6 +24,7 @@
 #include <termios.h> // For changing terminal attributes
 #include <sys/ioctl.h> // Contains some data types (winsize for termios.h)
 #include <portaudio.h> // PortAudio is a cross-platform audio library
+#include <stdint.h> // int32_t
 
 namespace Engine
 {
@@ -280,6 +281,8 @@ namespace Engine
 		unsigned long startPoint = 0UL;
 		// Playing
 		bool playing = false;
+		// Volume
+		float volume = 1.0f;
 
 		// Note that these variables don't do anything if changed, but can be used to access the data about the sound.
 
@@ -313,7 +316,7 @@ namespace Engine
 		// length - the length in samples. 0 means the entire sound.
 		// loops - how many times to loop. 0 and 1 mean play once. 
 		// a vector of floats between 0.0f to 1.0f, each element will be the volume of each corresponding channel.
-		void Play(unsigned long start = 0, unsigned long length = 0, unsigned short loops = 0, std::vector<float> volumes = {});
+		void Play(unsigned long start = 0, unsigned long length = 0, unsigned short loops = 0, float volume = 1.0f);
 		// Pause playing the sound.
 		void Pause();
 		// Resume playing the sound.

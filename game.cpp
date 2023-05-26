@@ -1,8 +1,4 @@
 #include "engine/engine.hpp"
-#include <chrono>
-#include <portaudio.h>
-#include <string>
-#include <thread>
 
 bool catchingCharacterB = false;
 
@@ -29,7 +25,7 @@ struct Character
 	{
 		if (onGround) {
 			yVelocity -= jumpStreng;
-			jumpSFX.Play(0, 0, 0, { 0.3f });
+			jumpSFX.Play(0, 0, 0, 0.7f);
 		}
 	}
 
@@ -63,7 +59,7 @@ struct Character
 		cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
 
 		if (!priorOnGround && onGround)
-			groundHitSFX.Play();
+			groundHitSFX.Play(0, 0, 0, 1.0f);
 	}
 
 	Character(Engine::Layer* layer)
@@ -148,6 +144,10 @@ void TurnOnCharacterCamera() {
 
 int main()
 {
+	Engine::AudioSource backgroundMusic;
+	backgroundMusic.LoadWavFile("Assets/mrmoneyman.wav");
+	backgroundMusic.Play(0, 0, 0, 0.5f);
+
 	Engine::InitializeAudio();
 
 	Engine::colliderTypes = {
