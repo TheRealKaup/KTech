@@ -136,6 +136,29 @@ struct GravityBox
 	}
 };
 
+struct AutoUpdatingText
+{
+	long* data;
+	Engine::Object obj;
+	long threshold;
+
+	void OnTick()
+	{
+		if (*data > threshold)
+			obj.textures[0].Write({std::to_string(*data)}, {255, 0, 0, 1.0f}, {0, 0, 0, 0.5f}, {0, 0});
+		else
+			obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 1.0f}, {0, 0, 0, 0.5f}, {0, 0});
+	}
+
+	AutoUpdatingText(long* data, Engine::Vector2D pos, Engine::Layer* layer, long threshold) : data(data), threshold(threshold)
+	{
+		obj.textures.resize(1);
+		obj.pos = pos;
+		obj.OnTick = std::bind(&AutoUpdatingText::OnTick, this);
+		layer->AddObject(&obj);
+	}
+};
+
 bool charCamOn = false;
 
 void TurnOnCharacterCamera() {
@@ -145,10 +168,11 @@ void TurnOnCharacterCamera() {
 int main()
 {
 	Engine::AudioSource backgroundMusic;
-	backgroundMusic.LoadWavFile("Assets/mrmoneyman.wav");
-	backgroundMusic.Play(0, 0, 0, 0.5f);
+	// backgroundMusic.LoadWavFile("Assets/bordercrossing.wav");
+	// backgroundMusic.Play(0, 0, 0, 0.8f);
 
 	Engine::InitializeAudio();
+	Engine::PrepareTerminal({50, 50});
 
 	Engine::colliderTypes = {
 		{ 0, 1, 1, 2 }, // Heavy - 0
@@ -219,7 +243,7 @@ int main()
 	darkLayer.brgba = { 0, 0, 0, 0.5f };
 	darkLayer.frgba = { 0, 0, 0, 0.5f };
 
-	Engine::PrepareTerminal({50, 50});
+	AutoUpdatingText audioPerformance(&Engine::audioPerformance, {1, 1}, &layer, 172);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 
@@ -250,4 +274,6 @@ int main()
 		Engine::WaitUntilNextTick();
 	}
 	Engine::TerminateAudio();
+	Engine::ResetTerminal();
+	exit(0);
 }

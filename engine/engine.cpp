@@ -249,14 +249,7 @@ void SignalHandler(int signal)
 	}
 	if (signal == SIGINT) // I just find it so cool these signals work :)
 	{
-		Engine::ResetTerminal();
-		// DO NOT REMOVE! I actually removed this once beacuse I thought it's meaningless, but no!
-		// Engine::running stops the engine.
-		// Beacuse we are handling the quit signal, it will not force the engine to stop. So the engine must stop itself, and
 		Engine::running = false;
-		// Terminate (deallocate) the PortAudio library
-		Engine::TerminateAudio();
-		// Call user-defined OnQuit
 		if (Engine::OnQuit)
 			Engine::OnQuit();
 	}

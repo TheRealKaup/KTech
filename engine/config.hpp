@@ -32,6 +32,3 @@
 #define ksF10 "\033[21~"
 #define ksF11 "\033[23~"
 #define ksF12 "\033[24~"
-
-// Audio
-#define config_framesPerBuffer 128

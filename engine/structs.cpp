@@ -28,19 +28,19 @@ void Engine::TimePoint::SetToNow()
 {
 	chornoTimePoint = std::chrono::high_resolution_clock::now();
 }
-int Engine::TimePoint::Seconds()
+long Engine::TimePoint::Seconds()
 {
 	return std::chrono::duration_cast<std::chrono::seconds>(chornoTimePoint - engineStartTP.chornoTimePoint).count();
 }
-int Engine::TimePoint::Milliseconds()
+long Engine::TimePoint::Milliseconds()
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(chornoTimePoint - engineStartTP.chornoTimePoint).count();
 }
-int Engine::TimePoint::Microseconds()
+long Engine::TimePoint::Microseconds()
 {
 	return std::chrono::duration_cast<std::chrono::microseconds>(chornoTimePoint - engineStartTP.chornoTimePoint).count();
 }
-int Engine::TimePoint::Nanoseconds()
+long Engine::TimePoint::Nanoseconds()
 {
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(chornoTimePoint - engineStartTP.chornoTimePoint).count();
 }

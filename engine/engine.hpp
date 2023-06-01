@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <iostream> // Printing, strings, et cetera
 #include <string> // to_string
 #include <vector> // Heavily based
@@ -19,11 +20,11 @@
 #include <fstream> // Reading textures and audio files
 #include <cstring> // strcmp
 #include "config.hpp" // macros
+#include <portaudio.h> // PortAudio is a cross-platform audio library
 // Linux libraries
 #include <signal.h> // For getting signals (like on quit)
 #include <termios.h> // For changing terminal attributes
 #include <sys/ioctl.h> // Contains some data types (winsize for termios.h)
-#include <portaudio.h> // PortAudio is a cross-platform audio library
 #include <stdint.h> // int32_t
 
 namespace Engine
@@ -76,6 +77,9 @@ namespace Engine
 
 	// Global PortAudio stream
 	extern PaStream* stream;
+
+	// Time in microseconds that it took for the last audio buffer to process
+	extern long audioPerformance;
 
 	// Keyboard input things
 	namespace Input
@@ -272,17 +276,17 @@ namespace Engine
 		// Current sample
 		unsigned long cur = 0UL;
 		// Amount of samples
-		unsigned long dataSizeInSamples = 0UL;
+		unsigned long frames = 0UL;
 		// The end point in samples
 		unsigned long endpointToPlay = 0UL;
 		// Loops to play
 		unsigned long loopsToPlay = 0UL;
 		// Start point to play in samples
 		unsigned long startPoint = 0UL;
-		// Playing
-		bool playing = false;
 		// Volume
 		float volume = 1.0f;
+		// Is playing
+		bool playing = false;
 
 		// Note that these variables don't do anything if changed, but can be used to access the data about the sound.
 
@@ -302,7 +306,7 @@ namespace Engine
 		unsigned long dataSize = 0UL;
 
 		// The audio in bytes after it was loaded.
-		char* data = nullptr;
+		int16_t* data = nullptr;
 
 		// Default constructer, doesn't do anything.
 		AudioSource();
@@ -323,11 +327,6 @@ namespace Engine
 		void Resume();
 		// Stop playing the sound.
 		void Stop();
-		// volume - between 0.0f to 1.0f that will be the volume of all the channels.
-		void ChangeVolume(float volume);
-		// Change volumes of every specific channel.
-		// volumes - a vector of floats between 0.0f to 1.0f, each element will be the volume of each corresponding channel.
-		void ChangeVolumes(std::vector<float> volumes = {});
 	};
 	
 	struct Camera
@@ -349,7 +348,7 @@ namespace Engine
 	};
 	
 	struct Map
-	{// 
+	{
 	public:
 		std::function<void()> OnTick = NULL;
 		std::vector<Camera*> cameras = {};
@@ -374,13 +373,13 @@ namespace Engine
 		void SetToNow();
 
 		// Get an int which represents the time point in seconds
-		int Seconds();
+		long Seconds();
 		// Get an int which represents the time point in milliseconds
-		int Milliseconds();
+		long Milliseconds();
 		// Get an int which represents the time point in microseconds
-		int Microseconds();
+		long Microseconds();
 		// Get an int which represents the time point in nanoseconds
-		int Nanoseconds();
+		long Nanoseconds();
 	};
 
 	bool AreObjectsOverlapping(Engine::Object* objA, Engine::Object* objB, bool ignoreIrrelevancy = false);

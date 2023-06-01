@@ -1,6 +1,11 @@
+#include "config.hpp"
 #include "engine.hpp"
+#include <cstddef>
+#include <portaudio.h>
 
-// Audio values: 16 bit depth, 2 channels, default (unknown) sample rate
+#define config_framesPerBuffer 256
+
+// Audio values: 16 bit depth, 2 channels, default (probably 44100) sample rate
 
 static void Log(std::string string)
 {
@@ -11,15 +16,25 @@ static void Log(std::string string, unsigned number)
 	std::cout << "\033[38;2;255;255;0m" << string << number << "\033[m" << std::endl << std::flush;
 }
 
+// Engine
 PaStream* Engine::stream = nullptr;
-// default device info
-PaStreamParameters outputParameters;
-unsigned char stream_SampleSize = 2;
-unsigned char stream_Channels = 2;
-unsigned char stream_BlockAlign = 4;
+long Engine::audioPerformance = 0L;
+// std::vector<Engine::AudioSource*> Engine::audioSources;
 
-std::vector<Engine::AudioSource*> activeSources;
-int32_t tempAudioLimiter = 0;
+// default device info
+static PaStreamParameters outputParameters;
+static unsigned char stream_SampleSize = 2;
+static unsigned char stream_Channels = 2;
+static unsigned char stream_BlockAlign = 4;
+
+static std::vector<Engine::AudioSource*> activeSources;
+static int32_t tempAudioLimiter = 0;
+
+static int32_t unlimitedOutput[config_framesPerBuffer * 2];
+static void* emptyOutput[config_framesPerBuffer * 2];
+
+static Engine::TimePoint start;
+static Engine::TimePoint end;
 
 int Callback(
 	const void *input,
@@ -29,98 +44,137 @@ int Callback(
 	PaStreamCallbackFlags statusFlags,
 	void *userData)
 {
-	memset(output, 0, framesPerBuffer * stream_BlockAlign);
+	// start.SetToNow();
+	static bool firstSourceFilled;
+	static size_t f;
 
-	// Add all the active audio sources' data into the buffer
-	for (size_t s = 0; s < activeSources.size(); s++)
+	// Set unlimitedOutput to the first source (which saves memsetting it)
+	if (activeSources.size() > 0)
 	{
-		// Only supports 16 bit depth
-		if (activeSources[s]->bitsPerSample != 16)
-			continue;
-
-		// Only supports 2 or 1 channels (which will be converted into 2 channels)
-		if (activeSources[s]->channels == 2)
+		firstSourceFilled = true;
+		// Set to first source (which saves a memset at the start)
+		if (activeSources[0]->channels == 2)
 		{
-			// Add all the frames of each source one by one.
-			for (unsigned f = 0; f < framesPerBuffer; f++, activeSources[s]->cur++)
+			for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[0]->cur++)
 			{
-				// Populate output, each channel separately
-				tempAudioLimiter = (int32_t)((int16_t*)(output))[f * 2] + (int32_t)((int16_t*)(activeSources[s]->data))[activeSources[s]->cur * 2] * activeSources[s]->volume;
-				if (tempAudioLimiter > 32767)
-					((int16_t*)(output))[f * 2] = 32767;
-				else if (tempAudioLimiter < -32767)
-					((int16_t*)(output))[f * 2] = -32767;
-				else
-					((int16_t*)(output))[f * 2] = tempAudioLimiter;
-				tempAudioLimiter = (int32_t)((int16_t*)(output))[f * 2 + 1] + (int32_t)((int16_t*)(activeSources[s]->data))[activeSources[s]->cur * 2 + 1] * activeSources[s]->volume;
-				if (tempAudioLimiter > 32767)
-					((int16_t*)(output))[f * 2 + 1] = 32767;
-				else if (tempAudioLimiter < -32767)
-					((int16_t*)(output))[f * 2 + 1] = -32767;
-				else
-					((int16_t*)(output))[f * 2 + 1] = tempAudioLimiter;
-				
-				// Check if reached the end of sound
-				if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
+				if (activeSources[0]->cur >= activeSources[0]->endpointToPlay)
 				{
-					if (activeSources[s]->loopsToPlay > 0) // Loop
+					if (activeSources[0]->loopsToPlay > 0)
 					{
-						activeSources[s]->loopsToPlay--;
-						activeSources[s]->cur = activeSources[s]->startPoint;
+						activeSources[0]->loopsToPlay--;
+						activeSources[0]->cur = activeSources[0]->startPoint;
 					}
 					else
 					{
-						activeSources[s]->playing = false;
-						activeSources.erase(activeSources.begin() + s);
+						activeSources[0]->playing = false;
+						activeSources.erase(activeSources.begin());
+						memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
+						firstSourceFilled = false;
 						break;
 					}
+				}
+				unlimitedOutput[f] = activeSources[0]->data[activeSources[0]->cur * 2] * activeSources[0]->volume;
+				unlimitedOutput[f + 1] = activeSources[0]->data[activeSources[0]->cur * 2 + 1] * activeSources[0]->volume;
+			}
+		}
+		else if (activeSources[0]->channels == 1)
+		{
+			for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[0]->cur++)
+			{				
+				if (activeSources[0]->cur >= activeSources[0]->endpointToPlay)
+				{
+					if (activeSources[0]->loopsToPlay > 0)
+					{
+						activeSources[0]->loopsToPlay--;
+						activeSources[0]->cur = activeSources[0]->startPoint;
+					}
+					else
+					{
+						activeSources[0]->playing = false;
+						activeSources.erase(activeSources.begin());
+						memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
+						firstSourceFilled = false;
+						break;
+					}
+				}
+				unlimitedOutput[f] = activeSources[0]->data[activeSources[0]->cur] * activeSources[0]->volume;
+				unlimitedOutput[f + 1] = activeSources[0]->data[activeSources[0]->cur] * activeSources[0]->volume;
+			}
+		}
+		// Add the other sources
+		for (size_t s = firstSourceFilled ? 1 : 0; s < activeSources.size(); s++)
+		{
+
+			if (activeSources[s]->channels == 2)
+			{
+				for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[s]->cur++)
+				{
+					if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
+					{
+						if (activeSources[s]->loopsToPlay > 0) // Loop
+						{
+							activeSources[s]->loopsToPlay--;
+							activeSources[s]->cur = activeSources[s]->startPoint;
+						}
+						else
+						{
+							activeSources[s]->playing = false;
+							activeSources.erase(activeSources.begin() + s);
+							s--;
+							break;
+						}
+					}
+					unlimitedOutput[f] += activeSources[s]->data[activeSources[s]->cur * 2] * activeSources[s]->volume;
+					unlimitedOutput[f + 1] += activeSources[s]->data[activeSources[s]->cur * 2 + 1] * activeSources[s]->volume;
+				}
+			}
+			else if (activeSources[s]->channels == 1)
+			{
+				for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[s]->cur++)
+				{				
+					if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
+					{
+						if (activeSources[s]->loopsToPlay > 0) // Loop
+						{
+							activeSources[s]->loopsToPlay--;
+							activeSources[s]->cur = activeSources[s]->startPoint;
+						}
+						else
+						{
+							activeSources[s]->playing = false;
+							activeSources.erase(activeSources.begin() + s);
+							s--;
+							break;
+						}
+					}
+					unlimitedOutput[f] += activeSources[s]->data[activeSources[s]->cur] * activeSources[s]->volume;
+					unlimitedOutput[f + 1] += activeSources[s]->data[activeSources[s]->cur] * activeSources[s]->volume;
 				}
 			}
 		}
-		else if (activeSources[s]->channels == 1)
+		// At last, limit `unlimitedOutput` and add it to `output`.
+		for (f = 0; f < config_framesPerBuffer * 2; f++)
 		{
-			for (unsigned f = 0; f < framesPerBuffer; f++, activeSources[s]->cur++)
-			{
-				// Populate output, each channel separately
-				tempAudioLimiter = (int32_t)((int16_t*)(output))[f * 2] + (int32_t)((int16_t*)(activeSources[s]->data))[activeSources[s]->cur] * activeSources[s]->volume;
-				if (tempAudioLimiter > 32767)
-					((int16_t*)(output))[f * 2] = 32767;
-				else if (tempAudioLimiter < -32767)
-					((int16_t*)(output))[f * 2] = -32767;
-				else
-					((int16_t*)(output))[f * 2] = tempAudioLimiter;
-				tempAudioLimiter = (int32_t)((int16_t*)(output))[f * 2 + 1] + (int32_t)((int16_t*)(activeSources[s]->data))[activeSources[s]->cur] * activeSources[s]->volume;
-				if (tempAudioLimiter > 32767)
-					((int16_t*)(output))[f * 2 + 1] = 32767;
-				else if (tempAudioLimiter < -32767)
-					((int16_t*)(output))[f * 2 + 1] = -32767;
-				else
-					((int16_t*)(output))[f * 2 + 1] = tempAudioLimiter;
-				
-				// Check if reached the end of sound
-				if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
-				{
-					if (activeSources[s]->loopsToPlay > 0) // Loop
-					{
-						activeSources[s]->loopsToPlay--;
-						activeSources[s]->cur = activeSources[s]->startPoint;
-					}
-					else
-					{
-						activeSources[s]->playing = false;
-						activeSources.erase(activeSources.begin() + s);
-						break;
-					}
-				}
-			}
+			if (unlimitedOutput[f] > 32767)
+				((int16_t*)(output))[f] = 32767;
+			else if (unlimitedOutput[f] < -32767)
+				((int16_t*)(output))[f] = -32767;
+			else
+				((int16_t*)(output))[f] = unlimitedOutput[f];
 		}
 	}
+	else
+		output = emptyOutput; // Premade empty output buffer
+
+	// end.SetToNow();
+	// Engine::audioPerformance = (end.Nanoseconds() - start.Nanoseconds());
 
 	return paContinue;
 }
 
 void Engine::InitializeAudio()
 {
+	// Start PortAudio
 	Pa_Initialize();
 	// Open PortAudio stream
 	outputParameters.device = Pa_GetDefaultOutputDevice();
@@ -128,14 +182,15 @@ void Engine::InitializeAudio()
 	outputParameters.sampleFormat = paInt16;
 	outputParameters.suggestedLatency = Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultHighOutputLatency;
 	outputParameters.hostApiSpecificStreamInfo = NULL;
-	Pa_OpenStream(&stream, NULL, &outputParameters, Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultSampleRate, config_framesPerBuffer, paNoFlag, Callback, nullptr);
+	Pa_OpenStream(&stream, NULL, &outputParameters, Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultSampleRate, config_framesPerBuffer, paClipOff, Callback, nullptr);
 	// Data used in callback function
 	stream_SampleSize = Pa_GetSampleSize(paInt16);
 	stream_Channels = outputParameters.channelCount;
 	stream_BlockAlign = stream_SampleSize * stream_Channels;
+	// Create an empty output to instantly send in callback when there are no active audio sources
+	memset(emptyOutput, 0, config_framesPerBuffer * stream_BlockAlign);
 	// Start the stream
 	Pa_StartStream(stream);
-
 }
 void Engine::TerminateAudio()
 {
@@ -197,42 +252,36 @@ bool Engine::AudioSource::LoadWavFile(std::string fileName)
 		 	break;
 	}
 	file.read((char*)&dataSize, 4); // Data size
-	data = new char[dataSize]; // Resize data array to fit the data
+	// Get it ourselves in case it isn't accurate
+	unsigned startPos = file.tellg(); // Get the current position
+	file.seekg(0, std::ifstream::end); // Move to the end
+	unsigned endPos = file.tellg(); // Get the current position
+	dataSize = endPos - startPos; // Get the size
+	file.seekg(startPos, std::ifstream::beg); // Return to the last position
+	data = new int16_t[dataSize / 2]; // Resize data array to fit the data
 	file.read((char*)data, dataSize);// Read the data into the data array
 
-	dataSizeInSamples = dataSize / blockAlign;
+	frames = dataSize / blockAlign;
 	
 	return true;
 }
 
 void Engine::AudioSource::Play(unsigned long start, unsigned long length, unsigned short loops, float volume)
 {
-	this->volume = volume;
-	Log("Play");
-	for (unsigned i = 0; i < activeSources.size(); i++)
-	{
-		if (activeSources[i] == this)
-		{
-			playing = false;
-			return;
-			if (length == 0)
-				endpointToPlay = dataSizeInSamples;
-			else	
-				endpointToPlay = length + start;
-			loopsToPlay = loops;
-			cur = start;
-			startPoint = cur;
-			return;
-		}
-	}
 	playing = true;
+	this->volume = volume;
 	if (length == 0)
-		endpointToPlay = dataSizeInSamples;
-	else	
+		endpointToPlay = frames;
+	else if (length > (dataSize / channels))
+		length = frames;
+	else
 		endpointToPlay = length + start;
 	loopsToPlay = loops;
 	cur = start;
 	startPoint = cur;
+	for (unsigned i = 0; i < activeSources.size(); i++)
+		if (activeSources[i] == this)
+			return; // Don't add to activeSources if already there.
 	activeSources.push_back(this);
 }
 
@@ -240,24 +289,16 @@ Engine::AudioSource::AudioSource() {}
 
 void Engine::AudioSource::Pause()
 {
-	Pa_StopStream(stream);
+	playing = false;
 }
 
 void Engine::AudioSource::Resume()
 {
-	Pa_StartStream(stream);
+	playing = true;
 }
 
 void Engine::AudioSource::Stop()
 {
-	Pa_StopStream(stream);
+	playing = false;
 	cur = 0;
-}
-
-void Engine::AudioSource::ChangeVolume(float volume)
-{
-}
-
-void Engine::AudioSource::ChangeVolumes(std::vector<float> volumes)
-{
 }
