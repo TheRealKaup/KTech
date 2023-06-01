@@ -31,7 +31,6 @@ static std::vector<Engine::AudioSource*> activeSources;
 static int32_t tempAudioLimiter = 0;
 
 static int32_t unlimitedOutput[config_framesPerBuffer * 2];
-static void* emptyOutput[config_framesPerBuffer * 2];
 
 static Engine::TimePoint start;
 static Engine::TimePoint end;
@@ -164,7 +163,7 @@ int Callback(
 		}
 	}
 	else
-		output = emptyOutput; // Premade empty output buffer
+		memset(output, 0, config_framesPerBuffer * 4);
 
 	// end.SetToNow();
 	// Engine::audioPerformance = (end.Nanoseconds() - start.Nanoseconds());
@@ -187,8 +186,6 @@ void Engine::InitializeAudio()
 	stream_SampleSize = Pa_GetSampleSize(paInt16);
 	stream_Channels = outputParameters.channelCount;
 	stream_BlockAlign = stream_SampleSize * stream_Channels;
-	// Create an empty output to instantly send in callback when there are no active audio sources
-	memset(emptyOutput, 0, config_framesPerBuffer * stream_BlockAlign);
 	// Start the stream
 	Pa_StartStream(stream);
 }

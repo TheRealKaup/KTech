@@ -58,13 +58,12 @@ struct Character
 
 		cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
 
-		if (!priorOnGround && onGround)
-			groundHitSFX.Play(0, 0, 0, 1.0f);
+		// if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0, 0.5f);
 	}
 
 	Character(Engine::Layer* layer)
 	{
-		groundHitSFX.LoadWavFile("Assets/groundHit.wav");
+		groundHitSFX.LoadWavFile("Assets/groundHit2.wav");
 		jumpSFX.LoadWavFile("Assets/jump.wav");
 
 		obj.pos = { 5, 2 };//
