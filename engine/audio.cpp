@@ -19,7 +19,6 @@ static void Log(std::string string, unsigned number)
 // Engine
 PaStream* Engine::stream = nullptr;
 long Engine::audioPerformance = 0L;
-// std::vector<Engine::AudioSource*> Engine::audioSources;
 
 // default device info
 static PaStreamParameters outputParameters;
@@ -31,9 +30,6 @@ static std::vector<Engine::AudioSource*> activeSources;
 static int32_t tempAudioLimiter = 0;
 
 static int32_t unlimitedOutput[config_framesPerBuffer * 2];
-
-static Engine::TimePoint start;
-static Engine::TimePoint end;
 
 int Callback(
 	const void *input,
@@ -165,9 +161,6 @@ int Callback(
 	else
 		memset(output, 0, config_framesPerBuffer * 4);
 
-	// end.SetToNow();
-	// Engine::audioPerformance = (end.Nanoseconds() - start.Nanoseconds());
-
 	return paContinue;
 }
 
@@ -239,6 +232,8 @@ bool Engine::AudioSource::LoadWavFile(std::string fileName)
 	file.read((char*)&blockAlign, 2); // Block align
 	file.read((char*)&bitsPerSample, 2); // Bits per sample
 	
+	Log("SampleRate=", sampleRate);
+
 	// Data chunk
 	while (true) // Find the chunk
 	{
@@ -249,11 +244,12 @@ bool Engine::AudioSource::LoadWavFile(std::string fileName)
 		 	break;
 	}
 	file.read((char*)&dataSize, 4); // Data size
-	// Get it ourselves in case it isn't accurate
+	// Get it ourselves in case it's too large
 	unsigned startPos = file.tellg(); // Get the current position
 	file.seekg(0, std::ifstream::end); // Move to the end
-	unsigned endPos = file.tellg(); // Get the current position
-	dataSize = endPos - startPos; // Get the size
+	unsigned endPos = file.tellg(); // Get the last position
+	if (dataSize > endPos - startPos) // Correct the size only if the written data size is too large
+		dataSize = endPos - startPos; // Correct the size
 	file.seekg(startPos, std::ifstream::beg); // Return to the last position
 	data = new int16_t[dataSize / 2]; // Resize data array to fit the data
 	file.read((char*)data, dataSize);// Read the data into the data array

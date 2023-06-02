@@ -58,7 +58,7 @@ struct Character
 
 		cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
 
-		// if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0, 0.5f);
+		if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0, 0.5f);
 	}
 
 	Character(Engine::Layer* layer)
@@ -264,7 +264,7 @@ int main()
 				map.cameras[0]->Render(map.layers);
 				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
 			}
-			Engine::Print();
+			// Engine::Print();
 		}
 
 		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;
