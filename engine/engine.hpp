@@ -129,13 +129,19 @@ namespace Engine
 		void Loop();
 		
 		// Returns true if the last input is equal to stringKey
-		bool Equals(char const* stringKey);
+		bool Is(std::string stringKey);
 		// Returns true if the last input is equal to charKey
-		bool Equals(char charKey);
+		bool Is(char charKey);
 		// Returns true if the last input is BIGGER OR EQUAL than charKey
 		bool Bigger(char charKey);
 		// Return true if the last input is SMALLER OR EQUAL than charKEy
 		bool Smaller(char charKey);
+		// Returns true if the last input is between or equal to the specified keys.
+		bool Between(char charKey1, char charKey2);
+		// Returns true if the last input is a number
+		bool IsNum();
+		// Returns the last value as a number
+		unsigned char Num();
 	}
 
 	struct RGB
@@ -153,14 +159,14 @@ namespace Engine
 
 	struct Vector2D
 	{
-		int x, y;
-		Vector2D(int xAxis = 0, int yAxis = 0);
+		long x, y;
+		Vector2D(long xAxis = 0, long yAxis = 0);
 	};
 
 	struct UVector2D
 	{
-		unsigned int x, y;
-		UVector2D(unsigned int xAxis = 0, unsigned int yAxis = 0);
+		unsigned long x, y;
+		UVector2D(unsigned long xAxis = 0, unsigned long yAxis = 0);
 	};
 
 	struct Pixel
@@ -249,7 +255,7 @@ namespace Engine
 
 		void ExpandMovementTree(Vector2D dir, std::vector<Object*>* pushingObjects, std::vector<Object*>* objectsToPush, std::vector<unsigned>* pushingColliders, std::vector<unsigned>* collidersToPush, std::vector<Object*>* blockedObjects, std::vector<Object*>* blockingObjects, std::vector<unsigned>* blockedColliders, std::vector<unsigned>* blockingColliders);
 
-		Object(Vector2D position = {0U, 0U}, std::string objectName = "Unnamed Object");
+		Object(Vector2D position = {0U, 0U}, std::string objectName = "");
 	};
 
 	struct Layer

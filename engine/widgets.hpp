@@ -1,5 +1,6 @@
-/*#pragma once
-#include "engine.h"
+#pragma once
+#include "config.hpp"
+#include "engine.hpp"
 
 #define Characters_Lower 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
 #define Characters_Upper 'Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','G','H','J','K','L','Z','X','C','V','B','N','M'
@@ -15,50 +16,17 @@ namespace Widgets
 		bool selected = false;
 		bool down = false;
 
-		std::function<void()> OnUp;
-		std::function<void()> OnDown;
+		std::function<void()> OnPress;
 		
-		Engine::RGBA notRGBA, selectedRGBA, downRGBA;
+		Engine::RGBA notRGBA, selectedRGBA;
 
 		Engine::Object obj;
 
 	private:
-		void InsideOnDown()
+		void InsideOnPress()
 		{
-			if (selected)
-			{
-				down = true;
-				if (OnDown)
-					OnDown();
-
-				for (size_t i = 0; i < obj.textures.size(); i++)
-				{
-					for (size_t y = 0; y < obj.textures[i].t.size(); y++)
-					{
-						for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-							obj.textures[i].t[y][x].frgba = downRGBA;
-					}
-				}
-			}
-		}
-
-		void InsideOnUp()
-		{
-			if (selected)
-			{
-				down = false;
-				if (OnUp)
-					OnUp();
-
-				for (size_t i = 0; i < obj.textures.size(); i++)
-				{
-					for (size_t y = 0; y < obj.textures[i].t.size(); y++)
-					{
-						for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-							obj.textures[i].t[y][x].frgba = selectedRGBA;
-					}
-				}
-			}
+			if (selected && OnPress)
+				OnPress();
 		}
 
 	public:
@@ -90,12 +58,12 @@ namespace Widgets
 			selected = false;
 		}
 
-		Button(Engine::Layer* layer, std::function<void()> OnDown, std::function<void()> OnUp, int key = VK_RETURN, Engine::Vector2D pos = { 0, 0 }, std::string text = "Button",
-			Engine::RGBA notRGBA = { 150, 150, 150, 1.0f }, Engine::RGBA selectedRGBA = { 255, 255, 255, 1.0f }, Engine::RGBA downRGBA = { 150, 150, 255, 1.0f })
-			: OnUp(OnUp), OnDown(OnDown), notRGBA(notRGBA), selectedRGBA(selectedRGBA), downRGBA(downRGBA)
+		template<typename T>
+		Button(Engine::Layer* layer, std::function<void()> OnPress, T key = kReturn, Engine::Vector2D pos = { 0, 0 }, std::string text = "Button",
+			Engine::RGBA notRGBA = { 150, 150, 150, 1.0f }, Engine::RGBA selectedRGBA = { 255, 255, 255, 1.0f })
+			: OnPress(OnPress), notRGBA(notRGBA), selectedRGBA(selectedRGBA)
 		{
-			Engine::RegisterInputHandler(key, true, std::bind(&Button::InsideOnDown, this));
-			Engine::RegisterInputHandler(key, false, std::bind(&Button::InsideOnUp, this));
+			Engine::Input::RegisterHandler(key, std::bind(&Button::InsideOnPress, this), true);
 			
 			obj.pos = pos;
 
@@ -104,7 +72,7 @@ namespace Widgets
 			
 			obj.textures[0].Write({ text }, notRGBA, { 0, 0, 0, 0.0f }, { 1, 1 });
 			
-			obj.textures[1].Block({ 2 + text.size(), 3 }, Engine::SuperChar(' ', {0, 0, 0, 0.0f}), {0U, 0U});
+			obj.textures[1].Block({ 2UL + (unsigned long)text.size(), 3 }, Engine::SuperChar(' ', {0, 0, 0, 0.0f}), {0U, 0U});
 			obj.textures[1].t[0][0] = Engine::SuperChar('#', notRGBA);
 			obj.textures[1].t[0][text.length() + 1] = Engine::SuperChar('#', notRGBA);
 			for (size_t x = 1; x <= text.length(); x++)
@@ -120,6 +88,7 @@ namespace Widgets
 		}
 	};
 
+	
 	class IntInputField
 	{
 	public:
@@ -145,7 +114,7 @@ namespace Widgets
 		{
 			if (selected)
 			{
-				if (Engine::lastDownVirtualKey == VK_BACK || Engine::lastDownVirtualKey == VK_DELETE)
+				if (Engine::Input::Is(kBackspace) || Engine::Input::Is(ksDelete))
 				{
 					if (currentDigit == 0)
 						return;
@@ -155,15 +124,15 @@ namespace Widgets
 					currentDigit--;
 					obj.textures[0].t[0][currentDigit].character = ' ';
 				}
-				else if (Engine::lastDownKey >= '0' || Engine::lastDownKey <= '9')
+				else if (Engine::Input::Between('0', '9'))
 				{
 					if (currentDigit == maxDigits)
 						return;
 
-					obj.textures[0].t[0][currentDigit].character = Engine::lastDownKey;
+					obj.textures[0].t[0][currentDigit].character = Engine::Input::buf[0];
 					currentDigit++;
 
-					visibleNumber = visibleNumber * 10 + Engine::lastDownKey - '0';
+					visibleNumber = visibleNumber * 10 + Engine::Input::Num();
 				}
 
 				number = visibleNumber;
@@ -248,18 +217,18 @@ namespace Widgets
 			std::string text = "Value = ", Engine::RGBA notRGBA = { 150, 150, 150, 1.0f }, Engine::RGBA selectedRGBA = { 255, 255, 255, 1.0f })
 			: OnInsert(OnInsert), min(min), max(max), notRGBA(notRGBA), selectedRGBA(selectedRGBA)
 		{
-			Engine::RegisterInputHandler('0', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('1', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('2', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('3', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('4', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('5', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('6', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('7', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('8', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler('9', true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler(VK_BACK, true, std::bind(&IntInputField::InternalInsert, this));
-			Engine::RegisterInputHandler(VK_DELETE, true, std::bind(&IntInputField::InternalInsert, this));
+			Engine::Input::RegisterHandler('0', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('1', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('2', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('3', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('4', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('5', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('6', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('7', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('8', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler('9', std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler(kBackspace, std::bind(&IntInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler(ksDelete, std::bind(&IntInputField::InternalInsert, this), true);
 
 			obj.pos = pos;
 
@@ -330,8 +299,7 @@ namespace Widgets
 		{
 			if (selected)
 			{
-				// Remove character
-				if (Engine::lastDownVirtualKey == VK_BACK || Engine::lastDownVirtualKey == VK_DELETE)
+				if (Engine::Input::Is(kBackspace) || Engine::Input::Is(ksDelete))
 				{
 					if (currentChar == 0)
 						return;
@@ -341,32 +309,13 @@ namespace Widgets
 
 					obj.textures[0].t[0][currentChar].character = ' ';
 				}
-				else if(Engine::lastDownKeyRequiresShift)
-				{
-					if (currentChar == maxChars)
-						return;
-					
-					IsKeyDown(VK_SHIFT);
-					if (IsKeyDown(VK_SHIFT))
-					{
-						obj.textures[0].t[0][currentChar].character = Engine::lastDownKey;
-						
-						string.push_back(Engine::lastDownKey);
-						currentChar++;
-					}
-				}
+				else if (currentChar == maxChars)
+					return;
 				else
 				{
-					if (currentChar == maxChars)
-						return;
-					IsKeyDown(VK_SHIFT);
-					if (!IsKeyDown(VK_SHIFT))
-					{
-						obj.textures[0].t[0][currentChar].character = Engine::lastDownKey;
-						
-						string.push_back(Engine::lastDownKey);
-						currentChar++;
-					}
+					obj.textures[0].t[0][currentChar].character = Engine::Input::buf[0];
+					string.push_back(Engine::Input::buf[0]);
+					currentChar++;
 				}
 				if (OnInsert)
 					OnInsert();
@@ -423,10 +372,10 @@ namespace Widgets
 		{
 			// Registering input
 			for (size_t i = 0; i < allowedCharacters.size(); i++)
-				Engine::RegisterInputHandler(allowedCharacters[i], true, std::bind(&StringInputField::InternalInsert, this));
+				Engine::Input::RegisterHandler(allowedCharacters[i], std::bind(&StringInputField::InternalInsert, this), true);
 
-			Engine::RegisterInputHandler(VK_DELETE, true, std::bind(&StringInputField::InternalInsert, this), true);
-			Engine::RegisterInputHandler(VK_BACK, true, std::bind(&StringInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler(ksDelete, std::bind(&StringInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler(kBackspace, std::bind(&StringInputField::InternalInsert, this), true);
 
 			obj.pos = pos;
 
@@ -464,4 +413,4 @@ namespace Widgets
 			layer->AddObject(&obj);
 		}
 	};
-}*/
+}

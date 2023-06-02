@@ -264,7 +264,7 @@ int main()
 				map.cameras[0]->Render(map.layers);
 				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
 			}
-			// Engine::Print();
+			Engine::Print();
 		}
 
 		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;

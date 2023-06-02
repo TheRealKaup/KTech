@@ -43,29 +43,30 @@ void Engine::Input::RegisterHandler(char input, std::function<void()> call, bool
 	handlers.push_back(Handler({input}, call, onTick));
 }
 
+// The issue: Call() doesn't set buf accordingly
+
 void Engine::Input::Call()
 {
 	for (unsigned i = 0; i < handlers.size(); i++)
-		for (unsigned j = 0; j < handlers[i].calls.size(); j++)
-			if (handlers[i].onTicks[j] && handlers[i].timesPressed > 0 && handlers[i].calls[j])
-			{
-				handlers[i].calls[j]();
-				handlers[i].timesPressed = 0;
-			}
+		if (handlers[i].timesPressed > 0)
+		{
+			for (unsigned j = 0; j < handlers[i].calls.size(); j++)
+				if (handlers[i].onTicks[j] && handlers[i].calls[j])
+					handlers[i].calls[j]();
+			handlers[i].timesPressed = 0;
+		}
 }
 
 char* Engine::Input::Get()
 {
 	// Clear previous buffer
-	unsigned i;
-	for (i = 0; i < maxEscapeSequenceLength; i++)
-		buf[i] = 0;
+	memset(buf, 0, maxEscapeSequenceLength);
 
 	// Read to buffer (blocking)
 	length = read(0, buf, maxEscapeSequenceLength);
 
 	// Call handlers
-	for (i = 0; i < handlers.size(); i++)
+	for (unsigned i = 0; i < handlers.size(); i++)
 		if (strcmp(buf, handlers[i].input.c_str()) == 0) // If the strings are equal
 		{
 			handlers[i].timesPressed++;
@@ -86,22 +87,37 @@ void Engine::Input::Loop()
 		OnQuit();
 }
 
-bool Engine::Input::Equals(char const* stringKey)
+bool Engine::Input::Is(std::string stringKey)
 {
-	return strcmp(buf, stringKey) == 0;
+	return (strcmp(buf, stringKey.c_str()) == 0);
 }
 
-bool Engine::Input::Equals(char charKey)
+bool Engine::Input::Is(char charKey)
 {
-	return buf[0] == charKey && buf[1] == 0;
+	return (buf[0] == charKey) && (buf[1] == 0);
+}
+
+bool Engine::Input::IsNum()
+{
+	return (buf[0] >= '0') && (buf[0] <= '9') && (buf[1] == 0);
+}
+
+unsigned char Engine::Input::Num()
+{
+	return (buf[0] - '0');
 }
 
 bool Engine::Input::Bigger(char charKey)
 {
-	return buf[0] >= charKey;
+	return (buf[0] >= charKey) && (buf[1] == 0);
 }
 
 bool Engine::Input::Smaller(char charKey)
 {
-	return buf[0] <= charKey;
+	return (buf[0] <= charKey) && (buf[1] == 0);
+}
+
+bool Engine::Input::Between(char charKey1, char charKey2)
+{
+	return (buf[0] >= charKey1) && (buf[0] <= charKey2) && (buf[1] == 0);
 }

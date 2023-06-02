@@ -12,9 +12,9 @@ Engine::RGBA::RGBA(unsigned char red, unsigned char green, unsigned char blue, f
 		a = alpha;
 }
 
-Engine::Vector2D::Vector2D(int xAxis, int yAxis) : x(xAxis), y(yAxis) {}
+Engine::Vector2D::Vector2D(long xAxis, long yAxis) : x(xAxis), y(yAxis) {}
 
-Engine::UVector2D::UVector2D(unsigned int xAxis, unsigned int yAxis) : x(xAxis), y(yAxis) {}
+Engine::UVector2D::UVector2D(unsigned long xAxis, unsigned long yAxis) : x(xAxis), y(yAxis) {}
 
 Engine::Pixel::Pixel(char32_t character, RGB foreRGB, RGB backRGB) : character(character), frgb(foreRGB), brgb(backRGB) {}
 
