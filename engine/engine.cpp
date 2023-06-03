@@ -16,7 +16,6 @@ Engine::TimePoint Engine::engineStartTP;
 long int Engine::totalTicks = 0;
 // Config
 std::function<void()> Engine::GlobalOnTick = NULL;
-std::function<void()> Engine::OnQuit = NULL;
 bool Engine::running = true;
 // Physics
 std::vector<std::vector<unsigned char>> Engine::colliderTypes = {
@@ -248,11 +247,7 @@ void SignalHandler(int signal)
 		// Engine::Print();
 	}
 	if (signal == SIGINT) // I just find it so cool these signals work :)
-	{
 		Engine::running = false;
-		if (Engine::OnQuit)
-			Engine::OnQuit();
-	}
 }
 
 void Engine::PrepareTerminal(Engine::UVector2D imageSize)
@@ -294,6 +289,8 @@ void Engine::WaitUntilNextTick()
 	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / Engine::tps - Engine::deltaTime));
 	Engine::deltaTime = NowInMicroseconds() - Engine::thisTickStartTP.Microseconds();
 	Engine::fps = 1000000.0f / Engine::deltaTime;
+	Engine::thisTickStartTP.SetToNow();
+	Engine::totalTicks++;
 }
 
 void Engine::CallOnTicks(Engine::Map* map)

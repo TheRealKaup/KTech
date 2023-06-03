@@ -137,7 +137,7 @@ struct GravityBox
 
 struct AutoUpdatingText
 {
-	long* data;
+	float* data;
 	Engine::Object obj;
 	long threshold;
 
@@ -149,7 +149,7 @@ struct AutoUpdatingText
 			obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 1.0f}, {0, 0, 0, 0.5f}, {0, 0});
 	}
 
-	AutoUpdatingText(long* data, Engine::Vector2D pos, Engine::Layer* layer, long threshold) : data(data), threshold(threshold)
+	AutoUpdatingText(float* data, Engine::Vector2D pos, Engine::Layer* layer, long threshold) : data(data), threshold(threshold)
 	{
 		obj.textures.resize(1);
 		obj.pos = pos;
@@ -242,11 +242,13 @@ int main()
 	darkLayer.brgba = { 0, 0, 0, 0.5f };
 	darkLayer.frgba = { 0, 0, 0, 0.5f };
 
-	AutoUpdatingText audioPerformance(&Engine::audioPerformance, {1, 1}, &layer, 172);
+	AutoUpdatingText audioPerformance(&Engine::potentialfps, {1, 1}, &layer, 172);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 
-	for (Engine::tps = 24; Engine::running; Engine::thisTickStartTP.SetToNow(), Engine::totalTicks++)
+	Engine::tps = 24;
+	Engine::thisTickStartTP.SetToNow();
+	while (Engine::running)
 	{
 		Engine::Input::Call();
 		Engine::CallOnTicks(&map);
@@ -266,12 +268,11 @@ int main()
 			}
 			Engine::Print();
 		}
-
 		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;
 		// std::cout << "x=" << Engine::terminalSize.ws_col << ", y=" << Engine::terminalSize.ws_row << std::endl;
-	
 		Engine::WaitUntilNextTick();
 	}
+	
 	Engine::TerminateAudio();
 	Engine::ResetTerminal();
 	exit(0);

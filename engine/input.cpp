@@ -82,9 +82,6 @@ void Engine::Input::Loop()
 {
 	// `strcmp(Get(), "\03") != 0` - Quit if Ctrl+C was received 
 	while (strcmp(Get(), "\03") != 0);
-
-	if (OnQuit)
-		OnQuit();
 }
 
 bool Engine::Input::Is(std::string stringKey)

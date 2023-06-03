@@ -67,7 +67,6 @@ namespace Engine
 	extern long int totalTicks;
 
 	extern std::function<void()> GlobalOnTick;
-	extern std::function<void()> OnQuit;
 	extern bool running;
 
 	// The final image that will be printed. This allows multiple cameras to print at the same time
@@ -363,6 +362,11 @@ namespace Engine
 
 		int AddCamera(Camera* camera, bool asActiveCamera = false);
 		int AddLayer(Layer* layer);
+
+		// Returns true if managed to render (active camera is valid), otherwise, false.
+		bool Render();
+		// Returns true if managed to draw (active camera is valid), otherwise, false.
+		bool Draw(Vector2D pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
 	};
 
 	// An easy to use time point which uses std::chrono.
@@ -411,6 +415,7 @@ namespace Engine
 	// Print the final image to the console.
 	void Print();
 	// Wait the precise amount of time to fill the frame according to the ticks per second value.
+	// Also adds 1 to Engine::totalTicks and resets thisTickStartTP
 	void WaitUntilNextTick();
 	// Give this function a map and it will call all the OnKey functions of the layers, objects and cameras (map itself included) in the map.
 	// This way, you don't have to write the very long and ugly for loops to do so.

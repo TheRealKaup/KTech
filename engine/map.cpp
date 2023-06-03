@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include <cstddef>
 
 
 // ---=== Layer ===---
@@ -47,4 +48,24 @@ int Engine::Map::AddLayer(Layer* layer)
 {
 	layers.push_back(layer);
 	return layers.size() - 1;
+}
+
+bool Engine::Map::Render()
+{
+	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
+	{
+		cameras[activeCameraI]->Render(layers);
+		return true;
+	}
+	return false;
+}
+
+bool Engine::Map::Draw(Vector2D pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
+{
+	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
+	{
+		cameras[0]->Draw(pos, left, top, right, bottom);
+		return true;
+	}
+	return false;
 }
