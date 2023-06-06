@@ -1,11 +1,10 @@
 #include "engine.hpp"
-#include <cstdio>
-#include <cstring>
 
 #define maxEscapeSequenceLength 7
 
 char* Engine::Input::buf = new char[maxEscapeSequenceLength];
 unsigned char Engine::Input::length = 0;
+char* Engine::Input::quitString = (char*)"\03";
 
 void Engine::Input::Handler::AddCall(std::function<void()> call, bool onTick)
 {
@@ -81,7 +80,7 @@ char* Engine::Input::Get()
 void Engine::Input::Loop()
 {
 	// `strcmp(Get(), "\03") != 0` - Quit if Ctrl+C was received 
-	while (strcmp(Get(), "\03") != 0);
+	while (strcmp(Get(), quitString) != 0);
 }
 
 bool Engine::Input::Is(std::string stringKey)

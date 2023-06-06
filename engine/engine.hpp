@@ -103,6 +103,8 @@ namespace Engine
 		extern std::vector<Handler> handlers;
 		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
 		extern unsigned handlerIndex;
+		// Will exit the input loop when this key is received
+		extern char* quitString;
 
 		// Register an input handler in order to get your function called on a keyboard input event.
 		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
