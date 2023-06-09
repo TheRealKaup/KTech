@@ -181,9 +181,9 @@ In the next tutorial, we'll make a game that will actually run, display our worl
 
 #### About this tutorial
 
-In this tutorial, you will learn how to **use** KTech. You will learn its concepts, classes and functions. You will learn how to use them to make your game.
+In this tutorial, you will learn how to **use** KTech and make a game with it.
 
-Don't worry if until this point of the documentation you heard KTech concepts that you don't know or understand, because this is the tutorial that is supposed to teach you these things about KTech.
+Don't worry if until this point of the documentation you have heard KTech concepts that you aren't familiar with, because this is the tutorial that is supposed to teach you these things about KTech.
 
 #### The loop
 
