@@ -16,9 +16,9 @@ Engine::Vector2D::Vector2D(long xAxis, long yAxis) : x(xAxis), y(yAxis) {}
 
 Engine::UVector2D::UVector2D(unsigned long xAxis, unsigned long yAxis) : x(xAxis), y(yAxis) {}
 
-Engine::Pixel::Pixel(char32_t character, RGB foreRGB, RGB backRGB) : character(character), frgb(foreRGB), brgb(backRGB) {}
+Engine::Cell::Cell(char32_t character, RGB foreRGB, RGB backRGB) : character(character), frgb(foreRGB), brgb(backRGB) {}
 
-Engine::SuperChar::SuperChar(char32_t character, RGBA foreRGBA, RGBA backRGBA) : character(character), frgba(foreRGBA), brgba(backRGBA) {}
+Engine::CellA::CellA(char32_t character, RGBA foreRGBA, RGBA backRGBA) : character(character), frgba(foreRGBA), brgba(backRGBA) {}
 
 Engine::TimePoint::TimePoint()
 {
@@ -46,7 +46,7 @@ long Engine::TimePoint::Nanoseconds()
 }
 
 // Engine::Texture::Texture() {};
-void Engine::Texture::Block(UVector2D size, SuperChar value, Vector2D pos) {
+void Engine::Texture::Rectangle(UVector2D size, CellA value, Vector2D pos) {
 	this->pos = pos;
 	t.resize(size.y);
 	for (size_t y = 0; y < t.size(); y++)
@@ -63,7 +63,7 @@ void Engine::Texture::File(std::string fileName, Vector2D pos) {
 		return;
 	std::string line;
 
-	SuperChar value;
+	CellA value;
 
 	for (size_t y = 0; std::getline(file, line); y++)
 	{
@@ -111,6 +111,31 @@ void Engine::Texture::Write(std::vector<std::string> stringVector, RGBA frgba, R
 			t[y][x].brgba = brgba;
 		}
 	}
+}
+
+void Engine::Texture::SetCell(CellA value)
+{
+	for (unsigned y = 0; y < t.size(); y++)
+		for (unsigned x = 0; x < t[y].size(); x++)
+			t[y][x] = value;
+}
+void Engine::Texture::SetForeground(RGBA value)
+{
+	for (unsigned y = 0; y < t.size(); y++)
+		for (unsigned x = 0; x < t[y].size(); x++)
+			t[y][x].frgba = value;
+}
+void Engine::Texture::SetBackground(RGBA value)
+{
+	for (unsigned y = 0; y < t.size(); y++)
+		for (unsigned x = 0; x < t[y].size(); x++)
+			t[y][x].brgba = value;
+}
+void Engine::Texture::SetCharacter(char value)
+{
+	for (unsigned y = 0; y < t.size(); y++)
+		for (unsigned x = 0; x < t[y].size(); x++)
+			t[y][x].character = value;
 }
 
 Engine::Collider::Collider(UVector2D size, Vector2D pos, int type) : size(size), pos(pos), simple(true), type(type) {}

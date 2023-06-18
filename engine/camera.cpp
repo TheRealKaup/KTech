@@ -13,7 +13,7 @@ static int t, o, l, x, y, finalY, finalX, baseX;
 void Engine::Camera::Render(std::vector<Layer*> layers)
 {
 	if (image.size() != res.y)
-		image.resize(res.y, std::vector<Pixel>(res.x));
+		image.resize(res.y, std::vector<Cell>(res.x));
 	for (y = 0; y < res.y; y++)
 	{
 		for (x = 0; x < res.x; x++)

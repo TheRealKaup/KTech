@@ -72,17 +72,17 @@ namespace Widgets
 			
 			obj.textures[0].Write({ text }, notRGBA, { 0, 0, 0, 0.0f }, { 1, 1 });
 			
-			obj.textures[1].Block({ 2UL + (unsigned long)text.size(), 3 }, Engine::SuperChar(' ', {0, 0, 0, 0.0f}), {0U, 0U});
-			obj.textures[1].t[0][0] = Engine::SuperChar('#', notRGBA);
-			obj.textures[1].t[0][text.length() + 1] = Engine::SuperChar('#', notRGBA);
+			obj.textures[1].Rectangle({ 2UL + (unsigned long)text.size(), 3 }, Engine::CellA(' ', {0, 0, 0, 0.0f}), {0U, 0U});
+			obj.textures[1].t[0][0] = Engine::CellA('#', notRGBA);
+			obj.textures[1].t[0][text.length() + 1] = Engine::CellA('#', notRGBA);
 			for (size_t x = 1; x <= text.length(); x++)
-				obj.textures[1].t[0][x] = Engine::SuperChar('-', notRGBA);
-			obj.textures[1].t[1][0] = Engine::SuperChar('|', notRGBA);
-			obj.textures[1].t[1][text.length() + 1] = Engine::SuperChar('|', notRGBA);
-			obj.textures[1].t[2][0] = Engine::SuperChar('#', notRGBA);
-			obj.textures[1].t[2][text.length() + 1] = Engine::SuperChar('#', notRGBA);
+				obj.textures[1].t[0][x] = Engine::CellA('-', notRGBA);
+			obj.textures[1].t[1][0] = Engine::CellA('|', notRGBA);
+			obj.textures[1].t[1][text.length() + 1] = Engine::CellA('|', notRGBA);
+			obj.textures[1].t[2][0] = Engine::CellA('#', notRGBA);
+			obj.textures[1].t[2][text.length() + 1] = Engine::CellA('#', notRGBA);
 			for (size_t x = 1; x <= text.length(); x++)
-				obj.textures[1].t[2][x] = Engine::SuperChar('-', notRGBA);
+				obj.textures[1].t[2][x] = Engine::CellA('-', notRGBA);
 
 			layer->AddObject(&obj);
 		}
@@ -200,7 +200,7 @@ namespace Widgets
 
 		void ChangeValue(std::string newNumber)
 		{
-			obj.textures[0].Block({ maxDigits, 1 }, Engine::SuperChar(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)obj.textures[1].t[0].size(), 1 });
+			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)obj.textures[1].t[0].size(), 1 });
 			number = 0;
 			currentDigit = 0;
 			for (int x = 0; x < maxDigits && x < newNumber.length(); x++)
@@ -208,7 +208,7 @@ namespace Widgets
 				currentDigit++;
 				number *= 10;
 				number += newNumber[x] - '0';
-				obj.textures[0].t[0][x] = Engine::SuperChar(newNumber[x], notRGBA);
+				obj.textures[0].t[0][x] = Engine::CellA(newNumber[x], notRGBA);
 			}
 			visibleNumber = number;
 		}
@@ -250,29 +250,29 @@ namespace Widgets
 			// Texture
 			obj.textures.resize(3);
 
-			obj.textures[0].Block({ maxDigits, 1 }, Engine::SuperChar(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)text.length(), 1 });
+			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)text.length(), 1 });
 			for (int x = 0; x < maxDigits && x < defaultNum.length(); x++)
 			{
 				currentDigit++;
 				number *= 10;
 				number += defaultNum[x] - '0';
-				obj.textures[0].t[0][x] = Engine::SuperChar(defaultNum[x], notRGBA);
+				obj.textures[0].t[0][x] = Engine::CellA(defaultNum[x], notRGBA);
 			}
 			visibleNumber = number;
 
 			obj.textures[1].Write({ text }, notRGBA, Engine::RGBA(), { 1, 1 });
 
-			obj.textures[2].Block({ 2 + text.size() + maxDigits, 3 }, Engine::SuperChar(' ', { 0, 0, 0, 0.0f }), { 0, 0 });
-			obj.textures[2].t[0][0] = Engine::SuperChar('#', notRGBA);
-			obj.textures[2].t[0][obj.textures[2].t[0].size() - 1] = Engine::SuperChar('#', notRGBA);
+			obj.textures[2].Rectangle({ 2 + text.size() + maxDigits, 3 }, Engine::CellA(' ', { 0, 0, 0, 0.0f }), { 0, 0 });
+			obj.textures[2].t[0][0] = Engine::CellA('#', notRGBA);
+			obj.textures[2].t[0][obj.textures[2].t[0].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < obj.textures[2].t[0].size() - 1; x++)
-				obj.textures[2].t[0][x] = Engine::SuperChar('-', notRGBA);
-			obj.textures[2].t[1][0] = Engine::SuperChar('|', notRGBA);
-			obj.textures[2].t[1][obj.textures[2].t[1].size() - 1] = Engine::SuperChar('|', notRGBA);
-			obj.textures[2].t[2][0] = Engine::SuperChar('#', notRGBA);
-			obj.textures[2].t[2][obj.textures[2].t[2].size() - 1] = Engine::SuperChar('#', notRGBA);
+				obj.textures[2].t[0][x] = Engine::CellA('-', notRGBA);
+			obj.textures[2].t[1][0] = Engine::CellA('|', notRGBA);
+			obj.textures[2].t[1][obj.textures[2].t[1].size() - 1] = Engine::CellA('|', notRGBA);
+			obj.textures[2].t[2][0] = Engine::CellA('#', notRGBA);
+			obj.textures[2].t[2][obj.textures[2].t[2].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < obj.textures[2].t[2].size() - 1; x++)
-				obj.textures[2].t[2][x] = Engine::SuperChar('-', notRGBA);
+				obj.textures[2].t[2][x] = Engine::CellA('-', notRGBA);
 
 			layer->AddObject(&obj);
 		}
@@ -381,29 +381,29 @@ namespace Widgets
 
 			// Texture
 			Engine::Texture field;
-			field.Block({ maxChars, 1 }, Engine::SuperChar(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)text.length(), 1 });
+			field.Rectangle({ maxChars, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)text.length(), 1 });
 			for (int x = 0; x < maxChars && x < defaultString.length(); x++)
 			{
 				currentChar++;
 				string += defaultString[x];
-				field.t[0][x] = Engine::SuperChar(defaultString[x], notRGBA);
+				field.t[0][x] = Engine::CellA(defaultString[x], notRGBA);
 			}
 
 			Engine::Texture fieldText;
 			fieldText.Write({ text }, notRGBA, Engine::RGBA(), { 1, 1 });
 
 			Engine::Texture frame;
-			frame.Block({ 2U + text.size() + maxChars, 3 }, Engine::SuperChar(' ', {0, 0, 0, 0.0f}), {0, 0});
-			frame.t[0][0] = Engine::SuperChar('#', notRGBA);
-			frame.t[0][frame.t[0].size() - 1] = Engine::SuperChar('#', notRGBA);
+			frame.Rectangle({ 2U + text.size() + maxChars, 3 }, Engine::CellA(' ', {0, 0, 0, 0.0f}), {0, 0});
+			frame.t[0][0] = Engine::CellA('#', notRGBA);
+			frame.t[0][frame.t[0].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < frame.t[0].size() - 1; x++)
-				frame.t[0][x] = Engine::SuperChar('-', notRGBA);
-			frame.t[1][0] = Engine::SuperChar('|', notRGBA);
-			frame.t[1][frame.t[1].size() - 1] = Engine::SuperChar('|', notRGBA);
-			frame.t[2][0] = Engine::SuperChar('#', notRGBA);
-			frame.t[2][frame.t[2].size() - 1] = Engine::SuperChar('#', notRGBA);
+				frame.t[0][x] = Engine::CellA('-', notRGBA);
+			frame.t[1][0] = Engine::CellA('|', notRGBA);
+			frame.t[1][frame.t[1].size() - 1] = Engine::CellA('|', notRGBA);
+			frame.t[2][0] = Engine::CellA('#', notRGBA);
+			frame.t[2][frame.t[2].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < frame.t[2].size() - 1; x++)
-				frame.t[2][x] = Engine::SuperChar('-', notRGBA);
+				frame.t[2][x] = Engine::CellA('-', notRGBA);
 
 			obj.textures.resize(3);
 			obj.textures[0] = field;

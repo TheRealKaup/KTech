@@ -213,10 +213,10 @@ int main()
 
 	Engine::Object border({0, 0}, "L");
 	border.textures.resize(4);
-	border.textures[0].Block({ 50, 1 }, Engine::SuperChar('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
-	border.textures[1].Block({ 50, 1 }, Engine::SuperChar('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 49 });
-	border.textures[2].Block({ 1, 50 }, Engine::SuperChar('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
-	border.textures[3].Block({ 1, 50 }, Engine::SuperChar('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 49, 0 });
+	border.textures[0].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
+	border.textures[1].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 49 });
+	border.textures[2].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
+	border.textures[3].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 49, 0 });
 	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 0 }, 0));
 	border.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, 0 }, 0));
 	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 49 }, 0));
@@ -232,6 +232,7 @@ int main()
 	GravityBox gbC(&layer, {30, 20}, 3);
 
 	Engine::Object house({ 20, 32 }, "");
+
 	house.textures.resize(1);
 	house.textures[0].File("Assets/house.kcget", { 0, 0 });
 	layer.AddObject(&house);
@@ -241,7 +242,7 @@ int main()
 	Engine::Layer darkLayer;
 	darkLayer.brgba = { 0, 0, 0, 0.5f };
 	darkLayer.frgba = { 0, 0, 0, 0.5f };
-
+	
 	AutoUpdatingText audioPerformance(&Engine::potentialfps, {1, 1}, &layer, 172);
 
 	std::thread t_inputLoop(Engine::Input::Loop);

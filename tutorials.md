@@ -1,208 +1,94 @@
 **Tutorials:**
-  - Intro: KTech's interface, how to start using it
-  - Making a simple platform game
-  - How KTech works, looking at the engine's files
+ - [Intro: KTech's interface, how to start using it](#intro)
+ - [Loop](#loop)
+ - [Basic Graphics](#basic-graphics)
+ - [Input](#input)
+ - [Collision](#collision)
+ - [Audio](#audio)
+ - Putting it all together
+ - How KTech works, looking at the engine's files
+
+**To do:**
+- Input, Collision, Audio, Widgets, 
 
 **Notes:**
-
-- KTech's documentation was written to be suitable for people who are new to game development, and even to some computer programming concepts.
+- KTech's documentation was written to be suitable for people who are new to game development.
 - I **strongly advice** that whenever you encounter a programming concept which you are not familiar with, you should pause to learn it.
-- I sometimes use the words "directory" and "folder" interchangeably, as well as "KTech" and "the engine".
+- I sometimes use the words "directory" and "folder" interchangeably.
+- By saying "the engine" I mean the C++ game engine library, KTech.
 - When I write "`filename`:", it means the following content is the file's entire content. And when I instead write "from `filename`:", it means the following content is a only a portion of the file's content. This is to save some text.
 
-# Intro: KTech's interface, how to start using it
-
-### About this tutorial
+# Intro
+## About this tutorial
 
 In this tutorial, you will learn how to setup a KTech project, so you can start learning how to use the game engine.
 
-### A little about using KTech
+## About using KTech
 
-KTech, unlike popular game engines such as *Unreal Engine* and *Unity*, isn't as of itself a GUI application. It is only a C++ library which you put in your game engine directory and use it as you wish.
+It is important to understand that KTech is only a C++ game engine library, which makes game development higher level. As of itself (meaning not including programs like TextureCreator), it doesn't have a GUI application that assists you in crafting your game.
 
-A "KTech game project" in reality is your project which also uses KTech. What I am trying to say is that unlike, for example *Unreal Engine*, KTech isn't a super-rich and powerful software development kit (SDK) application which creates for you the game files, runs your game, and holds everything together.
+To use KTech, you have to use the programming language C++, though you don't need to be all that experienced with the language.
 
-With KTech, you do all of these things.
+If you know how to handle these concepts with C++, you should be more than fine:
+- Classes
+- Namespaces
+- Functions (or "methods")
+- Pointers
+- Vectors
+- Threads
+- Compiling
+- Header files
 
-KTech is a very bare bone game engine, in which things, that in other game engines are abstracted to a drag & drop exeperience, are done by writing code.
+If you aren't familiar with something from the list or don't feel comfortable using it, you should pause to learn it.
 
-For example, to place the player character in the game world, in...
-- *Unreal Engine* you would drag the character from the game's directory to the game editor viewport.
-- KTech you would set the character's position in its object's class constructor and call a function which adds the object to the game world.
+## How to setup a KTech project
 
-The reason these are such different experiences is because of the level they operate at. A drag & drop experience, when you hit run to play the game, goes down a level and gets converted into an operation which gives the character a position and adds it to the game world, which sounds familiar.
-
-This information isn't too important for you if you didn't come with a background of using game engines that have these drag & drop experiences and other abstractions which hide what truly happen. The reason I am emphesizing this major difference is because when I stopped using Unity and Unreal Engine in order to make this game engine, understanding this point really assisted me to get a solid grasp of what I was doing.
-
-### Setup a KTech project
+In the next section we will go over these steps in detail:
 
 1. Download the "engine" folder from the KTech GitHub repository.
 2. Put the engine folder in a directory which will be your game's code directory.
 3. Create a C++ code file in your game's code directory, and call it whatever you'd like. For example, "game.cpp".
 4. Include the KTech library in your game's code files by writing `#include <engine/engine.hpp>` at the start of the code.
 
-### What did we just do
+## What did we just do
 
-The "engine" folder is the KTech game engine's code, and it is important to understand that KTech is nothing more than that. KTech isn't a software you need to launch in order to create a world with logic and rules. KTech is a collection of tools, expressed as code, that make game development easier and more accessible, or in other words, a library.
+In the first step we downloaded the "engine" folder. The engine folder contains the KTech library. If you look inside, you will see some C++ files (.cpp) and C++ header files (.hpp).
 
-By writing `#include <other_code_file_name.hpp>` in a code file, you basically get access to its content. I enourage you to check the content of the file "engine.hpp" in the engine directory. You don't have to understand what everything there means, but notice the things such as `Map`, `AudioSource`, or `InitializeAudio`. These are all the concepts, tools or however you'd like to call them, which the engine provides. The other code files in the folder define the functionality of these functions.
+In the second step we put the engine inside your game's code directory. You game's code directory doesn't have to be something specific, so create it wherever and name it however you'd like. This is just generally where you should place your game files (such assets and code), and the engine also needs to be there, or in a place where it is accessible from.
 
-So, by adding `#include <engine/engine.hpp>` at the start of your game's code files, you are accessing the concepts and functions in that C++ header file (.hpp), which are defined in the other C++ code files (.cpp).
+In the third step we created a C++ code file (like `game.cpp`) designated for your game's code. In this code file you will use the functions and classes from the engine folder to make your game. The engine files are tools which your game' code files use to make a game with logic and rules.
 
-### About KTech classes
+In the fourth step we included the engine's header file (`engine.hpp`) from the engine folder. This header file has all the engine's declerations of its functions, classes and variables. I recommend you to take a peek inside `engine.hpp` to see what it contains.
 
-Concepts, such as a map, an object and a camera are classes.
+## The Engine namespace
 
-In the making of your game, you create instances of these classes.
+All of the engine's stuff (classes, functions...) are stored in a namespace for clarity. The namespace's name is `Engine`, so to access something from it, write `Engine::Something`.
 
-It is important to understand that unlike other common game engines, you are responsible for creating, keeping and changing instances of these classes, and not, for example,  a physics system that automatically updates your objects position according to gravity, or, a drag and drop experience to set the positions of cameras and objects at the start of the game. And also, you can always go deeper and remove or replace KTech functionality with your own, in case you feel like you still don't have enough control.
+## Compiling
 
-It might sound like game development with KTech is very manual and tedious, but fear not, because the engine provides functions that make it easy to program your game's functionality, which saves you writing compelx and long code, but doesn't save you from pretty much infinite control over your game. This is a considerable advantage over common game engines, which either hide their code and functionality, or are too big and complicated to understand, analyze, and modify.
+-needs to be written-
 
-### How to actually access classes and engine functions
+# Loop
 
-If you look inside `engine.hpp`, you will see that everything is written within a "namespace". A namespace is used to organize code, and make things clearer especially when you use the namespace's content.
+## About this tutorial
 
-In order to reach an engine class, for example, the "Map" class, you have to access it from the namespace, by specifying the namespace.
+In this tutorial, you will start learning how to use KTech by creating a game loop.
 
-Let's create a map:
+## The loop
 
-`game.cpp`:
+A video game at its core is a loop which renders graphics, calculates physics, receives player inputs and processes them. This loop most commonly runs asynchronous, though can run synchronous with KTech. with the game play loop.
 
-```c++
-#include <engine/engine.hpp>
+An iteration of the game loop is called a tick, and it runs at a certain ticks per second (TPS) rate, like, 12, 24, or 60 TPS. This is what gives a game the feel of a continuous world. For example, the very known game Minecraft by default runs at 20 TPS.
 
-int main()
-{
-	Engine::Map map;
-}
-```
+In KTech, the game develoepr creates their own game's loop. This allows for incredible control over your game, and a true understanding of what's happening and how everything works.
 
-Here, the game starts from the usual C++ entry point, `main()`. We use the `Map` class from the `Engine` namespace we got access to by including in the first line the "engine.hpp" header file from the "engine" folder we downloaded into our game development directory.
+## Create a game loop
 
-This program, or "game", by the way, creates an empty map an immediately exists and ends.
+Firstly, let's setup a KTech project by following the [How to setup a KTech project](#how-to-setup-a-ktech-project) step-by-step guide.
 
-### Creating a world
-
-If you come from other game engines, like Unity or Unreal Engine, the code from the last section is pretty much what these engines do at the start of a game if you told them in the game making editor that there is a map.
-
-This is the core difference between the game development experiences, the fact that there is no "editor" for this kind of stuff in KTech.
-
-*This, though, might actually change in the future. Just like how there is TextureCreator (an application made with KTech for creating KTech game textures) for making KTech game development easier, there can be more of these applications to create, for example, maps, or, animations.
-
-Let's expand the program from before and also add a layer to the map, and an object to that layer, and a texture to that object.
-
-A layer, by the way, allows to seperate objects in the same map if you wish so. For example, you can have a layer for the ground and a layer for clouds.
-
-Step 1: create a layer, and add the layer to the map.
+Secondly, let's add a loop.
 
 `game.cpp`:
-
-```c++
-#include <engine/engine.hpp>
-
-int main()
-{
-	Engine::Map map; // Create an empty map
-
-	Engine::Layer layer; // Create an empty layer
-	map.AddLayer(&layer); // Add the layer to the map
-}
-```
-
-As you can see, with KTech, when you add things to other things you usually add them as pointers. It is very important to know what pointers are and how to use them, so if you don't feel comfortable using them, please pause reading this and return after you have learned how to use them properly. If you are curious to know why KTech uses pointers pointers so heavily, there is a section explaining this.
-
-Step 2: create an object.
-
-`game.cpp`:
-
-```c++
-#include <engine/engine.hpp>
-
-int main()
-{
-	Engine::Map map; // Create an empty map
-
-	Engine::Layer layer; // Create an empty layer
-	map.AddLayer(&layer); // Add the layer to the map
-
-	Engine::Object object( // Create an object
-		Engine::Vector2D(5, 5), // Set the position
-		"My Object"); // Set the object's name
-}
-```
-
-Here, we created an object and used its class constructor. `Object` has 2 optional parameters, meaning you don't have to fill them, and instead use the default values which will set the object's position to (0, 0) and the name to "" (empty). `Engine::Vector2D` is another class like `Map`, `Layer` and `Object`, which has 2 variables inside of it: an X value and a Y value. So, so far we have an object that is at the position of (5, 5) and is called "My Object".
-
-Step 3: add a texture to the object, and add the object to the layer.
-
-`game.cpp`:
-
-```c++
-#include <engine/engine.hpp>
-
-int main()
-{
-	Engine::Map map; // Create an empty map
-
-	Engine::Layer layer; // Create an empty layer
-	map.AddLayer(&layer); // Add the layer to the map
-
-	Engine::Object object( // Create an object
-		Engine::Vector2D(5, 5), // Set the position
-		"My Object"); // Set the object's name
-
-	object.textures.resize(1); // Add space to the texture array
-	object.textures[0].Rectangle( // Draw a rectangle shape
-		Engine::UVector2D(3, 3), // The size of the rectangle
-		Engine::SuperChar('#', Engine::RGBA(0, 0, 255, 1.0f)), // The value each character cell
-		Engine::Vector2D(0, 0)); // The position of the texture relative to the object
-
-	layer.AddObject(&object); // Add the object to the layer
-}
-```
-
-I encourage you to look inside the engine header file, and try to grasp what the classes are, have, and their capabilities.
-As you can see, `Object` has a vector, which is similar to an array, of textures. Meaning a single object can have multiple textures, which is useful for managing how the object looks. `Texture` is a class of its own, and it has the functions `Rectangle()`, `File()` and `Write()`. These 3 functions are to fill the texture with, well, a texture. `Rectangle()` will make it a rectangle with the same value on each pixel (character cell with a foreground color, background color and character), `File()` will load the texture from a texture file, and `Write()` is for writing the texture in code, which can also be useful sometimes.
-
-So, by resizing the texture vector to 1, we add space to 1 texture.
-
-After resizing it, we can access it from the texture vector as you do with an array, and we will then call Rectangle() to make it a blue 3 by 3 square made of the character '#'.
-
-And lastly, after creating our beautiful object, we add it to the layer.
-
-By the way, because we add the object to the layer as a pointer, we can add the object before giving it a texture and the object that will end up in the layer will still have the later-added texture. So, if you want to organize your code to look a little nicer, you can add all the objects to the layers and the layers to the maps at the top of your code and then initialize it all.
-
-But, like the previous program, it really isn't a game because immediately after we make our world we reach the end of the program, which quits it.
-
-In the next tutorial, we'll make a game that will actually run, display our world and even play some sounds.
-
-# Making a simple platform game
-
-#### About this tutorial
-
-In this tutorial, you will learn how to **use** KTech and make a game with it.
-
-Don't worry if until this point of the documentation you have heard KTech concepts that you aren't familiar with, because this is the tutorial that is supposed to teach you these things about KTech.
-
-#### The loop
-
-The last piece of code in this documentation was a program, but not a game.
-
-What makes a game, a game?
-
-A game at its core is a loop. Some games are turn-based, some not, but almost always you can find a game play loop within it. For example: the player harvests resrouces, with those resources crafts a tool, with that tool gets more resources faster, with those resources crafts a better tool, and so on.
-
-But, specifically a **video** game, has another kind of loop, working asynchronous with that other loop. That loop renders graphics, calculates physics, receives player inputs and processes them.
-
-When making a game with, for example, Unity or Unreal Engine, you do get some glimpses of that base, true core, loop. Most commonly, by asking the game engine to call our functions ("user-defined functions") **on tick**. An iteration of that loop is called a **tick**, and it runs a certain amount of ticks per second, for example, 12, 24, or 60 ticks per second. For example, the very known game Minecraft by default runs at 20 ticks per second.
-
-**In KTech, the game develoepr creates their own game's base loop.** This allows for incredible control over your game, and a true understanding of how everything works.
-
-#### How to actually create a base loop
-
-`game.cpp`:
-
 ```c++
 #include <engine/engine.hpp>
 
@@ -217,288 +103,728 @@ int main()
 }
 ```
 
-Yep, that's it. This is the loop, and it's completely yours.
+As you can see, this is just a simple while-loop, and you have complete control over it.
 
-The `Initialization` part is where you initialize the world, meaning, create the map, the layers, the objects.
+The `Initialization` part is where you initialize the game's world, like create a map, layers and objects.
 
-The `Playing` part is where you run the game, at the base loop level. We will learn how to do these things later, but as an example, rendering an image is something that can be done in this loop.
+The `Playing` part is where you run the game at the tick level. We will discuss what can be placed here in a moment
 
 The `Exit` part is where you quit the game, for example, save the player's progress into a file.
 
-`running` is a global boolean variable provided by engine, as you can see from the `Engine::`. You can ditch it, but I recommend you use it, because the engine will automatically set it to false when it detects an exit request from the terminal, meaning it will exit the loops.
+`Engine::running` is a global boolean variable provided by the engine. I strongly recommend you use it because the engine will automatically set it to false when it detects an exit request from the terminal, meaning it will exit the loop and enter the exit part. This is more useful than having the whole thread taken down without notice and not reaching the exit part.
 
-Even though we have a base loop, it's still hard to call this a game, because all this is doing is entering a blank infinite loop. In fact, not even the functionality I mentioned earlier about `Engine::running` will work if you run this, because this program doesn't initialize that engine functionality.
+By running this program, nothing happens, this is obviously because our program is an infinite loop which does nothing. In fact, by ending the program, it will also not reach the exit part as expected by using `Engine::Running`, since we haven't yet initialized anything engine-related. Of course `Engine::running`'s functionality isn't working - our program is nothing but a plain C++ while-loop.
 
-Let's combine the program from the last tutorial with this one:
+Let's continue by adding 2 things:
+1. Initialization of `Engine::running`
+2. Time handling
+
+By time handling I mean keeping the loop run at a constant TPS.
+
+Currently, our while-loop is blocking the thread by moving on to the next tick (iteration) without waiting. This is not good, because:
+- We usually want our game to run at a consistent speed throughout the game play, and this is not consistent because it relies on the CPU's maximum speed and shifting availability.
+- We also want our game's TPS to not be crazy high (relying on the maximum CPU perfomance can give us a TPS rate as high as a 5 digits number with a basic game), and instead something low like 144, 60 or 24 which is more comfortable to work with, and additionaly, creates a threshold which allows weak and strong systems to run the game at the same speed.
+- Running this program on different systems with different maximum CPU speeds will result in varying game speeds, meaning it will change the game's whole behaviour.
+- By blocking the CPU thread, we take over so much of the player's computing power, which is not very nice.
 
 `game.cpp`:
-
 ```c++
 #include <engine/engine.hpp>
 
 int main()
 {
 	// Initialization
-	Engine::Map map; // Create an empty map
-
-	Engine::Layer layer; // Create an empty layer
-	map.AddLayer(&layer); // Add the layer to the map
-
-	Engine::Object object( // Create an object
-		Engine::Vector2D(5, 5), // Set the position
-		"My Object"); // Set the object's name
-
-	object.textures.resize(1); // Add space to the texture array
-	object.textures[0].Rectangle( // Draw a rectangle shape
-		Engine::UVector2D(3, 3), // The size of the rectangle
-		Engine::SuperChar('#', Engine::RGBA(0, 0, 255, 1.0f)), // The value each character cell
-		Engine::Vector2D(0, 0)); // The position of the texture relative to the object
-
-	layer.AddObject(&object); // Add the object to the layer
-
-	// Base loop
+	Engine::PrepareTerminal({10, 10}); // Prepares terminal-related stuff
+	Engine::tps = 24; // Set the TPS to 24
+	Engine::thisTickStartTP.SetToNow(); // State the start time point of the first tick
 	while (Engine::running)
 	{
 		// Playing
+		Engine::WaitUntilNextTick(); // Suspend the thread until the next tick should start
 	}
-
+	Engine::ResetTerminal(); // Resets terminal settings that the engine set in PrepareTerminal()
 	// Exit
 }
 ```
 
-Now we are getting somewhere, though our program is still not a game. Let's once again analyze what this program does:
+- `Engine::PrepareTerminal({10, 10});` - This function sets terminal settings, such as hiding the cursor, and prepares other miscellaneous terminal-related stuff. The parameter is an `Engine::UVector2D` (which is a class with 2 `unsigned long int` types, representing an unsigned 2D point) stating the size of the graphical ouput in character cells. This function is mandatory before printing anything to the terminal.
+- `Engine::tps = 24;` - `Engine::tps` is a global variable that the engine provides. This, as the name suggets, states the ticks per second rate. This is mandatory before 
+- `Engine::thisTickStartTP.SetToNow();` - Before entering the loop you need to inform the engine with the current time so `WaitUntilNextTick()` can correctly suspend the thread specifically after the first tick. This is what this line does. `Engine::thisTickStartTP` is an instance of class `Engine::TimePoint` which `WaitUntilNextTick()` uses to remember the last time it was called, and to know for how long to suspend the thread when called.
+- `Engine::WaitUntilNextTick();` - will wait and return return until the time is right for the next tick, meaning it is suspending the thread and thus the loop. If there is no time left to wait for the next tick (perhaps because the game did too many operations this tick), then it will return immediately.
+- `Engine::ResetTerminal()` - Resets terminal settings that the engine set in `Engine::PrepareTerminal()`, allowing for further use of the terminal after the game exits.
 
-1. It creates an empty map.
-2. It creates an empty layer.
-3. It adds the layer to the map, so, at this point we have a map with an empty layer.
-4. It creats an empty object.
-5. It expands the object's textures vector (array) by 1, allowing us to draw a texture at the first index of the object's texture vector.
-6. It sets the first texture of the object to a blue 3 by 3 square made of the '#' character.
-7. It adds the object to the layer, so, at this point we have a map with a layer with an object that has a blue square texture.
-8. At this point it finished initializing the game and now enters the infinite game base loop, which will end if the game gets forcfully quitted (for example by pressing Ctrl+C which is standard for exiting terminal applications).
+With these additions to the loop, our iterations run at a stable TPS rate.
 
-Let's make the base loop display our world.
+You can always check what the functions do by simply checking their definitions in the engine folder. Look in the references to see where something is defined with a detailed explenation of what it does.
 
-First, we are missing a camera, let's create one in the initialization part, somewhere after we create the map:
+# Basic graphics
 
-from `game.cpp`:
+## About this tutorial
 
-```c++
-// ...after creating the map
-Engine::Camera camera({ 0, 0 }, { 20, 20 });
-map.AddCamera(&camera, true);
-// ...before entering the base loop
+In this tutorial you will learn how to use graphics in KTech.
+
+## How graphics work in KTech
+
+KTech's graphics isn't like normal graphics. An image in KTech is made of character cells (since it is a terminal game engine), which are constructed of a character, the character's (foreground) RGB color and the background RGB color.
+
+RGB in KTech is full 24 bit range (meaning 16777216 possible colors).
+
+But this is just the the final rendered image which is displayd on the screen, because textures' character cells also have alpha channels (RGBA), allowing transparency and better graphics.
+
+When textures overlap (have the same positions), the characters of the most upper texture will take place in the final image, so as the foreground color and background color, according to the alpha channels.
+
+This could seem like a lot of information, but it's mostly techincal stuff which you won't be working with too often.
+
+In order to display graphics on the terminal we need to do a couple of things:
+1. [Have a world with visible objects.](#create-a-world)
+2. Have a camera.
+3. Prepare the terminal for printing.
+4. Render with the camera.
+5. Draw the camera's rendered image on the engine's final image.
+6. Print the image.
+
+In the next sections, we will go over the classes used while working with graphics in KTech, and then, in the following sections, we will construct a program that properly displays graphics, explainign everything in great detail.
+
+## Coordinates
+
+Coordinates in KTech work like how coordinates work in the field of printing and screens:
+
+```
+o----> X+
+|
+|
+V
+Y+
 ```
 
-The first parameter in the camera class constructor, which is a Vector2D, `{0, 0}`, is the position of the camera.
+This is because of the order characters are printed into the terminal: characters start at the top left corner, characters go right as they are printed, and when they reach the end of the row they go down into a new line.
 
-The second parameters (also a Vector2D) is the size of the camera's image, the "resolution", so here it is 20 by 20, which might sound small, but this size is not in pixels, it is in character cells. The player can resize their terminal's font if they want to make the game larger on their screen.
+## Object
 
-After making the camera, we add it to the map. The first parameter for the map's function "`AddCamera`" is a pointer the camera, and the second parameter asks us if we want this camera to be the active one. This is useful if your map has multiple cameras you wish to switch between. We don't add the camera to a layer, because layers separate objects only on the physical sepctrum (collision), but a camera renders all the objects in a map. Objects in higher layers will be displayd on top.
+KTech uses a class called `Object`.
 
-Before we tell the camera to render and print in the base loop, you must prepare the terminal for printing, before entering the base loop:
+An `Object` has these things:
+1. Position
+2. Name
+3. Vector of textures
+4. Vector of colliders
+5. On-event calls
+6. Move() function
+7. Some other stuff
 
-from `game.cpp`:
+Once again, you can check the references to see exactly what the `Object` class has with proper explenations, and you can also take a peek at the engine's code. But this list here is just to conceptualize `Object`.
 
-```c++
-// ...after initializing world
-Engine::PrepareTerminal({20, 20});
-// ...before entering the base loop
-```
+So, `Object` is pretty much a physical, visible and functional, well, "object", which you put in your game's world.
 
-`PrepareTerminal` prepares a global image, which is like a final image before printing a rendered image (allowing printing multiple images at the same time at different locations on the terminal). It also prepares some other stuff regarding the termianl. If you want to check out exactly what it does, you can simply look in the `engine.cpp` file in the engine folder, and look for this engine function definition. This, by the way, enables the `Engine:running` functionality discussed earlier.
+Before we go into the adding an object into a world part, let's dive into what's a texture.
 
-You should also call the engine function `Engine::ResetTerminal()` at the exit part of the game, which will reset the termianl settings set by the engine, allowing for further use of the terminal after the game exits:
+## Texture
 
-from `game.cpp`:
+The class `Object` uses the class `Texture` to store its textures.
 
-```c++
-// ...after the base loop
-Engine::ResetTerminal();
-// ...before the program's end
-```
+The class `Textures` has:
+1. Position (relative to the parent, or "owning", object)
+2. Texture-creating functions `Rect()`, `File()` and `Write()`
 
-Now, let's add the base loop functionality:
+And some other things which are listed in the references.
 
-from `game.cpp`:
+This what each texture-creating function does:
+- `Rect()` - Draw a rectangle on the texture with a specified size, character, foreground color and background color.
+- `File()` - Load texture from a KTech texture file, which can be made with TextureCreator. This allows for complex textures, with distinct colors and characters in all character cells.
+- `Draw()` - Draw a texture by writing it in the code editor, with a specified foreground color and background color.
 
-```c++
-// ...after initialization
-while (Engine::running) // The base loop
-{
-	map.Render();
-	map.Draw();
-	Engine::Print();
-}
-// ...before exit
-```
+## Map
 
-`Map::Render()` renders an image with the map's active camera. It stores the image inside that active camera, awaiting to be drawn.
+A `Map` is what a game world called in KTech.
 
-`Map::Draw()` draws the rendered image of the map's active camera to the final engine image.
+`Map` has:
+- Vector of layers
+- Vector of cameras
+- Other stuff
 
-The final engine image allows printing multiple images at the same time, at different positions.
+A `Map` is simply a collection of `Layer`s and `Camera`s.
 
-Also, look at `Map::Draw()`'s optional parameters listed in `engine.hpp`. You can tell `Map::Draw()` to draw the image at a certain position on the final image, and specify a rectangle to crop the camera's image.
+## Layer
 
-`Engine::Print()`, lastly, prints the engine's final image to the terminal, which actually displays the image.
+A `Layer` is a collection of objects.
 
-Let's take a look at our current version of the program:
+It has a vector of objects and some other stuff.
 
-`game.cpp`:
+Both `Map` and `Layer` are not very functional, and act as a group of things.
 
+The reason `Camera`s are stored in a `Map` and `Object`s are stored in a `Layer` is that a camera can see the entire map, and the order of layers affects the order objects are rendered (objects in higher layers will be displayed on top of objects in lower layers). This allows for easier rendering order managment, and additionally, also affects collision, which we will cover in the following [collision tutorial](#collision).
+
+## Camera
+
+A `Camera` is a much more functional class.
+
+It has:
+- Position
+- Resolution
+- `Render()` function which transforms objects into an image and stores that image within itself.
+- `Draw()` function which draws the stored rendered image on the engine's final image.
+
+## The final image
+
+"The engine's final image" is a global engine image which solves printing multiple images at the same time.
+
+If for example you wish to display a rendered image at one half of the terminal and another rendered image at the other half, the final image allows this, because you can draw your images at a specified position and a rectangle (for cropping the image) on the final image before printing it. We will try this functionality later.
+
+## Create a world
+
+Let's create a new KTech project by simply adding another C++ code file in your game's code directory, and compile it instead of the C++ code file from the last tutorial. I will call this game "graphics_test.cpp" and copy the loop from the [game loop](#loop) tutorial to start things off.
+
+`graphics_test.cpp`:
 ```c++
 #include <engine/engine.hpp>
 
 int main()
 {
-	// Initialization
-	Engine::Map map; // Create an empty map
+	// We will initialize our world here
 
-	Engine::Layer layer; // Create an empty layer
-	map.AddLayer(&layer); // Add the layer to the map
-
-	Engine::Camera camera({ 0, 0 }, { 20, 20 }); // Create a camera
-	map.AddCamera(&camera, true); // Add the camera to the map
-
-	Engine::Object object( // Create an object
-		Engine::Vector2D(5, 5), // Set the position
-		"My Object"); // Set the object's name
-
-	object.textures.resize(1); // Add space to the texture array
-	object.textures[0].Rectangle( // Draw a rectangle shape
-		Engine::UVector2D(3, 3), // The size of the rectangle
-		Engine::SuperChar('#', Engine::RGBA(0, 0, 255, 1.0f)), // The value each character cell
-		Engine::Vector2D(0, 0)); // The position of the texture relative to the object
-
-	layer.AddObject(&object); // Add the object to the layer
-
-	Engine::PrepareTerminal({20, 20});
-
-	// Base loop
+	Engine::PrepareTerminal({10, 10});
+	Engine::tps = 24;s
+	Engine::thisTickStartTP.SetToNow();
 	while (Engine::running)
 	{
-		// Running
+		// And render and print our world here
+		Engine::WaitUntilNextTick();
+	}
+	Engine::ResetTerminal();
+}
+```
+It's important to note that this way of doing things is not mandatory. If your game doesn't require to render an image and print it every tick, you can change this behaviour to render an image and print it every time the player inputs a key, or a certain game event happens. This is one of the advantges of KTech being bare bone, it lets you run your game the way it fits your game. We will experiment with this in another tutorial.
+
+Back to the topic. Notice the comments. We will create our world before entering the loop, and display our world inside the loop.
+
+This makes sense: Before entering the playing state of the game we should initialize, or "load" it, and after everything was loaded we can enter the playing state by reaching the loop. In your own games you can of course create a different behaviour, for example, load only your game's main menu's assets, and when the player chooses to enter the actual game, unload the main menu's assets and load the game's assets and then enter the game.
+
+But in this tutoril we will simply initialize our world and display it in the loop.
+
+First, let's create a map:
+
+from `graphics_test.cpp`:
+```c++
+int main()
+{
+	// We will initialize our world here
+	Engine::Map map; // Create a map
+	// ...Before PrepareTerminal
+}
+```
+
+`Engine::Map` doesn't have a class constructor, which is common among KTech classes. `map` is now a completely empty map with no layers and no cameras.
+
+Let's also create a layer and add it to the camera:
+
+from `graphics_test.cpp`:
+```c++
+int main()
+{
+	// We will initialize our world here
+	Engine::Map map;
+	
+	Engine::Layer layer; // Create a layer
+	map.AddLayer(&layer); // Add the layer to the map
+	// ...Before PrepareTerminal
+}
+```
+
+Same as how we created `map`, `layer` has default values and no objects.
+
+Using `Map::AddLayer` we add `layer` to `map` as a pointer. The usage of pointers here is important. This means that you are responsible for storing all of these class instances in the memory, and not the engine. This also means we can add objects and change attributes in `layer` after adding it to `map` and changes will apply, which is comfortable to work with and doesn't require a resource-heavy deep copy.
+
+Now we have a map with an empty layer. Let's create an object and add it to the layer:
+
+from `graphics_test.cpp`:
+```c++
+int main()
+{
+	// We will initialize our world here
+	Engine::Map map;
+	
+	Engine::Layer layer;
+	map.AddLayer(&layer);
+	
+	Engine::Object object({5, 5}); // Create an object
+	layer.AddObject(&object); // Add the object to the layer
+	// ...Before PrepareTerminal
+}
+```
+
+`Engine::Object` has a constructor which all of its parameters are optional:
+- Position of type `Engine::Vector2D`
+- Name of type `std::string`
+
+Not specifying the position will set it to {0, 0}, and not specifying the name will set it to "" (empty).
+
+We create an empty object with the position of {5, 5} and add it to layer.
+
+Let's add a texture to the object:
+
+from `graphics_test.cpp`:
+```c++
+int main()
+{
+	// We will initialize our world here
+	Engine::Map map;
+	
+	Engine::Layer layer;
+	map.AddLayer(&layer);
+	
+	Engine::Object object({5, 5});
+	layer.AddObject(&object);	
+
+	object.textures.resize(1); // Add a texture to the object
+	object.textures[0].Write( // Draw the texture to be a pink character 
+		{
+			" O ",
+			"/|\\",
+			"/ \\"
+		}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Vector2D( 0, 0 )
+	);
+	// ...Before PrepareTerminal
+}
+```
+
+As you can see, neither the `Engine::Texture` class has a constructor, and instead, it has functions that draw the texture after it was created. This is comfortable with this writing scheme. By resizing the object's texture vector we create a new empty texture, and then we access it and call `Write` to draw this pink (255, 0, 255) character texture.
+
+`Engine::RGBA` is used to store and pass RGBA values. The first `RGBA` parameter in `Write()` is the foreground color of the characters. The second `RGBA` is the background color, and because the default constructor of RGBA is (0, 0, 0, 0.0f), the background of this texture will be completely transperent. The `Vector2D` parameter is the position of the texture relative to its parent object.
+
+Once again: if you want to seek more information about `Write()` and the classes used here, simply check the references or look inside the engine's code.
+
+And this it it, now we have a map with a layer with an object with a texture of a pink character.
+
+## Print the world
+
+In order to display the world we need a camera, so let's create one:
+
+
+from `graphics_test.cpp`:
+```c++
+int main()
+{
+	// ...After creating the map
+	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(15, 10)); // Create a camera
+	map.AddCamera(&camera, true); // Add the camera to the map
+	// ...Before PrepareTerminal
+}
+```
+
+`Engine::Camera`'s constructor has 2 parameters:
+- Position of type `Vector2D`
+- Resolution of type `UVector2D` (which is like Vector2D but has 2 unsigned long integers)
+
+In this example make a camera at the position of (0, 0) and with a resolution (in character cells) of (15, 10).
+
+We then add `camera` to `map` and specify (the second parameter) to make it the active camera.
+
+`Map::activeCameraI` is an index to the stated active camera from the cameras vector, which allows the nicer to use `Map::Render()` and `Map::Draw()` functions to work.
+
+So now our `map` also has an active camera.
+
+Next, we need to render an image, draw it to the engine's final image, and print the final image:
+
+`graphics_test.cpp`:
+```c++
+int main()
+{
+	// ...After creating world
+	Engine::PrepareTerminal({15, 10}); // We want the size of the final image to be (15, 10)
+	Engine::tps = 24;s
+	Engine::thisTickStartTP.SetToNow();
+	while (Engine::running)
+	{
+		map.Render(); // Renders using the active camera
+		map.Draw(); // Draws the active camera's rendered image
+		Engine::Print(); // Print the final image into the terminal
+		Engine::WaitUntilNextTick();
+	}
+}
+```
+
+And voila. Compile and run this, and you will see a pink character printed into the terminal 24 times a second. Admittedly, it's not impressive, but it's something. Here is the final piece of code:
+
+`graphics_test.cpp`:
+```c++
+#include <engine/engine.hpp>
+int main()
+{
+	// Initialize game world
+	Engine::Map map;
+	
+	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(15, 10)); // Create a camera
+	map.AddCamera(&camera, true); // Add the camera to the map
+
+	Engine::Layer layer;
+	map.AddLayer(&layer);
+	
+	Engine::Object object({5, 5});
+	layer.AddObject(&object);	
+
+	object.textures.resize(1);
+	object.textures[0].Write(
+		{
+			" O ",
+			"/|\\",
+			"/ \\"
+		}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Vector2D( 0, 0 )
+	);
+
+	// Enter game loop
+	Engine::PrepareTerminal({15, 10});
+	Engine::tps = 24;
+	Engine::thisTickStartTP.SetToNow();
+	while (Engine::running)
+	{
 		map.Render();
 		map.Draw();
 		Engine::Print();
+		Engine::WaitUntilNextTick();
 	}
-
 	// Exit
 	Engine::ResetTerminal();
 }
 ```
 
-I still don't think we can call this a game, but it is definitely a renderer. If you run it, it will display a blue square of hashes.
+# Input
 
-#### Timing
-
-Here is a small practice, try to answer these questions about the current version of our program:
-
-1. What are the 3 parts of the program?
-2. What happens in the first part?
-3. What happens in the second?
-4. What happens in the third?
-5. What is the ticks per second (TPS) rate (how many iterations the base loop goes through per second)?
-
-The answer for 5 is as high as your computer allows, because our-while loop is blocking the thread by immediately executing the next operation eternally. This is not good, because:
-
-- We usually want our game to run at a consistent speed throughout the game play, and this is not consistent because it relies on the CPU's maximum speed and shifting availability.
-- We also want our game's TPS to not be crazy high (relying on the maximum CPU perfomance can give us a TPS rate as high as a 5 digits number), and instead something low like 144, 60 or 24 which are numbers that are more comfortable to work with.
-- Running this program on different systems with different maximum CPU speeds will result in varying game speeds.
-- By blocking the CPU thread, we take over so much of the player's computing power, which is not cool.
-
-To clarify, by "speed" I don't just mean the game's graphical FPS, but the entire game's speed. If you design your game to move your character 1 character cell every tick, different TPSs will result in different character speed.
-
-#### How to actually limit TPS
-
-The solution is to limit our TPS, by suspending our thread with specific time values. The goal is to give our base loop a consistent and smooth TPS rate.
-
-Additionaly, setting a low enough TPS (like 144, 60, 24, et cetera) creates a threshold which allows weak and strong systems to run the game at the same speed.
-
-To do this, the engine provides a function and a global variable:
-
-- `Engine::tps` - this global variables declares the game's TPS rate.
-- `Engine::WaitUntilNextTick()` - this function suspends the thread until the next tick should start.
-
-`WaitUntilNextTick()` knows how much time is left for the current tick based on the last time it was called, which makes it convenient to place in a loop.
-
-Let's implement this TPS limiting functionality into our loop:
-
-from `game.cpp`:
-
-```c++
-// ...after initialization
-Engine::thisTickStartTP.SetToNow(); // State the start time point of the first tick
-Engine::tps = 24; // Set the TPS to 24
-// Base loop
-while (Engine::running)
-{
-	map.Render();
-	map.Draw();
-	Engine::Print();
-	Engine::WaitUntilNextTick(); // Suspend the thread until the next tick should start
-}
-// ...before exiting
-```
-
-- `Engine::thisTickStartTP.SetToNow();` - Before entering the loop you need to inform the engine with the current time so `WaitUntilNextTick()` can correctly suspend the thread specifically after the first tick. This is what this line does. `Engine::thisTickStartTP` is an instance of class `Engine::TimePoint` which `WaitUntilNextTick()` uses to remember the last time it was called, and to know for how long to suspend the thread.
-- `Engine::tps = 24;` - sets the TPS before entering the loop, but you can change its value at any point and it should act correspondingly.
-- `Engine::WaitUntilNextTick();` - will return until the time is right for the next tick, meaning it is "blocking" the loop. If there is no time left to wait for the next tick, perhaps because the game did too many operations this tick, then it will return immediately.
-
-Our "game" now properly runs at a consistent TPS.
-
-#### Input with KTech
+## About this tutorial
 
 In this section we will make our blue square move, but first, we need to understand how input works with KTech.
 
-To demonstrate how it works, open an application where you can type text in, and hold one of the character keys. One character will be inserted, and after a short delay, many of that character will be inserted repeatedly until you release the key.
+## How input works in KTech
 
-This is how KTech receives and distributes input, because KTech is a terminal game engine. For some certain game designs this is inconvenient, but it's a source for odd and unique solutions. There is no way to get a key state like in Unity or Unreal Engine, because terminal applications don't get access to such information. Terminal applications only get standard terminal input, but really, it's pretty fine for video games, especially for ones that are mostly UI based.
+To demonstrate how it works, open a terminal application which allows you to type (such as a text editor or a shell), and hold one of the character keys. One character will be inserted, and after a short delay, many of that character will be inserted repeatedly until you release the key.
 
-In order to receive input from the engine, we need to register an "input handler", which calls a callback function when the input handler's key gets pressed.
+This is how KTech receives and distributes input, because KTech is a terminal game engine. For some certain game designs this is inconvenient, but it's a source for odd and unique solutions. There is no way to get a key state like in Unity or Unreal Engine, because terminal applications don't get access to this data. Terminal applications only get standard terminal input, which is adaquate for video games, and especially for UI based video games.
 
-So, the input limitations are:
-
-- No way to know key states
+These are KTech's limitations:
 - Keys start repeating if they are held for a certain length of time
-- No way to know when keys are released (only pressed
-- Only keyboard, no mouse input
+- Only down events
+- Only keyboard
+- Keys states are unknown
 
-#### How to actually get input
+Additionally, some inputs (like some modified keys) are received as escape codes, so check [the escape codes list]() from the references. There are some more important notes in that part of the references, so I strongly recommend you check that out.
 
-Inside the `Engine` namespace there is another namespace called `Input`. This namespace has everything input-related things. This is a namespace inside a namepsace, so accessing things from the `Input` namespace looks like this: `Engine::Input::<Namespace Member>`.
+## Get input
 
-Similar to how you need to call `PrepareTerminal` before the game loop so you can print graphics, input also requires preparation so you can receive input events.
+These are the steps:
+- Call `PrepareTerminal()`
+- Start an input thread
+- Register input handler
+- At the end of the program, call `ResetTerminal()`
 
-Inside the `Input` namespace there is a function called `Loop`, which is the input loop.
+We already covered `Engine::PrepareTerminal()` and `Engine::ResetTerminal()` before. You can always check the references to check out exactly what these engine functions do.
 
-The input loop is a blocking loop which waits until every input press:
+In order to receive input from the engine, we need to register an "input handler", which calls its assigned callback function when its key gets pressed.
 
-from `engine/input.cpp`:
+Input related things are organized inside the `Input` namespace inside the `Engine` namespace.
+
+## Register input handler
+
+Inside the `Input` namespace there is the `RegisterHandler()` function. This function does what its name says - it puts in the engine's memory your callback function, and whenever the input loop receives the specified input the input loop will call that callback function.
+
+from [the Engine::Input references]():
 
 ```c++
-void Engine::Input::Loop()
+Engine::Input::RegisterHandler(
+	std::string stringKey/char charKey,
+	std::function<void()> call,
+	bool onTick = false
+)
+```
+
+- `stringKey`/`charKey` - the key, can be a character (such as 'a' or ' ') or a string (such as "\033[A").
+- `call` a pointer to your callback function.
+- `onTick` - (optional, `false` by default) we will cover exactly what this means, how to use it, and why it might be prefered in some cases later.
+
+Let's register an input handler in the [previous program](#print-the-world):
+
+from `game.cpp`
+```c++
+int ChangeObjectColor(&Engine::Object obj) // Our custom callback that changes an object's color 
 {
-	while (true)
-	{
-		Get()
-	}
+	// Randomize the foreground color of the first texture
+	obj.texture[0].SetForeground(Engine::RGBA(rand() % 256, rand() % 256, rand() % 256, 1.0f));
+}
+
+int main()
+{
+	/// ...After creating object
+	srand(time(NULL)); // Generate a random see for later use
+	Engine::Input::RegisterHandler('c', std::bind(ChangeObjectColor, &object)); // Register an input handler
+	/// ...Before entering loop
 }
 ```
 
-This is the actual definition of `Engine::Input::Loop()`. What I am trying to say, is that by calling this function, you will not be able to continue your program, because it is an infinite loop that quits only when the program ends.
+This addition to the program will randomize our object's first texture foreground color (the character color) each time the 'c' key is received.
 
-As you can see, the only operation this function does inside its while-loop is `Engine::Input::Get`, which returns until the player enters input, meaning `Get()` is also blocking.
+- `ChangeObjectColor()` is a new function we created. It calls `Engine::Texture::SetForeground()` for the given object which sets all the texture's character cells' foreground value.
+- `srand(time(NULL))` generates random seed so `rand` in `ChangeObjectColor` will work.
+- In `RegisterHandler`, we take `ChangeObjectColor()` and bind its `Object*` parameter with `&object` (a pointer of our object from before) using `std::bind`. This gives us a callback function with no parameters and returns, which is what `RegisterHandler` expects.
 
-So, if we want a game that works with a consistent TPS like our game does, then we can't simply call this before the base loop (beacuse it won't reach the base loop) nor can we call `Get()` inside it.
+Though this won't work because the program is missing an input thread.
 
-another thread; multithreading:
+## Create an input thread
 
-from `game.cpp`:
+The input thread is another loop running asynchronous with the game loop.
 
+The `Input` namespace has a premade input loop that can be ran as a separate thread:
+
+from `engine/input.cpp`:
 ```c++
-std::thread t_inputLoop(Engine::Input::Loop);
+void Engine::Input::Loop()
+{
+	while (Engine::running)
+		Get();
+}
 ```
 
-And now the input loop runs in a thread of its own.
+This is `Engine::Input::Loop()`'s definition, and as you can see, it is nothing more than a while loop that is calling `Get()` each iteration and will stop running if `Engine::running` is false.
+
+`Engine::Input::Get()` is a blocking function which returns only after an input is received. This fact makes it unsuitable for the game loop if we wish to run the game loop at a consistent TPS, which is why in this example we will run the input loop in a separate thread, so the game loop can run at a consistent TPS and the input loop will get us player inputs.
+
+What you need to know about this `Engine::Input::Loop()` is that if it is running, it will call your callbacks within your registered input handlers, which is the component we were missing so far.
+
+Let's return to our program:
+
+from `game.cpp`
+```c++
+int main()
+{
+	/// ...Preferably after initialization
+	std::thread t_inputLoop(Engine::Input::Loop);
+	/// ...Preferably right before entering game loop
+}
+```
+
+Here, we create a new `std::thread` with a reference to the `Engine::Input::Loop` function.
+
+The reason I advice you to place this right before entering the loop is because from that point the program will receive inputs which doesn't make much sense to receive when loading the game. It doesn't really matter though, and perhaps your game needs to start receiving input on startup, like if you want to integrate a cancel loading feature to exit the game. But, in this example we don't need such functionality, so I think it's most fitting that input will start coming only while actually playing.
+
+Now, if you compile and run the program, it should randomize the foreground color of your object each time you hit the 'c' key.
+
+## OnTick inputs
+
+In the [register input handler section](#register-input-handler) we registered an input handler but we didn't expanded on what's the third parameter in `Engine::Input::RegisterHandler()`, `bool onTick`, is.
+
+Setting `onTick` to false (the default value of the parameter) will make `Engine::Input::Get()`, which is called in `Engine::Input::Loop()`, to call callback functions when the specified input is received immediately, which is the basic functionality.
+
+Setting `onTick` to true will make `Get()` collect all the times the input was pressed and distribute the presses as a single press each game loop tick.
+
+In other words, setting `onTick` to true is deciding to synchronize the call of your callback function with the game loop, and avoiding calling callback functions multiple times each tick.
+
+This is because the repeating rate of when you hold a key for a certain length of time is most likely not synchronized and faster than the game's TPS. This can lead to unwanted results, for example:
+
+- Your character's movement keys start repeating at a rate faster than the game's TPS, and if the game is set up in a way that whenever the movement keys are pressed the character moves a cell, the character will skip a some cells every frame and then.
+- You have a UI element in your game which allows the player to type text, and then the player holds a letter key which start repeating. Because the repeating rate is faster, in some frames it seems like 2 characters entered the text field at the same time.
+
+You would probably prefer, in a game which intergrates a consistent TPS game loop, to receive the same key only once per tick, even if the repeating rate actually sent more than 1 presses of the key this tick.
+
+In order to make `onTick` work, you need to call `Engine::Input::Call()` each tick since `Engine::Input::Loop()` simply can't just tell when a tick begins and ends. `Engine::Input::Call()` is desgisned to be placed inside a game loop: it distributes all of the collected inputs since the last time `Engine::Input::Call()` was called. 
+
+Let's add it:
+
+from `game.cpp`:
+```c++
+int main()
+{
+	// ...
+	while (true) // The game loop
+	{
+		// Somewhere in the game loop, perhaps at the start
+		Engine::Input::Call();
+	}
+	// ...
+}
+```
+
+And now you can set `onTick` to true inside `Engine::Input::RegisterHandler`, and it shoud work as expected.
+
+Really, this is mostly relevant in games which run at a low TPS (like 24), acknowledging that the repeating rate is usually not very high (like 30, though it isn't the same on every computer). This is because `onTick` doesn't solve keys which repeat at a lower (not a faster) rate than the game's TPS rate. It simply can't do that, since, as mentioned before, the engine doesn't get the necessary information, key states, for this.
+
+## Moving character
+
+I recommend that for making a game "character", one that is built of an object and custom logic and rules, you should create a unique class.
+
+Let's start a new game, by creating a new game file which we will compile instead. In the context of this tutorial, rename the last game's code file ("game.cpp") to "game.cpp.old" and create a new game's code file named "game.cpp", so we have an old code file which we won't use anymore ("game.cpp.old") and a new, empty game code file ("game.cpp").
+
+Let's start by creating a character class, but let's not actually call it "character", because the word "character" can be confused between the ubiquitous computer symbols and a person in a story or a game. So instead we will call it "Player".
+
+`game.cpp`:
+```c++
+#include <engine/engine.hpp>
+
+class Player // Our "Player" class
+{
+	Engine::Object object; // Has an object
+	Player(Engine::Layer* layer) // Asks for a layer
+	{
+		// ...Create the object, initialize Player logic...
+		layer->AddObject(&object); // Adds the object to the layer
+	}
+};
+
+int main()
+{
+	// Initialize world
+	Engine::Map map;
+	
+	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(30, 15));
+	map.AddCamera(&camera, true);
+
+	Engine::Layer layer;
+	map.AddLayer(&layer);
+	
+	Player player(&layer); // Create 
+
+	// Enter game loop
+	Engine::PrepareTerminal({30, 15});
+	Engine::tps = 24;
+	Engine::thisTickStartTP.SetToNow();
+	std::thread t_inputLoop(Engine::Input::Loop);
+	while (Engine::running)
+	{
+		Engine::Input::Call();
+		map.Render();
+		map.Draw();
+		Engine::Print();
+		Engine::WaitUntilNextTick();
+	}
+
+	// Exit
+	Engine::ResetTerminal();
+}
+
+```
+
+I borrowd the basic and useful program template from the previous couple of tutorials. It simply creates a map with a layer and a camera, prepares the terminal, enters a game loop with a consistent TPS, renders and prints graphics, calls collected inputs, and resets the terminal when exiting the game loop.
+
+Usually in these tutorials, I'll comment after new lines. Here, the new things are the Player class and the creation of a player instance inside `main()`.
+
+I suspect that the way `Player` is written is the way you would commonly write classes with KTech:
+- Has at least one object.
+- Has a constructor which requests a layer.
+- Initializes its contents.
+- Adds its one or more objects to the layer.
+
+So our `Player` class has an object, a constructor, and inside the constructor adds its object to a given layer.
+
+But we clearly didn't add anything more to the `Player` class, so the object does nothing.
+
+Let's continue by making the object look like the player-looking object from previous tutorials:
+
+from `game.cpp`
+```c++
+class Player
+{
+	Engine::Object object;
+	Player(Engine::Layer* layer)
+	{
+		object.textures.resize(1);
+		object.textures[0].Write(
+			{
+				" O ",
+				"/|\\",
+				"/ \\"
+			}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Vector2D( 0, 0 )
+		);
+
+		layer->AddObject(&object);
+	}
+};
+```
+
+Now the object within `Player` has a pink person-looking texture.
+I suggest we add 2 more constructor customizations, just for fun:
+- Position
+- Color
+
+from `game.cpp`
+```c++
+class Player
+{
+	Engine::Object object;
+	Player(Engine::Layer* layer, Engine::Vector2D position, Engine::RGBA color)
+	{
+		object.pos = position;
+		object.textures.resize(1);
+		object.textures[0].Write(
+			{
+				" O ",
+				"/|\\",
+				"/ \\"
+			}, color, Engine::RGBA(), Engine::Vector2D( 0, 0 )
+		);
+		layer->AddObject(&object);
+	}
+};
+```
+
+So now the constructor also gets a position of type `Vector2D` and a color of type `RGBA` and sets the player these values accordingly. We also need to update our `Player` instance creation in `main()`:
+
+from `game.cpp`
+```c++
+int main()
+{
+	// ...Player creation, after creating layer
+	Player player(&layer, Engine::Vector2D(3, 3), Engine::RGBA(150, 150, 255, 1.0f)); // Create 
+	// ...Before entering game loop
+}
+```
+
+And now our player spawns at the position (3, 3) with a blue color.
+
+Let's continue by adding movement for `Player`:
+
+from `game.cpp`
+```c++
+class Player
+{
+	Engine::Object object;
+	
+	void Move()
+	{
+		if (Engine::Input::Is('w'))
+			object.pos.y--;
+		else if (Engine::Input::Is('a'))
+			object.pos.x--;
+		else if (Engine::Input::Is('s'))
+			object.pos.y++;
+		else if (Engine::Input::Is('d'))
+			object.pos.x++;
+	}
+	
+	Player(Engine::Layer* layer, Engine::Vector2D position, Engine::RGBA color)
+	{
+		Engine::Input::RegisterHandler('w', std::bind(&Player::Move, this), true);
+		Engine::Input::RegisterHandler('a', std::bind(&Player::Move, this), true);
+		Engine::Input::RegisterHandler('s', std::bind(&Player::Move, this), true);
+		Engine::Input::RegisterHandler('d', std::bind(&Player::Move, this), true);
+
+		object.pos = position;
+		object.textures.resize(1);
+		object.textures[0].Write(
+			{
+				" O ",
+				"/|\\",
+				"/ \\"
+			}, color, Engine::RGBA(), Engine::Vector2D( 0, 0 )
+		);
+		layer->AddObject(&object);
+	}
+};
+```
+
+`Engine::Input::Is()` is a function to check if the last input is equal to the parameter. You can also directly access the input buffer (`Engine::Input::buf`) though I see no reason to, and it's easier to write with `Is()`.
+
+We add and subtract 1 cell according to the last input. Because up is -1 on the Y axis then we are subtracting 1 from the Y value of the object's position when the 'w' key is pressed.
+
+The usage of `std::bind()` in `RegisterHandler()` inside the constructor makes it possible for the engine to call the `Move()` of this class instance.
+
+And this should be it. Also notice that we are setting the `onTick` parameter in `RegsiterHandler` to true since it simply fits our consistent and low TPS game loop, and that we are calling `Engine::Input::Call()` in the game loop to make this work.
+
+Compile and run this program, and really, we can call this a game by this point, since we have a visible character that moves according to the player's input.
+
+# Collision

@@ -18,7 +18,6 @@ static void Log(std::string string, unsigned number)
 
 // Engine
 PaStream* Engine::stream = nullptr;
-long Engine::audioPerformance = 0L;
 
 // default device info
 static PaStreamParameters outputParameters;

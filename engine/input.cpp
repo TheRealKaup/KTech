@@ -4,7 +4,6 @@
 
 char* Engine::Input::buf = new char[maxEscapeSequenceLength];
 unsigned char Engine::Input::length = 0;
-char* Engine::Input::quitString = (char*)"\03";
 
 void Engine::Input::Handler::AddCall(std::function<void()> call, bool onTick)
 {
@@ -80,7 +79,8 @@ char* Engine::Input::Get()
 void Engine::Input::Loop()
 {
 	// `strcmp(Get(), "\03") != 0` - Quit if Ctrl+C was received 
-	while (strcmp(Get(), quitString) != 0);
+	while (Engine::running)
+		Get();
 }
 
 bool Engine::Input::Is(std::string stringKey)

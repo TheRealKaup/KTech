@@ -24,7 +24,7 @@ std::vector<std::vector<unsigned char>> Engine::colliderTypes = {
 	{ 2, 2, 2 } // Overlappable - 2
 };
 // Console
-std::vector<std::vector<Engine::Pixel>> Engine::image = {};
+std::vector<std::vector<Engine::Cell>> Engine::image = {};
 std::string Engine::stringImage = "";
 
 // ---=== Engine Functions ===---

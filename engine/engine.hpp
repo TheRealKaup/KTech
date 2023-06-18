@@ -33,8 +33,8 @@ namespace Engine
 	struct RGBA;
 	struct Vector2D;
 	struct UVector2D;
-	struct Pixel;
-	struct SuperChar;
+	struct Cell;
+	struct CellA;
 	struct Texture;
 	struct Collider;
 	struct Object;
@@ -70,15 +70,12 @@ namespace Engine
 	extern bool running;
 
 	// The final image that will be printed. This allows multiple cameras to print at the same time
-	extern std::vector<std::vector<Pixel>> image;
+	extern std::vector<std::vector<Cell>> image;
 	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
 	extern std::string stringImage;
 
 	// Global PortAudio stream
 	extern PaStream* stream;
-
-	// Time in microseconds that it took for the last audio buffer to process
-	extern long audioPerformance;
 
 	// Keyboard input things
 	namespace Input
@@ -103,8 +100,6 @@ namespace Engine
 		extern std::vector<Handler> handlers;
 		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
 		extern unsigned handlerIndex;
-		// Will exit the input loop when this key is received
-		extern char* quitString;
 
 		// Register an input handler in order to get your function called on a keyboard input event.
 		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
@@ -170,38 +165,46 @@ namespace Engine
 		UVector2D(unsigned long xAxis = 0, unsigned long yAxis = 0);
 	};
 
-	struct Pixel
+	struct Cell
 	{
 		char32_t character;
 		RGB frgb;
 		RGB brgb;
-		Pixel(char32_t character = ' ', RGB foreground = {0, 0, 0}, RGB background = { 0, 0, 0 });
+		Cell(char32_t character = ' ', RGB foreground = {0, 0, 0}, RGB background = { 0, 0, 0 });
 	};
 
-	struct SuperChar
+	struct CellA
 	{
-		char32_t character;
+		char character;
 		RGBA frgba;
 		RGBA brgba;
-		SuperChar(char32_t character = ' ', RGBA foreground = {255, 255, 255, 1.0f}, RGBA background = {0, 0, 0, 0.0f});
+		CellA(char32_t character = ' ', RGBA foreground = {255, 255, 255, 1.0f}, RGBA background = {0, 0, 0, 0.0f});
 	};
 
 	struct Texture
 	{
-		std::vector<std::vector<SuperChar>> t = {};
+		std::vector<std::vector<CellA>> t = {};
 		Vector2D pos = {0, 0};
 		bool active = true;
-		
+
 		// The constructors are functions instead of actual constructors because of my own preference.
 		// Visual Studio has a hard time correctly showing the parameters when filling them, so I decided that
 		// this is the best solution for making the writing experience easier.
 		
 		// A rectangle of the same value. (Limited to a single color and character)
-		void Block(UVector2D size, SuperChar value, Vector2D pos);
+		void Rectangle(UVector2D size, CellA value, Vector2D pos);
 		// Load from a file. (Requires file)
 		void File(std::string fileName, Vector2D pos);
 		// Create a texture by writing it. (Limited to a single color)
 		void Write(std::vector<std::string> stringVector, RGBA frgba, RGBA brgba, Vector2D pos);
+		// Change all the cells' values
+		void SetCell(CellA value);
+		// Chagne all the cells' foreground color values
+		void SetForeground(RGBA value);
+		// Chagne all the cells' background color values
+		void SetBackground(RGBA value);
+		// Chagne all the cells' character values
+		void SetCharacter(char value);
 	};
 
 	struct Collider
@@ -342,7 +345,7 @@ namespace Engine
 		std::string name = "Unnamed Camera";
 		Vector2D pos = { 0, 0 };
 		UVector2D res = { 10U, 10U };
-		std::vector<std::vector<Pixel>> image = {};
+		std::vector<std::vector<Cell>> image = {};
 
 		Camera(Vector2D position = {0, 0}, UVector2D resolution = {0, 0}, std::string cameraName = "Unnamed Camera");
 		
