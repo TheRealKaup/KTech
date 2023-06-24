@@ -5,11 +5,12 @@
  - [Input](#input)
  - [Collision](#collision)
  - [Audio](#audio)
+ - [Widgets](#widgets)
  - Putting it all together
  - How KTech works, looking at the engine's files
 
 **To do:**
-- Input, Collision, Audio, Widgets, 
+- Collision, Audio, Widgets, 
 
 **Notes:**
 - KTech's documentation was written to be suitable for people who are new to game development.
@@ -652,11 +653,13 @@ Let's start a new game, by creating a new game file which we will compile instea
 
 Let's start by creating a character class, but let's not actually call it "character", because the word "character" can be confused between the ubiquitous computer symbols and a person in a story or a game. So instead we will call it "Player".
 
+### TODO: Mention about `Player` being struct and not class 
+
 `game.cpp`:
 ```c++
 #include <engine/engine.hpp>
 
-class Player // Our "Player" class
+struct Player // Our "Player" class
 {
 	Engine::Object object; // Has an object
 	Player(Engine::Layer* layer) // Asks for a layer
@@ -828,3 +831,289 @@ And this should be it. Also notice that we are setting the `onTick` parameter in
 Compile and run this program, and really, we can call this a game by this point, since we have a visible character that moves according to the player's input.
 
 # Collision
+
+## About this tutorial
+
+In this tutorial you will learn how collision works and how to use it. We will expand the program from the last tutorial and add objects with colliders to the world and make them behave in different ways.
+
+## Collision in KTech
+
+The collision subsystem in KTech is made of a couple of important elements:
+- `Layer`s
+- `Object`s with `Collider`s
+- Collider types
+- `Object::Move()` function
+- On collision events
+
+Calculating collision in KTech is done by calling the `Object::Move()` function which processes the colliders in the space and determines a move result. This is in contrast to calling a function inside the game loop which each tick calcualtes physics and updates positions. KTech's collision functionality isn't continuous, meaning it doesn't work by updating positions.
+
+## `Layer`s
+
+As we already touched upon, layers are a way to manage objects within maps. The higher the layer's index inside the map's layer vector, the later the objects within the layers will be rendered, meaning they will be displayed on top. But that is just graphics-wise.
+
+Collision-wise, objects interact only with other objects in the same layer. You can look at layers as a third Z axis; objects from different layers can't collide with each other because they are in different Z positions, but a camera can still render an image with objects from different layers as long as they are in X and Y range, and the Z axis determines the rendering order.
+
+## `Collider`s
+
+This is the first time we encounter the `Engine::Collider` class.
+
+The current version of the engine only supports what's called a simple collider. A simple collider is a rectangle, which is stored as 2 `Vector2D`; a size and a position relative to the parent object. A compelx collider, which is currently not working, is supposed to be a 2D boolean vector representing the collider, allowing you to create complex shaped colliders. But once again, these don't work at the moment, and will probably return in the near future.
+
+So, this simple collider rectangle represents a kind of physical space, which is used to determine collision results.
+
+`Engine::Collider` has 2 constructors, one for the complex collider and the second for the simple, so use the simple one. Check the references for the exact `Engine::Collider`'s content and constructors.
+
+`Object`s have a `Collider` vector called `Object::colliders`. Meaning, a single `Object` can have multiple `Collider`s. This is useful for many purposes. For exmaple, let's say you are creating a platform game which allows the player to jump. To know if the player can jump, you should check if the player is on the ground and not mid-air, and a way to to this is to add an additional collider (beside the normal body collider) under their legs which allows you tell if there is ground beneath the player.
+
+## Collider types
+
+A collider type is a value assigned to each `Collider`, used to determine the collision result between 2 colliders.
+
+There are 3 possible collision results:
+1. Block (result=0), the moving collider can't move because of the other collider.
+2. Push (result=1), the moving collider can move, and will also move the other collider with it to clear the way. 
+3. Overlap (result=2), the moving collider can move into the other collider.
+
+The collider types are stored in the 2D unsigned char (8 bit number) vector `Engine::colliderTypes` which you can define to fit your needs. These are the default collider types:
+```c++
+std::vector<std::vector<unsigned char>> Engine::colliderTypes = {
+	{ 0, 1, 2 }, // Heavy - 0
+	{ 0, 1, 2 }, // Normal - 1
+	{ 2, 2, 2 } // Overlappable - 2
+};
+```
+
+This is definitely confusing to look at for the first time. This table states all of the collision results between colliders; every row is a collider type which is moving, and every column is a collider type which is being moved into. This is how you should be looking at it:
+
+| What happens when type A collider collides with type B collider? | B=0         | B=1         | B=2         |
+|------------------------------------------------------------------|-------------|-------------|-------------|
+| **A=0**                                                          | 0 (Block)   | 1 (Push)    | 2 (Overlap) |
+| **A=1**                                                          | 0 (Block)   | 1 (Push)    | 2 (Overlap) |
+| **A=2**                                                          | 2 (Overlap) | 2 (Overlap) | 2 (Overlap) |
+
+Meaning, heavy colliders can't be pushed, normal colliders can be pushed, and overlappable colliders overlap and can be overlapped.
+
+For example, if a type 0 collider collides with a type 1 collider, the moving object will push the other object.
+
+If we would want, for whatever reason, that this collision result will instead be, for example, block, we would change that value in the collider types table by writing `Engine::colliderTypes[0][1] = 0;` or `Engine::colliderTypes = {{ 0, 0, 2 }, { 0, 1, 2 }, { 2, 2, 2 }};`.
+
+The `Engine::Collider` class has a `Collider::colliderType` integer variable. This variable represetns the collider type of the collider. As covered earlier, a single `Object` can have multiple `Collider`s, which means an `Object` can have multiple `Collider`s with of different types, which allows advanced behaviour.
+
+The `Collider::colliderType` variable's value needs to be set between the `Engine::colliderTypes` rows index range, otherwise, it will have a undefined collider type.
+
+## `Object::Move()`
+
+This function is what makes things happen.
+
+It takes a single `Vector2D` parameter for the wanted movement direction.
+
+`Object::Move()`'s goal is to check if movement can be done, by processing the object's environment (inside `Object::parentLayer`), object by object, collider by collider. `Object::Move()` always concludes a successful movement which will lead to changing `Object::pos` accordingly, or a blocked movement which will lead to nothing happening. These 2 conclusions can mean:
+- Succesful movement: there is nothing is in the way, or, there is an object in the way and the moving object managed to push it, or, there is an object in the way and the moving object can go though it (overlap).
+- Blocked movement: there is an object in the way and the moving object can't push it.
+
+`Object::Move()` also can do what I call "tree movement". This allows for an object to push an object which will push another object, kind of a movement sequence, or a "tree". This means that if an object is moving and there is a blocking object in the way, it will first check if there are other objects which it can push, and will check if those pushable objects can push that blocking object. Tree movement is always in favor of moving and not being blocked, meaning, it will not stop searching for a way to push blocking objects until there are no more relevant object to search for.
+
+In short, by actually calling `Object::Move()` with a given direction, `Move()` tries to change the position of the moving object with the other objects from the moving object's parent layer in mind.
+
+## On event callback functions
+
+Additionally, `Object::Move()` calls "on event" callback functions. Check these variables inside `Object`:
+
+```c++
+Object* theOtherObject = NULL;
+Vector2D lastPush = { 0, 0 };
+int theColliderIndex = -1;
+int theOtherColliderIndex = -1;
+std::function<void()> OnPushed = NULL;
+std::function<void()> OnPush = NULL;
+std::function<void()> OnBlocked = NULL;
+std::function<void()> OnBlock = NULL;
+```
+
+- `OnPushed` is a pointer you set to a function you define (a callback function) which gets called when this object is being pushed.
+- `OnPush` is a callback function which gets called when this object pushes another objet. 
+- `OnBlocked` is a callback function which gets called when this object gets blocked (if it just moved or it was attempted to be pushed into an eventually blocking object).
+- `OnBlock` is a callback function whch gets called when this object blocks another object.
+- `lastPush` is a `Vector2D` specifying the direction of the last time it was pushed. It is set before whenever `OnPushed` and `OnPush` are called.
+- `theOtherObject` is a pointer to an object which is set to the relevant object whenever `OnPushed`, `OnPush`, `OnBlocked` and `OnBlock` are called.
+- `theColliderIndex` is an integer which is set to the relevant index in this `Object`'s `colliders` vector whenever `OnPushed`, `OnPush`, `OnBlocked` and `OnBlock` are called.
+- `theOtherColliderIndex` is an integer which is set to the relevant index in the `theOtherObject`'s `colliders` vector whenever `OnPushed`, `OnPush`, `OnBlocked` and `OnBlock` are called.
+
+These callback functions and variables are useful for adding rules and logic into your game after calling `Object::Move()`.
+
+For example, if I had a custom class with an object and I wanted that whenever it gets touched, the touching object will disappear, I would set `OnBlock` and `OnPushed` to a function which uses the `theOtherObject` object pointer to remove the object from the layer:
+
+```c++
+struct ObjectWhichMakesThingsDiappear
+{
+	Engine::Object object;
+
+	void RemoveOtherObject()
+	{
+		object.parentLayer->RemoveObject(object.theOtherObject);
+	}
+
+	ObjectWhichMakesThingsDiappear(Engine::Layer* layer)
+	{
+		// ...Add a collider to the object et cetera (we didn't cover how to actually do this yet)
+		object.OnBlock = std::bind(&ObjectWhichMakesThingsDiappear::RemoveOtherObject, this);
+		object.OnPushed = std::bind(&ObjectWhichMakesThingsDiappear::RemoveOtherObject, this);
+		layer->AddObject(&object);
+	}
+};
+```
+
+## Game plan
+
+In the following sections we will cover collision in practice by making a game which:
+- Defines its own collider types
+- Creates a world with multiple objects, some with multiple colliders and some with different collider types
+- Calls `Object::Move()` with player input
+- Harneses the power of on event callback functions
+
+Unlike the previous programs in the last tutorials, you can really call this program a game; it will be a much larger program with real gameplay.
+
+Our game will be a simple obstacle course with multiple levels. The player's mission is to get from the starting point to the ending point without hitting the moving enemey objects. There will also be a mechanic to open doors by dragging boxes onto pressure plates.
+
+The first level will look like this:
+```
+#########
+#   E   #
+#       #
+#X<---> #
+#       #
+# <--->X#
+#       #
+#X<---> #
+#       #
+#   S   #
+#########
+```
+
+- `S` - Starting point
+- `E` - Ending point
+- `#` - Wall, blocking border
+- `X` - Enemy, the player fails if they touch it
+- `<->` - Enemy movement path
+
+The player starts at the bottom and their goal is to get to the top. The enemies move back and forth on their path. We will use the movement from the [input tutorial](), so we need to have the way input works in mind.
+
+The second level:
+```
+#########
+#E#  B  #
+# #     #
+# # <->X#
+# #     #
+# #     #
+# #X<-> #
+# #     #
+# D  S P#
+#########
+```
+
+- `D` - Door
+- `P` - Pressure plate
+- `B` - Draggable box
+
+The player's mission in this level is to avoid the moving enemies through the corridor in order to reach the box and drag it back onto the pressure plate at the bottom right, which will open the door at the bottom left, letting the player get to the ending point.
+
+To make this even more challenging, when the player holds a box, the box will become a part of them so if an enemy hits the box that will also fail the player.
+
+The third and last level:
+``` 
+################
+#P<---\D/-->--\#
+#####//#|#####|#
+# S #|##|#/X\#|#
+#   #|#PX#|E|#X#
+#    |#B|#\</#|#
+# B  v##|##D##|#
+#    X##\--<--/#
+################
+```
+
+The player's mission is to drag the box into the first enemy's movement path, which will make the enemy push the box onto the pressure plate. The player needs to let the enemy drag it since if they try to drag the box themselves, the enemy might to reach them before they manage to enter the door. Behind the door is another room with 2 enemies circling a smaller room, the player needs to follow the enemies and keep up the speed so they don't get hit or hit an enemy. In the left side of the room there is another set of box that needs to be placed upon a pressure plate which will open the small room's door. To make this easier to understand in game, we will color buttons and doors the same. Inside the small room there is a nother enemy which circles around the ending point.
+
+After the player finished the first level, the game will start the second level, after that the third, and after that will finish the game and exit it.
+
+## First level
+
+For now we will use the default collider types, which are heavy, normal and overlappable.
+
+Our walls will have heavy colliders, meaning they can't be pushed and are fixed into placed. Normal and heavy colliders will be blocked if they try to move into heavy colliders.
+
+Let's start with an empty game loop, input thread, a map with a camera and a layer, 16 * 11 image size (which should be about what we need), a moving player class, 
+
+`game.cpp`:
+```c++
+#include <engine/engine.hpp>
+
+class Player
+{
+	Engine::Object object;
+	
+	void Move()
+	{
+		if (Engine::Input::Is('w'))
+			object.pos.y--;
+		else if (Engine::Input::Is('a'))
+			object.pos.x--;
+		else if (Engine::Input::Is('s'))
+			object.pos.y++;
+		else if (Engine::Input::Is('d'))
+			object.pos.x++;
+	}
+	
+	Player(Engine::Layer* layer, Engine::Vector2D position, Engine::RGBA color)
+	{
+		Engine::Input::RegisterHandler('w', std::bind(&Player::Move, this), true);
+		Engine::Input::RegisterHandler('a', std::bind(&Player::Move, this), true);
+		Engine::Input::RegisterHandler('s', std::bind(&Player::Move, this), true);
+		Engine::Input::RegisterHandler('d', std::bind(&Player::Move, this), true);
+
+		object.pos = position;
+		object.textures.resize(1);
+		object.textures[0].Write(
+			{
+				" O ",
+				"/|\\",
+				"/ \\"
+			}, color, Engine::RGBA(), Engine::Vector2D( 0, 0 )
+		);
+		layer->AddObject(&object);
+	}
+};
+
+int main()
+{
+	// Initialize world
+	Engine::Map map;
+	
+	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(16, 11));
+	map.AddCamera(&camera, true);
+
+	Engine::Layer layer;
+	map.AddLayer(&layer);
+	
+	// Enter game loop
+	Engine::PrepareTerminal({16, 11});
+	std::thread t_inputLoop(Engine::Input::Loop);
+	Engine::tps = 24;
+	Engine::thisTickStartTP.SetToNow();
+	while (Engine::running)
+	{
+		Engine::Input::Call();
+		map.Render();
+		map.Draw();
+		Engine::Print();
+		Engine::WaitUntilNextTick();
+	}
+
+	// Exit
+	Engine::ResetTerminal();
+}
+
+```
+
+# MISSING engine component: OnOverlap

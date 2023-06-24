@@ -275,8 +275,12 @@ namespace Engine
 		float opacity = 1.0f;
 
 		int AddObject(Object* object);
+		// Remove an object by its index, returns false if couldn't find the object.
 		bool RemoveObject(int index);
+		// Remove an object by its name, returns false if couldn't find the object.
 		bool RemoveObject(std::string name);
+		// Remove an object by its pointer, returns false if couldn't find the object.
+		bool RemoveObject(Object* object);
 	};
 	
 	struct AudioSource

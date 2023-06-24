@@ -56,7 +56,6 @@ void BetterPrint()
 				2.2.1)
 		3) String for each pixel, write to stringImage according to terminalSize.
 
-
 		Ok, so it makes sense to write to stringImage according to terminalSize in order to save processings.
 		stringImage though is kept at the maximum image size, because terminalSize is likely to change.
 

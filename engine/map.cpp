@@ -33,6 +33,18 @@ bool Engine::Layer::RemoveObject(std::string name)
 	return false;
 }
 
+bool Engine::Layer::RemoveObject(Object* object)
+{
+	for (int i = 0; i < objects.size(); i ++)
+	{
+		if (objects[i] == object)
+		{
+			objects.erase(objects.begin() + i - 1);
+			return true;
+		}
+	}
+	return false;
+}
 
 // ---=== Map ===---
 
