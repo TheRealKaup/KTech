@@ -99,6 +99,11 @@ struct Character
 	}
 };
 
+void SetRunningFalse()
+{
+	Engine::running =false;
+}
+
 struct GravityBox
 {
 	Engine::Object obj;
@@ -127,8 +132,10 @@ struct GravityBox
 			}, { 100, 0, 200, 1.0f }, { 0, 0, 0, 0.1f }, { 0, 0 }
 		);
 
-		obj.colliders.push_back(Engine::Collider({ 3, 3 }, { 0, 0 }, 2));
+		obj.colliders.push_back(Engine::Collider({ 3, 3 }, { 0, 0 }, 3));
 		
+		obj.OnOverlapExit = SetRunningFalse;
+
 		obj.OnTick = std::bind(&GravityBox::OnTick, this);
 		
 		layer->AddObject(&obj);

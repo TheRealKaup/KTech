@@ -78,7 +78,6 @@ char* Engine::Input::Get()
 
 void Engine::Input::Loop()
 {
-	// `strcmp(Get(), "\03") != 0` - Quit if Ctrl+C was received 
 	while (Engine::running)
 		Get();
 }

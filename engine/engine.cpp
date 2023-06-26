@@ -260,7 +260,7 @@ void Engine::PrepareTerminal(Engine::UVector2D imageSize)
 	terminalAttributes.c_lflag &= ~ICANON;
 	terminalAttributes.c_lflag &= ~ECHO;
 	terminalAttributes.c_cc[VMIN] = 1;
-	terminalAttributes.c_cc[VTIME] = 0;
+	terminalAttributes.c_cc[VTIME] = 1;
 	tcsetattr(0, TCSANOW, &terminalAttributes);
 
 	// Size the image

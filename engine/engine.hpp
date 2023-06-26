@@ -231,7 +231,7 @@ namespace Engine
 
 	struct Object
 	{
-		Layer* parentLayer = NULL; 
+		Layer* parentLayer = NULL;
 
 		std::function<void()> OnTick = NULL;
 		
@@ -241,10 +241,10 @@ namespace Engine
 		std::vector<Texture> textures = {};
 		std::vector<Collider> colliders = {};
 
-		Object* theOtherObject = NULL;
 		Vector2D lastPush = { 0, 0 };
-		int theColliderIndex = -1;
-		int theOtherColliderIndex = -1;
+		size_t colliderIndex = -1;
+		Object* otherObject = NULL;
+		size_t otherColliderIndex = -1;
 
 		// This event can be called after calling Move. OnPushed means that another object pushed this one.
 		std::function<void()> OnPushed = NULL;
@@ -254,10 +254,34 @@ namespace Engine
 		std::function<void()> OnBlocked = NULL;
 		// This event can be called after calling Move. OnBlock means that this object blocked another object.
 		std::function<void()> OnBlock = NULL;
+		// This event can be called after calling Move if a collider from this object started overlapping a collider from another object.
+		std::function<void()> OnOverlap = NULL;
+		// This event can be called after calling Move if a collider from this object stopped overlapping a collider from another object.
+		std::function<void()> OnOverlapExit = NULL;
+		// This event can be called after calling Move if a collider from another object started overlapping a collider from this object.
+		std::function<void()> OnOverlapped = NULL;
+		// This event can be called after calling Move if a collider from another object stopped overlapping a collider from this object.
+		std::function<void()> OnOverlappedExit = NULL;
 
 		bool Move(Vector2D dir);
 
-		void ExpandMovementTree(Vector2D dir, std::vector<Object*>* pushingObjects, std::vector<Object*>* objectsToPush, std::vector<unsigned>* pushingColliders, std::vector<unsigned>* collidersToPush, std::vector<Object*>* blockedObjects, std::vector<Object*>* blockingObjects, std::vector<unsigned>* blockedColliders, std::vector<unsigned>* blockingColliders);
+		void ExpandMovementTree(Vector2D dir,
+			std::vector<Object*>* pushingObjects,
+			std::vector<Object*>* objectsToPush,
+			std::vector<size_t>* pushingColliders,
+			std::vector<size_t>* collidersToPush,
+			std::vector<Object*>* blockedObjects,
+			std::vector<Object*>* blockingObjects,
+			std::vector<size_t>* blockedColliders,
+			std::vector<size_t>* blockingColliders,
+			std::vector<Object*>* overlappingObjects,
+			std::vector<Object*>* overlappedObjects,
+			std::vector<size_t>* overlappingColliders,
+			std::vector<size_t>* overlappedColliders,
+			std::vector<Object*>* exitOverlappingObjects,
+			std::vector<Object*>* exitOverlappedObjects,
+			std::vector<size_t>* exitOverlappingColliders,
+			std::vector<size_t>* exitOverlappedColliders);
 
 		Object(Vector2D position = {0U, 0U}, std::string objectName = "");
 	};
@@ -400,8 +424,6 @@ namespace Engine
 		// Get an int which represents the time point in nanoseconds
 		long Nanoseconds();
 	};
-
-	bool AreObjectsOverlapping(Engine::Object* objA, Engine::Object* objB, bool ignoreIrrelevancy = false);
 
 	// Storage, could be used for many things.
 	extern std::vector<Object> storedObjects;
