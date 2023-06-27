@@ -1,14 +1,15 @@
 #include "engine.hpp"
 
-Engine::Camera::Camera(Vector2D position, UVector2D resolution, std::string name)
+Engine::Camera::Camera(Point position, UPoint resolution, std::string name)
 	: pos(position), res(resolution) {}
 
 // <400 before, >400 after second update, >1500 expected max potential before, 1300-2000 now. (20x20)
 
 static Engine::Layer* layer;
 static Engine::Object* obj;
-static Engine::Texture* text;
+static Engine::Texture* texture;
 static int t, o, l, x, y, finalY, finalX, baseX;
+static u_int32_t temp;
 
 void Engine::Camera::Render(std::vector<Layer*> layers)
 {
@@ -36,39 +37,39 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 			obj = layer->objects[o];
 			for (t = 0; t < obj->textures.size(); t++)
 			{
-				text = &obj->textures[t];
+				texture = &obj->textures[t];
 				
-				if (!text->active)
+				if (!texture->active)
 					continue;
 
-				for (y = 0; y < text->t.size(); y++)
+				for (y = 0; y < texture->t.size(); y++)
 				{
-					finalY = y + obj->pos.y + text->pos.y - pos.y;
+					finalY = y + obj->pos.y + texture->pos.y - pos.y;
 
 					if (finalY < 0)
 						continue;
 					if (finalY >= res.y)
 						break;
 
-					for (x = 0; x < text->t[y].size(); x++)
+					for (x = 0; x < texture->t[y].size(); x++)
 					{
-						finalX = x + obj->pos.x + text->pos.x - pos.x;
+						finalX = x + obj->pos.x + texture->pos.x - pos.x;
 
 						if (finalX < 0)
 							continue;
 						if (finalX >= res.x)
 							break;
 
-						if (text->t[y][x].character != ' ')
+						if (texture->t[y][x].character != ' ')
 						{
-							image[finalY][finalX].character = text->t[y][x].character;
-							image[finalY][finalX].frgb.r = layer->opacity * text->t[y][x].frgba.a * text->t[y][x].frgba.r + (1.0f - layer->opacity * text->t[y][x].frgba.a) * image[finalY][finalX].frgb.r;
-							image[finalY][finalX].frgb.g = layer->opacity * text->t[y][x].frgba.a * text->t[y][x].frgba.g + (1.0f - layer->opacity * text->t[y][x].frgba.a) * image[finalY][finalX].frgb.g;
-							image[finalY][finalX].frgb.b = layer->opacity * text->t[y][x].frgba.a * text->t[y][x].frgba.b + (1.0f - layer->opacity * text->t[y][x].frgba.a) * image[finalY][finalX].frgb.b;
+							image[finalY][finalX].character = texture->t[y][x].character;
+							image[finalY][finalX].frgb.r = (texture->t[y][x].frgba.r * texture->t[y][x].frgba.a + image[finalY][finalX].frgb.r * (255 - texture->t[y][x].frgba.a)) / 255;
+							image[finalY][finalX].frgb.g = (texture->t[y][x].frgba.g * texture->t[y][x].frgba.a + image[finalY][finalX].frgb.g * (255 - texture->t[y][x].frgba.a)) / 255;
+							image[finalY][finalX].frgb.b = (texture->t[y][x].frgba.b * texture->t[y][x].frgba.a + image[finalY][finalX].frgb.b * (255 - texture->t[y][x].frgba.a)) / 255;;
 						}
-						image[finalY][finalX].brgb.r = layer->opacity * text->t[y][x].brgba.a * text->t[y][x].brgba.r + (1.0f - layer->opacity * text->t[y][x].brgba.a) * image[finalY][finalX].brgb.r;
-						image[finalY][finalX].brgb.g = layer->opacity * text->t[y][x].brgba.a * text->t[y][x].brgba.g + (1.0f - layer->opacity * text->t[y][x].brgba.a) * image[finalY][finalX].brgb.g;
-						image[finalY][finalX].brgb.b = layer->opacity * text->t[y][x].brgba.a * text->t[y][x].brgba.b + (1.0f - layer->opacity * text->t[y][x].brgba.a) * image[finalY][finalX].brgb.b;
+						image[finalY][finalX].brgb.r = (texture->t[y][x].brgba.r * texture->t[y][x].brgba.a + image[finalY][finalX].brgb.r * (255 - texture->t[y][x].brgba.a)) / 255;
+						image[finalY][finalX].brgb.g = (texture->t[y][x].brgba.g * texture->t[y][x].brgba.a + image[finalY][finalX].brgb.g * (255 - texture->t[y][x].brgba.a)) / 255;
+						image[finalY][finalX].brgb.b = (texture->t[y][x].brgba.b * texture->t[y][x].brgba.a + image[finalY][finalX].brgb.b * (255 - texture->t[y][x].brgba.a)) / 255;
 					}
 				}
 			}
@@ -102,7 +103,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 	}
 }
 
-void Engine::Camera::Draw(Vector2D pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
+void Engine::Camera::Draw(Point pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
 {
 	// Return if the image is sized 0
 	if (image.size() == 0)

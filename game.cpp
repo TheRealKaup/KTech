@@ -73,7 +73,7 @@ struct Character
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, { 0, 0, 0, 1.0f }, { 0, 0, 0, 0.0f }, { 0, 0 }
+			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
 		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 0, 1 }, 1));
 		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 1, 0 }, 1));
@@ -99,11 +99,6 @@ struct Character
 	}
 };
 
-void SetRunningFalse()
-{
-	Engine::running =false;
-}
-
 struct GravityBox
 {
 	Engine::Object obj;
@@ -119,7 +114,7 @@ struct GravityBox
 			obj.Move({ 0, 1 });
 	}
 
-	GravityBox(Engine::Layer* layer, Engine::Vector2D pos, unsigned fallingSpeed = 1U) : fallingSpeed(fallingSpeed)
+	GravityBox(Engine::Layer* layer, Engine::Point pos, unsigned fallingSpeed = 1U) : fallingSpeed(fallingSpeed)
 	{
 		obj.pos = pos;
 
@@ -129,12 +124,10 @@ struct GravityBox
 				"#-#",
 				"|G|",
 				"#-#"
-			}, { 100, 0, 200, 1.0f }, { 0, 0, 0, 0.1f }, { 0, 0 }
+			}, { 100, 0, 200, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
 
-		obj.colliders.push_back(Engine::Collider({ 3, 3 }, { 0, 0 }, 3));
-		
-		obj.OnOverlapExit = SetRunningFalse;
+		obj.colliders.push_back(Engine::Collider({ 3, 3 }, { 0, 0 }, 2));
 
 		obj.OnTick = std::bind(&GravityBox::OnTick, this);
 		
@@ -151,12 +144,12 @@ struct AutoUpdatingText
 	void OnTick()
 	{
 		if (*data > threshold)
-			obj.textures[0].Write({std::to_string(*data)}, {255, 0, 0, 1.0f}, {0, 0, 0, 0.5f}, {0, 0});
+			obj.textures[0].Write({std::to_string(*data)}, {255, 0, 0, 255}, {0, 0, 0, 127}, {0, 0});
 		else
-			obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 1.0f}, {0, 0, 0, 0.5f}, {0, 0});
+			obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
 	}
 
-	AutoUpdatingText(float* data, Engine::Vector2D pos, Engine::Layer* layer, long threshold) : data(data), threshold(threshold)
+	AutoUpdatingText(float* data, Engine::Point pos, Engine::Layer* layer, long threshold) : data(data), threshold(threshold)
 	{
 		obj.textures.resize(1);
 		obj.pos = pos;
@@ -220,10 +213,10 @@ int main()
 
 	Engine::Object border({0, 0}, "L");
 	border.textures.resize(4);
-	border.textures[0].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
-	border.textures[1].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 49 });
-	border.textures[2].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 0, 0 });
-	border.textures[3].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 1.0f }, { 255, 255, 255, 1.0f }), { 49, 0 });
+	border.textures[0].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
+	border.textures[1].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
+	border.textures[2].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
+	border.textures[3].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
 	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 0 }, 0));
 	border.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, 0 }, 0));
 	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 49 }, 0));
@@ -247,8 +240,8 @@ int main()
 	Engine::Input::RegisterHandler("m", TurnOnCharacterCamera);
 
 	Engine::Layer darkLayer;
-	darkLayer.brgba = { 0, 0, 0, 0.5f };
-	darkLayer.frgba = { 0, 0, 0, 0.5f };
+	darkLayer.brgba = { 0, 0, 0, 127 };
+	darkLayer.frgba = { 0, 0, 0, 127 };
 	
 	AutoUpdatingText audioPerformance(&Engine::potentialfps, {1, 1}, &layer, 172);
 

@@ -2,19 +2,11 @@
 
 Engine::RGB::RGB(unsigned char red, unsigned char green, unsigned char blue) : r(red), g(green), b(blue) {}
 
-Engine::RGBA::RGBA(unsigned char red, unsigned char green, unsigned char blue, float alpha) : r(red), g(green), b(blue)
-{
-	if (alpha > 1.0f)
-		a = 1.0f;
-	else if (alpha < 0.0f)
-		a = 0.0f;
-	else
-		a = alpha;
-}
+Engine::RGBA::RGBA(unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha) : r(red), g(green), b(blue), a(alpha) {}
 
-Engine::Vector2D::Vector2D(long xAxis, long yAxis) : x(xAxis), y(yAxis) {}
+Engine::Point::Point(long x, long y) : x(x), y(y) {}
 
-Engine::UVector2D::UVector2D(unsigned long xAxis, unsigned long yAxis) : x(xAxis), y(yAxis) {}
+Engine::UPoint::UPoint(unsigned long x, unsigned long y) : x(x), y(y) {}
 
 Engine::Cell::Cell(char32_t character, RGB foreRGB, RGB backRGB) : character(character), frgb(foreRGB), brgb(backRGB) {}
 
@@ -46,7 +38,7 @@ long Engine::TimePoint::Nanoseconds()
 }
 
 // Engine::Texture::Texture() {};
-void Engine::Texture::Rectangle(UVector2D size, CellA value, Vector2D pos) {
+void Engine::Texture::Rectangle(UPoint size, CellA value, Point pos) {
 	this->pos = pos;
 	t.resize(size.y);
 	for (size_t y = 0; y < t.size(); y++)
@@ -56,7 +48,7 @@ void Engine::Texture::Rectangle(UVector2D size, CellA value, Vector2D pos) {
 			t[y][x] = value;
 	}
 }
-void Engine::Texture::File(std::string fileName, Vector2D pos) {
+void Engine::Texture::File(std::string fileName, Point pos) {
 	this->pos = pos;
 	std::ifstream file(fileName);
 	if (!file.is_open())
@@ -80,7 +72,7 @@ void Engine::Texture::File(std::string fileName, Vector2D pos) {
 			else if (j == 2)
 				value.frgba.b = (unsigned char)line[x];
 			else if (j == 3)
-				value.frgba.a = (unsigned char)line[x] / 255.0f;
+				value.frgba.a = (unsigned char)line[x];
 			else if (j == 4)
 				value.brgba.r = (unsigned char)line[x];
 			else if (j == 5)
@@ -88,7 +80,7 @@ void Engine::Texture::File(std::string fileName, Vector2D pos) {
 			else if (j == 6)
 				value.brgba.b = (unsigned char)line[x];
 			else if (j == 7)
-				value.brgba.a = (unsigned char)line[x] / 255.0f;
+				value.brgba.a = (unsigned char)line[x];
 			else if (j == 8)
 			{
 				value.character = line[x];
@@ -97,7 +89,7 @@ void Engine::Texture::File(std::string fileName, Vector2D pos) {
 		}
 	}
 }
-void Engine::Texture::Write(std::vector<std::string> stringVector, RGBA frgba, RGBA brgba, Vector2D pos) {
+void Engine::Texture::Write(std::vector<std::string> stringVector, RGBA frgba, RGBA brgba, Point pos) {
 	this->pos = pos;
 	t.resize(stringVector.size());
 	for (size_t y = 0; y < stringVector.size(); y++)
@@ -138,7 +130,13 @@ void Engine::Texture::SetCharacter(char value)
 			t[y][x].character = value;
 }
 
-Engine::Collider::Collider(UVector2D size, Vector2D pos, int type) : size(size), pos(pos), simple(true), type(type) {}
-Engine::Collider::Collider(std::vector<std::vector<bool>> collider, Vector2D pos, int type) : c(collider), pos(pos), simple(false), type(type) {}
+Engine::Collider::Collider(UPoint size, Point pos, int type) : size(size), pos(pos), simple(true), type(type) {}
+Engine::Collider::Collider(std::vector<std::vector<bool>> collider, Point pos, int type) : c(collider), pos(pos), simple(false), type(type) {}
 
-Engine::Object::Object(Vector2D pos, std::string name) : pos(pos), name(name) {}
+Engine::Object::Object(Point pos, std::string name) : pos(pos), name(name) {}
+
+Engine::Object::~Object()
+{
+	if (parentLayer)
+		parentLayer->RemoveObject(this);
+}

@@ -31,8 +31,8 @@ namespace Engine
 {
 	struct RGB;
 	struct RGBA;
-	struct Vector2D;
-	struct UVector2D;
+	struct Point;
+	struct UPoint;
 	struct Cell;
 	struct CellA;
 	struct Texture;
@@ -148,21 +148,20 @@ namespace Engine
 
 	struct RGBA
 	{
-		unsigned char r, g, b;
-		float a;
-		RGBA(unsigned char red = 0, unsigned char green = 0, unsigned char blue = 0, float alpha = 1.0f);
+		unsigned char r, g, b, a;
+		RGBA(unsigned char red = 0, unsigned char green = 0, unsigned char blue = 0, unsigned char alpha = 255);
 	};
 
-	struct Vector2D
+	struct Point
 	{
 		long x, y;
-		Vector2D(long xAxis = 0, long yAxis = 0);
+		Point(long x = 0, long y = 0);
 	};
 
-	struct UVector2D
+	struct UPoint
 	{
 		unsigned long x, y;
-		UVector2D(unsigned long xAxis = 0, unsigned long yAxis = 0);
+		UPoint(unsigned long x = 0, unsigned long y = 0);
 	};
 
 	struct Cell
@@ -178,25 +177,40 @@ namespace Engine
 		char character;
 		RGBA frgba;
 		RGBA brgba;
-		CellA(char32_t character = ' ', RGBA foreground = {255, 255, 255, 1.0f}, RGBA background = {0, 0, 0, 0.0f});
+		CellA(char32_t character = ' ', RGBA foreground = {255, 255, 255, 255}, RGBA background = {0, 0, 0, 255});
 	};
 
 	struct Texture
 	{
-		std::vector<std::vector<CellA>> t = {};
-		Vector2D pos = {0, 0};
+		// Position relative to the texture's parent object.
+		Point pos = {0, 0};
+		// `true` - simple texture mode.
+		// `false` - complex texture mode.
+		// A simple texture is a rectangle which is faster to render and uses less memory than a complex texture, but is limited to a single cell value.
+		// A complex texture is a specific 2D cell shape which is slower to render and uses more memory than a simple texture, but is more capable than a simple texture.
+		bool simple = true;
+		// `true` - count in the texture and allow to render it.
+		// `false` - skip the texture and don't allow to render it.
 		bool active = true;
+
+		// (Used if the texture is simple) The size of the texture's rectangle.
+		UPoint size = { 0, 0 };
+		// (Used if the texture is simple) The cell value of the texture's rectangle.
+		CellA value = CellA('#', RGBA());
+
+		// (Used if the texture is complex) The 2D cell shape.
+		std::vector<std::vector<CellA>> t = {}; 
 
 		// The constructors are functions instead of actual constructors because of my own preference.
 		// Visual Studio has a hard time correctly showing the parameters when filling them, so I decided that
 		// this is the best solution for making the writing experience easier.
 		
 		// A rectangle of the same value. (Limited to a single color and character)
-		void Rectangle(UVector2D size, CellA value, Vector2D pos);
+		void Rectangle(UPoint size, CellA value, Point pos);
 		// Load from a file. (Requires file)
-		void File(std::string fileName, Vector2D pos);
+		void File(std::string fileName, Point pos);
 		// Create a texture by writing it. (Limited to a single color)
-		void Write(std::vector<std::string> stringVector, RGBA frgba, RGBA brgba, Vector2D pos);
+		void Write(std::vector<std::string> stringVector, RGBA frgba, RGBA brgba, Point pos);
 		// Change all the cells' values
 		void SetCell(CellA value);
 		// Chagne all the cells' foreground color values
@@ -209,24 +223,30 @@ namespace Engine
 
 	struct Collider
 	{
-		// A simple collider is a rectangle.
+		// Position relative to the collider's parent object.
+		Point pos = { 0, 0 };
+		// `true` - simple collider mode.
+		// `false` - complex collider mode.
+		// A simple collider is a rectangle which is faster to process and uses less memory than a complex collider.
 		bool simple = true;
-		// Used if the collider is complex.
-		std::vector<std::vector<bool>> c = {};
-		// Used by both simple and complex colliders.
-		Vector2D pos = { 0, 0 };
-		// Used if the collider is simple.
-		UVector2D size = { 0, 0 };
-
+		// The collider type which is defined by Engine::colliderTypes
+		unsigned char type = 0;
 		// Turn the collider on/off.
 		bool active = true;
-		// The collider type which is defined by Engine::colliderTypes
-		unsigned char type;
+
+		// Used if the collider is simple.
+		// The size of the collider's rectangle.
+		UPoint size = { 0, 0 };
+		
+		// Used if the collider is complex.
+		// A 2D boolean vector 
+		std::vector<std::vector<bool>> c = {};
+
 
 		// For a simple collider
-		Collider(UVector2D size = {0, 0}, Vector2D pos = {0, 0}, int type = 0);
+		Collider(UPoint size = {0, 0}, Point pos = {0, 0}, int type = 0);
 		// For a complex collider
-		Collider(std::vector<std::vector<bool>> collider, Vector2D pos = { 0, 0 }, int type = 0);
+		Collider(std::vector<std::vector<bool>> collider, Point pos = { 0, 0 }, int type = 0);
 	};
 
 	struct Object
@@ -236,12 +256,12 @@ namespace Engine
 		std::function<void()> OnTick = NULL;
 		
 		std::string name = "Unnamed Object";
-		Vector2D pos = { 0, 0 };
+		Point pos = { 0, 0 };
 
 		std::vector<Texture> textures = {};
 		std::vector<Collider> colliders = {};
 
-		Vector2D lastPush = { 0, 0 };
+		Point lastPush = { 0, 0 };
 		size_t colliderIndex = -1;
 		Object* otherObject = NULL;
 		size_t otherColliderIndex = -1;
@@ -263,27 +283,31 @@ namespace Engine
 		// This event can be called after calling Move if a collider from another object stopped overlapping a collider from this object.
 		std::function<void()> OnOverlappedExit = NULL;
 
-		bool Move(Vector2D dir);
+		// Tries to move the object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
+		bool Move(Point dir);
 
-		void ExpandMovementTree(Vector2D dir,
-			std::vector<Object*>* pushingObjects,
-			std::vector<Object*>* objectsToPush,
-			std::vector<size_t>* pushingColliders,
-			std::vector<size_t>* collidersToPush,
-			std::vector<Object*>* blockedObjects,
-			std::vector<Object*>* blockingObjects,
-			std::vector<size_t>* blockedColliders,
-			std::vector<size_t>* blockingColliders,
-			std::vector<Object*>* overlappingObjects,
-			std::vector<Object*>* overlappedObjects,
-			std::vector<size_t>* overlappingColliders,
-			std::vector<size_t>* overlappedColliders,
-			std::vector<Object*>* exitOverlappingObjects,
-			std::vector<Object*>* exitOverlappedObjects,
-			std::vector<size_t>* exitOverlappingColliders,
-			std::vector<size_t>* exitOverlappedColliders);
+		// Engine used function.
+		void ExpandMovementTree(Point dir,
+			std::vector<Object*>& pushingObjects,
+			std::vector<Object*>& objectsToPush,
+			std::vector<size_t>& pushingColliders,
+			std::vector<size_t>& collidersToPush,
+			std::vector<Object*>& blockedObjects,
+			std::vector<Object*>& blockingObjects,
+			std::vector<size_t>& blockedColliders,
+			std::vector<size_t>& blockingColliders,
+			std::vector<Object*>& overlappingObjects,
+			std::vector<Object*>& overlappedObjects,
+			std::vector<size_t>& overlappingColliders,
+			std::vector<size_t>& overlappedColliders,
+			std::vector<Object*>& exitOverlappingObjects,
+			std::vector<Object*>& exitOverlappedObjects,
+			std::vector<size_t>& exitOverlappingColliders,
+			std::vector<size_t>& exitOverlappedColliders);
 
-		Object(Vector2D position = {0U, 0U}, std::string objectName = "");
+		Object(Point position = {0U, 0U}, std::string objectName = "");
+
+		~Object();
 	};
 
 	struct Layer
@@ -294,8 +318,8 @@ namespace Engine
 
 		std::vector<Object*> objects = {};
 		
-		RGBA frgba = { 0, 0, 0, 0.0f };
-		RGBA brgba = { 0, 0, 0, 0.0f };
+		RGBA frgba = { 0, 0, 0, 0 };
+		RGBA brgba = { 0, 0, 0, 0 };
 		float opacity = 1.0f;
 
 		int AddObject(Object* object);
@@ -371,18 +395,18 @@ namespace Engine
 	{
 		std::function<void()> OnTick = NULL;
 		std::string name = "Unnamed Camera";
-		Vector2D pos = { 0, 0 };
-		UVector2D res = { 10U, 10U };
+		Point pos = { 0, 0 };
+		UPoint res = { 10U, 10U };
 		std::vector<std::vector<Cell>> image = {};
 
-		Camera(Vector2D position = {0, 0}, UVector2D resolution = {0, 0}, std::string cameraName = "Unnamed Camera");
+		Camera(Point position = {0, 0}, UPoint resolution = {0, 0}, std::string cameraName = "Unnamed Camera");
 		
 		void Render(std::vector<Layer*> layers);
 		// This function will draw what was rendered (Camera::image's contents) into the "final" image (Engine::image), which will be printed at once with Engine::Print.
 		// pos is the position desired to draw the rendered image to the final image.
 		// left, top, right and bottom are a rectangle representing the area of the rendered image desired to draw to the final image.
 		// Setting right/bottom to 0 will default to the rendered image's size.
-		void Draw(Vector2D pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
+		void Draw(Point pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
 	};
 	
 	struct Map
@@ -399,7 +423,7 @@ namespace Engine
 		// Returns true if managed to render (active camera is valid), otherwise, false.
 		bool Render();
 		// Returns true if managed to draw (active camera is valid), otherwise, false.
-		bool Draw(Vector2D pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
+		bool Draw(Point pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
 	};
 
 	// An easy to use time point which uses std::chrono.
@@ -440,7 +464,7 @@ namespace Engine
 	// Terminate (deallocate) the audio library (PortAudio).
 	void TerminateAudio();
 	// Prepare the terminal for printing and receiving input
-	void PrepareTerminal(UVector2D imageSize);
+	void PrepareTerminal(UPoint imageSize);
 	// Reset the terminal before exiting the game (turn in back to normal).
 	void ResetTerminal();
 	// Print the final image to the console.

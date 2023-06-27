@@ -59,8 +59,8 @@ namespace Widgets
 		}
 
 		template<typename T>
-		Button(Engine::Layer* layer, std::function<void()> OnPress, T key = kReturn, Engine::Vector2D pos = { 0, 0 }, std::string text = "Button",
-			Engine::RGBA notRGBA = { 150, 150, 150, 1.0f }, Engine::RGBA selectedRGBA = { 255, 255, 255, 1.0f })
+		Button(Engine::Layer* layer, std::function<void()> OnPress, T key = kReturn, Engine::Point pos = { 0, 0 }, std::string text = "Button",
+			Engine::RGBA notRGBA = { 150, 150, 150, 255 }, Engine::RGBA selectedRGBA = { 255, 255, 255, 255 })
 			: OnPress(OnPress), notRGBA(notRGBA), selectedRGBA(selectedRGBA)
 		{
 			Engine::Input::RegisterHandler(key, std::bind(&Button::InsideOnPress, this), true);
@@ -70,9 +70,9 @@ namespace Widgets
 			// Texture
 			obj.textures.resize(2);
 			
-			obj.textures[0].Write({ text }, notRGBA, { 0, 0, 0, 0.0f }, { 1, 1 });
+			obj.textures[0].Write({ text }, notRGBA, { 0, 0, 0, 0 }, { 1, 1 });
 			
-			obj.textures[1].Rectangle({ 2UL + (unsigned long)text.size(), 3 }, Engine::CellA(' ', {0, 0, 0, 0.0f}), {0U, 0U});
+			obj.textures[1].Rectangle({ 2UL + (unsigned long)text.size(), 3 }, Engine::CellA(' ', {0, 0, 0, 0}), {0U, 0U});
 			obj.textures[1].t[0][0] = Engine::CellA('#', notRGBA);
 			obj.textures[1].t[0][text.length() + 1] = Engine::CellA('#', notRGBA);
 			for (size_t x = 1; x <= text.length(); x++)
@@ -200,7 +200,7 @@ namespace Widgets
 
 		void ChangeValue(std::string newNumber)
 		{
-			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)obj.textures[1].t[0].size(), 1 });
+			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)obj.textures[1].t[0].size(), 1 });
 			number = 0;
 			currentDigit = 0;
 			for (int x = 0; x < maxDigits && x < newNumber.length(); x++)
@@ -213,8 +213,8 @@ namespace Widgets
 			visibleNumber = number;
 		}
 
-		IntInputField(Engine::Layer* layer, std::function<void()> OnInsert, unsigned int min = 0, unsigned int max = 255, std::string defaultNum = "0", Engine::Vector2D pos = {0, 0},
-			std::string text = "Value = ", Engine::RGBA notRGBA = { 150, 150, 150, 1.0f }, Engine::RGBA selectedRGBA = { 255, 255, 255, 1.0f })
+		IntInputField(Engine::Layer* layer, std::function<void()> OnInsert, unsigned int min = 0, unsigned int max = 255, std::string defaultNum = "0", Engine::Point pos = {0, 0},
+			std::string text = "Value = ", Engine::RGBA notRGBA = { 150, 150, 150, 255 }, Engine::RGBA selectedRGBA = { 255, 255, 255, 255 })
 			: OnInsert(OnInsert), min(min), max(max), notRGBA(notRGBA), selectedRGBA(selectedRGBA)
 		{
 			Engine::Input::RegisterHandler('0', std::bind(&IntInputField::InternalInsert, this), true);
@@ -250,7 +250,7 @@ namespace Widgets
 			// Texture
 			obj.textures.resize(3);
 
-			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)text.length(), 1 });
+			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)text.length(), 1 });
 			for (int x = 0; x < maxDigits && x < defaultNum.length(); x++)
 			{
 				currentDigit++;
@@ -262,7 +262,7 @@ namespace Widgets
 
 			obj.textures[1].Write({ text }, notRGBA, Engine::RGBA(), { 1, 1 });
 
-			obj.textures[2].Rectangle({ 2 + text.size() + maxDigits, 3 }, Engine::CellA(' ', { 0, 0, 0, 0.0f }), { 0, 0 });
+			obj.textures[2].Rectangle({ 2 + text.size() + maxDigits, 3 }, Engine::CellA(' ', { 0, 0, 0, 0 }), { 0, 0 });
 			obj.textures[2].t[0][0] = Engine::CellA('#', notRGBA);
 			obj.textures[2].t[0][obj.textures[2].t[0].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < obj.textures[2].t[0].size() - 1; x++)
@@ -366,8 +366,8 @@ namespace Widgets
 			currentChar = string.length();
 		}
 
-		StringInputField(Engine::Layer* layer = 0, std::function<void()> OnInsert = 0, std::vector<int> allowedCharacters = {}, Engine::Vector2D pos = { 0, 0 }, std::string text = "Value = ",
-			unsigned int maxChars = 8, std::string defaultString = "String", Engine::RGBA notRGBA = { 150, 150, 150, 1.0f }, Engine::RGBA selectedRGBA = { 255, 255, 255, 1.0f })
+		StringInputField(Engine::Layer* layer = 0, std::function<void()> OnInsert = 0, std::vector<int> allowedCharacters = {}, Engine::Point pos = { 0, 0 }, std::string text = "Value = ",
+			unsigned int maxChars = 8, std::string defaultString = "String", Engine::RGBA notRGBA = { 150, 150, 150, 255 }, Engine::RGBA selectedRGBA = { 255, 255, 255, 255 })
 			: OnInsert(OnInsert), maxChars(maxChars), notRGBA(notRGBA), selectedRGBA(selectedRGBA)
 		{
 			// Registering input
@@ -381,7 +381,7 @@ namespace Widgets
 
 			// Texture
 			Engine::Texture field;
-			field.Rectangle({ maxChars, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0.0f }), { 1 + (int)text.length(), 1 });
+			field.Rectangle({ maxChars, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)text.length(), 1 });
 			for (int x = 0; x < maxChars && x < defaultString.length(); x++)
 			{
 				currentChar++;
@@ -393,7 +393,7 @@ namespace Widgets
 			fieldText.Write({ text }, notRGBA, Engine::RGBA(), { 1, 1 });
 
 			Engine::Texture frame;
-			frame.Rectangle({ 2U + text.size() + maxChars, 3 }, Engine::CellA(' ', {0, 0, 0, 0.0f}), {0, 0});
+			frame.Rectangle({ 2U + text.size() + maxChars, 3 }, Engine::CellA(' ', {0, 0, 0, 0}), {0, 0});
 			frame.t[0][0] = Engine::CellA('#', notRGBA);
 			frame.t[0][frame.t[0].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < frame.t[0].size() - 1; x++)

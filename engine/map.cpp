@@ -35,15 +35,18 @@ bool Engine::Layer::RemoveObject(std::string name)
 
 bool Engine::Layer::RemoveObject(Object* object)
 {
-	for (int i = 0; i < objects.size(); i ++)
+	bool removed = false;
+	for (size_t i = 0; i < objects.size();)
 	{
 		if (objects[i] == object)
 		{
 			objects.erase(objects.begin() + i - 1);
-			return true;
+			removed = true;
 		}
+		else
+			i++;
 	}
-	return false;
+	return removed;
 }
 
 // ---=== Map ===---
@@ -72,7 +75,7 @@ bool Engine::Map::Render()
 	return false;
 }
 
-bool Engine::Map::Draw(Vector2D pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
+bool Engine::Map::Draw(Point pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{

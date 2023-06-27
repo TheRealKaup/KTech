@@ -2,23 +2,23 @@
 
 using namespace Engine;
 
-void Engine::Object::ExpandMovementTree(Vector2D dir,
-	std::vector<Object*>* pushingObjects,
-	std::vector<Object*>* objectsToPush,
-	std::vector<size_t>* pushingColliders,
-	std::vector<size_t>* collidersToPush,
-	std::vector<Object*>* blockedObjects,
-	std::vector<Object*>* blockingObjects,
-	std::vector<size_t>* blockedColliders,
-	std::vector<size_t>* blockingColliders,
-	std::vector<Object*>* overlappingObjects,
-	std::vector<Object*>* overlappedObjects,
-	std::vector<size_t>* overlappingColliders,
-	std::vector<size_t>* overlappedColliders,
-	std::vector<Object*>* exitOverlappingObjects,
-	std::vector<Object*>* exitOverlappedObjects,
-	std::vector<size_t>* exitOverlappingColliders,
-	std::vector<size_t>* exitOverlappedColliders)
+void Engine::Object::ExpandMovementTree(Point dir,
+	std::vector<Object*>& pushingObjects,
+	std::vector<Object*>& objectsToPush,
+	std::vector<size_t>& pushingColliders,
+	std::vector<size_t>& collidersToPush,
+	std::vector<Object*>& blockedObjects,
+	std::vector<Object*>& blockingObjects,
+	std::vector<size_t>& blockedColliders,
+	std::vector<size_t>& blockingColliders,
+	std::vector<Object*>& overlappingObjects,
+	std::vector<Object*>& overlappedObjects,
+	std::vector<size_t>& overlappingColliders,
+	std::vector<size_t>& overlappedColliders,
+	std::vector<Object*>& exitOverlappingObjects,
+	std::vector<Object*>& exitOverlappedObjects,
+	std::vector<size_t>& exitOverlappingColliders,
+	std::vector<size_t>& exitOverlappedColliders)
 {
 	// Only supporting SIMPLE COLLLIDERS.
 
@@ -31,8 +31,8 @@ void Engine::Object::ExpandMovementTree(Vector2D dir,
 		oObj = parentLayer->objects[o];
 
 		// Filter in only objects which aren't a part of the movement tree and objects from `blockingObjects`
-		for (int i = 0; i < pushingObjects->size(); i++) {
-			if (oObj == (*pushingObjects)[i] || oObj == (*objectsToPush)[i]) {
+		for (int i = 0; i < pushingObjects.size(); i++) {
+			if (oObj == pushingObjects[i] || oObj == objectsToPush[i]) {
 				oObj = this; // Stupid way to exit the other for-loop but whatever.
 			}
 		}
@@ -87,18 +87,18 @@ void Engine::Object::ExpandMovementTree(Vector2D dir,
 						// Overlap!
 						if (!inOverlap)
 						{
-							overlappingObjects->push_back(this);
-							overlappedObjects->push_back(oObj);
-							overlappingColliders->push_back(c);
-							overlappedColliders->push_back(oc);
+							overlappingObjects.push_back(this);
+							overlappedObjects.push_back(oObj);
+							overlappingColliders.push_back(c);
+							overlappedColliders.push_back(oc);
 						}
 					}
 					else if (inOverlap)
 					{
-						exitOverlappingObjects->push_back(this);
-						exitOverlappedObjects->push_back(oObj);
-						exitOverlappingColliders->push_back(c);
-						exitOverlappedColliders->push_back(oc);
+						exitOverlappingObjects.push_back(this);
+						exitOverlappedObjects.push_back(oObj);
+						exitOverlappingColliders.push_back(c);
+						exitOverlappedColliders.push_back(oc);
 					}
 				}
 				else if (finalResult != collisionResult)
@@ -126,22 +126,22 @@ void Engine::Object::ExpandMovementTree(Vector2D dir,
 
 		if (finalResult == 0)
 		{
-			blockedObjects->push_back(this);
-			blockingObjects->push_back(oObj);
-			blockedColliders->push_back(originallyBlockedColliderI);
-			blockingColliders->push_back(originallyBlockingColliderI);
+			blockedObjects.push_back(this);
+			blockingObjects.push_back(oObj);
+			blockedColliders.push_back(originallyBlockedColliderI);
+			blockingColliders.push_back(originallyBlockingColliderI);
 		}
 		else if (finalResult == 1)
 		{
-			pushingObjects->push_back(this);
-			objectsToPush->push_back(oObj);
-			collidersToPush->push_back(c);
-			pushingColliders->push_back(oc);
+			pushingObjects.push_back(this);
+			objectsToPush.push_back(oObj);
+			collidersToPush.push_back(c);
+			pushingColliders.push_back(oc);
 		}
 	}
 }
 
-bool Object::Move(Vector2D dir)
+bool Object::Move(Point dir)
 {
 	// Pushing vectors:
 	std::vector<Object*> pushingObjects;
@@ -163,10 +163,42 @@ bool Object::Move(Vector2D dir)
 	std::vector<size_t> exitOverlappingColliders;
 	std::vector<size_t> exitOverlappedColliders;
 	
-	ExpandMovementTree(dir, &pushingObjects, &objectsToPush, &pushingColliders, &collidersToPush, &blockedObjects, &blockingObjects, &blockedColliders, &blockingColliders, &overlappingObjects, &overlappedObjects, &overlappingColliders, &overlappedColliders, &exitOverlappingObjects, &exitOverlappedObjects, &exitOverlappingColliders, &exitOverlappedColliders);
+	ExpandMovementTree(dir,
+		pushingObjects,
+		objectsToPush,
+		pushingColliders,
+		collidersToPush,
+		blockedObjects,
+		blockingObjects,
+		blockedColliders,
+		blockingColliders,
+		overlappingObjects,
+		overlappedObjects,
+		overlappingColliders,
+		overlappedColliders,
+		exitOverlappingObjects,
+		exitOverlappedObjects,
+		exitOverlappingColliders,
+		exitOverlappedColliders);
 
 	for (size_t i = 0; i < objectsToPush.size(); i++)
-		objectsToPush[i]->ExpandMovementTree(dir, &pushingObjects, &objectsToPush, &pushingColliders, &collidersToPush, &blockedObjects, &blockingObjects, &blockedColliders, &blockingColliders, &overlappingObjects, &overlappedObjects, &overlappingColliders, &overlappedColliders, &exitOverlappingObjects, &exitOverlappedObjects, &exitOverlappingColliders, &exitOverlappedColliders);
+		objectsToPush[i]->ExpandMovementTree(dir,
+							pushingObjects,
+							objectsToPush,
+							pushingColliders,
+							collidersToPush,
+							blockedObjects,
+							blockingObjects,
+							blockedColliders,
+							blockingColliders,
+							overlappingObjects,
+							overlappedObjects,
+							overlappingColliders,
+							overlappedColliders,
+							exitOverlappingObjects,
+							exitOverlappedObjects,
+							exitOverlappingColliders,
+							exitOverlappedColliders);
 
 	if (blockedObjects.size() == 0)
 	{
@@ -242,7 +274,7 @@ bool Object::Move(Vector2D dir)
 	{
 		// Unable to move, blocked.
 		Object* theOtherObject = NULL;
-		Vector2D lastPush = { 0, 0 };
+		Point lastPush = { 0, 0 };
 		int theColliderIndex = -1;
 		int theOtherColliderIndex = -1;
 		for (size_t i = 0; i < blockedObjects.size(); i++)

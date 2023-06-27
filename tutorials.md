@@ -148,7 +148,7 @@ int main()
 }
 ```
 
-- `Engine::PrepareTerminal({10, 10});` - This function sets terminal settings, such as hiding the cursor, and prepares other miscellaneous terminal-related stuff. The parameter is an `Engine::UVector2D` (which is a class with 2 `unsigned long int` types, representing an unsigned 2D point) stating the size of the graphical ouput in character cells. This function is mandatory before printing anything to the terminal.
+- `Engine::PrepareTerminal({10, 10});` - This function sets terminal settings, such as hiding the cursor, and prepares other miscellaneous terminal-related stuff. The parameter is an `Engine::UPoint` (which is a class with 2 `unsigned long int` types, representing an unsigned 2D point) stating the size of the graphical ouput in character cells. This function is mandatory before printing anything to the terminal.
 - `Engine::tps = 24;` - `Engine::tps` is a global variable that the engine provides. This, as the name suggets, states the ticks per second rate. This is mandatory before 
 - `Engine::thisTickStartTP.SetToNow();` - Before entering the loop you need to inform the engine with the current time so `WaitUntilNextTick()` can correctly suspend the thread specifically after the first tick. This is what this line does. `Engine::thisTickStartTP` is an instance of class `Engine::TimePoint` which `WaitUntilNextTick()` uses to remember the last time it was called, and to know for how long to suspend the thread when called.
 - `Engine::WaitUntilNextTick();` - will wait and return return until the time is right for the next tick, meaning it is suspending the thread and thus the loop. If there is no time left to wait for the next tick (perhaps because the game did too many operations this tick), then it will return immediately.
@@ -354,7 +354,7 @@ int main()
 ```
 
 `Engine::Object` has a constructor which all of its parameters are optional:
-- Position of type `Engine::Vector2D`
+- Position of type `Engine::Point`
 - Name of type `std::string`
 
 Not specifying the position will set it to {0, 0}, and not specifying the name will set it to "" (empty).
@@ -382,7 +382,7 @@ int main()
 			" O ",
 			"/|\\",
 			"/ \\"
-		}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Vector2D( 0, 0 )
+		}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Point( 0, 0 )
 	);
 	// ...Before PrepareTerminal
 }
@@ -390,7 +390,7 @@ int main()
 
 As you can see, neither the `Engine::Texture` class has a constructor, and instead, it has functions that draw the texture after it was created. This is comfortable with this writing scheme. By resizing the object's texture vector we create a new empty texture, and then we access it and call `Write` to draw this pink (255, 0, 255) character texture.
 
-`Engine::RGBA` is used to store and pass RGBA values. The first `RGBA` parameter in `Write()` is the foreground color of the characters. The second `RGBA` is the background color, and because the default constructor of RGBA is (0, 0, 0, 0.0f), the background of this texture will be completely transperent. The `Vector2D` parameter is the position of the texture relative to its parent object.
+`Engine::RGBA` is used to store and pass RGBA values. The first `RGBA` parameter in `Write()` is the foreground color of the characters. The second `RGBA` is the background color, and because the default constructor of RGBA is (0, 0, 0, 0.0f), the background of this texture will be completely transperent. The `Point` parameter is the position of the texture relative to its parent object.
 
 Once again: if you want to seek more information about `Write()` and the classes used here, simply check the references or look inside the engine's code.
 
@@ -406,15 +406,15 @@ from `graphics_test.cpp`:
 int main()
 {
 	// ...After creating the map
-	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(15, 10)); // Create a camera
+	Engine::Camera camera(Engine::Point(0, 0), Engine::UPoint(15, 10)); // Create a camera
 	map.AddCamera(&camera, true); // Add the camera to the map
 	// ...Before PrepareTerminal
 }
 ```
 
 `Engine::Camera`'s constructor has 2 parameters:
-- Position of type `Vector2D`
-- Resolution of type `UVector2D` (which is like Vector2D but has 2 unsigned long integers)
+- Position of type `Point`
+- Resolution of type `UPoint` (which is like Point but has 2 unsigned long integers instead)
 
 In this example make a camera at the position of (0, 0) and with a resolution (in character cells) of (15, 10).
 
@@ -454,7 +454,7 @@ int main()
 	// Initialize game world
 	Engine::Map map;
 	
-	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(15, 10)); // Create a camera
+	Engine::Camera camera(Engine::Point(0, 0), Engine::UPoint(15, 10)); // Create a camera
 	map.AddCamera(&camera, true); // Add the camera to the map
 
 	Engine::Layer layer;
@@ -469,7 +469,7 @@ int main()
 			" O ",
 			"/|\\",
 			"/ \\"
-		}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Vector2D( 0, 0 )
+		}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Point( 0, 0 )
 	);
 
 	// Enter game loop
@@ -674,7 +674,7 @@ int main()
 	// Initialize world
 	Engine::Map map;
 	
-	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(30, 15));
+	Engine::Camera camera(Engine::Point(0, 0), Engine::UPoint(30, 15));
 	map.AddCamera(&camera, true);
 
 	Engine::Layer layer;
@@ -731,7 +731,7 @@ class Player
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Vector2D( 0, 0 )
+			}, Engine::RGBA(255, 0, 255, 1.0f), Engine::RGBA(), Engine::Point( 0, 0 )
 		);
 
 		layer->AddObject(&object);
@@ -749,7 +749,7 @@ from `game.cpp`
 class Player
 {
 	Engine::Object object;
-	Player(Engine::Layer* layer, Engine::Vector2D position, Engine::RGBA color)
+	Player(Engine::Layer* layer, Engine::Point position, Engine::RGBA color)
 	{
 		object.pos = position;
 		object.textures.resize(1);
@@ -758,21 +758,21 @@ class Player
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, color, Engine::RGBA(), Engine::Vector2D( 0, 0 )
+			}, color, Engine::RGBA(), Engine::Point( 0, 0 )
 		);
 		layer->AddObject(&object);
 	}
 };
 ```
 
-So now the constructor also gets a position of type `Vector2D` and a color of type `RGBA` and sets the player these values accordingly. We also need to update our `Player` instance creation in `main()`:
+So now the constructor also gets a position of type `Point` and a color of type `RGBA` and sets the player these values accordingly. We also need to update our `Player` instance creation in `main()`:
 
 from `game.cpp`
 ```c++
 int main()
 {
 	// ...Player creation, after creating layer
-	Player player(&layer, Engine::Vector2D(3, 3), Engine::RGBA(150, 150, 255, 1.0f)); // Create 
+	Player player(&layer, Engine::Point(3, 3), Engine::RGBA(150, 150, 255, 1.0f)); // Create 
 	// ...Before entering game loop
 }
 ```
@@ -799,7 +799,7 @@ class Player
 			object.pos.x++;
 	}
 	
-	Player(Engine::Layer* layer, Engine::Vector2D position, Engine::RGBA color)
+	Player(Engine::Layer* layer, Engine::Point position, Engine::RGBA color)
 	{
 		Engine::Input::RegisterHandler('w', std::bind(&Player::Move, this), true);
 		Engine::Input::RegisterHandler('a', std::bind(&Player::Move, this), true);
@@ -813,7 +813,7 @@ class Player
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, color, Engine::RGBA(), Engine::Vector2D( 0, 0 )
+			}, color, Engine::RGBA(), Engine::Point( 0, 0 )
 		);
 		layer->AddObject(&object);
 	}
@@ -838,36 +838,37 @@ In this tutorial you will learn how collision works and how to use it. We will e
 
 ## Collision in KTech
 
-The collision subsystem in KTech is made of a couple of important elements:
-- `Layer`s
-- `Object`s with `Collider`s
+The collision subsystem in KTech is made of a couple of important elements which we will cover in detail in the following sections:
+- [`Layer`s with `Object`s with `Collider`s](#world-with-physical-space)
 - Collider types
-- `Object::Move()` function
-- On collision events
+- `Object::Move()`
+- "on-event"s
 
-Calculating collision in KTech is done by calling the `Object::Move()` function which processes the colliders in the space and determines a move result. This is in contrast to calling a function inside the game loop which each tick calcualtes physics and updates positions. KTech's collision functionality isn't continuous, meaning it doesn't work by updating positions.
+Collision in KTech is done with a single operation called whenever an object wants to move. This is in contrast to a physics engine which works in a continuous way, which updates positions of objects each tick according to their velocity et cetera.
 
-## `Layer`s
+## World with physical space
 
-As we already touched upon, layers are a way to manage objects within maps. The higher the layer's index inside the map's layer vector, the later the objects within the layers will be rendered, meaning they will be displayed on top. But that is just graphics-wise.
+As we already touched upon, layers are a way to manage objects within maps. Graphics-wise, the layer's index is equal the rendering order of objects in a map.
 
-Collision-wise, objects interact only with other objects in the same layer. You can look at layers as a third Z axis; objects from different layers can't collide with each other because they are in different Z positions, but a camera can still render an image with objects from different layers as long as they are in X and Y range, and the Z axis determines the rendering order.
+Collision-wise, objects interact only with other objects in the same layer. You can look at layers as a third Z axis: objects from different layers can't collide with each other because they are in different Z positions, but a camera can still render objects from different layers as long as they are in the X and Y range, and the Z axis determines the rendering order.
 
-## `Collider`s
+This is the first time we encounter the `Engine::Collider` class. It behaves in a pretty similar manner to `Engine::Texture`, both:
+- Are stored in vectors inside `Object`'s.
+- Have a simple form and a complex form
+- Have variables such as positions relative to the parent object and active status
+- Have different constructors
 
-This is the first time we encounter the `Engine::Collider` class.
+The current version of the engine only supports what's called a simple collider. A simple collider is a rectangle, which is stored inside 2 `Point` class instances; a size and a position relative to the parent object. A compelx collider, which is currently not working, is supposed to be a 2D boolean vector representing the collider, allowing you to create complex shaped colliders. But once again, these don't work at the moment, and will probably return in the near future.
 
-The current version of the engine only supports what's called a simple collider. A simple collider is a rectangle, which is stored as 2 `Vector2D`; a size and a position relative to the parent object. A compelx collider, which is currently not working, is supposed to be a 2D boolean vector representing the collider, allowing you to create complex shaped colliders. But once again, these don't work at the moment, and will probably return in the near future.
+So, this simple collider rectangle represents the physical spaces of objects.
 
-So, this simple collider rectangle represents a kind of physical space, which is used to determine collision results.
-
-`Engine::Collider` has 2 constructors, one for the complex collider and the second for the simple, so use the simple one. Check the references for the exact `Engine::Collider`'s content and constructors.
+`Engine::Collider` has 2 constructors, one for the complex collider and the second for the simple, so at the moment, only use the simple one. Check the references for the exact `Engine::Collider`'s content and constructors.
 
 `Object`s have a `Collider` vector called `Object::colliders`. Meaning, a single `Object` can have multiple `Collider`s. This is useful for many purposes. For exmaple, let's say you are creating a platform game which allows the player to jump. To know if the player can jump, you should check if the player is on the ground and not mid-air, and a way to to this is to add an additional collider (beside the normal body collider) under their legs which allows you tell if there is ground beneath the player.
 
 ## Collider types
 
-A collider type is a value assigned to each `Collider`, used to determine the collision result between 2 colliders.
+Each `Collider` has a collider type which is used to determine the collision result between 2 colliders.
 
 There are 3 possible collision results:
 1. Block (result=0), the moving collider can't move because of the other collider.
@@ -903,9 +904,11 @@ The `Collider::colliderType` variable's value needs to be set between the `Engin
 
 ## `Object::Move()`
 
+In practice, calculating collision in KTech is done by calling the `Object::Move()` function which processes the colliders in the space, determiens a move result, changes positions of objects and ends by calling "on-event"s. This means that 
+
 This function is what makes things happen.
 
-It takes a single `Vector2D` parameter for the wanted movement direction.
+It takes a single `Point` parameter for the wanted movement direction.
 
 `Object::Move()`'s goal is to check if movement can be done, by processing the object's environment (inside `Object::parentLayer`), object by object, collider by collider. `Object::Move()` always concludes a successful movement which will lead to changing `Object::pos` accordingly, or a blocked movement which will lead to nothing happening. These 2 conclusions can mean:
 - Succesful movement: there is nothing is in the way, or, there is an object in the way and the moving object managed to push it, or, there is an object in the way and the moving object can go though it (overlap).
@@ -921,7 +924,7 @@ Additionally, `Object::Move()` calls "on event" callback functions. Check these 
 
 ```c++
 Object* theOtherObject = NULL;
-Vector2D lastPush = { 0, 0 };
+Point lastPush = { 0, 0 };
 int theColliderIndex = -1;
 int theOtherColliderIndex = -1;
 std::function<void()> OnPushed = NULL;
@@ -934,7 +937,7 @@ std::function<void()> OnBlock = NULL;
 - `OnPush` is a callback function which gets called when this object pushes another objet. 
 - `OnBlocked` is a callback function which gets called when this object gets blocked (if it just moved or it was attempted to be pushed into an eventually blocking object).
 - `OnBlock` is a callback function whch gets called when this object blocks another object.
-- `lastPush` is a `Vector2D` specifying the direction of the last time it was pushed. It is set before whenever `OnPushed` and `OnPush` are called.
+- `lastPush` is a `Point` specifying the direction of the last time it was pushed. It is set before whenever `OnPushed` and `OnPush` are called.
 - `theOtherObject` is a pointer to an object which is set to the relevant object whenever `OnPushed`, `OnPush`, `OnBlocked` and `OnBlock` are called.
 - `theColliderIndex` is an integer which is set to the relevant index in this `Object`'s `colliders` vector whenever `OnPushed`, `OnPush`, `OnBlocked` and `OnBlock` are called.
 - `theOtherColliderIndex` is an integer which is set to the relevant index in the `theOtherObject`'s `colliders` vector whenever `OnPushed`, `OnPush`, `OnBlocked` and `OnBlock` are called.
@@ -1065,7 +1068,7 @@ class Player
 			object.pos.x++;
 	}
 	
-	Player(Engine::Layer* layer, Engine::Vector2D position, Engine::RGBA color)
+	Player(Engine::Layer* layer, Engine::Point position, Engine::RGBA color)
 	{
 		Engine::Input::RegisterHandler('w', std::bind(&Player::Move, this), true);
 		Engine::Input::RegisterHandler('a', std::bind(&Player::Move, this), true);
@@ -1079,7 +1082,7 @@ class Player
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, color, Engine::RGBA(), Engine::Vector2D( 0, 0 )
+			}, color, Engine::RGBA(), Engine::Point( 0, 0 )
 		);
 		layer->AddObject(&object);
 	}
@@ -1090,7 +1093,7 @@ int main()
 	// Initialize world
 	Engine::Map map;
 	
-	Engine::Camera camera(Engine::Vector2D(0, 0), Engine::UVector2D(16, 11));
+	Engine::Camera camera(Engine::Point(0, 0), Engine::UPoint(16, 11));
 	map.AddCamera(&camera, true);
 
 	Engine::Layer layer;
@@ -1113,5 +1116,4 @@ int main()
 	// Exit
 	Engine::ResetTerminal();
 }
-
 ```

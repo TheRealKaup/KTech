@@ -249,7 +249,7 @@ void SignalHandler(int signal)
 		Engine::running = false;
 }
 
-void Engine::PrepareTerminal(Engine::UVector2D imageSize)
+void Engine::PrepareTerminal(Engine::UPoint imageSize)
 {
 	// Hide cursor
 	std::cout << "\033[?25l";

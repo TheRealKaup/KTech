@@ -81,3 +81,11 @@ Maybe I should skip this idea and once again use a library that already works.
 ## 25/6/2023 18:07
 
 The engine desperately needs a better terminal adaptation update.
+
+# Memory
+
+## 27/6/2023
+
+2 issues:
+- In `ExpandMovementTree()` I'm constantly pushing into the vectors, which is incredibly costy.
+- Pointer managment in the engine sucks. There is no clear and cheap way to transfer an object between layers or maps. Not sure if unique pointers are much of a solution.
