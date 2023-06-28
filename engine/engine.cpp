@@ -1,33 +1,19 @@
 ﻿#include "engine.hpp"
 
-// ---=== Engine Variables ===---
+// ---=== Variables ===---
 
-// Data
-std::vector<Engine::Object> Engine::storedObjects = {};
-std::vector<Engine::Layer> Engine::storedLayers = {};
-winsize Engine::terminalSize;
-// Time
+int32_t Engine::deltaTime = 0;
+Engine::TimePoint Engine::thisTickStartTP ;
 float Engine::potentialfps = 0.0f;
 float Engine::fps = 0.0f;
-Engine::TimePoint Engine::thisTickStartTP;
-int Engine::tps = 12;
-long int Engine::deltaTime = 0;
 Engine::TimePoint Engine::engineStartTP;
-long int Engine::totalTicks = 0;
-// Config
-std::function<void()> Engine::GlobalOnTick = NULL;
-bool Engine::running = true;
-// Physics
-std::vector<std::vector<unsigned char>> Engine::colliderTypes = {
-	{ 0, 1, 2 }, // Heavy - 0
-	{ 0, 1, 2 }, // Normal - 1
-	{ 2, 2, 2 } // Overlappable - 2
-};
-// Console
-std::vector<std::vector<Engine::Cell>> Engine::image = {};
-std::string Engine::stringImage = "";
+int32_t Engine::totalTicks = 0;
 
-// ---=== Engine Functions ===---
+winsize Engine::terminalSize;
+std::vector<std::vector<Engine::Cell>> Engine::image;
+std::string Engine::stringImage;
+
+// ---=== Functions ===---
 
 Engine::Object* Engine::StoreObject(Object object)
 {
@@ -95,9 +81,9 @@ void Engine::Print()
 			l++;
 		}
 		// First char in the line (optimizations)
-		lfr = image[y][0].frgb.r;
-		lfg = image[y][0].frgb.g;
-		lfb = image[y][0].frgb.b;
+		lfr = image[y][0].f.r;
+		lfg = image[y][0].f.g;
+		lfb = image[y][0].f.b;
 		stringImage[l] = '\033';
 		stringImage[l + 1] = '[';
 		stringImage[l + 2] = '3';
@@ -117,9 +103,9 @@ void Engine::Print()
 		stringImage[l + 16] = (lfb % 100) / 10 + '0';
 		stringImage[l + 17] = lfb % 10 + '0';
 		stringImage[l + 18] = 'm';
-		lbr = image[y][0].brgb.r;
-		lbg = image[y][0].brgb.g;
-		lbb = image[y][0].brgb.b;
+		lbr = image[y][0].b.r;
+		lbg = image[y][0].b.g;
+		lbb = image[y][0].b.b;
 		stringImage[l + 19] = '\033';
 		stringImage[l + 20] = '[';
 		stringImage[l + 21] = '4';
@@ -139,16 +125,16 @@ void Engine::Print()
 		stringImage[l + 35] = (lbb % 100) / 10 + '0';
 		stringImage[l + 36] = lbb % 10 + '0';
 		stringImage[l + 37] = 'm';
-		stringImage[l + 38] = image[y][0].character;
+		stringImage[l + 38] = image[y][0].c;
 		l += 39;
 		for (unsigned x = 1; x < image[y].size() && x < terminalSize.ws_col; x++)
 		{
 			// foreground
-			if ((image[y][x].character != ' ') && (image[y][x].frgb.r != lfr || image[y][x].frgb.g != lfg || image[y][x].frgb.b != lfb))
+			if ((image[y][x].c != ' ') && (image[y][x].f.r != lfr || image[y][x].f.g != lfg || image[y][x].f.b != lfb))
 			{
-				lfr = image[y][x].frgb.r;
-				lfg = image[y][x].frgb.g;
-				lfb = image[y][x].frgb.b;
+				lfr = image[y][x].f.r;
+				lfg = image[y][x].f.g;
+				lfb = image[y][x].f.b;
 				stringImage[l] = '\033';
 				stringImage[l + 1] = '[';
 				stringImage[l + 2] = '3';
@@ -171,11 +157,11 @@ void Engine::Print()
 				l += 19;
 			}
 			// background
-			if (image[y][x].brgb.r != lbr || image[y][x].brgb.g != lbg || image[y][x].brgb.b != lbb)
+			if (image[y][x].b.r != lbr || image[y][x].b.g != lbg || image[y][x].b.b != lbb)
 			{
-				lbr = image[y][x].brgb.r;
-				lbg = image[y][x].brgb.g;
-				lbb = image[y][x].brgb.b;
+				lbr = image[y][x].b.r;
+				lbg = image[y][x].b.g;
+				lbb = image[y][x].b.b;
 
 				if (lbr || lbg || lbb)
 				{
@@ -212,7 +198,7 @@ void Engine::Print()
 					l += 7;
 				}
 			}
-			stringImage[l] = image[y][x].character;
+			stringImage[l] = image[y][x].c;
 			l++;
 		}
 		stringImage[l] = '\033';

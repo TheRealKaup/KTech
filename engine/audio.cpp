@@ -1,7 +1,4 @@
-#include "config.hpp"
 #include "engine.hpp"
-#include <cstddef>
-#include <portaudio.h>
 
 #define config_framesPerBuffer 256
 
@@ -16,14 +13,10 @@ static void Log(std::string string, unsigned number)
 	std::cout << "\033[38;2;255;255;0m" << string << number << "\033[m" << std::endl << std::flush;
 }
 
-// Engine
-PaStream* Engine::stream = nullptr;
+static PaStream* stream = nullptr;
 
 // default device info
 static PaStreamParameters outputParameters;
-static unsigned char stream_SampleSize = 2;
-static unsigned char stream_Channels = 2;
-static unsigned char stream_BlockAlign = 4;
 
 static std::vector<Engine::AudioSource*> activeSources;
 static int32_t tempAudioLimiter = 0;
@@ -174,10 +167,6 @@ void Engine::InitializeAudio()
 	outputParameters.suggestedLatency = Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultHighOutputLatency;
 	outputParameters.hostApiSpecificStreamInfo = NULL;
 	Pa_OpenStream(&stream, NULL, &outputParameters, Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultSampleRate, config_framesPerBuffer, paClipOff, Callback, nullptr);
-	// Data used in callback function
-	stream_SampleSize = Pa_GetSampleSize(paInt16);
-	stream_Channels = outputParameters.channelCount;
-	stream_BlockAlign = stream_SampleSize * stream_Channels;
 	// Start the stream
 	Pa_StartStream(stream);
 }
@@ -187,7 +176,7 @@ void Engine::TerminateAudio()
 	Pa_Terminate();
 }
 
-bool Engine::AudioSource::LoadWavFile(std::string fileName)
+bool Engine::AudioSource::LoadWavFile(const std::string& fileName)
 {
 	int32_t temp = 0UL;
 	int16_t temp2 = 0UL;
@@ -258,7 +247,7 @@ bool Engine::AudioSource::LoadWavFile(std::string fileName)
 	return true;
 }
 
-void Engine::AudioSource::Play(unsigned long start, unsigned long length, unsigned short loops, float volume)
+void Engine::AudioSource::Play(uint32_t start, uint32_t length, uint16_t loops, float volume)
 {
 	playing = true;
 	this->volume = volume;

@@ -4,21 +4,21 @@
 
 char* Engine::Input::buf = new char[maxEscapeSequenceLength];
 unsigned char Engine::Input::length = 0;
+std::vector<Engine::Input::Handler> Engine::Input::handlers = {};
+size_t Engine::Input::handlerIndex = -1;
 
 void Engine::Input::Handler::AddCall(std::function<void()> call, bool onTick)
 {
 	onTicks.push_back(onTick);
 	calls.push_back(call);
 }
-Engine::Input::Handler::Handler(std::string input, std::function<void()> call, bool onTick) : input(input)
+Engine::Input::Handler::Handler(const std::string& input, std::function<void()> call, bool onTick) : input(input)
 {
 	onTicks.push_back(onTick);
 	calls.push_back(call);
 }
-std::vector<Engine::Input::Handler> Engine::Input::handlers = {};
-unsigned Engine::Input::handlerIndex = -1;
 
-void Engine::Input::RegisterHandler(std::string input, std::function<void()> call, bool onTick)
+void Engine::Input::RegisterHandler(const std::string& input, std::function<void()> call, bool onTick)
 {
 	// If a handler already exists for this input, add the call to the calls vector
 	for (unsigned i = 0; i < handlers.size(); i++)
@@ -82,7 +82,7 @@ void Engine::Input::Loop()
 		Get();
 }
 
-bool Engine::Input::Is(std::string stringKey)
+bool Engine::Input::Is(const std::string& stringKey)
 {
 	return (strcmp(buf, stringKey.c_str()) == 0);
 }

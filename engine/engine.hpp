@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <iostream> // Printing, strings, et cetera
 #include <string> // to_string
 #include <vector> // Heavily based
@@ -44,38 +43,29 @@ namespace Engine
 	struct AudioSource;
 	struct TimePoint;
 
-	extern std::vector<std::vector<unsigned char>> colliderTypes; /* Example:
-	0 - Can't push | 1 - Can push | 2 - Can overlap
-	{
-		  A  B, C <- Being collided
-	  A { 0, 1, 2 }, <- Moving
-	  B { 0, 1, 2 },
-	  C { 2, 2, 2 }
-	}
-	// A Can't be pushed, can push (Heavy)
-	// B Can be pushed, can push (Normal)
-	// C Can be pushed, can't push (Light) */
+	inline bool running = true;
 
-	extern winsize terminalSize;
+	inline std::vector<std::vector<uint8_t>> colliderTypes = {
+	{ 0, 1, 2 }, // Heavy - 0
+	{ 0, 1, 2 }, // Normal - 1
+	{ 2, 2, 2 } // Overlappable - 2
+	};
 
-	extern int tps;
-	extern long int deltaTime;
+	inline std::function<void()> GlobalOnTick = nullptr;
+
+	inline int16_t tps = 24;
+	extern int32_t deltaTime;
 	extern TimePoint thisTickStartTP;
 	extern float potentialfps;
 	extern float fps;
 	extern TimePoint engineStartTP;
-	extern long int totalTicks;
+	extern int32_t totalTicks;
 
-	extern std::function<void()> GlobalOnTick;
-	extern bool running;
-
+	extern winsize terminalSize;
 	// The final image that will be printed. This allows multiple cameras to print at the same time
 	extern std::vector<std::vector<Cell>> image;
 	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
 	extern std::string stringImage;
-
-	// Global PortAudio stream
-	extern PaStream* stream;
 
 	// Keyboard input things
 	namespace Input
@@ -85,21 +75,21 @@ namespace Engine
 			std::string input;
 			std::vector<std::function<void()>> calls;
 			std::vector<bool> onTicks;
-			unsigned timesPressed = 0;
+			uint timesPressed = 0;
 
 			void AddCall(std::function<void()> call, bool onTick);
 
-			Handler(std::string input, std::function<void()> call, bool onTick);
+			Handler(const std::string& input, std::function<void()> call, bool onTick);
 		};
 
 		// The last input as the engine received it, including escape codes.
 		extern char* buf;
 		// The length (in bytes) of the last input as received by the engine.
-		extern unsigned char length;
+		extern uint8_t length;
 		// Input handlers.
 		extern std::vector<Handler> handlers;
 		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
-		extern unsigned handlerIndex;
+		extern size_t handlerIndex;
 
 		// Register an input handler in order to get your function called on a keyboard input event.
 		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
@@ -110,7 +100,7 @@ namespace Engine
 		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
 		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
 		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
-		void RegisterHandler(std::string stringKey, std::function<void()> call, bool onTick = false);
+		void RegisterHandler(const std::string& stringKey, std::function<void()> call, bool onTick = false);
 		void RegisterHandler(char charKey, std::function<void()> call, bool onTick = false);
 		// Get inputs (and calls registered input handler accordingly).
 		// Returns the input (also updates Engine::Input::buf).
@@ -125,7 +115,7 @@ namespace Engine
 		void Loop();
 		
 		// Returns true if the last input is equal to stringKey
-		bool Is(std::string stringKey);
+		bool Is(const std::string& stringKey);
 		// Returns true if the last input is equal to charKey
 		bool Is(char charKey);
 		// Returns true if the last input is BIGGER OR EQUAL than charKey
@@ -142,42 +132,42 @@ namespace Engine
 
 	struct RGB
 	{
-		unsigned char r, g, b;
-		RGB(unsigned char red = 0, unsigned char green = 0, unsigned char blue = 0);
+		uint8_t r, g, b;
+		inline RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0) : r(red), g(green), b(blue) {}
 	};
 
 	struct RGBA
 	{
-		unsigned char r, g, b, a;
-		RGBA(unsigned char red = 0, unsigned char green = 0, unsigned char blue = 0, unsigned char alpha = 255);
+		uint8_t r, g, b, a;
+		inline RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255) : r(red), g(green), b(blue), a(alpha) {}
 	};
 
 	struct Point
 	{
-		long x, y;
-		Point(long x = 0, long y = 0);
+		int32_t x, y;
+		inline Point(int32_t x = 0, int32_t y = 0) : x(x), y(y) {}
 	};
 
 	struct UPoint
 	{
-		unsigned long x, y;
-		UPoint(unsigned long x = 0, unsigned long y = 0);
+		uint32_t x, y;
+		inline UPoint(uint32_t x = 0, uint32_t y = 0) : x(x), y(y) {}
 	};
 
 	struct Cell
 	{
-		char32_t character;
-		RGB frgb;
-		RGB brgb;
-		Cell(char32_t character = ' ', RGB foreground = {0, 0, 0}, RGB background = { 0, 0, 0 });
+		char c;
+		RGB f;
+		RGB b;
+		inline Cell(char character = ' ', RGB foreground = {0, 0, 0}, RGB background = { 0, 0, 0 }) : c(character), f{foreground}, b(background) {}
 	};
 
 	struct CellA
 	{
-		char character;
-		RGBA frgba;
-		RGBA brgba;
-		CellA(char32_t character = ' ', RGBA foreground = {255, 255, 255, 255}, RGBA background = {0, 0, 0, 255});
+		char c;
+		RGBA f;
+		RGBA b;
+		inline CellA(char character = ' ', RGBA foreground = {255, 255, 255, 255}, RGBA background = {0, 0, 0, 255}) : c(character), f{foreground}, b(background) {}
 	};
 
 	struct Texture
@@ -208,9 +198,9 @@ namespace Engine
 		// A rectangle of the same value. (Limited to a single color and character)
 		void Rectangle(UPoint size, CellA value, Point pos);
 		// Load from a file. (Requires file)
-		void File(std::string fileName, Point pos);
+		void File(const std::string& fileName, Point pos);
 		// Create a texture by writing it. (Limited to a single color)
-		void Write(std::vector<std::string> stringVector, RGBA frgba, RGBA brgba, Point pos);
+		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point pos);
 		// Change all the cells' values
 		void SetCell(CellA value);
 		// Chagne all the cells' foreground color values
@@ -230,7 +220,7 @@ namespace Engine
 		// A simple collider is a rectangle which is faster to process and uses less memory than a complex collider.
 		bool simple = true;
 		// The collider type which is defined by Engine::colliderTypes
-		unsigned char type = 0;
+		uint8_t type = 0;
 		// Turn the collider on/off.
 		bool active = true;
 
@@ -244,16 +234,16 @@ namespace Engine
 
 
 		// For a simple collider
-		Collider(UPoint size = {0, 0}, Point pos = {0, 0}, int type = 0);
+		inline Collider(UPoint size = {0, 0}, Point position = {0, 0}, uint8_t type = 0) : size(size), pos(position), type(type), simple(true) {}
 		// For a complex collider
-		Collider(std::vector<std::vector<bool>> collider, Point pos = { 0, 0 }, int type = 0);
+		inline Collider(std::vector<std::vector<bool>> collider, Point position = { 0, 0 }, uint8_t type = 0) : c(collider), pos(position), type(type), simple(false) {}
 	};
 
 	struct Object
 	{
 		Layer* parentLayer = NULL;
 
-		std::function<void()> OnTick = NULL;
+		std::function<void()> OnTick = nullptr;
 		
 		std::string name = "Unnamed Object";
 		Point pos = { 0, 0 };
@@ -267,21 +257,21 @@ namespace Engine
 		size_t otherColliderIndex = -1;
 
 		// This event can be called after calling Move. OnPushed means that another object pushed this one.
-		std::function<void()> OnPushed = NULL;
+		std::function<void()> OnPushed = nullptr;
 		// This event can be called after calling Move. OnPush means that this objects pushed another object.
-		std::function<void()> OnPush = NULL;
+		std::function<void()> OnPush = nullptr;
 		// This event can be called after calling Move. OnBlocked means that another objects blocked this one.
-		std::function<void()> OnBlocked = NULL;
+		std::function<void()> OnBlocked = nullptr;
 		// This event can be called after calling Move. OnBlock means that this object blocked another object.
-		std::function<void()> OnBlock = NULL;
+		std::function<void()> OnBlock = nullptr;
 		// This event can be called after calling Move if a collider from this object started overlapping a collider from another object.
-		std::function<void()> OnOverlap = NULL;
+		std::function<void()> OnOverlap = nullptr;
 		// This event can be called after calling Move if a collider from this object stopped overlapping a collider from another object.
-		std::function<void()> OnOverlapExit = NULL;
+		std::function<void()> OnOverlapExit = nullptr;
 		// This event can be called after calling Move if a collider from another object started overlapping a collider from this object.
-		std::function<void()> OnOverlapped = NULL;
+		std::function<void()> OnOverlapped = nullptr;
 		// This event can be called after calling Move if a collider from another object stopped overlapping a collider from this object.
-		std::function<void()> OnOverlappedExit = NULL;
+		std::function<void()> OnOverlappedExit = nullptr;
 
 		// Tries to move the object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
 		bool Move(Point dir);
@@ -305,7 +295,7 @@ namespace Engine
 			std::vector<size_t>& exitOverlappingColliders,
 			std::vector<size_t>& exitOverlappedColliders);
 
-		Object(Point position = {0U, 0U}, std::string objectName = "");
+		Object(Point position = Point(0, 0), const std::string& objectName = "");
 
 		~Object();
 	};
@@ -314,19 +304,19 @@ namespace Engine
 	{
 		bool active = true;
 
-		std::function<void()> OnTick = NULL;
+		std::function<void()> OnTick = nullptr;
 
 		std::vector<Object*> objects = {};
 		
 		RGBA frgba = { 0, 0, 0, 0 };
 		RGBA brgba = { 0, 0, 0, 0 };
-		float opacity = 1.0f;
+		uint8_t alpha = 255;
 
 		int AddObject(Object* object);
 		// Remove an object by its index, returns false if couldn't find the object.
-		bool RemoveObject(int index);
+		bool RemoveObject(size_t index);
 		// Remove an object by its name, returns false if couldn't find the object.
-		bool RemoveObject(std::string name);
+		bool RemoveObject(const std::string& name);
 		// Remove an object by its pointer, returns false if couldn't find the object.
 		bool RemoveObject(Object* object);
 	};
@@ -336,15 +326,15 @@ namespace Engine
 		// PortAudio's opaque stream pointer
 		PaStream* stream;
 		// Current sample
-		unsigned long cur = 0UL;
+		uint32_t cur = 0UL;
 		// Amount of samples
-		unsigned long frames = 0UL;
+		uint32_t frames = 0UL;
 		// The end point in samples
-		unsigned long endpointToPlay = 0UL;
+		uint32_t endpointToPlay = 0UL;
 		// Loops to play
-		unsigned long loopsToPlay = 0UL;
+		uint32_t loopsToPlay = 0UL;
 		// Start point to play in samples
-		unsigned long startPoint = 0UL;
+		uint32_t startPoint = 0UL;
 		// Volume
 		float volume = 1.0f;
 		// Is playing
@@ -353,19 +343,19 @@ namespace Engine
 		// Note that these variables don't do anything if changed, but can be used to access the data about the sound.
 
 		// The size of the .wav file itself (in bytes).
-		unsigned long fileSize = 0UL;
+		uint32_t fileSize = 0UL;
 		// The amount of channels used to play the sound.
-		unsigned channels = 0U;
+		uint8_t channels = 0U;
 		// The sample rate (per second).
-		unsigned long sampleRate = 0UL;
+		uint32_t sampleRate = 0UL;
 		// The byte rate (per second).
-		unsigned long byteRate = 0UL;
+		uint32_t byteRate = 0UL;
 		// I honestly don't know what this is.
-		unsigned blockAlign = 0U;
+		uint8_t blockAlign = 0U;
 		// The size of a sample (in... bits).
-		unsigned bitsPerSample = 0U;
+		uint16_t bitsPerSample = 0U;
 		// The size of the data within the file (in bytes).
-		unsigned long dataSize = 0UL;
+		uint32_t dataSize = 0UL;
 
 		// The audio in bytes after it was loaded.
 		int16_t* data = nullptr;
@@ -373,16 +363,16 @@ namespace Engine
 		// Default constructer, doesn't do anything.
 		AudioSource();
 		// Load .wav file.
-		// fileName - the name of the file.
+		// `fileName` - the name of the file.
 		// Returns true if succeeded
-		bool LoadWavFile(std::string fileName);
+		bool LoadWavFile(const std::string& fileName);
 
 		// Play the sound from the beginning.
 		// start - the start point in samples. 0 means the first sample.
 		// length - the length in samples. 0 means the entire sound.
 		// loops - how many times to loop. 0 and 1 mean play once. 
 		// a vector of floats between 0.0f to 1.0f, each element will be the volume of each corresponding channel.
-		void Play(unsigned long start = 0, unsigned long length = 0, unsigned short loops = 0, float volume = 1.0f);
+		void Play(uint32_t start = 0, uint32_t length = 0, uint16_t loops = 0, float volume = 1.0f);
 		// Pause playing the sound.
 		void Pause();
 		// Resume playing the sound.
@@ -393,20 +383,20 @@ namespace Engine
 	
 	struct Camera
 	{
-		std::function<void()> OnTick = NULL;
-		std::string name = "Unnamed Camera";
-		Point pos = { 0, 0 };
-		UPoint res = { 10U, 10U };
+		std::function<void()> OnTick = nullptr;
+		std::string name = "";
+		Point pos = Point(0, 0);
+		UPoint res = UPoint(10, 10);
 		std::vector<std::vector<Cell>> image = {};
 
-		Camera(Point position = {0, 0}, UPoint resolution = {0, 0}, std::string cameraName = "Unnamed Camera");
+		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 		
 		void Render(std::vector<Layer*> layers);
 		// This function will draw what was rendered (Camera::image's contents) into the "final" image (Engine::image), which will be printed at once with Engine::Print.
 		// pos is the position desired to draw the rendered image to the final image.
 		// left, top, right and bottom are a rectangle representing the area of the rendered image desired to draw to the final image.
 		// Setting right/bottom to 0 will default to the rendered image's size.
-		void Draw(Point pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
+		void Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
 	};
 	
 	struct Map
@@ -415,7 +405,7 @@ namespace Engine
 		std::function<void()> OnTick = NULL;
 		std::vector<Camera*> cameras = {};
 		std::vector<Layer*> layers = {};
-		int activeCameraI = -1;
+		size_t activeCameraI = -1;
 
 		int AddCamera(Camera* camera, bool asActiveCamera = false);
 		int AddLayer(Layer* layer);
@@ -423,7 +413,7 @@ namespace Engine
 		// Returns true if managed to render (active camera is valid), otherwise, false.
 		bool Render();
 		// Returns true if managed to draw (active camera is valid), otherwise, false.
-		bool Draw(Point pos = {0, 0}, unsigned left = 0U, unsigned top = 0U, unsigned right = 0U, unsigned bottom = 0U);
+		bool Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
 	};
 
 	// An easy to use time point which uses std::chrono.
@@ -431,7 +421,7 @@ namespace Engine
 	struct TimePoint
 	{
 		// The std::chrono time point
-		std::chrono::high_resolution_clock::time_point chornoTimePoint;
+		std::chrono::high_resolution_clock::time_point chronoTimePoint;
 
 		// The default constructor will set the time point to the time it was created
 		TimePoint();
@@ -450,8 +440,8 @@ namespace Engine
 	};
 
 	// Storage, could be used for many things.
-	extern std::vector<Object> storedObjects;
-	extern std::vector<Layer> storedLayers;
+	inline std::vector<Object> storedObjects = {};
+	inline std::vector<Layer> storedLayers = {};
 	// If you don't want to store an object yourself, add it to this function which will store it for you. Add the returned pointer to the desired layer.
 	// This is used by the engine when you load a map.
 	Object* StoreObject(Object object);

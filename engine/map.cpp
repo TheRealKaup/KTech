@@ -1,6 +1,4 @@
 #include "engine.hpp"
-#include <cstddef>
-
 
 // ---=== Layer ===---
 
@@ -11,7 +9,7 @@ int Engine::Layer::AddObject(Object* object)
 	return objects.size() - 1;
 }
 
-bool Engine::Layer::RemoveObject(int index)
+bool Engine::Layer::RemoveObject(size_t index)
 {
 	if (objects.size() < index)
 		return false;
@@ -20,7 +18,7 @@ bool Engine::Layer::RemoveObject(int index)
 	return true;
 }
 
-bool Engine::Layer::RemoveObject(std::string name)
+bool Engine::Layer::RemoveObject(const std::string& name)
 {
 	for (int i = 0; i < objects.size(); i ++)
 	{
@@ -75,7 +73,7 @@ bool Engine::Map::Render()
 	return false;
 }
 
-bool Engine::Map::Draw(Point pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
+bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{

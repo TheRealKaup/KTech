@@ -1,6 +1,6 @@
 #include "engine.hpp"
 
-Engine::Camera::Camera(Point position, UPoint resolution, std::string name)
+Engine::Camera::Camera(Point position, UPoint resolution, const std::string& name)
 	: pos(position), res(resolution) {}
 
 // <400 before, >400 after second update, >1500 expected max potential before, 1300-2000 now. (20x20)
@@ -8,7 +8,8 @@ Engine::Camera::Camera(Point position, UPoint resolution, std::string name)
 static Engine::Layer* layer;
 static Engine::Object* obj;
 static Engine::Texture* texture;
-static int t, o, l, x, y, finalY, finalX, baseX;
+static size_t t, o, l, x, y;
+static Engine::Point final;
 static u_int32_t temp;
 
 void Engine::Camera::Render(std::vector<Layer*> layers)
@@ -19,18 +20,18 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 	{
 		for (x = 0; x < res.x; x++)
 		{
-			image[y][x].frgb = { 0, 0, 0 };
-			image[y][x].brgb = { 0, 0, 0 };
-			image[y][x].character = ' ';
+			image[y][x].f = { 0, 0, 0 };
+			image[y][x].b = { 0, 0, 0 };
+			image[y][x].c = ' ';
 		}
 	}
 
-	for (size_t i = 0; i < layers.size(); i++)
+	for (l = 0; l < layers.size(); l++)
 	{
-		if (!layers[i]->active)
+		if (!layers[l]->active)
 			continue;
 
-		layer = layers[i];
+		layer = layers[l];
 
 		for (o = 0; o < layer->objects.size(); o++)
 		{
@@ -44,32 +45,33 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 
 				for (y = 0; y < texture->t.size(); y++)
 				{
-					finalY = y + obj->pos.y + texture->pos.y - pos.y;
+					final.y = y + obj->pos.y + texture->pos.y - pos.y;
 
-					if (finalY < 0)
+					if (final.y < 0)
 						continue;
-					if (finalY >= res.y)
+					if (final.y >= res.y)
 						break;
 
 					for (x = 0; x < texture->t[y].size(); x++)
 					{
-						finalX = x + obj->pos.x + texture->pos.x - pos.x;
+						final.x = x + obj->pos.x + texture->pos.x - pos.x;
 
-						if (finalX < 0)
+						if (final.x < 0)
 							continue;
-						if (finalX >= res.x)
+						if (final.x >= res.x)
 							break;
 
-						if (texture->t[y][x].character != ' ')
+						if (texture->t[y][x].c != ' ')
 						{
-							image[finalY][finalX].character = texture->t[y][x].character;
-							image[finalY][finalX].frgb.r = (texture->t[y][x].frgba.r * texture->t[y][x].frgba.a + image[finalY][finalX].frgb.r * (255 - texture->t[y][x].frgba.a)) / 255;
-							image[finalY][finalX].frgb.g = (texture->t[y][x].frgba.g * texture->t[y][x].frgba.a + image[finalY][finalX].frgb.g * (255 - texture->t[y][x].frgba.a)) / 255;
-							image[finalY][finalX].frgb.b = (texture->t[y][x].frgba.b * texture->t[y][x].frgba.a + image[finalY][finalX].frgb.b * (255 - texture->t[y][x].frgba.a)) / 255;;
+							// image[finalY][finalX].frgb.r = layer->opacity * text->t[y][x].frgba.a * text->t[y][x].frgba.r + (1.0f - layer->opacity * text->t[y][x].frgba.a) * image[finalY][finalX].frgb.r;
+							image[final.y][final.x].c = texture->t[y][x].c;
+							image[final.y][final.x].f.r = (texture->t[y][x].f.r * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.r * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
+							image[final.y][final.x].f.g = (texture->t[y][x].f.g * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.g * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
+							image[final.y][final.x].f.b = (texture->t[y][x].f.b * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.b * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;;
 						}
-						image[finalY][finalX].brgb.r = (texture->t[y][x].brgba.r * texture->t[y][x].brgba.a + image[finalY][finalX].brgb.r * (255 - texture->t[y][x].brgba.a)) / 255;
-						image[finalY][finalX].brgb.g = (texture->t[y][x].brgba.g * texture->t[y][x].brgba.a + image[finalY][finalX].brgb.g * (255 - texture->t[y][x].brgba.a)) / 255;
-						image[finalY][finalX].brgb.b = (texture->t[y][x].brgba.b * texture->t[y][x].brgba.a + image[finalY][finalX].brgb.b * (255 - texture->t[y][x].brgba.a)) / 255;
+						image[final.y][final.x].b.r = (texture->t[y][x].b.r * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.r * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
+						image[final.y][final.x].b.g = (texture->t[y][x].b.g * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.g * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
+						image[final.y][final.x].b.b = (texture->t[y][x].b.b * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.b * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
 					}
 				}
 			}
@@ -81,9 +83,9 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 			{
 				for (size_t x = 0; x < res.x; x++)
 				{
-					image[y][x].brgb.r = layer->brgba.a * layer->brgba.r + (1.0f - layer->brgba.a) * image[y][x].brgb.r;
-					image[y][x].brgb.g = layer->brgba.a * layer->brgba.g + (1.0f - layer->brgba.a) * image[y][x].brgb.g;
-					image[y][x].brgb.b = layer->brgba.a * layer->brgba.b + (1.0f - layer->brgba.a) * image[y][x].brgb.b;
+					image[y][x].b.r = layer->brgba.a * layer->brgba.r + (1.0f - layer->brgba.a) * image[y][x].b.r;
+					image[y][x].b.g = layer->brgba.a * layer->brgba.g + (1.0f - layer->brgba.a) * image[y][x].b.g;
+					image[y][x].b.b = layer->brgba.a * layer->brgba.b + (1.0f - layer->brgba.a) * image[y][x].b.b;
 				}
 			}
 		}
@@ -94,16 +96,16 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 			{
 				for (size_t x = 0; x < res.x; x++)
 				{
-					image[y][x].frgb.r = layer->frgba.a * layer->frgba.r + (1.0f - layer->frgba.a) * image[y][x].frgb.r;
-					image[y][x].frgb.g = layer->frgba.a * layer->frgba.g + (1.0f - layer->frgba.a) * image[y][x].frgb.g;
-					image[y][x].frgb.b = layer->frgba.a * layer->frgba.b + (1.0f - layer->frgba.a) * image[y][x].frgb.b;
+					image[y][x].f.r = layer->frgba.a * layer->frgba.r + (1.0f - layer->frgba.a) * image[y][x].f.r;
+					image[y][x].f.g = layer->frgba.a * layer->frgba.g + (1.0f - layer->frgba.a) * image[y][x].f.g;
+					image[y][x].f.b = layer->frgba.a * layer->frgba.b + (1.0f - layer->frgba.a) * image[y][x].f.b;
 				}
 			}
 		}
 	}
 }
 
-void Engine::Camera::Draw(Point pos, unsigned left, unsigned top, unsigned right, unsigned bottom)
+void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
 {
 	// Return if the image is sized 0
 	if (image.size() == 0)

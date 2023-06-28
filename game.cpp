@@ -63,8 +63,8 @@ struct Character
 
 	Character(Engine::Layer* layer)
 	{
-		groundHitSFX.LoadWavFile("Assets/groundHit2.wav");
-		jumpSFX.LoadWavFile("Assets/jump.wav");
+		groundHitSFX.LoadWavFile("assets/groundHit.wav");
+		jumpSFX.LoadWavFile("assets/jump.wav");
 
 		obj.pos = { 5, 2 };//
 		obj.textures.resize(1);
@@ -167,7 +167,7 @@ void TurnOnCharacterCamera() {
 int main()
 {
 	Engine::AudioSource backgroundMusic;
-	// backgroundMusic.LoadWavFile("Assets/bordercrossing.wav");
+	// backgroundMusic.LoadWavFile("assets/bordercrossing.wav");
 	// backgroundMusic.Play(0, 0, 0, 0.8f);
 
 	Engine::InitializeAudio();
@@ -191,9 +191,9 @@ int main()
 
 	Engine::Object worldProps({ 1, 1 }, "");
 	worldProps.textures.resize(3);
-	worldProps.textures[0].File("Assets/sky.kcget", { 0, 0 });
-	worldProps.textures[1].File("Assets/sky2.kcget", { 0, 30 });
-	worldProps.textures[2].File("Assets/land.kcget", { 0, 20 });
+	worldProps.textures[0].File("assets/sky.kcget", { 0, 0 });
+	worldProps.textures[1].File("assets/sky2.kcget", { 0, 30 });
+	worldProps.textures[2].File("assets/land.kcget", { 0, 20 });
 	int base = 29;
 	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, base }, 0));
 	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 1, base + 2 }, 0));
@@ -234,7 +234,7 @@ int main()
 	Engine::Object house({ 20, 32 }, "");
 
 	house.textures.resize(1);
-	house.textures[0].File("Assets/house.kcget", { 0, 0 });
+	house.textures[0].File("assets/house.kcget", { 0, 0 });
 	layer.AddObject(&house);
 
 	Engine::Input::RegisterHandler("m", TurnOnCharacterCamera);
@@ -249,6 +249,7 @@ int main()
 
 	Engine::tps = 24;
 	Engine::thisTickStartTP.SetToNow();
+
 	while (Engine::running)
 	{
 		Engine::Input::Call();
