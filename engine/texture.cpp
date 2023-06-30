@@ -1,32 +1,6 @@
 #include "engine.hpp"
 
-Engine::TimePoint::TimePoint()
-{
-	chronoTimePoint = std::chrono::high_resolution_clock::now();
-}
-void Engine::TimePoint::SetToNow()
-{
-	chronoTimePoint = std::chrono::high_resolution_clock::now();
-}
-long Engine::TimePoint::Seconds()
-{
-	return std::chrono::duration_cast<std::chrono::seconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-long Engine::TimePoint::Milliseconds()
-{
-	return std::chrono::duration_cast<std::chrono::milliseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-long Engine::TimePoint::Microseconds()
-{
-	return std::chrono::duration_cast<std::chrono::microseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-long Engine::TimePoint::Nanoseconds()
-{
-	return std::chrono::duration_cast<std::chrono::nanoseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-
-// Engine::Texture::Texture() {};
-void Engine::Texture::Rectangle(UPoint size, CellA value, Point pos) {
+void Engine::Texture::Simple(UPoint size, CellA value, Point pos) {
 	this->pos = pos;
 	t.resize(size.y);
 	for (size_t y = 0; y < t.size(); y++)
@@ -36,11 +10,12 @@ void Engine::Texture::Rectangle(UPoint size, CellA value, Point pos) {
 			t[y][x] = value;
 	}
 }
-void Engine::Texture::File(const std::string& fileName, Point pos) {
+
+bool Engine::Texture::File(const std::string& fileName, Point pos) {
 	this->pos = pos;
 	std::ifstream file(fileName);
 	if (!file.is_open())
-		return;
+		return false;
 	std::string line;
 
 	CellA value;
@@ -76,7 +51,10 @@ void Engine::Texture::File(const std::string& fileName, Point pos) {
 			}
 		}
 	}
+    
+    return true;
 }
+
 void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point pos) {
 	this->pos = pos;
 	t.resize(stringVector.size());
@@ -98,29 +76,24 @@ void Engine::Texture::SetCell(CellA value)
 		for (unsigned x = 0; x < t[y].size(); x++)
 			t[y][x] = value;
 }
+
 void Engine::Texture::SetForeground(RGBA value)
 {
 	for (unsigned y = 0; y < t.size(); y++)
 		for (unsigned x = 0; x < t[y].size(); x++)
 			t[y][x].f = value;
 }
+
 void Engine::Texture::SetBackground(RGBA value)
 {
 	for (unsigned y = 0; y < t.size(); y++)
 		for (unsigned x = 0; x < t[y].size(); x++)
 			t[y][x].b = value;
 }
+
 void Engine::Texture::SetCharacter(char value)
 {
 	for (unsigned y = 0; y < t.size(); y++)
 		for (unsigned x = 0; x < t[y].size(); x++)
 			t[y][x].c = value;
-}
-
-Engine::Object::Object(Point pos, const std::string& name) : pos(pos), name(name) {}
-
-Engine::Object::~Object()
-{
-	if (parentLayer)
-		parentLayer->RemoveObject(this);
 }

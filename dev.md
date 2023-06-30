@@ -89,3 +89,13 @@ The engine desperately needs a better terminal adaptation update.
 2 issues:
 - In `ExpandMovementTree()` I'm constantly pushing into the vectors, which is incredibly costy.
 - Pointer managment in the engine sucks. There is no clear and cheap way to transfer an object between layers or maps. Not sure if unique pointers are much of a solution.
+
+## 28/6/2023 12:41
+
+Solutions for `ExpandMovementTree()` vector issue:
+- Divide the amount of vectors by 4 by replacing same-sized vectors with sctructured vectors. For example: `vector pushingObjects, objectsToPush, pushingColliders, collidersToPush` -> `vector pushData = { {object, object, size_t, size_t}, ... }`.
+- Private variables inside `Object` to completely avoid any vectors or maps, resets those variables at the start and end of `Move()`.
+
+## 28/6/2023 14:05
+
+Went with the first solution. Also, `ExpandMovementTree()` is not a part of the `Engine` namespace anymore. There is no reason for it to be there, the only thing it could do is confuse the user. So, what I have done now cut the allocation occurrences by 4 times.

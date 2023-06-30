@@ -75,11 +75,12 @@ struct Character
 				"/ \\"
 			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
-		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 0, 1 }, 1));
-		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 1, 0 }, 1));
-		obj.colliders.push_back(Engine::Collider({ 1, 2 }, { 2, 1 }, 1));
+		obj.colliders.resize(3);
+		obj.colliders[0].Simple(Engine::UPoint(1, 2), 1, Engine::Point(0, 1));
+		obj.colliders[1].Simple(Engine::UPoint(1, 2), 1, Engine::Point(1, 0));
+		obj.colliders[2].Simple(Engine::UPoint(1, 2), 1, Engine::Point(2, 1));
 
-		cam = Engine::Camera({ 0, 0 }, { 15, 15 });
+		cam = Engine::Camera(Engine::Point( 0, 0 ), Engine::UPoint( 15, 15 ));
 
 		Engine::Input::RegisterHandler("w", std::bind(&Character::Jump, this), true);
 		Engine::Input::RegisterHandler("W", std::bind(&Character::Jump, this), true);
@@ -127,7 +128,8 @@ struct GravityBox
 			}, { 100, 0, 200, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
 
-		obj.colliders.push_back(Engine::Collider({ 3, 3 }, { 0, 0 }, 2));
+		obj.colliders.resize(1);
+		obj.colliders[0].Simple(Engine::UPoint(3, 3), 2, Engine::Point(0, 0));
 
 		obj.OnTick = std::bind(&GravityBox::OnTick, this);
 		
@@ -139,17 +141,13 @@ struct AutoUpdatingText
 {
 	float* data;
 	Engine::Object obj;
-	long threshold;
 
 	void OnTick()
 	{
-		if (*data > threshold)
-			obj.textures[0].Write({std::to_string(*data)}, {255, 0, 0, 255}, {0, 0, 0, 127}, {0, 0});
-		else
-			obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
+		obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
 	}
 
-	AutoUpdatingText(float* data, Engine::Point pos, Engine::Layer* layer, long threshold) : data(data), threshold(threshold)
+	AutoUpdatingText(float* data, Engine::Point pos, Engine::Layer* layer) : data(data)
 	{
 		obj.textures.resize(1);
 		obj.pos = pos;
@@ -194,33 +192,36 @@ int main()
 	worldProps.textures[0].File("assets/sky.kcget", { 0, 0 });
 	worldProps.textures[1].File("assets/sky2.kcget", { 0, 30 });
 	worldProps.textures[2].File("assets/land.kcget", { 0, 20 });
-	int base = 29;
-	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, base }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 1, base + 2 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 2, base + 3 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 1, 50 }, { 3, base + 5 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 4, base + 6 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 6, base + 7 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 5, 50 }, { 8, base + 8 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 14, 50 }, { 13, base + 9 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 6, 50 }, { 27, base + 10 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 5, 50 }, { 33, base + 11 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 3, 50 }, { 38, base + 12 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 41, base + 13 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 2, 50 }, { 43, base + 14 }, 0));
-	worldProps.colliders.push_back(Engine::Collider({ 3, 50 }, { 45, base + 15 }, 0));
+	
+	worldProps.colliders.resize(14);
+	uint8_t base = 29;
+	worldProps.colliders[0].Simple(Engine::UPoint(1, 1), 0, Engine::Point(0, base));
+	worldProps.colliders[1].Simple(Engine::UPoint(1, 1), 0, Engine::Point(1, base + 2));
+	worldProps.colliders[2].Simple(Engine::UPoint(1, 1), 0, Engine::Point(2, base + 3));
+	worldProps.colliders[3].Simple(Engine::UPoint(1, 1), 0, Engine::Point(3, base + 5));
+	worldProps.colliders[4].Simple(Engine::UPoint(2, 1), 0, Engine::Point(4, base + 6));
+	worldProps.colliders[5].Simple(Engine::UPoint(2, 1), 0, Engine::Point(6, base + 7));
+	worldProps.colliders[6].Simple(Engine::UPoint(5, 1), 0, Engine::Point(8, base + 8));
+	worldProps.colliders[7].Simple(Engine::UPoint(14, 1), 0, Engine::Point(13, base + 9));
+	worldProps.colliders[8].Simple(Engine::UPoint(6, 1), 0, Engine::Point(27, base + 10));
+	worldProps.colliders[9].Simple(Engine::UPoint(5, 1), 0, Engine::Point(33, base + 11));
+	worldProps.colliders[10].Simple(Engine::UPoint(3, 1), 0, Engine::Point(38, base + 12));
+	worldProps.colliders[11].Simple(Engine::UPoint(2, 1), 0, Engine::Point(41, base + 13));
+	worldProps.colliders[12].Simple(Engine::UPoint(2, 1), 0, Engine::Point( 43, base + 14));
+	worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
 	layer.AddObject(&worldProps);
 
 	Engine::Object border({0, 0}, "L");
 	border.textures.resize(4);
-	border.textures[0].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
-	border.textures[1].Rectangle({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
-	border.textures[2].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
-	border.textures[3].Rectangle({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
-	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 0 }, 0));
-	border.colliders.push_back(Engine::Collider({ 1, 50 }, { 0, 0 }, 0));
-	border.colliders.push_back(Engine::Collider({ 50, 1 }, { 0, 49 }, 0));
-	border.colliders.push_back(Engine::Collider({ 1, 50 }, { 49, 0 }, 0));
+	border.textures[0].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
+	border.textures[1].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
+	border.textures[2].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
+	border.textures[3].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
+	border.colliders.resize(4);
+	border.colliders[0].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 0));
+	border.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
+	border.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 49));
+	border.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
 	layer.AddObject(&border);
 
 	// Character character(&layer);
@@ -243,7 +244,7 @@ int main()
 	darkLayer.brgba = { 0, 0, 0, 127 };
 	darkLayer.frgba = { 0, 0, 0, 127 };
 	
-	AutoUpdatingText audioPerformance(&Engine::potentialfps, {1, 1}, &layer, 172);
+	AutoUpdatingText audioPerformance(&Engine::potentialfps, {1, 1}, &layer);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 

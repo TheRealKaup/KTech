@@ -37,7 +37,7 @@ namespace Widgets
 				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
 				{
 					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].frgba = selectedRGBA;
+						obj.textures[i].t[y][x].f = selectedRGBA;
 				}
 			}
 
@@ -51,7 +51,7 @@ namespace Widgets
 				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
 				{
 					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].frgba = notRGBA;
+						obj.textures[i].t[y][x].f = notRGBA;
 				}
 			}
 
@@ -72,7 +72,7 @@ namespace Widgets
 			
 			obj.textures[0].Write({ text }, notRGBA, { 0, 0, 0, 0 }, { 1, 1 });
 			
-			obj.textures[1].Rectangle({ 2UL + (unsigned long)text.size(), 3 }, Engine::CellA(' ', {0, 0, 0, 0}), {0U, 0U});
+			obj.textures[1].Simple(Engine::UPoint( 2 + text.size(), 3 ), Engine::CellA(' ', {0, 0, 0, 0}), {0U, 0U});
 			obj.textures[1].t[0][0] = Engine::CellA('#', notRGBA);
 			obj.textures[1].t[0][text.length() + 1] = Engine::CellA('#', notRGBA);
 			for (size_t x = 1; x <= text.length(); x++)
@@ -92,12 +92,12 @@ namespace Widgets
 	class IntInputField
 	{
 	public:
-		int number = 0;
-		int visibleNumber = 0;
+		uint32_t number = 0;
+		uint32_t visibleNumber = 0;
 
 		bool selected = false;
 
-		int currentDigit = 0;
+		uint8_t currentDigit = 0;
 		
 		std::function<void()> OnInsert;
 
@@ -106,9 +106,8 @@ namespace Widgets
 		Engine::Object obj;
 
 	private:
-		unsigned int min, max;
-		unsigned char maxDigits = 0;
-		unsigned char minDigits = 0;
+		uint32_t min, max;
+		uint8_t maxDigits = 0, minDigits = 0;
 		
 		void InternalInsert()
 		{
@@ -122,14 +121,14 @@ namespace Widgets
 					visibleNumber /= 10;
 
 					currentDigit--;
-					obj.textures[0].t[0][currentDigit].character = ' ';
+					obj.textures[0].t[0][currentDigit].c = ' ';
 				}
 				else if (Engine::Input::Between('0', '9'))
 				{
 					if (currentDigit == maxDigits)
 						return;
 
-					obj.textures[0].t[0][currentDigit].character = Engine::Input::buf[0];
+					obj.textures[0].t[0][currentDigit].c = Engine::Input::buf[0];
 					currentDigit++;
 
 					visibleNumber = visibleNumber * 10 + Engine::Input::Num();
@@ -154,7 +153,7 @@ namespace Widgets
 				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
 				{
 					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].frgba = selectedRGBA;
+						obj.textures[i].t[y][x].f = selectedRGBA;
 				}
 			}
 			selected = true;
@@ -188,7 +187,7 @@ namespace Widgets
 				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
 				{
 					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].frgba = notRGBA;
+						obj.textures[i].t[y][x].f = notRGBA;
 				}
 			}
 
@@ -200,7 +199,7 @@ namespace Widgets
 
 		void ChangeValue(std::string newNumber)
 		{
-			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)obj.textures[1].t[0].size(), 1 });
+			obj.textures[0].Simple(Engine::UPoint( maxDigits, 1 ), Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), Engine::Point(1 + (int)obj.textures[1].t[0].size(), 1));
 			number = 0;
 			currentDigit = 0;
 			for (int x = 0; x < maxDigits && x < newNumber.length(); x++)
@@ -213,7 +212,7 @@ namespace Widgets
 			visibleNumber = number;
 		}
 
-		IntInputField(Engine::Layer* layer, std::function<void()> OnInsert, unsigned int min = 0, unsigned int max = 255, std::string defaultNum = "0", Engine::Point pos = {0, 0},
+		IntInputField(Engine::Layer* layer, std::function<void()> OnInsert, uint32_t min = 0, uint32_t max = 255, std::string defaultNum = "0", Engine::Point pos = {0, 0},
 			std::string text = "Value = ", Engine::RGBA notRGBA = { 150, 150, 150, 255 }, Engine::RGBA selectedRGBA = { 255, 255, 255, 255 })
 			: OnInsert(OnInsert), min(min), max(max), notRGBA(notRGBA), selectedRGBA(selectedRGBA)
 		{
@@ -250,7 +249,7 @@ namespace Widgets
 			// Texture
 			obj.textures.resize(3);
 
-			obj.textures[0].Rectangle({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)text.length(), 1 });
+			obj.textures[0].Simple({ maxDigits, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)text.length(), 1 });
 			for (int x = 0; x < maxDigits && x < defaultNum.length(); x++)
 			{
 				currentDigit++;
@@ -262,7 +261,7 @@ namespace Widgets
 
 			obj.textures[1].Write({ text }, notRGBA, Engine::RGBA(), { 1, 1 });
 
-			obj.textures[2].Rectangle({ 2 + text.size() + maxDigits, 3 }, Engine::CellA(' ', { 0, 0, 0, 0 }), { 0, 0 });
+			obj.textures[2].Simple(Engine::UPoint( 2 + text.size() + maxDigits, 3 ), Engine::CellA(' ', { 0, 0, 0, 0 }), { 0, 0 });
 			obj.textures[2].t[0][0] = Engine::CellA('#', notRGBA);
 			obj.textures[2].t[0][obj.textures[2].t[0].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < obj.textures[2].t[0].size() - 1; x++)
@@ -292,9 +291,9 @@ namespace Widgets
 		Engine::Object obj;
 
 	private:
-		int currentChar = 0;
-		int maxChars;
-		
+		uint16_t currentChar = 0;
+		uint16_t maxChars;
+
 		void InternalInsert()
 		{
 			if (selected)
@@ -307,13 +306,13 @@ namespace Widgets
 					currentChar--;
 					string.resize(string.size() - 1);
 
-					obj.textures[0].t[0][currentChar].character = ' ';
+					obj.textures[0].t[0][currentChar].c = ' ';
 				}
 				else if (currentChar == maxChars)
 					return;
 				else
 				{
-					obj.textures[0].t[0][currentChar].character = Engine::Input::buf[0];
+					obj.textures[0].t[0][currentChar].c = Engine::Input::buf[0];
 					string.push_back(Engine::Input::buf[0]);
 					currentChar++;
 				}
@@ -330,7 +329,7 @@ namespace Widgets
 				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
 				{
 					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].frgba = selectedRGBA;
+						obj.textures[i].t[y][x].f = selectedRGBA;
 				}
 			}
 			
@@ -344,7 +343,7 @@ namespace Widgets
 				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
 				{
 					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].frgba = notRGBA;
+						obj.textures[i].t[y][x].f = notRGBA;
 				}
 			}
 			selected = false;
@@ -358,10 +357,10 @@ namespace Widgets
 				if (x < string.length())
 				{
 					string[x] = newString[x];
-					obj.textures[0].t[0][x].character = newString[x];
+					obj.textures[0].t[0][x].c = newString[x];
 				}
 				else
-					obj.textures[0].t[0][x].character = ' ';
+					obj.textures[0].t[0][x].c = ' ';
 			}
 			currentChar = string.length();
 		}
@@ -381,7 +380,7 @@ namespace Widgets
 
 			// Texture
 			Engine::Texture field;
-			field.Rectangle({ maxChars, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)text.length(), 1 });
+			field.Simple({ maxChars, 1 }, Engine::CellA(' ', notRGBA, { 0, 0, 0, 0 }), { 1 + (int)text.length(), 1 });
 			for (int x = 0; x < maxChars && x < defaultString.length(); x++)
 			{
 				currentChar++;
@@ -393,7 +392,7 @@ namespace Widgets
 			fieldText.Write({ text }, notRGBA, Engine::RGBA(), { 1, 1 });
 
 			Engine::Texture frame;
-			frame.Rectangle({ 2U + text.size() + maxChars, 3 }, Engine::CellA(' ', {0, 0, 0, 0}), {0, 0});
+			frame.Simple(Engine::UPoint( 2U + text.size() + maxChars, 3 ), Engine::CellA(' ', {0, 0, 0, 0}), {0, 0});
 			frame.t[0][0] = Engine::CellA('#', notRGBA);
 			frame.t[0][frame.t[0].size() - 1] = Engine::CellA('#', notRGBA);
 			for (int x = 1; x < frame.t[0].size() - 1; x++)

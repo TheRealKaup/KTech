@@ -172,16 +172,16 @@ namespace Engine
 
 	struct Texture
 	{
+		// `True` - Allow `Camera::Render()` to render this texture.
+		// `False` - Disallow `Camera::Render()` to render this texture.
+		bool active = true;
 		// Position relative to the texture's parent object.
 		Point pos = {0, 0};
-		// `true` - simple texture mode.
-		// `false` - complex texture mode.
-		// A simple texture is a rectangle which is faster to render and uses less memory than a complex texture, but is limited to a single cell value.
-		// A complex texture is a specific 2D cell shape which is slower to render and uses more memory than a simple texture, but is more capable than a simple texture.
+		// `True` - Simple texture mode.
+		// `False` - Complex texture mode.
+		// A simple texture is a rectangle which is faster to render and uses less memory than a complex texture, but is limited to a single `CellA` value.
+		// A complex texture is a 2D cell-made shape which is slower to render and uses more memory than a simple texture, but is more capable than a simple texture.
 		bool simple = true;
-		// `true` - count in the texture and allow to render it.
-		// `false` - skip the texture and don't allow to render it.
-		bool active = true;
 
 		// (Used if the texture is simple) The size of the texture's rectangle.
 		UPoint size = { 0, 0 };
@@ -194,13 +194,13 @@ namespace Engine
 		// The constructors are functions instead of actual constructors because of my own preference.
 		// Visual Studio has a hard time correctly showing the parameters when filling them, so I decided that
 		// this is the best solution for making the writing experience easier.
-		
-		// A rectangle of the same value. (Limited to a single color and character)
-		void Rectangle(UPoint size, CellA value, Point pos);
-		// Load from a file. (Requires file)
-		void File(const std::string& fileName, Point pos);
-		// Create a texture by writing it. (Limited to a single color)
-		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point pos);
+
+		// A rectangle of the same value (limited to a single CellA value).
+		void Simple(UPoint size, CellA value, Point position);
+		// Load from a file.
+		bool File(const std::string& fileName, Point position);
+		// Create a texture by writing it (limited to single foreground and background RGBA values)
+		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point position);
 		// Change all the cells' values
 		void SetCell(CellA value);
 		// Chagne all the cells' foreground color values
@@ -213,16 +213,18 @@ namespace Engine
 
 	struct Collider
 	{
+		// `True` - Allow `Object::Move()` to process this collider.
+		// `False` - Disallow `Object::Move()` to process this collider.
+		bool active = true;
 		// Position relative to the collider's parent object.
 		Point pos = { 0, 0 };
-		// `true` - simple collider mode.
-		// `false` - complex collider mode.
+		// `True` - simple collider mode.
+		// `False` - complex collider mode.
 		// A simple collider is a rectangle which is faster to process and uses less memory than a complex collider.
+		// A complex collider is a 2D cell-made shape which is slower to process and uses more mamory than a simple collider, but is more capable than a simple collider.
 		bool simple = true;
 		// The collider type which is defined by Engine::colliderTypes
 		uint8_t type = 0;
-		// Turn the collider on/off.
-		bool active = true;
 
 		// Used if the collider is simple.
 		// The size of the collider's rectangle.
@@ -232,11 +234,14 @@ namespace Engine
 		// A 2D boolean vector 
 		std::vector<std::vector<bool>> c = {};
 
-
-		// For a simple collider
-		inline Collider(UPoint size = {0, 0}, Point position = {0, 0}, uint8_t type = 0) : size(size), pos(position), type(type), simple(true) {}
-		// For a complex collider
-		inline Collider(std::vector<std::vector<bool>> collider, Point position = { 0, 0 }, uint8_t type = 0) : c(collider), pos(position), type(type), simple(false) {}
+		// A rectangle.
+		void Simple(UPoint size, uint8_t type, Point position);
+		// Load from a file.
+		bool File(const std::string& fileName, uint8_t type, Point position);
+		// Create a collider by writing it.
+		void Write(const std::vector<std::string>& stringVector, uint8_t type, Point position);
+		// Create a collider which corrosponds to a texture (also takes its position)
+		void ByTexture(const Texture& texture, uint8_t type);
 	};
 
 	struct Object
@@ -275,25 +280,6 @@ namespace Engine
 
 		// Tries to move the object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
 		bool Move(Point dir);
-
-		// Engine used function.
-		void ExpandMovementTree(Point dir,
-			std::vector<Object*>& pushingObjects,
-			std::vector<Object*>& objectsToPush,
-			std::vector<size_t>& pushingColliders,
-			std::vector<size_t>& collidersToPush,
-			std::vector<Object*>& blockedObjects,
-			std::vector<Object*>& blockingObjects,
-			std::vector<size_t>& blockedColliders,
-			std::vector<size_t>& blockingColliders,
-			std::vector<Object*>& overlappingObjects,
-			std::vector<Object*>& overlappedObjects,
-			std::vector<size_t>& overlappingColliders,
-			std::vector<size_t>& overlappedColliders,
-			std::vector<Object*>& exitOverlappingObjects,
-			std::vector<Object*>& exitOverlappedObjects,
-			std::vector<size_t>& exitOverlappingColliders,
-			std::vector<size_t>& exitOverlappedColliders);
 
 		Object(Point position = Point(0, 0), const std::string& objectName = "");
 
