@@ -9,9 +9,6 @@
  - Putting it all together
  - How KTech works, looking at the engine's files
 
-**To do:**
-- Collision, Audio, Widgets, 
-
 **Notes:**
 - KTech's documentation was written to be suitable for people who are new to game development.
 - I **strongly advice** that whenever you encounter a programming concept which you are not familiar with, you should pause to learn it.
@@ -30,7 +27,7 @@ It is important to understand that KTech is only a C++ game engine library, whic
 
 To use KTech, you have to use the programming language C++, though you don't need to be all that experienced with the language.
 
-If you know how to handle these concepts with C++, you should be more than fine:
+If you know how to handle these concepts in C++, you should be more than fine:
 - Classes
 - Namespaces
 - Functions (or "methods")

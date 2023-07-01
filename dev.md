@@ -2,6 +2,15 @@ I deicided to create this file for more trackable and readable development logs,
 
 This does not replace the git commit messages.
 
+# To do
+
+|Title|Description|Status|Original log|
+|-|-|-|-|
+|Overlapping|Overlap functionality with event calling|Done but untested|[Overlapping](#overlapping)|
+|Consistent `Texture` and `Collider` classes|Add simple mode to `Texture` and creation functions to `Collider`|In progress, missing complex `Collider` and simple `Texture` functionality|[Simple textures & collider constructors](#simple-textures--collider-constructors)|
+|Optimizing memory allocation use in `ExpandMovementTree()`|Reduce the use of `std::vector::push_back()`|Done|[Memory](#memory)|
+|Tutorials|Finish writing [the tutorails](tutorials.md)|Currently writing [collision](tutorials.md/#collision), haven't yet started writing [widgets](tutorials.md/#widgets), [audio](tutorials.md/#audio) and [putting it all together](tutorials.md/#putting-it-all-together), still requires editing||
+
 # Overlapping
 
 ## 24/6/2023 17:37
