@@ -10,6 +10,7 @@
 
 #pragma once
 
+// Standard libraries
 #include <iostream> // Printing, strings, et cetera
 #include <string> // to_string
 #include <vector> // Heavily based
@@ -18,13 +19,15 @@
 #include <chrono> // Time management
 #include <fstream> // Reading textures and audio files
 #include <cstring> // strcmp
-#include "config.hpp" // macros
-#include <portaudio.h> // PortAudio is a cross-platform audio library
+#include <stdint.h> // int32_t
 // Linux libraries
 #include <signal.h> // For getting signals (like on quit)
 #include <termios.h> // For changing terminal attributes
 #include <sys/ioctl.h> // Contains some data types (winsize for termios.h)
-#include <stdint.h> // int32_t
+// Cross-platform libraries
+#include <portaudio.h> // PortAudio is a cross-platform audio library
+
+#include "config.hpp" // macros
 
 namespace Engine
 {
@@ -46,9 +49,9 @@ namespace Engine
 	inline bool running = true;
 
 	inline std::vector<std::vector<uint8_t>> colliderTypes = {
-	{ 0, 1, 2 }, // Heavy - 0
-	{ 0, 1, 2 }, // Normal - 1
-	{ 2, 2, 2 } // Overlappable - 2
+		{ 0, 1, 2 }, // Heavy - 0
+		{ 0, 1, 2 }, // Normal - 1
+		{ 2, 2, 2 } // Overlappable - 2
 	};
 
 	inline std::function<void()> GlobalOnTick = nullptr;

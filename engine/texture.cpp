@@ -1,18 +1,16 @@
 #include "engine.hpp"
 
-void Engine::Texture::Simple(UPoint size, CellA value, Point pos) {
-	this->pos = pos;
-	t.resize(size.y);
-	for (size_t y = 0; y < t.size(); y++)
-	{
-		t[y].resize(size.x, value);
-		for (size_t x = 0; x < t[y].size(); x++)
-			t[y][x] = value;
-	}
+void Engine::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
+	simple = true;
+	pos = _pos;
+	size = _size;
+	value = _value;
 }
 
-bool Engine::Texture::File(const std::string& fileName, Point pos) {
-	this->pos = pos;
+bool Engine::Texture::File(const std::string& fileName, Point _pos) {
+	simple = false;
+	pos = _pos;
+	
 	std::ifstream file(fileName);
 	if (!file.is_open())
 		return false;
@@ -55,8 +53,9 @@ bool Engine::Texture::File(const std::string& fileName, Point pos) {
     return true;
 }
 
-void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point pos) {
-	this->pos = pos;
+void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point _pos) {
+	simple = false;
+	pos = _pos;
 	t.resize(stringVector.size());
 	for (size_t y = 0; y < stringVector.size(); y++)
 	{

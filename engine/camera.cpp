@@ -3,8 +3,6 @@
 Engine::Camera::Camera(Point position, UPoint resolution, const std::string& name)
 	: pos(position), res(resolution) {}
 
-// <400 before, >400 after second update, >1500 expected max potential before, 1300-2000 now. (20x20)
-
 static Engine::Layer* layer;
 static Engine::Object* obj;
 static Engine::Texture* texture;
@@ -43,35 +41,65 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 				if (!texture->active)
 					continue;
 
-				for (y = 0; y < texture->t.size(); y++)
+				if (texture->simple)
 				{
-					final.y = y + obj->pos.y + texture->pos.y - pos.y;
-
-					if (final.y < 0)
-						continue;
-					if (final.y >= res.y)
-						break;
-
-					for (x = 0; x < texture->t[y].size(); x++)
+					for (y = 0; y < texture->size.y; y++)
 					{
-						final.x = x + obj->pos.x + texture->pos.x - pos.x;
-
-						if (final.x < 0)
+						final.y = y + obj->pos.y + texture->pos.y - pos.y;
+						if (final.y < 0)
 							continue;
-						if (final.x >= res.x)
+						if (final.y >= res.y)
+							break;
+	
+						for (x = 0; x < texture->size.x; x++)
+						{
+							final.x = x + obj->pos.x + texture->pos.x - pos.x;
+							if (final.x < 0)
+								continue;
+							if (final.x >= res.x)
+								break;
+							if (texture->value.c != ' ')
+							{
+								image[final.y][final.x].c = texture->value.c;
+								image[final.y][final.x].f.r = (texture->value.f.r * texture->value.f.a * layer->alpha + image[final.y][final.x].f.r * (65025 - texture->value.f.a * layer->alpha)) / 65025;
+								image[final.y][final.x].f.g = (texture->value.f.g * texture->value.f.a * layer->alpha + image[final.y][final.x].f.g * (65025 - texture->value.f.a * layer->alpha)) / 65025;
+								image[final.y][final.x].f.b = (texture->value.f.b * texture->value.f.a * layer->alpha + image[final.y][final.x].f.b * (65025 - texture->value.f.a * layer->alpha)) / 65025;;
+							}
+							image[final.y][final.x].b.r = (texture->value.b.r * texture->value.b.a * layer->alpha + image[final.y][final.x].b.r * (65025 - texture->value.b.a * layer->alpha)) / 65025;
+							image[final.y][final.x].b.g = (texture->value.b.g * texture->value.b.a * layer->alpha + image[final.y][final.x].b.g * (65025 - texture->value.b.a * layer->alpha)) / 65025;
+							image[final.y][final.x].b.b = (texture->value.b.b * texture->value.b.a * layer->alpha + image[final.y][final.x].b.b * (65025 - texture->value.b.a * layer->alpha)) / 65025;
+						}
+					}
+				}
+				else
+				{
+					for (y = 0; y < texture->t.size(); y++)
+					{
+						final.y = y + obj->pos.y + texture->pos.y - pos.y;
+						if (final.y < 0)
+							continue;
+						if (final.y >= res.y)
 							break;
 
-						if (texture->t[y][x].c != ' ')
+						for (x = 0; x < texture->t[y].size(); x++)
 						{
-							// image[finalY][finalX].frgb.r = layer->opacity * text->t[y][x].frgba.a * text->t[y][x].frgba.r + (1.0f - layer->opacity * text->t[y][x].frgba.a) * image[finalY][finalX].frgb.r;
-							image[final.y][final.x].c = texture->t[y][x].c;
-							image[final.y][final.x].f.r = (texture->t[y][x].f.r * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.r * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
-							image[final.y][final.x].f.g = (texture->t[y][x].f.g * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.g * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
-							image[final.y][final.x].f.b = (texture->t[y][x].f.b * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.b * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;;
+							final.x = x + obj->pos.x + texture->pos.x - pos.x;
+							if (final.x < 0)
+								continue;
+							if (final.x >= res.x)
+								break;
+
+							if (texture->t[y][x].c != ' ')
+							{
+								image[final.y][final.x].c = texture->t[y][x].c;
+								image[final.y][final.x].f.r = (texture->t[y][x].f.r * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.r * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
+								image[final.y][final.x].f.g = (texture->t[y][x].f.g * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.g * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
+								image[final.y][final.x].f.b = (texture->t[y][x].f.b * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.b * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;;
+							}
+							image[final.y][final.x].b.r = (texture->t[y][x].b.r * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.r * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
+							image[final.y][final.x].b.g = (texture->t[y][x].b.g * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.g * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
+							image[final.y][final.x].b.b = (texture->t[y][x].b.b * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.b * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
 						}
-						image[final.y][final.x].b.r = (texture->t[y][x].b.r * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.r * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
-						image[final.y][final.x].b.g = (texture->t[y][x].b.g * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.g * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
-						image[final.y][final.x].b.b = (texture->t[y][x].b.b * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.b * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
 					}
 				}
 			}
