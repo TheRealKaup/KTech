@@ -1,6 +1,5 @@
 #pragma once
-#include "config.hpp"
-#include "engine.hpp"
+#include "engine/engine.hpp"
 
 #define Characters_Lower 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
 #define Characters_Upper 'Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','G','H','J','K','L','Z','X','C','V','B','N','M'
@@ -10,17 +9,22 @@
 
 namespace Widgets
 {
-	class Button
+	struct Widget
+	{
+		Engine::Object obj;
+		bool selected = false;
+		virtual void Select();
+		virtual void Deselect();
+	};
+
+	class Button : Widget
 	{
 	public:
-		bool selected = false;
 		bool down = false;
 
 		std::function<void()> OnPress;
 		
 		Engine::RGBA notRGBA, selectedRGBA;
-
-		Engine::Object obj;
 
 	private:
 		void InsideOnPress()
@@ -89,21 +93,17 @@ namespace Widgets
 	};
 
 	
-	class IntInputField
+	class IntInputField : Widget
 	{
 	public:
 		uint32_t number = 0;
 		uint32_t visibleNumber = 0;
-
-		bool selected = false;
 
 		uint8_t currentDigit = 0;
 		
 		std::function<void()> OnInsert;
 
 		Engine::RGBA notRGBA, selectedRGBA;
-
-		Engine::Object obj;
 
 	private:
 		uint32_t min, max;
@@ -277,18 +277,14 @@ namespace Widgets
 		}
 	};
 
-	class StringInputField
+	class StringInputField : Widget
 	{
 	public:
 		std::string string = "";
 
-		bool selected = false;
-
 		std::function<void()> OnInsert;
 
 		Engine::RGBA notRGBA, selectedRGBA;
-
-		Engine::Object obj;
 
 	private:
 		uint16_t currentChar = 0;
