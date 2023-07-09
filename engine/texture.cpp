@@ -7,6 +7,20 @@ void Engine::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
 	value = _value;
 }
 
+void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
+{
+	simple = false;
+	pos = _pos;
+	
+	t.resize(_size.y, std::vector<CellA>(_size.y, _value));
+	for (std::vector<CellA>& row : t)
+	{
+		row.resize(_size.x);
+		for (CellA& cell : row)
+			cell = _value;
+	}
+}
+
 bool Engine::Texture::File(const std::string& fileName, Point _pos) {
 	simple = false;
 	pos = _pos;
