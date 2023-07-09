@@ -62,10 +62,9 @@ public:
 		selected = false;
 	}
 
-	template<typename T>
 	Button(Engine::Layer* layer,
 		std::function<void()> OnPress,
-		T key = kReturn,
+		std::string key = kReturn,
 		Engine::Point pos = { 0, 0 },
 		const std::string& text = "Button",
 		bool withFrame = false,

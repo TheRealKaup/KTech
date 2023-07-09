@@ -23,7 +23,7 @@ private:
 	{
 		if (selected)
 		{
-			if (Engine::Input::Is(kBackspace) || Engine::Input::Is(ksDelete))
+			if (Engine::Input::Is(kBackspace) || Engine::Input::Is(kDelete))
 			{
 				if (currentChar == 0)
 					return;
@@ -93,9 +93,9 @@ public:
 
 	StringInputField(Engine::Layer* layer = 0,
 		std::function<void()> OnInsert = 0,
-		std::vector<int> allowedCharacters = {},
+		std::vector<char> allowedCharacters = {},
 		Engine::Point pos = { 0, 0 },
-		std::string text = "Value = ",
+		const std::string& text = "Value = ",
 		unsigned int maxChars = 8,
 		const std::string& defaultString = "String",
 		bool withFrame = false,
@@ -141,8 +141,8 @@ public:
 		
 		// Input handlers
 		for (size_t i = 0; i < allowedCharacters.size(); i++)
-			Engine::Input::RegisterHandler(allowedCharacters[i], std::bind(&StringInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(ksDelete, std::bind(&StringInputField::InternalInsert, this), true);
+			Engine::Input::RegisterHandler({allowedCharacters[i]}, std::bind(&StringInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler(kDelete, std::bind(&StringInputField::InternalInsert, this), true);
 		Engine::Input::RegisterHandler(kBackspace, std::bind(&StringInputField::InternalInsert, this), true);
 		
 		// Add object

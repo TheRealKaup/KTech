@@ -112,10 +112,9 @@ public:
 		RemovePressColor();
 	}
 
-	template<typename T>
 	Switch(Engine::Layer* layer,
 		std::function<void()> OnPress,
-		T key = kReturn,
+		const std::string& key = kReturn,
 		Engine::Point pos = { 0, 0 },
 		const std::string& text = "Switch",
 		bool on = false,

@@ -20,7 +20,7 @@ private:
 	{
 		if (selected)
 		{
-			if (Engine::Input::Is(kBackspace) || Engine::Input::Is(ksDelete))
+			if (Engine::Input::Is(kBackspace) || Engine::Input::Is(kDelete))
 			{
 				if (currentDigit == 0)
 					return;
@@ -125,7 +125,7 @@ public:
 		std::function<void()> OnInsert,
 		uint32_t min = 0,
 		uint32_t max = 255,
-		std::string defaultNum = "0",
+		const std::string& defaultNum = "0",
 		Engine::Point pos = {0, 0},
 		const std::string& text = "Value = ",
 		bool withFrame = false,
@@ -201,18 +201,18 @@ public:
 		}
 
 		// Input handlers
-		Engine::Input::RegisterHandler('0', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('1', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('2', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('3', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('4', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('5', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('6', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('7', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('8', std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler('9', std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("0", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("1", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("2", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("3", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("4", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("5", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("6", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("7", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("8", std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler("9", std::bind(&IntInputField::InternalInsert, this), true);
 		Engine::Input::RegisterHandler(kBackspace, std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(ksDelete, std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler(kDelete, std::bind(&IntInputField::InternalInsert, this), true);
 
 		// Add object
 		layer->AddObject(&obj);
