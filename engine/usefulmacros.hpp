@@ -5,9 +5,9 @@
 #define NowInMicroseconds() std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::engineStartTP.chronoTimePoint).count()
 #define NowInNanoseconds() std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::engineStartTP.chronoTimePoint).count()
 
-#define kReturn "\12"
-#define kBackspace "\10"
-#define kEscape "\33"
+#define kReturn "\x0a"
+#define kBackspace "\x7f"
+#define kEscape "\x1b"
 #define kUp "\33[A"
 #define kDown "\33[B"
 #define kRight "\33[C"
