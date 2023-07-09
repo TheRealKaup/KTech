@@ -27,8 +27,6 @@
 // Cross-platform libraries
 #include <portaudio.h> // PortAudio is a cross-platform audio library
 
-#include "config.hpp" // macros
-
 namespace Engine
 {
 	struct RGB;

@@ -50,10 +50,10 @@ void Engine::Time::CallInvocations()
 
 void Engine::Time::WaitUntilNextTick()
 {
-	deltaTime = NowInMicroseconds() - thisTickStartTP.Microseconds();
+	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::engineStartTP.chronoTimePoint).count() - thisTickStartTP.Microseconds();
 	potentialfps = 1000000.0f / deltaTime;
 	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / tps - deltaTime));
-	deltaTime = NowInMicroseconds() - thisTickStartTP.Microseconds();
+	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::engineStartTP.chronoTimePoint).count() - thisTickStartTP.Microseconds();
 	fps = 1000000.0f / deltaTime;
 	thisTickStartTP.SetToNow();
 	totalTicks++;
