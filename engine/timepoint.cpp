@@ -1,31 +1,31 @@
 #include "engine.hpp"
 
-Engine::TimePoint::TimePoint()
+Engine::Time::TimePoint::TimePoint()
 {
 	chronoTimePoint = std::chrono::high_resolution_clock::now();
 }
 
-void Engine::TimePoint::SetToNow()
+void Engine::Time::TimePoint::SetToNow()
 {
 	chronoTimePoint = std::chrono::high_resolution_clock::now();
 }
 
-long Engine::TimePoint::Seconds()
+long Engine::Time::TimePoint::Seconds()
 {
 	return std::chrono::duration_cast<std::chrono::seconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
 }
 
-long Engine::TimePoint::Milliseconds()
+long Engine::Time::TimePoint::Milliseconds()
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
 }
 
-long Engine::TimePoint::Microseconds()
+long Engine::Time::TimePoint::Microseconds()
 {
 	return std::chrono::duration_cast<std::chrono::microseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
 }
 
-long Engine::TimePoint::Nanoseconds()
+long Engine::Time::TimePoint::Nanoseconds()
 {
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
 }

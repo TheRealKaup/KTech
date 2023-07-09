@@ -1,4 +1,4 @@
-#include "engine/engine.hpp"
+#include "../../engine/engine.hpp"
 
 bool catchingCharacterB = false;
 
@@ -244,17 +244,18 @@ int main()
 	darkLayer.brgba = { 0, 0, 0, 127 };
 	darkLayer.frgba = { 0, 0, 0, 127 };
 	
-	AutoUpdatingText audioPerformance(&Engine::potentialfps, {1, 1}, &layer);
+	AutoUpdatingText audioPerformance(&Engine::Time::potentialfps, {1, 1}, &layer);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 
-	Engine::tps = 24;
-	Engine::thisTickStartTP.SetToNow();
+	Engine::Time::tps = 24;
 
 	while (Engine::running)
 	{
+		Engine::Time::StartThisTick();
+
 		Engine::Input::Call();
-		Engine::CallOnTicks(&map);
+		map.CallOnTicks();
 
 		if (map.activeCameraI != -1 && map.activeCameraI < map.cameras.size())
 		{
@@ -273,7 +274,7 @@ int main()
 		}
 		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;
 		// std::cout << "x=" << Engine::terminalSize.ws_col << ", y=" << Engine::terminalSize.ws_row << std::endl;
-		Engine::WaitUntilNextTick();
+		Engine::Time::WaitUntilNextTick();
 	}
 	
 	Engine::TerminateAudio();

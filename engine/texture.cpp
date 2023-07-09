@@ -69,30 +69,42 @@ void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA f
 	}
 }
 
-void Engine::Texture::SetCell(CellA value)
+void Engine::Texture::SetCell(CellA _value)
 {
-	for (unsigned y = 0; y < t.size(); y++)
-		for (unsigned x = 0; x < t[y].size(); x++)
-			t[y][x] = value;
+	if (simple)
+		value = _value;
+	else
+		for (size_t y = 0; y < t.size(); y++)
+			for (size_t x = 0; x < t[y].size(); x++)
+				t[y][x] = _value;
 }
 
-void Engine::Texture::SetForeground(RGBA value)
+void Engine::Texture::SetForeground(RGBA _value)
 {
-	for (unsigned y = 0; y < t.size(); y++)
-		for (unsigned x = 0; x < t[y].size(); x++)
-			t[y][x].f = value;
+	if (simple)
+		value.f = _value;
+	else
+		for (size_t y = 0; y < t.size(); y++)
+			for (size_t x = 0; x < t[y].size(); x++)
+				t[y][x].f = _value;
 }
 
-void Engine::Texture::SetBackground(RGBA value)
+void Engine::Texture::SetBackground(RGBA _value)
 {
-	for (unsigned y = 0; y < t.size(); y++)
-		for (unsigned x = 0; x < t[y].size(); x++)
-			t[y][x].b = value;
+	if (simple)
+		value.b = _value;
+	else
+		for (size_t y = 0; y < t.size(); y++)
+			for (size_t x = 0; x < t[y].size(); x++)
+				t[y][x].b = _value;
 }
 
-void Engine::Texture::SetCharacter(char value)
+void Engine::Texture::SetCharacter(char _value)
 {
-	for (unsigned y = 0; y < t.size(); y++)
-		for (unsigned x = 0; x < t[y].size(); x++)
-			t[y][x].c = value;
+	if (simple)
+		value.c = _value;
+	else
+		for (size_t y = 0; y < t.size(); y++)
+			for (size_t x = 0; x < t[y].size(); x++)
+				t[y][x].c = _value;
 }

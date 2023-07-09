@@ -2,13 +2,6 @@
 
 // ---=== Variables ===---
 
-int32_t Engine::deltaTime = 0;
-Engine::TimePoint Engine::thisTickStartTP ;
-float Engine::potentialfps = 0.0f;
-float Engine::fps = 0.0f;
-Engine::TimePoint Engine::engineStartTP;
-int32_t Engine::totalTicks = 0;
-
 winsize Engine::terminalSize;
 std::vector<std::vector<Engine::Cell>> Engine::image;
 std::string Engine::stringImage;
@@ -84,6 +77,7 @@ void Engine::Print()
 		lfr = image[y][0].f.r;
 		lfg = image[y][0].f.g;
 		lfb = image[y][0].f.b;
+
 		stringImage[l] = '\033';
 		stringImage[l + 1] = '[';
 		stringImage[l + 2] = '3';
@@ -163,40 +157,26 @@ void Engine::Print()
 				lbg = image[y][x].b.g;
 				lbb = image[y][x].b.b;
 
-				if (lbr || lbg || lbb)
-				{
-					stringImage[l] = '\033';
-					stringImage[l + 1] = '[';
-					stringImage[l + 2] = '4';
-					stringImage[l + 3] = '8';
-					stringImage[l + 4] = ';';
-					stringImage[l + 5] = '2';
-					stringImage[l + 6] = ';';
-					stringImage[l + 7] = lbr / 100 + '0';
-					stringImage[l + 8] = (lbr % 100) / 10 + '0';
-					stringImage[l + 9] = lbr % 10 + '0';
-					stringImage[l + 10] = ';';
-					stringImage[l + 11] = lbg / 100 + '0';
-					stringImage[l + 12] = (lbg % 100) / 10 + '0';
-					stringImage[l + 13] = lbg % 10 + '0';
-					stringImage[l + 14] = ';';
-					stringImage[l + 15] = lbb / 100 + '0';
-					stringImage[l + 16] = (lbb % 100) / 10 + '0';
-					stringImage[l + 17] = lbb % 10 + '0';
-					stringImage[l + 18] = 'm';
-					l += 19;
-				}
-				else
-				{
-					stringImage[l] = '\033';
-					stringImage[l + 1] = '[';
-					stringImage[l + 2] = '4';
-					stringImage[l + 3] = '8';
-					stringImage[l + 4] = ';';
-					stringImage[l + 5] = '2';
-					stringImage[l + 6] = 'm';
-					l += 7;
-				}
+				stringImage[l] = '\033';
+				stringImage[l + 1] = '[';
+				stringImage[l + 2] = '4';
+				stringImage[l + 3] = '8';
+				stringImage[l + 4] = ';';
+				stringImage[l + 5] = '2';
+				stringImage[l + 6] = ';';
+				stringImage[l + 7] = lbr / 100 + '0';
+				stringImage[l + 8] = (lbr % 100) / 10 + '0';
+				stringImage[l + 9] = lbr % 10 + '0';
+				stringImage[l + 10] = ';';
+				stringImage[l + 11] = lbg / 100 + '0';
+				stringImage[l + 12] = (lbg % 100) / 10 + '0';
+				stringImage[l + 13] = lbg % 10 + '0';
+				stringImage[l + 14] = ';';
+				stringImage[l + 15] = lbb / 100 + '0';
+				stringImage[l + 16] = (lbb % 100) / 10 + '0';
+				stringImage[l + 17] = lbb % 10 + '0';
+				stringImage[l + 18] = 'm';
+				l += 19;
 			}
 			stringImage[l] = image[y][x].c;
 			l++;
@@ -265,41 +245,4 @@ void Engine::PrepareTerminal(Engine::UPoint imageSize)
 	signal(SIGWINCH, SignalHandler);
 	// Exit signal
 	signal(SIGINT, SignalHandler);
-}
-
-void Engine::WaitUntilNextTick()
-{
-	Engine::deltaTime = NowInMicroseconds() - Engine::thisTickStartTP.Microseconds();
-	Engine::potentialfps = 1000000.0f / Engine::deltaTime;
-	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / Engine::tps - Engine::deltaTime));
-	Engine::deltaTime = NowInMicroseconds() - Engine::thisTickStartTP.Microseconds();
-	Engine::fps = 1000000.0f / Engine::deltaTime;
-	Engine::thisTickStartTP.SetToNow();
-	Engine::totalTicks++;
-}
-
-void Engine::CallOnTicks(Engine::Map* map)
-{
-	if (Engine::GlobalOnTick)
-		Engine::GlobalOnTick();
-
-	if (map->OnTick)
-		map->OnTick();
-
-	for (size_t l = 0; l < map->layers.size(); l++)
-	{
-		if (map->layers[l]->OnTick)
-			map->layers[l]->OnTick();
-
-		for (size_t o = 0; o < map->layers[l]->objects.size(); o++)
-		{
-			if (map->layers[l]->objects[o]->OnTick)
-				map->layers[l]->objects[o]->OnTick();
-		}
-	}
-	for (size_t c = 0; c < map->cameras.size(); c++)
-	{
-		if (map->cameras[c]->OnTick)
-			map->cameras[c]->OnTick();
-	}
 }

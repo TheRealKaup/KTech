@@ -1,10 +1,10 @@
 /*
 
-	  || /   ----  ----  ----
-	 |||/\   |     |  _  |--
-	||||  \  \___  \__/  \___  kaup's console game engine
-	
-	Docs will be available at https://www.kaup.dev/kcge. Capybaright � 2021-2022 Kaup. All rights reserved.
+	  |  /  ----- ----- ----- -   -  
+	 || /\    |   |---  |     |---| 
+	|||/  \   |   \____ \____ |   |  kaup's terminal game engine
+
+	Tutorials and references are available at https://github.com/TheRealKaup/KTech in `tutorials.md` and `references.md` respectively. Capybaright � 2021-2023 Kaup. All rights reserved.
 
 */
 
@@ -54,41 +54,32 @@ namespace Engine
 		{ 2, 2, 2 } // Overlappable - 2
 	};
 
-	inline std::function<void()> GlobalOnTick = nullptr;
-
-	inline int16_t tps = 24;
-	extern int32_t deltaTime;
-	extern TimePoint thisTickStartTP;
-	extern float potentialfps;
-	extern float fps;
-	extern TimePoint engineStartTP;
-	extern int32_t totalTicks;
-
 	extern winsize terminalSize;
 	// The final image that will be printed. This allows multiple cameras to print at the same time
 	extern std::vector<std::vector<Cell>> image;
 	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
 	extern std::string stringImage;
 
-	// Keyboard input things
+	// Keyboard input; input handlers, input loop...
 	namespace Input
 	{	
+		struct HandlerCallback
+		{
+			std::function<void()> callback;
+			bool onTick;
+		};
+
 		struct Handler
 		{
 			std::string input;
-			std::vector<std::function<void()>> calls;
-			std::vector<bool> onTicks;
-			uint timesPressed = 0;
-
-			void AddCall(std::function<void()> call, bool onTick);
+			std::vector<HandlerCallback> callbacks;
+			uint8_t timesPressed = 0;
 
 			Handler(const std::string& input, std::function<void()> call, bool onTick);
 		};
 
 		// The last input as the engine received it, including escape codes.
-		extern char* buf;
-		// The length (in bytes) of the last input as received by the engine.
-		extern uint8_t length;
+		extern std::string input;
 		// Input handlers.
 		extern std::vector<Handler> handlers;
 		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
@@ -103,15 +94,14 @@ namespace Engine
 		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
 		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
 		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
-		void RegisterHandler(const std::string& stringKey, std::function<void()> call, bool onTick = false);
-		void RegisterHandler(char charKey, std::function<void()> call, bool onTick = false);
+		void RegisterHandler(const std::string& stringKey, std::function<void()> callback, bool onTick = false);
 		// Get inputs (and calls registered input handler accordingly).
 		// Returns the input (also updates Engine::Input::buf).
-		char* Get();
+		std::string& Get();
 		// Call this function in order to call all handlers who got their input received since the last time you called this function.
 		// This function also resets all `Engine::Input::handlers[].timesPressed`.
 		// Returns the amount of calls.
-		void Call();
+		uint32_t Call();
 		// A premade loop for automatically getting inputs and calling handlers.
 		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
 		// Calls OnQuit automatically when Ctrl+C is received.
@@ -130,7 +120,72 @@ namespace Engine
 		// Returns true if the last input is a number
 		bool IsNum();
 		// Returns the last value as a number
-		unsigned char Num();
+		uint8_t Num();
+	}
+
+	// Time management; invocations, tps, fps...
+	namespace Time
+	{
+		// Time point saving tool, std::chrono wrapper
+		struct TimePoint
+		{
+			// The std::chrono time point
+			std::chrono::high_resolution_clock::time_point chronoTimePoint;
+
+			// The default constructor will set the time point to the time it was created
+			TimePoint();
+
+			// Will reset the time point to the current time
+			void SetToNow();
+
+			// Get an int which represents the time point in seconds
+			long Seconds();
+			// Get an int which represents the time point in milliseconds
+			long Milliseconds();
+			// Get an int which represents the time point in microseconds
+			long Microseconds();
+			// Get an int which represents the time point in nanoseconds
+			long Nanoseconds();
+		};
+
+		struct Invocation
+		{
+			std::function<void()> callback;
+			uint32_t ticks; // Ticks, not a value that should change
+			uint32_t ticksLeft; // Current ticks left in this instance
+			uint32_t instancesLeft; // Instances left
+			inline Invocation(std::function<void()> callback, uint32_t ticks, uint32_t instances)
+				: callback(callback), ticks(ticks), ticksLeft(ticks), instancesLeft(instances) {}
+		};
+
+		inline int16_t tps = 24;
+		extern int32_t deltaTime;
+		extern TimePoint thisTickStartTP;
+		extern float potentialfps;
+		extern float fps;
+		extern TimePoint engineStartTP;
+		extern int32_t totalTicks;
+		inline std::vector<Invocation> invocations = {};
+
+		enum class TimeMeasurement
+		{
+			ticks,
+			seconds,
+			milliseconds
+		};
+		// Add a callback function to the `Engine::Time::invocations` vector, which will be called in a given time by `CallInvocations`.
+		// `std::function<void()> callback` - your callback function.
+		// `uint32_t` time - the given time.
+		// `TimeMeasurement timeMeasurement` - the time measurement for the given time, can be in ticks, seconds, milliseconds or microseconds (last three are converted into ticks).
+		// (optional) `uint32_t instances = 1` - how many times sequentially to invoke this callback function.
+		void Invoke(std::function<void()> callback, uint32_t time, TimeMeasurement timeMeasurement, uint32_t instances = 1);
+
+		void CallInvocations();
+
+		inline void StartThisTick() { Time::thisTickStartTP.SetToNow(); }
+		// Suspend the thread the amount of time should be left for the tick according to `tps`.
+		// Also adds 1 to `totalTicks` and resets `thisTickStartTP`.
+		void WaitUntilNextTick();
 	}
 
 	struct RGB
@@ -170,7 +225,7 @@ namespace Engine
 		char c;
 		RGBA f;
 		RGBA b;
-		inline CellA(char character = ' ', RGBA foreground = {255, 255, 255, 255}, RGBA background = {0, 0, 0, 255}) : c(character), f{foreground}, b(background) {}
+		inline CellA(char character = ' ', RGBA foreground = {255, 255, 255, 255}, RGBA background = {0, 0, 0, 0}) : c(character), f{foreground}, b(background) {}
 	};
 
 	struct Texture
@@ -198,19 +253,21 @@ namespace Engine
 		// Visual Studio has a hard time correctly showing the parameters when filling them, so I decided that
 		// this is the best solution for making the writing experience easier.
 
-		// A rectangle of the same value (limited to a single CellA value).
+		// [Simple] Create a rectangle of the same value (limited to a single CellA value).
 		void Simple(UPoint size, CellA value, Point position);
-		// Load from a file.
+		// [Complex] Create a rectangle.
+		void Rectangle(UPoint size, CellA value, Point position);// Load from a file.
+		// [Complex] Load from a file.
 		bool File(const std::string& fileName, Point position);
-		// Create a texture by writing it (limited to single foreground and background RGBA values)
+		// [Complex] Create a texture by writing it (limited to single foreground and background RGBA values)
 		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point position);
 		// Change all the cells' values
 		void SetCell(CellA value);
-		// Chagne all the cells' foreground color values
+		// Change all the cells' foreground color values
 		void SetForeground(RGBA value);
-		// Chagne all the cells' background color values
+		// Change all the cells' background color values
 		void SetBackground(RGBA value);
-		// Chagne all the cells' character values
+		// Change all the cells' character values
 		void SetCharacter(char value);
 	};
 
@@ -403,29 +460,8 @@ namespace Engine
 		bool Render();
 		// Returns true if managed to draw (active camera is valid), otherwise, false.
 		bool Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
-	};
-
-	// An easy to use time point which uses std::chrono.
-	// If you want to measure the time passed between 2 points in your code, you use 2 time points at those points and subtract the last one by the first one, which will get you the time passed between those 2 time points.
-	struct TimePoint
-	{
-		// The std::chrono time point
-		std::chrono::high_resolution_clock::time_point chronoTimePoint;
-
-		// The default constructor will set the time point to the time it was created
-		TimePoint();
-
-		// Will reset the time point to the current time
-		void SetToNow();
-
-		// Get an int which represents the time point in seconds
-		long Seconds();
-		// Get an int which represents the time point in milliseconds
-		long Milliseconds();
-		// Get an int which represents the time point in microseconds
-		long Microseconds();
-		// Get an int which represents the time point in nanoseconds
-		long Nanoseconds();
+		// Calls all of the OnTick callback functions of the `Camera`s, `Layer`s and `Object`s within this map, and this `Map`'s OnTick as well.
+		void CallOnTicks();
 	};
 
 	// Storage, could be used for many things.
@@ -448,10 +484,4 @@ namespace Engine
 	void ResetTerminal();
 	// Print the final image to the console.
 	void Print();
-	// Wait the precise amount of time to fill the frame according to the ticks per second value.
-	// Also adds 1 to Engine::totalTicks and resets thisTickStartTP
-	void WaitUntilNextTick();
-	// Give this function a map and it will call all the OnKey functions of the layers, objects and cameras (map itself included) in the map.
-	// This way, you don't have to write the very long and ugly for loops to do so.
-	void CallOnTicks(Map* map);
 };

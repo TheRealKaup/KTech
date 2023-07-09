@@ -33,3 +33,26 @@ bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, u
 	}
 	return false;
 }
+
+void Engine::Map::CallOnTicks()
+{
+	if (OnTick)
+		OnTick();
+
+	for (size_t l = 0; l < layers.size(); l++)
+	{
+		if (layers[l]->OnTick)
+			layers[l]->OnTick();
+
+		for (size_t o = 0; o < layers[l]->objects.size(); o++)
+		{
+			if (layers[l]->objects[o]->OnTick)
+				layers[l]->objects[o]->OnTick();
+		}
+	}
+	for (size_t c = 0; c < cameras.size(); c++)
+	{
+		if (cameras[c]->OnTick)
+			cameras[c]->OnTick();
+	}
+}

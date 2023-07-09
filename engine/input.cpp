@@ -1,79 +1,78 @@
 #include "engine.hpp"
 
-#define maxEscapeSequenceLength 7
+#define maxInputLength 7
 
-char* Engine::Input::buf = new char[maxEscapeSequenceLength];
-unsigned char Engine::Input::length = 0;
 std::vector<Engine::Input::Handler> Engine::Input::handlers = {};
 size_t Engine::Input::handlerIndex = -1;
 
-void Engine::Input::Handler::AddCall(std::function<void()> call, bool onTick)
+std::string Engine::Input::input(maxInputLength, '\0');
+
+Engine::Input::Handler::Handler(const std::string& input, std::function<void()> callback, bool onTick) : input(input)
 {
-	onTicks.push_back(onTick);
-	calls.push_back(call);
-}
-Engine::Input::Handler::Handler(const std::string& input, std::function<void()> call, bool onTick) : input(input)
-{
-	onTicks.push_back(onTick);
-	calls.push_back(call);
+	callbacks.push_back({callback, onTick});
 }
 
-void Engine::Input::RegisterHandler(const std::string& input, std::function<void()> call, bool onTick)
+void Engine::Input::RegisterHandler(const std::string& input, std::function<void()> callback, bool onTick)
 {
 	// If a handler already exists for this input, add the call to the calls vector
-	for (unsigned i = 0; i < handlers.size(); i++)
+	for (size_t i = 0; i < handlers.size(); i++)
 		if (handlers[i].input == input)
 		{
-			handlers[i].AddCall(call, onTick);
+			handlers[i].callbacks.push_back({callback, onTick});
 			return;
 		}
-	handlers.push_back(Handler(input, call, onTick));
-}
-void Engine::Input::RegisterHandler(char input, std::function<void()> call, bool onTick)
-{
-	// If a handler already exists for this input, add the call to the calls vector
-	for (unsigned i = 0; i < handlers.size(); i++)
-		if (handlers[i].input.length() == 1 && handlers[i].input[0] == input)
-		{
-			handlers[i].AddCall(call, onTick);
-			return;
-		}
-	handlers.push_back(Handler({input}, call, onTick));
+	handlers.push_back(Handler(input, callback, onTick));
 }
 
-// The issue: Call() doesn't set buf accordingly
-
-void Engine::Input::Call()
+uint32_t Engine::Input::Call()
 {
-	for (unsigned i = 0; i < handlers.size(); i++)
+	uint32_t counter = 0;
+	for (size_t i = 0; i < handlers.size(); i++)
+	{
 		if (handlers[i].timesPressed > 0)
 		{
-			for (unsigned j = 0; j < handlers[i].calls.size(); j++)
-				if (handlers[i].onTicks[j] && handlers[i].calls[j])
-					handlers[i].calls[j]();
+			for (size_t j = 0; j < handlers[i].callbacks.size(); j++)
+			{
+				if (handlers[i].callbacks[j].onTick && handlers[i].callbacks[j].callback)
+				{
+					counter++;
+					input = handlers[i].input;
+					handlers[i].callbacks[j].callback();
+				}
+			}
 			handlers[i].timesPressed = 0;
 		}
+	}
+	return counter;
 }
 
-char* Engine::Input::Get()
+std::string& Engine::Input::Get()
 {
+	static char* buf = new char[maxInputLength];
+
 	// Clear previous buffer
-	memset(buf, 0, maxEscapeSequenceLength);
+	memset(buf, 0, maxInputLength);
 
 	// Read to buffer (blocking)
-	length = read(0, buf, maxEscapeSequenceLength);
+	read(0, buf, maxInputLength);
+
+	// Update `std::string Input::input`
+	input.assign(buf);
 
 	// Call handlers
-	for (unsigned i = 0; i < handlers.size(); i++)
-		if (strcmp(buf, handlers[i].input.c_str()) == 0) // If the strings are equal
+	for (size_t i = 0; i < handlers.size(); i++)
+	{
+		if (input == handlers[i].input) // If the strings are equal
 		{
 			handlers[i].timesPressed++;
-			for (unsigned j = 0; j < handlers[i].calls.size(); j++) // Call the calls
-				if (!handlers[i].onTicks[j] && handlers[i].calls[j]) // Check if the call shouldn't be called on tick and isn't null
-					handlers[i].calls[j](); // Call
+			for (size_t j = 0; j < handlers[i].callbacks.size(); j++) // Call the calls
+				if (!handlers[i].callbacks[j].onTick && handlers[i].callbacks[j].callback) // Check if the call shouldn't be called on tick and isn't null
+					handlers[i].callbacks[j].callback(); // Call
+			break;
 		}
+	}
 	
-	return buf;
+	return input;
 }
 
 void Engine::Input::Loop()
@@ -84,35 +83,35 @@ void Engine::Input::Loop()
 
 bool Engine::Input::Is(const std::string& stringKey)
 {
-	return (strcmp(buf, stringKey.c_str()) == 0);
+	return (input == stringKey);
 }
 
 bool Engine::Input::Is(char charKey)
 {
-	return (buf[0] == charKey) && (buf[1] == 0);
+	return input.length() == 1 && input[0] == charKey;
 }
 
 bool Engine::Input::IsNum()
 {
-	return (buf[0] >= '0') && (buf[0] <= '9') && (buf[1] == 0);
+	return (input[0] >= '0') && (input[0] <= '9') && (input.length() == 1);
 }
 
-unsigned char Engine::Input::Num()
+uint8_t Engine::Input::Num()
 {
-	return (buf[0] - '0');
+	return input[0] - '0';
 }
 
 bool Engine::Input::Bigger(char charKey)
 {
-	return (buf[0] >= charKey) && (buf[1] == 0);
+	return (input[0] >= charKey) && (input[1] == 0);
 }
 
 bool Engine::Input::Smaller(char charKey)
 {
-	return (buf[0] <= charKey) && (buf[1] == 0);
+	return (input[0] <= charKey) && (input[1] == 0);
 }
 
 bool Engine::Input::Between(char charKey1, char charKey2)
 {
-	return (buf[0] >= charKey1) && (buf[0] <= charKey2) && (buf[1] == 0);
+	return (input[0] >= charKey1) && (input[0] <= charKey2) && (input[1] == 0);
 }
