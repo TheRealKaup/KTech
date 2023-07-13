@@ -119,7 +119,10 @@ void Engine::Print()
 		stringImage[l + 35] = (lbb % 100) / 10 + '0';
 		stringImage[l + 36] = lbb % 10 + '0';
 		stringImage[l + 37] = 'm';
-		stringImage[l + 38] = image[y][0].c;
+		if (image[y][0].c >= ' ' && image[y][0].c <= '~')
+			stringImage[l + 38] = image[y][0].c;
+		else
+			stringImage[l + 38] = '?';
 		l += 39;
 		for (unsigned x = 1; x < image[y].size() && x < terminalSize.ws_col; x++)
 		{
@@ -178,7 +181,10 @@ void Engine::Print()
 				stringImage[l + 18] = 'm';
 				l += 19;
 			}
-			stringImage[l] = image[y][x].c;
+			if (image[y][x].c >= ' ' && image[y][x].c <= '~')
+				stringImage[l] = image[y][x].c;
+			else
+				stringImage[l] = '?';
 			l++;
 		}
 		stringImage[l] = '\033';
@@ -245,4 +251,11 @@ void Engine::PrepareTerminal(Engine::UPoint imageSize)
 	signal(SIGWINCH, SignalHandler);
 	// Exit signal
 	signal(SIGINT, SignalHandler);
+}
+
+void Engine::Log(const std::string& text, RGB color)
+{
+	static uint32_t logIndex = 0;
+	std::cout << "\033[38;2;" << std::to_string(color.r) << ';' << std::to_string(color.g) << ';' << std::to_string(color.b) << 'm' << logIndex << "] " << text << "\033[m" << std::endl << std::flush;
+	logIndex++;
 }

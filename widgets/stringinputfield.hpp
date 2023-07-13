@@ -29,7 +29,7 @@ private:
 					return;
 
 				currentChar--;
-				string.resize(string.size() - 1);
+				string.pop_back();
 
 				obj.textures[0].t[0][currentChar].c = ' ';
 			}
@@ -50,28 +50,14 @@ public:
 	void Select()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
-		{
-			if (obj.textures[i].simple)
-				obj.textures[i].value.f = selectedRGBA;
-			else
-				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
-					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].f = selectedRGBA;
-		}
+			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
 	}
 
 	void Deselect()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
-		{
-			if (obj.textures[i].simple)
-				obj.textures[i].value.f = unselectedRGBA;
-			else
-				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
-					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].f = unselectedRGBA;
-		}
+			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
 	}
 
@@ -101,7 +87,7 @@ public:
 		bool withFrame = false,
 		Engine::RGBA unselectedRGBA = { 150, 150, 150, 255 },
 		Engine::RGBA selectedRGBA = { 255, 255, 255, 255 })
-		: OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
+		: OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
 	{
 		obj.pos = pos;
 
@@ -111,6 +97,11 @@ public:
 			obj.textures.resize(10);
 			// input
 			obj.textures[0].Rectangle(Engine::UPoint(maxChars, 1), Engine::CellA(' ', unselectedRGBA), Engine::Point(1 + text.length(), 1));
+			for (size_t i = 0; i < string.length() && i < obj.textures[0].t[0].size(); i++)
+			{
+				obj.textures[0].t[0][i].c = string[i];
+				currentChar++;
+			}
 			// text
 			obj.textures[1].Write({text}, unselectedRGBA, Engine::RGBA(0, 0, 0, 0), Engine::Point(1, 1));
 			// up-left corner
@@ -135,6 +126,11 @@ public:
 			obj.textures.resize(2);
 			// input
 			obj.textures[0].Rectangle(Engine::UPoint(maxChars, 1), Engine::CellA(' ', unselectedRGBA), Engine::Point(1 + text.length(), 1));
+			for (size_t i = 0; i < string.length() && i < obj.textures[0].t[0].size(); i++)
+			{
+				obj.textures[0].t[0][i].c = string[i];
+				currentChar++;
+			}
 			// text
 			obj.textures[1].Write({text}, unselectedRGBA, Engine::RGBA(0, 0, 0, 0), Engine::Point(1, 1));
 		}

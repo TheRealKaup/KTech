@@ -30,3 +30,18 @@
 #define kF10 "\33[21~"
 #define kF11 "\33[23~"
 #define kF12 "\33[24~"
+
+#define rgbRed Engine::RGB(255, 0, 0)
+#define rgbOrange Engine::RGB(255, 128, 0)
+#define rgbYellow Engine::RGB(255, 255, 0)
+#define rgbLime Engine::RGB(128, 255, 0)
+#define rgbGreen Engine::RGB(0, 255, 0)
+#define rgbMint Engine::RGB(0, 255, 128)
+#define rgbCyan Engine::RGB(0, 255, 255)
+#define rgbBlue Engine::RGB(0, 128, 255)
+#define rgbPrimaryBlue Engine::RGB(0, 0, 255)
+#define rgbPurple Engine::RGB(128, 0, 255)
+#define rgbPink Engine::RGB(255, 0, 255)
+#define rgbHotPink Engine::RGB(255, 0, 128)
+#define rgbWhite Engine::RGB(255, 255, 255)
+#define rgbGrat Engine::RGB(160, 160, 160)

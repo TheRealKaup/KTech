@@ -30,7 +30,7 @@ private:
 				currentDigit--;
 				obj.textures[0].t[0][currentDigit].c = ' ';
 			}
-			else if (Engine::Input::Num())
+			else if (Engine::Input::IsNum())
 			{
 				if (currentDigit == maxDigits)
 					return;
@@ -38,7 +38,7 @@ private:
 				obj.textures[0].t[0][currentDigit].c = Engine::Input::input.at(0);
 				currentDigit++;
 
-				visibleNumber = visibleNumber * 10 + Engine::Input::Num();
+				visibleNumber = visibleNumber * 10 + Engine::Input::GetNum();
 			}
 
 			number = visibleNumber;
@@ -56,19 +56,13 @@ public:
 	void Select()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
-		{
-			if (obj.textures[i].simple)
-				obj.textures[i].value.f = selectedRGBA;
-			else
-				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
-					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].f = selectedRGBA;
-		}
+			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
 	}
 
 	void Deselect()
 	{
+		// Correct visible number
 		if (visibleNumber < min)
 		{
 			visibleNumber = min;
@@ -79,7 +73,7 @@ public:
 			newTexture.resize(maxDigits, ' ');
 			obj.textures[0].Write({ newTexture }, unselectedRGBA, Engine::RGBA(), obj.textures[0].pos);
 		}
-		if (visibleNumber > max)
+		else if (visibleNumber > max)
 		{
 			visibleNumber = max;
 
@@ -89,19 +83,12 @@ public:
 			newTexture.resize(maxDigits, ' ');
 			obj.textures[0].Write({ newTexture }, unselectedRGBA, Engine::RGBA(), obj.textures[0].pos);
 		}
-
-		for (size_t i = 0; i < obj.textures.size(); i++)
-		{
-			if (obj.textures[i].simple)
-				obj.textures[i].value.f = unselectedRGBA;
-			else
-				for (size_t y = 0; y < obj.textures[i].t.size(); y++)
-					for (size_t x = 0; x < obj.textures[i].t[y].size(); x++)
-						obj.textures[i].t[y][x].f = unselectedRGBA;
-		}
-
-		if (visibleNumber >= min && visibleNumber <= max)
+		else if (visibleNumber >= min && visibleNumber <= max)
 			number = visibleNumber;
+
+		// Change color
+		for (size_t i = 0; i < obj.textures.size(); i++)
+			obj.textures[i].SetForeground(unselectedRGBA);
 
 		selected = false;
 	}

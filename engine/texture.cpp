@@ -21,50 +21,95 @@ void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
 	}
 }
 
-bool Engine::Texture::File(const std::string& fileName, Point _pos) {
+Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
+{
 	simple = false;
 	pos = _pos;
-	
+
+	Log("<Engine::Texture::File()> Opening file " + fileName + "." , RGB(128, 128, 255));
+	// Open file
 	std::ifstream file(fileName);
 	if (!file.is_open())
-		return false;
-	std::string line;
-
-	CellA value;
-
-	for (size_t y = 0; std::getline(file, line); y++)
 	{
-		// potentially broken if one of the values = 10 ('\n')
-		t.resize(t.size() + 1);
-		for (size_t x = 0, j = 0; x < line.length(); x++, j++)
+		Log("<Engine::Texture::File()> Error! Failed to open file " + fileName + ".", RGB(255, 0, 0));
+		return UPoint(0, 0);
+	}
+
+	Log("<Engine::Texture::File()> Reading size of texture.", RGB(128, 128, 255));
+	// Get the texture size (first 8 bytes of the file)
+	UPoint maxTextureSize;
+	file.read((char*)&maxTextureSize, 8);
+	Log("<Engine::Texture::File()> Size of texture in file: { " + std::to_string(maxTextureSize.x) + ", " + std::to_string(maxTextureSize.y) + " }.", RGB(128, 128, 255));
+	if (maxTextureSize.y > 9999)
+	{
+		Log("<Engine::Texture::File()> Warning! Y size of texture in file is too big. Scaling Y down to 9999.", RGB(255, 0, 0));
+		maxTextureSize.y = 9999;
+	}
+	if (maxTextureSize.x > 9999)
+	{
+		Log("<Engine::Texture::File()> Warning! X size of texture in file is too big. Scaling X down to 9999.", RGB(255, 0, 0));
+		maxTextureSize.x = 9999;
+	}
+
+	Log("<Engine::Texture::File()> Resizing texture to fit texture in file.", RGB(128, 128, 255));
+	// Resize the texture
+	t.resize(maxTextureSize.y);
+	for (size_t y = 0; y < t.size(); y++)
+		t[y].resize(maxTextureSize.x, CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
+
+	Log("<Engine::Texture::File()> Reading rest of file and writing to texture.", RGB(128, 128, 255));
+	// Read and write to the texture	
+	for (size_t y = 0; y < t.size(); y++)
+	{
+		for (size_t x = 0; x < t[y].size(); x++)
 		{
-			if (j == 9)
-				j = 0;
-			if (j == 0)
-				value.f.r = (unsigned char)line[x];
-			else if (j == 1)
-				value.f.g = (unsigned char)line[x];
-			else if (j == 2)
-				value.f.b = (unsigned char)line[x];
-			else if (j == 3)
-				value.f.a = (unsigned char)line[x];
-			else if (j == 4)
-				value.b.r = (unsigned char)line[x];
-			else if (j == 5)
-				value.b.g = (unsigned char)line[x];
-			else if (j == 6)
-				value.b.b = (unsigned char)line[x];
-			else if (j == 7)
-				value.b.a = (unsigned char)line[x];
-			else if (j == 8)
+			if (file.read((char*)&t[y][x], 9).eof())
 			{
-				value.c = line[x];
-				t[y].push_back(value);
+				y = t.size();
+				break;
 			}
 		}
 	}
-    
-    return true;
+
+		// Print old texture file
+	Log("<Engine::Texture::File()> Printing texture:", RGB(128, 128, 255));
+	for (const std::vector<CellA>& row : t)
+	{
+		for (const CellA& cell : row)
+		{
+			std::cout << "\033[38;2;" << std::to_string(cell.f.r * cell.f.a / 255) << ';' << std::to_string(cell.f.g * cell.f.a / 255) << ';'<< std::to_string(cell.f.b * cell.f.a / 255) << 'm'
+				<< "\033[48;2;" << std::to_string(cell.b.r * cell.b.a / 255) << ';' << std::to_string(cell.b.g * cell.b.a / 255) << ';'<< std::to_string(cell.b.b * cell.b.a / 255) << 'm' << cell.c;
+		}
+		std::cout << "\033[m" << std::endl;
+	}
+	std::cout << std::flush;
+
+	Log("<Engine::Texture::File()> Returning.", RGB(128, 128, 255));
+    return maxTextureSize;
+}
+
+void Engine::Texture::ExportToFile(const std::string& fileName)
+{
+	std::ofstream file(fileName);
+	
+	UPoint maxTextureSize(0, t.size());
+
+	for (size_t y = 0; y < t.size(); y++)
+		if (t[y].size() > maxTextureSize.x)
+			maxTextureSize.x = t[y].size();
+
+	file.write((char*)&maxTextureSize, 8);
+
+	for (size_t y = 0; y < maxTextureSize.y; y++)
+	{
+		for (size_t x = 0; x < maxTextureSize.x; x++)
+		{
+			if (x < t[y].size())
+				file.write((char*)&t[y][x], 9);
+			else
+				file.write("\0\0\0\0\0\0\0\0\0", 9);
+		}
+	}
 }
 
 void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point _pos) {
@@ -82,6 +127,22 @@ void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA f
 		}
 	}
 }
+
+void Engine::Texture::Resize(UPoint newSize, CellA newValue)
+{
+	if (simple)
+	{
+		size = newSize;
+		value = newValue;
+	}
+	else
+	{
+		t.resize(newSize.y);
+		for (std::vector<CellA>& row : t)
+			row.resize(newSize.x, newValue);
+	}
+}
+
 
 void Engine::Texture::SetCell(CellA _value)
 {

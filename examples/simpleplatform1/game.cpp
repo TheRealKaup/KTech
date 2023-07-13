@@ -1,13 +1,9 @@
 #include "../../engine/engine.hpp"
+#include "../../engine/usefulmacros.hpp"
 
 bool catchingCharacterB = false;
 
 Engine::Map* pmap;
-
-static void Log(std::string string)
-{
-	std::cout << "\033[38;2;255;0;255m" << string << "\033[m" << std::endl << std::flush;
-}
 
 struct Character
 {
@@ -189,9 +185,12 @@ int main()
 
 	Engine::Object worldProps({ 1, 1 }, "");
 	worldProps.textures.resize(3);
-	worldProps.textures[0].File("assets/sky.kcget", { 0, 0 });
-	worldProps.textures[1].File("assets/sky2.kcget", { 0, 30 });
-	worldProps.textures[2].File("assets/land.kcget", { 0, 20 });
+	Engine::Log("<Main> Loading assets/sky.ktecht", rgbBlue);
+	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
+	Engine::Log("<Main> Loading assets/sky2.ktecht", rgbBlue);
+	worldProps.textures[1].File("assets/sky2.ktecht", { 0, 30 }), Engine::CellA(' ');
+	Engine::Log("<Main> Loading assets/land.ktecht", rgbBlue);
+	worldProps.textures[2].File("assets/land.ktecht", { 0, 20 });
 	
 	worldProps.colliders.resize(14);
 	uint8_t base = 29;
@@ -235,7 +234,8 @@ int main()
 	Engine::Object house({ 20, 32 }, "");
 
 	house.textures.resize(1);
-	house.textures[0].File("assets/house.kcget", { 0, 0 });
+	Engine::Log("<Main> Loading house", rgbBlue);
+	house.textures[0].File("assets/house.ktecht", { 0, 0 });
 	layer.AddObject(&house);
 
 	Engine::Input::RegisterHandler("m", TurnOnCharacterCamera);

@@ -96,7 +96,7 @@ bool Engine::Input::IsNum()
 	return (input[0] >= '0') && (input[0] <= '9') && (input.length() == 1);
 }
 
-uint8_t Engine::Input::Num()
+uint8_t Engine::Input::GetNum()
 {
 	return input[0] - '0';
 }

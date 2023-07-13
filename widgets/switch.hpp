@@ -16,36 +16,20 @@ private:
 		if (selected)
 		{
 			if (on)
-			{
-				for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-					obj.textures[0].t[0][x].f = selectedOnRGBA;
-				for (size_t i = 1; i < obj.textures.size(); i++)
-					obj.textures[i].value.f = selectedOnRGBA;
-			}
+				for (size_t i = 0; i < obj.textures.size(); i++)
+					obj.textures[i].SetForeground(selectedOnRGBA);
 			if (!on)
-			{
-				for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-					obj.textures[0].t[0][x].f = selectedOffRGBA;
-				for (size_t i = 1; i < obj.textures.size(); i++)
-					obj.textures[i].value.f = selectedOffRGBA;
-			}
+				for (size_t i = 0; i < obj.textures.size(); i++)
+					obj.textures[i].SetForeground(selectedOffRGBA);
 		}
 		else
 		{
 			if (on)
-			{
-				for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-					obj.textures[0].t[0][x].f = unselectedOnRGBA;
-				for (size_t i = 1; i < obj.textures.size(); i++)
-					obj.textures[i].value.f = unselectedOnRGBA;
-			}
+				for (size_t i = 0; i < obj.textures.size(); i++)
+					obj.textures[i].SetForeground(unselectedOnRGBA);
 			if (!on)
-			{
-				for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-					obj.textures[0].t[0][x].f = unselectedOffRGBA;
-				for (size_t i = 1; i < obj.textures.size(); i++)
-					obj.textures[i].value.f = unselectedOffRGBA;
-			}
+				for (size_t i = 0; i < obj.textures.size(); i++)
+					obj.textures[i].SetForeground(unselectedOffRGBA);
 		}
 	}
 
@@ -71,38 +55,22 @@ public:
 	void Select()
 	{
 		if (on)
-		{
-			for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-				obj.textures[0].t[0][x].f = selectedOnRGBA;
-			for (size_t i = 1; i < obj.textures.size(); i++)
-				obj.textures[i].value.f = selectedOnRGBA;
-		}
+			for (size_t i = 0; i < obj.textures.size(); i++)
+				obj.textures[i].SetForeground(selectedOnRGBA);
 		if (!on)
-		{
-			for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-				obj.textures[0].t[0][x].f = selectedOffRGBA;
-			for (size_t i = 1; i < obj.textures.size(); i++)
-				obj.textures[i].value.f = selectedOffRGBA;
-		}
+			for (size_t i = 0; i < obj.textures.size(); i++)
+				obj.textures[i].SetForeground(selectedOffRGBA);
 		selected = true;
 	}  
 
 	void Deselect()
 	{
 		if (on)
-		{
-			for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-				obj.textures[0].t[0][x].f = unselectedOnRGBA;
-			for (size_t i = 1; i < obj.textures.size(); i++)
-				obj.textures[i].value.f = unselectedOnRGBA;
-		}
+			for (size_t i = 0; i < obj.textures.size(); i++)
+				obj.textures[i].SetForeground(unselectedOnRGBA);
 		if (!on)
-		{
-			for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-				obj.textures[0].t[0][x].f = unselectedOffRGBA;
-			for (size_t i = 1; i < obj.textures.size(); i++)
-				obj.textures[i].value.f = unselectedOffRGBA;
-		}
+			for (size_t i = 0; i < obj.textures.size(); i++)
+				obj.textures[i].SetForeground(unselectedOffRGBA);
 		selected = false;
 	}
 
