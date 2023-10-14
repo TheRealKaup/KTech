@@ -45,7 +45,7 @@ namespace Engine
 	struct TimePoint;
 
 	inline bool running = true;
-
+	
 	inline std::vector<std::vector<uint8_t>> colliderTypes = {
 		{ 0, 1, 2 }, // Heavy - 0
 		{ 0, 1, 2 }, // Normal - 1

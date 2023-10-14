@@ -201,7 +201,7 @@ void Engine::ResetTerminal()
 	// Reenable canonical mode and echo
 	termios terminalAttributes;
 	tcgetattr(0, &terminalAttributes);
-	terminalAttributes.c_lflag |= ICANON; 
+	terminalAttributes.c_lflag |= ICANON;
 	terminalAttributes.c_lflag |= ECHO;
 	tcsetattr(0, TCSANOW, &terminalAttributes);
 	// Show cursor and reset colors

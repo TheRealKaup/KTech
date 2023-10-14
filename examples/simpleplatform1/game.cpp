@@ -121,7 +121,7 @@ struct GravityBox
 				"#-#",
 				"|G|",
 				"#-#"
-			}, { 100, 0, 200, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
+			}, { 100, 0, 200, 255 }, { 200, 200, 200, 200 }, { 0, 0 }
 		);
 
 		obj.colliders.resize(1);
@@ -160,10 +160,6 @@ void TurnOnCharacterCamera() {
 
 int main()
 {
-	Engine::AudioSource backgroundMusic;
-	// backgroundMusic.LoadWavFile("assets/bordercrossing.wav");
-	// backgroundMusic.Play(0, 0, 0, 0.8f);
-
 	Engine::InitializeAudio();
 	Engine::PrepareTerminal({50, 50});
 
@@ -210,18 +206,18 @@ int main()
 	worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
 	layer.AddObject(&worldProps);
 
-	Engine::Object border({0, 0}, "L");
-	border.textures.resize(4);
-	border.textures[0].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
-	border.textures[1].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
-	border.textures[2].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
-	border.textures[3].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
-	border.colliders.resize(4);
-	border.colliders[0].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 0));
-	border.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
-	border.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 49));
-	border.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
-	layer.AddObject(&border);
+	Engine::Object frame(Engine::Point(0, 0), "L");
+	frame.textures.resize(4);
+	frame.textures[0].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
+	frame.textures[1].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
+	frame.textures[2].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
+	frame.textures[3].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
+	frame.colliders.resize(4);
+	frame.colliders[0].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 0));
+	frame.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
+	frame.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 49));
+	frame.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
+	layer.AddObject(&frame);
 
 	// Character character(&layer);
 	Character character(&layer);
@@ -241,8 +237,7 @@ int main()
 	Engine::Input::RegisterHandler("m", TurnOnCharacterCamera);
 
 	Engine::Layer darkLayer;
-	darkLayer.brgba = { 0, 0, 0, 127 };
-	darkLayer.frgba = { 0, 0, 0, 127 };
+	darkLayer.alpha = 127;
 	
 	AutoUpdatingText audioPerformance(&Engine::Time::potentialfps, {1, 1}, &layer);
 

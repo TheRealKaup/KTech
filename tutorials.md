@@ -281,7 +281,7 @@ int main()
 	// We will initialize our world here
 
 	Engine::PrepareTerminal({10, 10});
-	Engine::tps = 24;s
+	Engine::tps = 24;
 	Engine::thisTickStartTP.SetToNow();
 	while (Engine::running)
 	{

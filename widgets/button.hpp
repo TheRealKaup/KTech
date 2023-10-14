@@ -3,8 +3,6 @@
 class Button : public Widget
 {
 public:
-	bool down = false;
-
 	std::function<void()> OnPress;
 	
 	Engine::RGBA unselectedRGBA, selectedRGBA, downRGBA;
