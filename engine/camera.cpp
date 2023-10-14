@@ -45,7 +45,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 				{
 					for (y = 0; y < texture->size.y; y++)
 					{
-						final.y = y + obj->pos.y + texture->pos.y - pos.y;
+						final.y = y + obj->pos.y + texture->pos_r.y - pos.y;
 						if (final.y < 0)
 							continue;
 						if (final.y >= res.y)
@@ -53,7 +53,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 	
 						for (x = 0; x < texture->size.x; x++)
 						{
-							final.x = x + obj->pos.x + texture->pos.x - pos.x;
+							final.x = x + obj->pos.x + texture->pos_r.x - pos.x;
 							if (final.x < 0)
 								continue;
 							if (final.x >= res.x)
@@ -75,7 +75,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 				{
 					for (y = 0; y < texture->t.size(); y++)
 					{
-						final.y = y + obj->pos.y + texture->pos.y - pos.y;
+						final.y = y + obj->pos.y + texture->pos_r.y - pos.y;
 						if (final.y < 0)
 							continue;
 						if (final.y >= res.y)
@@ -83,7 +83,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 
 						for (x = 0; x < texture->t[y].size(); x++)
 						{
-							final.x = x + obj->pos.x + texture->pos.x - pos.x;
+							final.x = x + obj->pos.x + texture->pos_r.x - pos.x;
 							if (final.x < 0)
 								continue;
 							if (final.x >= res.x)

@@ -23,7 +23,7 @@ private:
 	{
 		if (selected)
 		{
-			if (Engine::Input::Is(kBackspace) || Engine::Input::Is(kDelete))
+			if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
 			{
 				if (currentChar == 0)
 					return;
@@ -47,14 +47,14 @@ private:
 	}
 
 public:
-	void Select()
+	virtual void Select()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
 	}
 
-	void Deselect()
+	virtual void Deselect()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
@@ -138,8 +138,8 @@ public:
 		// Input handlers
 		for (size_t i = 0; i < allowedCharacters.size(); i++)
 			Engine::Input::RegisterHandler({allowedCharacters[i]}, std::bind(&StringInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(kDelete, std::bind(&StringInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(kBackspace, std::bind(&StringInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler(Engine::Input::K::delete_, std::bind(&StringInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler(Engine::Input::K::backspace, std::bind(&StringInputField::InternalInsert, this), true);
 		
 		// Add object
 		layer->AddObject(&obj);

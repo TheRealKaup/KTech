@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../engine/engine.hpp"
-#include "../engine/usefulmacros.hpp"
 
 struct Widget
 {

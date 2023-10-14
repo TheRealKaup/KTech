@@ -2,7 +2,7 @@
 
 void Engine::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
 	simple = true;
-	pos = _pos;
+	pos_r = _pos;
 	size = _size;
 	value = _value;
 }
@@ -10,7 +10,7 @@ void Engine::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
 void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
 {
 	simple = false;
-	pos = _pos;
+	pos_r = _pos;
 	
 	t.resize(_size.y, std::vector<CellA>(_size.y, _value));
 	for (std::vector<CellA>& row : t)
@@ -24,7 +24,7 @@ void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
 Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
 {
 	simple = false;
-	pos = _pos;
+	pos_r = _pos;
 
 	Log("<Engine::Texture::File()> Opening file " + fileName + "." , RGB(128, 128, 255));
 	// Open file
@@ -114,7 +114,7 @@ void Engine::Texture::ExportToFile(const std::string& fileName)
 
 void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point _pos) {
 	simple = false;
-	pos = _pos;
+	pos_r = _pos;
 	t.resize(stringVector.size());
 	for (size_t y = 0; y < stringVector.size(); y++)
 	{
@@ -182,4 +182,37 @@ void Engine::Texture::SetCharacter(char _value)
 		for (size_t y = 0; y < t.size(); y++)
 			for (size_t x = 0; x < t[y].size(); x++)
 				t[y][x].c = _value;
+}
+
+void Engine::Texture::SetAlpha(uint8_t _value)
+{
+	if (simple)
+	{
+		value.f.a = _value;
+		value.b.a = _value;
+	}
+	else
+	{
+		for (size_t y = 0; y < t.size(); y++)
+		{
+			for (size_t x = 0; x < t[y].size(); x++)
+			{
+				t[y][x].f.a = _value;
+				t[y][x].b.a = _value;
+			}
+		}
+	}
+}
+
+Engine::UPoint Engine::Texture::GetSize()
+{
+	// If the texture is simple, then `size` already represents the texture's size.
+	if (simple)
+		return size;
+	// Otherwise, go over the entire texture to get the maximum X size, and use that to tell the size.
+	UPoint size(0, t.size());
+	for (size_t y = 0; y < t.size(); y++)
+		if (t[y].size() > size.x)
+			size.x = t[y].size();
+	return size;
 }

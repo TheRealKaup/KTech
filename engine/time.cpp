@@ -7,11 +7,11 @@ float Engine::Time::fps = 0.0f;
 Engine::Time::TimePoint Engine::Time::engineStartTP;
 int32_t Engine::Time::totalTicks = 0;
 
-void Engine::Time::Invoke(std::function<void()> callback, uint32_t time, TimeMeasurement timeMeasurement, uint32_t instances)
+void Engine::Time::Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement, uint32_t instances)
 {
-	if (timeMeasurement == TimeMeasurement::ticks)
+	if (timeMeasurement == Measurement::ticks)
 		invocations.push_back(Invocation(callback, time, instances));
-	else if (timeMeasurement == TimeMeasurement::seconds)
+	else if (timeMeasurement == Measurement::seconds)
 		invocations.push_back(Invocation(callback, time * tps, instances));
 	else
 		invocations.push_back(Invocation(callback, time * tps / 1000, instances));

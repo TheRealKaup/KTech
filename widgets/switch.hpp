@@ -44,7 +44,7 @@ private:
 			for (size_t i = 1; i < obj.textures.size(); i++)
 				obj.textures[i].value.f = downRGBA;
 			
-			Engine::Time::Invoke(std::bind(&Switch::RemovePressColor, this), 100, Engine::Time::TimeMeasurement::milliseconds);
+			Engine::Time::Invoke(std::bind(&Switch::RemovePressColor, this), 100, Engine::Time::Measurement::milliseconds);
 
 			if (OnPress)
 				OnPress();
@@ -52,7 +52,7 @@ private:
 	}
 
 public:
-	void Select()
+	virtual void Select()
 	{
 		if (on)
 			for (size_t i = 0; i < obj.textures.size(); i++)
@@ -63,7 +63,7 @@ public:
 		selected = true;
 	}  
 
-	void Deselect()
+	virtual void Deselect()
 	{
 		if (on)
 			for (size_t i = 0; i < obj.textures.size(); i++)
@@ -82,7 +82,7 @@ public:
 
 	Switch(Engine::Layer* layer,
 		std::function<void()> OnPress,
-		const std::string& key = kReturn,
+		const std::string& key = Engine::Input::K::return_,
 		Engine::Point pos = { 0, 0 },
 		const std::string& text = "Switch",
 		bool on = false,

@@ -33,7 +33,7 @@ void ExpandMovementTree(Object* thisObj, Point dir,
 		if (oObj == thisObj)
 			continue;
 
-		uint8_t finalResult = 2; // Default - nothing
+		CR finalResult = CR::O; // Default - nothing
 		size_t c = 0;
 		size_t oc = 0;
 		size_t originallyBlockedColliderI = 0; // Used if not found a pushable collider
@@ -53,7 +53,7 @@ void ExpandMovementTree(Object* thisObj, Point dir,
 				if (!otherCollider->active || otherCollider->size.x == 0 || otherCollider->size.y == 0)
 					continue;
 
-				uint8_t collisionResult = 2;
+				CR collisionResult = CR::O;
 				if (collider->type >= 0 && collider->type < colliderTypes.size())
 					if (otherCollider->type >= 0 && otherCollider->type < colliderTypes[collider->type].size())
 						collisionResult = colliderTypes[collider->type][otherCollider->type];
@@ -62,12 +62,12 @@ void ExpandMovementTree(Object* thisObj, Point dir,
 				// If the current known result if push (1) and the potential result is also push then once again there is no reason to proceed checking.
 				// But, if the potential result is overlap then proceed checking no matter the known result, we want to get all the overlaps occurences.
 				
-				if (collisionResult == 2)
+				if (collisionResult == CR::O)
 				{
-					int32_t cldrPosX = collider->pos.x + thisObj->pos.x;
-					int32_t oCldrPosX = otherCollider->pos.x + oObj->pos.x;
-					int32_t cldrPosY = collider->pos.y + thisObj->pos.y;
-					int32_t oCldrPosY = otherCollider->pos.y + oObj->pos.y;
+					int32_t cldrPosX = collider->pos_r.x + thisObj->pos.x;
+					int32_t oCldrPosX = otherCollider->pos_r.x + oObj->pos.x;
+					int32_t cldrPosY = collider->pos_r.y + thisObj->pos.y;
+					int32_t oCldrPosY = otherCollider->pos_r.y + oObj->pos.y;
 
 					bool inOverlap = (cldrPosX < oCldrPosX + otherCollider->size.x && cldrPosX + collider->size.x > oCldrPosX
 						&& cldrPosY < oCldrPosY + otherCollider->size.y && cldrPosY + collider->size.y > oCldrPosY);
@@ -91,16 +91,16 @@ void ExpandMovementTree(Object* thisObj, Point dir,
 				}
 				else if (finalResult != collisionResult)
 				{
-					int32_t cldrPosX = collider->pos.x + thisObj->pos.x + dir.x;
-					int32_t oCldrPosX = otherCollider->pos.x + oObj->pos.x;
-					int32_t cldrPosY = collider->pos.y + thisObj->pos.y + dir.y;
-					int32_t oCldrPosY = otherCollider->pos.y + oObj->pos.y;
+					int32_t cldrPosX = collider->pos_r.x + thisObj->pos.x + dir.x;
+					int32_t oCldrPosX = otherCollider->pos_r.x + oObj->pos.x;
+					int32_t cldrPosY = collider->pos_r.y + thisObj->pos.y + dir.y;
+					int32_t oCldrPosY = otherCollider->pos_r.y + oObj->pos.y;
 					if (cldrPosX < oCldrPosX + otherCollider->size.x && cldrPosX + collider->size.x > oCldrPosX
 						&& cldrPosY < oCldrPosY + otherCollider->size.y && cldrPosY + collider->size.y > oCldrPosY)
 					{
 						// Collision!
 						finalResult = collisionResult;
-						if (finalResult == 0)
+						if (finalResult == CR::B)
 						{
 							// There can only be one time (for each other object) where a block situation can get to this point in the code.
 							// That means that `c` and `oc` represent the original blocked and blocking colliders, which can be used for user-defined functions calling.
@@ -112,11 +112,11 @@ void ExpandMovementTree(Object* thisObj, Point dir,
 			}
 		}
 
-		if (finalResult == 0)
+		if (finalResult == CR::B)
 		{
 			blockData.push_back({thisObj, oObj, originallyBlockedColliderI, originallyBlockingColliderI});
 		}
-		else if (finalResult == 1)
+		else if (finalResult == CR::P)
 		{
 			pushData.push_back({thisObj, oObj, oc, c});
 		}

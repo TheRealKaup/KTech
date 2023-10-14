@@ -1,5 +1,4 @@
 #include "../../engine/engine.hpp"
-#include "../../engine/usefulmacros.hpp"
 
 bool catchingCharacterB = false;
 
@@ -81,15 +80,15 @@ struct Character
 		Engine::Input::RegisterHandler("w", std::bind(&Character::Jump, this), true);
 		Engine::Input::RegisterHandler("W", std::bind(&Character::Jump, this), true);
 		Engine::Input::RegisterHandler(" ", std::bind(&Character::Jump, this), true);
-		Engine::Input::RegisterHandler("\033[A", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterHandler(Engine::Input::K::up, std::bind(&Character::Jump, this), true);
 
 		Engine::Input::RegisterHandler("d", std::bind(&Character::Right, this));
 		Engine::Input::RegisterHandler("D", std::bind(&Character::Right, this));
-		Engine::Input::RegisterHandler("\033[C", std::bind(&Character::Right, this));
+		Engine::Input::RegisterHandler(Engine::Input::K::right, std::bind(&Character::Right, this));
 
 		Engine::Input::RegisterHandler("a", std::bind(&Character::Left, this));
 		Engine::Input::RegisterHandler("A", std::bind(&Character::Left, this));
-		Engine::Input::RegisterHandler("\033[D", std::bind(&Character::Left, this));
+		Engine::Input::RegisterHandler(Engine::Input::K::left, std::bind(&Character::Left, this));
 
 		obj.OnTick = std::bind(&Character::OnTick, this);
 		layer->AddObject(&obj);
@@ -160,15 +159,17 @@ void TurnOnCharacterCamera() {
 
 int main()
 {
+	using namespace Engine;
+
+	colliderTypes = { // For "simpleplatform1" example
+		{ CR::B, CR::P, CR::P, CR::O }, // Heavy - 0
+		{ CR::B, CR::P, CR::P, CR::O }, // Normal - 1
+		{ CR::B, CR::B, CR::P, CR::O }, // Light - 2
+		{ CR::O, CR::O, CR::O, CR::O } // Overlappable - 3
+	};
+
 	Engine::InitializeAudio();
 	Engine::PrepareTerminal({50, 50});
-
-	Engine::colliderTypes = {
-		{ 0, 1, 1, 2 }, // Heavy - 0
-		{ 0, 1, 1, 2 }, // Normal - 1
-		{ 0, 0, 1, 2 }, // Light - 2
-		{ 2, 2, 2, 2 } // Overlappable - 3
-	};
 
 	Engine::Map map;
 	pmap = &map;
@@ -181,11 +182,11 @@ int main()
 
 	Engine::Object worldProps({ 1, 1 }, "");
 	worldProps.textures.resize(3);
-	Engine::Log("<Main> Loading assets/sky.ktecht", rgbBlue);
+	Engine::Log("<Main> Loading assets/sky.ktecht", RGBColors::blue);
 	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
-	Engine::Log("<Main> Loading assets/sky2.ktecht", rgbBlue);
+	Engine::Log("<Main> Loading assets/sky2.ktecht", RGBColors::blue);
 	worldProps.textures[1].File("assets/sky2.ktecht", { 0, 30 }), Engine::CellA(' ');
-	Engine::Log("<Main> Loading assets/land.ktecht", rgbBlue);
+	Engine::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
 	worldProps.textures[2].File("assets/land.ktecht", { 0, 20 });
 	
 	worldProps.colliders.resize(14);
@@ -230,7 +231,7 @@ int main()
 	Engine::Object house({ 20, 32 }, "");
 
 	house.textures.resize(1);
-	Engine::Log("<Main> Loading house", rgbBlue);
+	Engine::Log("<Main> Loading house", RGBColors::blue);
 	house.textures[0].File("assets/house.ktecht", { 0, 0 });
 	layer.AddObject(&house);
 

@@ -10,7 +10,7 @@ void Engine::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
 {
     simple = true;
     type = _type;
-    pos = _pos;
+    pos_r = _pos;
     size = _size;
 }
 
@@ -18,7 +18,7 @@ bool Engine::Collider::File(const std::string& fileName, uint8_t _type, Point _p
 {
     simple = false;
     type = _type;
-    pos = _pos;
+    pos_r = _pos;
 
 	std::ifstream file(fileName);
 	if (!file.is_open())
@@ -41,7 +41,7 @@ void Engine::Collider::Write(const std::vector<std::string>& stringVector, uint8
 {
     simple = false;
     type = _type;
-    pos = _pos;
+    pos_r = _pos;
 
 	c.resize(stringVector.size());
 	for (size_t y = 0; y < stringVector.size(); y++)
@@ -57,7 +57,7 @@ void Engine::Collider::ByTexture(const Texture& texture, uint8_t _type)
 {
     simple = false;
     type = _type;
-    pos = texture.pos;
+    pos_r = texture.pos_r;
 
 	c.resize(texture.t.size());
 	for (size_t y = 0; y < texture.t.size(); y++)

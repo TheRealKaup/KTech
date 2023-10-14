@@ -20,7 +20,7 @@ private:
 	{
 		if (selected)
 		{
-			if (Engine::Input::Is(kBackspace) || Engine::Input::Is(kDelete))
+			if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
 			{
 				if (currentDigit == 0)
 					return;
@@ -53,14 +53,14 @@ private:
 	}
 
 public:
-	void Select()
+	virtual void Select()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
 	}
 
-	void Deselect()
+	virtual void Deselect()
 	{
 		// Correct visible number
 		if (visibleNumber < min)
@@ -71,7 +71,7 @@ public:
 
 			std::string newTexture = std::to_string(min);
 			newTexture.resize(maxDigits, ' ');
-			obj.textures[0].Write({ newTexture }, unselectedRGBA, Engine::RGBA(), obj.textures[0].pos);
+			obj.textures[0].Write({ newTexture }, unselectedRGBA, Engine::RGBA(), obj.textures[0].pos_r);
 		}
 		else if (visibleNumber > max)
 		{
@@ -81,7 +81,7 @@ public:
 
 			std::string newTexture = std::to_string(max);
 			newTexture.resize(maxDigits, ' ');
-			obj.textures[0].Write({ newTexture }, unselectedRGBA, Engine::RGBA(), obj.textures[0].pos);
+			obj.textures[0].Write({ newTexture }, unselectedRGBA, Engine::RGBA(), obj.textures[0].pos_r);
 		}
 		else if (visibleNumber >= min && visibleNumber <= max)
 			number = visibleNumber;
@@ -198,8 +198,8 @@ public:
 		Engine::Input::RegisterHandler("7", std::bind(&IntInputField::InternalInsert, this), true);
 		Engine::Input::RegisterHandler("8", std::bind(&IntInputField::InternalInsert, this), true);
 		Engine::Input::RegisterHandler("9", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(kBackspace, std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(kDelete, std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler(Engine::Input::K::backspace, std::bind(&IntInputField::InternalInsert, this), true);
+		Engine::Input::RegisterHandler(Engine::Input::K::delete_, std::bind(&IntInputField::InternalInsert, this), true);
 
 		// Add object
 		layer->AddObject(&obj);

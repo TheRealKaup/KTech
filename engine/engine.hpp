@@ -45,11 +45,18 @@ namespace Engine
 	struct TimePoint;
 
 	inline bool running = true;
-	
-	inline std::vector<std::vector<uint8_t>> colliderTypes = {
-		{ 0, 1, 2 }, // Heavy - 0
-		{ 0, 1, 2 }, // Normal - 1
-		{ 2, 2, 2 } // Overlappable - 2
+
+	// Collision Result
+	enum class CR : uint8_t
+	{
+		B,	// Block
+		P,	// Push
+		O	// Overlap
+	};
+	inline std::vector<std::vector<CR>> colliderTypes = {
+		{ CR::B, CR::P, CR::O }, // Heavy - 0
+		{ CR::B, CR::P, CR::O }, // Normal - 1
+		{ CR::O, CR::O, CR::O } // Overlappable - 2
 	};
 
 	extern winsize terminalSize;
@@ -60,7 +67,37 @@ namespace Engine
 
 	// Keyboard input; input handlers, input loop...
 	namespace Input
-	{	
+	{
+		// Key values
+		namespace K
+		{
+			constexpr char const* return_ = "\x0a";
+			constexpr char const* backspace = "\x7f";
+			constexpr char const* escape = "\x1b";
+			constexpr char const* up = "\33[A";
+			constexpr char const* down = "\33[B";
+			constexpr char const* right = "\33[C";
+			constexpr char const* left = "\33[D";
+			constexpr char const* end = "\33[F";
+			constexpr char const* home = "\33[H";
+			constexpr char const* insert = "\33[2~";
+			constexpr char const* delete_ = "\33[3~";
+			constexpr char const* pageUp = "\33[5~";
+			constexpr char const* pageDown = "\33[6~";
+			constexpr char const* f1 = "\33OP";
+			constexpr char const* f2 = "\33OQ";
+			constexpr char const* f3 = "\33OR";
+			constexpr char const* f4 = "\33OS";
+			constexpr char const* f5 = "\33[15~";
+			constexpr char const* f6 = "\33[17~";
+			constexpr char const* f7 = "\33[18~";
+			constexpr char const* f8 = "\33[19~";
+			constexpr char const* f9 = "\33[20~";
+			constexpr char const* f10 = "\33[21~";
+			constexpr char const* f11 = "\33[23~";
+			constexpr char const* f12 = "\33[24~";
+		};
+
 		struct HandlerCallback
 		{
 			std::function<void()> callback;
@@ -165,7 +202,7 @@ namespace Engine
 		extern int32_t totalTicks;
 		inline std::vector<Invocation> invocations = {};
 
-		enum class TimeMeasurement
+		enum class Measurement
 		{
 			ticks,
 			seconds,
@@ -176,7 +213,7 @@ namespace Engine
 		// `uint32_t` time - the given time.
 		// `TimeMeasurement timeMeasurement` - the time measurement for the given time, can be in ticks, seconds, milliseconds or microseconds (last three are converted into ticks).
 		// (optional) `uint32_t instances = 1` - how many times sequentially to invoke this callback function.
-		void Invoke(std::function<void()> callback, uint32_t time, TimeMeasurement timeMeasurement, uint32_t instances = 1);
+		void Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement, uint32_t instances = 1);
 
 		void CallInvocations();
 
@@ -189,25 +226,63 @@ namespace Engine
 	struct RGB
 	{
 		uint8_t r, g, b;
-		inline RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0) : r(red), g(green), b(blue) {}
+		inline constexpr RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0) : r(red), g(green), b(blue) {}
 	};
 
 	struct RGBA
 	{
 		uint8_t r, g, b, a;
-		inline RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255) : r(red), g(green), b(blue), a(alpha) {}
+		inline constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255) : r(red), g(green), b(blue), a(alpha) {}
+		inline constexpr RGBA(RGB rgb, uint8_t alpha) : r(rgb.r), g(rgb.g), b(rgb.b), a(alpha) {}
 	};
+	
+	namespace RGBColors
+	{
+		constexpr RGB red = RGB(255, 0, 0);
+		constexpr RGB orange = RGB(255, 128, 0);
+		constexpr RGB yellow = RGB(255, 255, 0);
+		constexpr RGB lime = RGB(128, 255, 0);
+		constexpr RGB green = RGB(0, 255, 0);
+		constexpr RGB mint = RGB(0, 255, 128);
+		constexpr RGB cyan = RGB(0, 255, 255);
+		constexpr RGB blue = RGB(0, 128, 255);
+		constexpr RGB primaryBlue = RGB(0, 0, 255);
+		constexpr RGB purple = RGB(128, 0, 255);
+		constexpr RGB pink = RGB(255, 0, 255);
+		constexpr RGB hotPink = RGB(255, 0, 128);
+		constexpr RGB white = RGB(255, 255, 255);
+		constexpr RGB gray = RGB(160, 160, 160);
+	}
+
+	namespace RGBAColors
+	{
+		constexpr RGBA red = RGBA(255, 0, 0, 255);
+		constexpr RGBA orange = RGBA(255, 128, 0, 255);
+		constexpr RGBA yellow = RGBA(255, 255, 0, 255);
+		constexpr RGBA lime = RGBA(128, 255, 0, 255);
+		constexpr RGBA green = RGBA(0, 255, 0, 255);
+		constexpr RGBA mint = RGBA(0, 255, 128, 255);
+		constexpr RGBA cyan = RGBA(0, 255, 255, 255);
+		constexpr RGBA blue = RGBA(0, 128, 255, 255);
+		constexpr RGBA primaryBlue = RGBA(0, 0, 255, 255);
+		constexpr RGBA purple = RGBA(128, 0, 255, 255);
+		constexpr RGBA pink = RGBA(255, 0, 255, 255);
+		constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
+		constexpr RGBA white = RGBA(255, 255, 255, 255);
+		constexpr RGBA gray = RGBA(160, 160, 160, 255);
+		constexpr RGBA transparent = RGBA(0, 0, 0, 0);
+	}
 
 	struct Point
 	{
 		int32_t x, y;
-		inline Point(int32_t x = 0, int32_t y = 0) : x(x), y(y) {}
+		constexpr inline Point(int32_t x = 0, int32_t y = 0) : x(x), y(y) {}
 	};
 
 	struct UPoint
 	{
 		uint32_t x, y;
-		inline UPoint(uint32_t x = 0, uint32_t y = 0) : x(x), y(y) {}
+		constexpr inline UPoint(uint32_t x = 0, uint32_t y = 0) : x(x), y(y) {}
 	};
 
 	struct Cell
@@ -215,7 +290,7 @@ namespace Engine
 		RGB f;
 		RGB b;
 		char c;
-		inline Cell(char character = ' ', RGB foreground = {0, 0, 0}, RGB background = { 0, 0, 0 }) : c(character), f{foreground}, b(background) {}
+		constexpr inline Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0)) : c(character), f{foreground}, b(background) {}
 	};
 
 	struct CellA
@@ -223,7 +298,7 @@ namespace Engine
 		RGBA f;
 		RGBA b;
 		char c;
-		inline CellA(char character = ' ', RGBA foreground = {255, 255, 255, 255}, RGBA background = {0, 0, 0, 0}) : c(character), f{foreground}, b(background) {}
+		constexpr inline CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0)) : c(character), f{foreground}, b(background) {}
 	};
 
 	struct Texture
@@ -232,7 +307,7 @@ namespace Engine
 		// `False` - Disallow `Camera::Render()` to render this texture.
 		bool active = true;
 		// Position relative to the texture's parent object.
-		Point pos = {0, 0};
+		Point pos_r = {0, 0};
 		// `True` - Simple texture mode.
 		// `False` - Complex texture mode.
 		// A simple texture is a rectangle which is faster to render and uses less memory than a complex texture, but is limited to a single `CellA` value.
@@ -248,31 +323,35 @@ namespace Engine
 		std::vector<std::vector<CellA>> t = {}; 
 
 		// The constructors are functions instead of actual constructors because of my own preference.
-		// Visual Studio has a hard time correctly showing the parameters when filling them, so I decided that
-		// this is the best solution for making the writing experience easier.
-
-		// [Simple] Create a rectangle of the same value (limited to a single CellA value).
+		
+		// * CONSTRUCTOR * [Simple] Construct a rectangle of the same value (limited to a single CellA value).
 		void Simple(UPoint size, CellA value, Point position);
-		// [Complex] Create a rectangle.
+		// * CONSTRUCTOR * [Complex] Construct a rectangle.
 		void Rectangle(UPoint size, CellA value, Point position);// Load from a file.
-		// [Complex] Load from a file.
+		// * CONSTRUCTOR * [Complex] Construct by loading from a file.
+		// Returns the size of the loaded texture.
 		Engine::UPoint File(const std::string& fileName, Point position);
-		// [Complex] Create a texture by writing it (limited to single foreground and background RGBA values)
+		// * CONSTRUCTOR * [Complex] Construct a texture by writing it (limited to single foreground and background RGBA values)
 		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point position);
-		// [Simple & Complex] Resize the texture, keeps previous values in the given size.
+		
+		// [Simple/Complex] Resize the texture, keeps previous values in the given size.
 		// `UPoint newSize` - The new rectangle size of the texture.
 		// `CellA newValue` - The value which only new cells will be set to. 
 		void Resize(UPoint newSize, CellA newValue);
-		// [Simple & Complex] Change all the cells' values
+		// [Simple/Complex] Change all the cells' values
 		void SetCell(CellA value);
-		// [Simple & Complex] Change all the cells' foreground color values
+		// [Simple/Complex] Change all the cells' foreground color values
 		void SetForeground(RGBA value);
-		// [Simple & Complex] Change all the cells' background color values
+		// [Simple/Complex] Change all the cells' background color values
 		void SetBackground(RGBA value);
-		// [Simple & Complex] Change all the cells' character values
+		// [Simple/Complex] Change all the cells' character values
 		void SetCharacter(char value);
+		// [Simple/Complex] Change all the cells' alpha values
+		void SetAlpha(uint8_t value);
 		// [Complex] Export the texture to a file (existent or non existent), uses standard ktech texture file format.
 		void ExportToFile(const std::string& fileName);
+		// [Simple/Complex] Get the size of the texture.
+		UPoint GetSize();
 	};
 
 	struct Collider
@@ -281,7 +360,7 @@ namespace Engine
 		// `False` - Disallow `Object::Move()` to process this collider.
 		bool active = true;
 		// Position relative to the collider's parent object.
-		Point pos = { 0, 0 };
+		Point pos_r = { 0, 0 };
 		// `True` - simple collider mode.
 		// `False` - complex collider mode.
 		// A simple collider is a rectangle which is faster to process and uses less memory than a complex collider.
