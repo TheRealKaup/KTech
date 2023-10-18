@@ -168,8 +168,8 @@ int main()
 		{ CR::O, CR::O, CR::O, CR::O } // Overlappable - 3
 	};
 
-	Engine::InitializeAudio();
 	Engine::PrepareTerminal({50, 50});
+	Engine::InitializeAudio();
 
 	Engine::Map map;
 	pmap = &map;

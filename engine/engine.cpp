@@ -2,9 +2,7 @@
 
 // ---=== Variables ===---
 
-winsize Engine::terminalSize;
 std::vector<std::vector<Engine::Cell>> Engine::image;
-std::string Engine::stringImage;
 
 // ---=== Functions ===---
 
@@ -204,8 +202,8 @@ void Engine::ResetTerminal()
 	terminalAttributes.c_lflag |= ICANON;
 	terminalAttributes.c_lflag |= ECHO;
 	tcsetattr(0, TCSANOW, &terminalAttributes);
-	// Show cursor and reset colors
-	std::cout << "\033[?25h\033[0m" << std::flush;
+	// Show cursor, and disable alternative buffer (return to previous terminal)
+	std::cout << "\033[?25h\033[?1049l" << std::flush;
 }
 
 void SignalHandler(int signal)
@@ -223,8 +221,11 @@ void SignalHandler(int signal)
 
 void Engine::PrepareTerminal(Engine::UPoint imageSize)
 {
-	// Hide cursor
-	std::cout << "\033[?25l";
+	// Redirect stderr to a file to supress ALSA's warnings spam in the terminal.
+	freopen("errfile.txt", "w", stderr);
+
+	// Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
+	std::cout << "\033[?25l\033[?1049h";
 
 	// Disable canonical mode and echo
 	termios terminalAttributes;

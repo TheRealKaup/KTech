@@ -59,11 +59,12 @@ namespace Engine
 		{ CR::O, CR::O, CR::O } // Overlappable - 2
 	};
 
-	extern winsize terminalSize;
+	// Reference to the size of the terminal, changing this won't change the terminal's size.
+	inline winsize terminalSize;
 	// The final image that will be printed. This allows multiple cameras to print at the same time
 	extern std::vector<std::vector<Cell>> image;
 	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
-	extern std::string stringImage;
+	inline std::string stringImage;
 
 	// Keyboard input; input handlers, input loop...
 	namespace Input
@@ -71,31 +72,102 @@ namespace Engine
 		// Key values
 		namespace K
 		{
+			constexpr char const* up = "\x1b[A";
+			constexpr char const* down = "\x1b[B";
+			constexpr char const* right = "\x1b[C";
+			constexpr char const* left = "\x1b[D";
+
 			constexpr char const* return_ = "\x0a";
 			constexpr char const* backspace = "\x7f";
 			constexpr char const* escape = "\x1b";
-			constexpr char const* up = "\33[A";
-			constexpr char const* down = "\33[B";
-			constexpr char const* right = "\33[C";
-			constexpr char const* left = "\33[D";
-			constexpr char const* end = "\33[F";
-			constexpr char const* home = "\33[H";
-			constexpr char const* insert = "\33[2~";
-			constexpr char const* delete_ = "\33[3~";
-			constexpr char const* pageUp = "\33[5~";
-			constexpr char const* pageDown = "\33[6~";
-			constexpr char const* f1 = "\33OP";
-			constexpr char const* f2 = "\33OQ";
-			constexpr char const* f3 = "\33OR";
-			constexpr char const* f4 = "\33OS";
-			constexpr char const* f5 = "\33[15~";
-			constexpr char const* f6 = "\33[17~";
-			constexpr char const* f7 = "\33[18~";
-			constexpr char const* f8 = "\33[19~";
-			constexpr char const* f9 = "\33[20~";
-			constexpr char const* f10 = "\33[21~";
-			constexpr char const* f11 = "\33[23~";
-			constexpr char const* f12 = "\33[24~";
+
+			constexpr char const* pageUp = "\x1b[5~";
+			constexpr char const* pageDown = "\x1b[6~";
+			constexpr char const* home = "\x1b[H";
+			constexpr char const* end = "\x1b[F";
+			constexpr char const* insert = "\x1b[2~";
+			constexpr char const* delete_ = "\x1b[3~";
+			
+			constexpr char const* f1 = "\x1bOP";
+			constexpr char const* f2 = "\x1bOQ";
+			constexpr char const* f3 = "\x1bOR";
+			constexpr char const* f4 = "\x1bOS";
+			constexpr char const* f5 = "\x1b[15~";
+			constexpr char const* f6 = "\x1b[17~";
+			constexpr char const* f7 = "\x1b[18~";
+			constexpr char const* f8 = "\x1b[19~";
+			constexpr char const* f9 = "\x1b[20~";
+			constexpr char const* f10 = "\x1b[21~";
+			// No F11 because of fullscreen
+			constexpr char const* f12 = "\x1b[24~";
+
+			constexpr char const* tab = "\x09";
+			
+			namespace Shift
+			{
+				constexpr char const* return_ = "\x1bOM";
+				
+				constexpr char const* delete_ = "\x1b[3;2~";
+				
+				constexpr char const* tab = "\x1b[Z";
+			}
+
+			namespace Ctrl
+			{
+				constexpr char const* up = "\33[1;5A";
+				constexpr char const* down = "\33[1;5B";
+				constexpr char const* right = "\33[1;5C";
+				constexpr char const* left = "\33[1;5D";
+
+				constexpr char const* pageUp = "\x1b[5;5~";
+				constexpr char const* pageDown = "\x1b[6;5~";
+				constexpr char const* home = "\x1b[1;5H";
+				constexpr char const* end = "\x1b[1;5F";
+				constexpr char const* delete_ = "\x1b[3;5~";
+
+				constexpr char const* backspace = "\x08";
+			}
+
+			namespace Alt
+			{
+				constexpr char const* up = "\33[1;3A";
+				constexpr char const* down = "\33[1;3B";
+				constexpr char const* right = "\33[1;3C";
+				constexpr char const* left = "\33[1;3D";
+
+				constexpr char const* return_ = "\x1b\x0a";
+				constexpr char const* backspace = "\x1b\x7f";
+				constexpr char const* escape = "\x1b\x1b";
+
+				constexpr char const* pageUp = "\x1b[5;3~";
+				constexpr char const* pageDown = "\x1b[6;3~";
+				constexpr char const* home = "\x1b[1;3H";
+				constexpr char const* end = "\x1b[1;3F";
+				constexpr char const* insert = "\x1b[2;3~";
+				constexpr char const* delete_ = "\x1b[3;3~";
+			}
+
+			namespace CtrlAlt
+			{
+				constexpr char const* up = "\33[1;7A";
+				constexpr char const* down = "\33[1;7B";
+				constexpr char const* right = "\33[1;7C";
+				constexpr char const* left = "\33[1;7D";
+
+				constexpr char const* pageUp = "\x1b[5;7~";
+				constexpr char const* pageDown = "\x1b[6;7~";
+				constexpr char const* home = "\x1b[1;7H";
+				constexpr char const* end = "\x1b[1;7F";
+				constexpr char const* insert = "\x1b[2;7~";
+			}
+
+			namespace CtrlShift
+			{
+				constexpr char const* up = "\33[1;6A";
+				constexpr char const* down = "\33[1;6B";
+				constexpr char const* right = "\33[1;6C";
+				constexpr char const* left = "\33[1;6D";
+			}
 		};
 
 		struct HandlerCallback
@@ -252,6 +324,7 @@ namespace Engine
 		constexpr RGB hotPink = RGB(255, 0, 128);
 		constexpr RGB white = RGB(255, 255, 255);
 		constexpr RGB gray = RGB(160, 160, 160);
+		constexpr RGB black = RGB(0, 0, 0);
 	}
 
 	namespace RGBAColors
@@ -270,6 +343,7 @@ namespace Engine
 		constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
 		constexpr RGBA white = RGBA(255, 255, 255, 255);
 		constexpr RGBA gray = RGBA(160, 160, 160, 255);
+		constexpr RGBA black = RGBA(0, 0, 0, 255);
 		constexpr RGBA transparent = RGBA(0, 0, 0, 0);
 	}
 
@@ -325,14 +399,14 @@ namespace Engine
 		// The constructors are functions instead of actual constructors because of my own preference.
 		
 		// * CONSTRUCTOR * [Simple] Construct a rectangle of the same value (limited to a single CellA value).
-		void Simple(UPoint size, CellA value, Point position);
+		void Simple(UPoint size, CellA value, Point relative_position);
 		// * CONSTRUCTOR * [Complex] Construct a rectangle.
-		void Rectangle(UPoint size, CellA value, Point position);// Load from a file.
+		void Rectangle(UPoint size, CellA value, Point relative_position);// Load from a file.
 		// * CONSTRUCTOR * [Complex] Construct by loading from a file.
 		// Returns the size of the loaded texture.
-		Engine::UPoint File(const std::string& fileName, Point position);
+		Engine::UPoint File(const std::string& fileName, Point relative_position);
 		// * CONSTRUCTOR * [Complex] Construct a texture by writing it (limited to single foreground and background RGBA values)
-		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point position);
+		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point relative_position);
 		
 		// [Simple/Complex] Resize the texture, keeps previous values in the given size.
 		// `UPoint newSize` - The new rectangle size of the texture.
@@ -378,11 +452,11 @@ namespace Engine
 		std::vector<std::vector<bool>> c = {};
 
 		// A rectangle.
-		void Simple(UPoint size, uint8_t type, Point position);
+		void Simple(UPoint size, uint8_t type, Point relative_position);
 		// Load from a file.
-		bool File(const std::string& fileName, uint8_t type, Point position);
+		bool File(const std::string& fileName, uint8_t type, Point relative_position);
 		// Create a collider by writing it.
-		void Write(const std::vector<std::string>& stringVector, uint8_t type, Point position);
+		void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relative_position);
 		// Create a collider which corrosponds to a texture (also takes its position)
 		void ByTexture(const Texture& texture, uint8_t type);
 	};
