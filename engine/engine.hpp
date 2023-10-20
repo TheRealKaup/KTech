@@ -170,25 +170,51 @@ namespace Engine
 			}
 		};
 
-		struct HandlerCallback
-		{
-			std::function<void()> callback;
-			bool onTick;
-		};
 
 		struct Handler
 		{
+			inline static std::vector<Handler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
+			
+			struct Callback
+			{
+				Handler* handlerParent;
+				bool enabled = true;
+				std::function<void()> callback;
+				bool onTick;
+				inline Callback(std::function<void()> callback, bool onTick, Handler* handlerParent) : callback(callback), onTick(onTick), handlerParent(handlerParent) {}
+			};
+
 			std::string input;
-			std::vector<HandlerCallback> callbacks;
+			std::vector<Callback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			uint8_t timesPressed = 0;
 
 			Handler(const std::string& input, std::function<void()> call, bool onTick);
 		};
 
+		struct CallbacksGroup
+		{
+			inline static std::vector<CallbacksGroup*> groups;
+
+			std::vector<Handler::Callback*> callbacks;
+			// What the callbacks' enabled status should be.
+			bool enabled;
+			// Is the enabled status already synced with the callbacks?
+			bool synced = true;
+			// Automatically adds itself to the static groups vector
+			inline CallbacksGroup(bool enabled = true) : enabled(enabled) { groups.push_back(this); }
+			// Automatically removes itself from the static groups vector
+			inline ~CallbacksGroup() { for (size_t i = 0; i < groups.size(); i++) if (groups[i] == this) groups.erase(groups.begin() + i); }
+			inline void AddCallback(Handler::Callback* callback) { callbacks.push_back(callback); callback->enabled = enabled; }
+			// Enable the callbacks in the group at the start of the next tick.
+			inline void Enable() { enabled = true; synced = false; }
+			// Disable the callbacks in the group at the start of the next tick.
+			inline void Disable() { enabled = false; synced = false; }
+			// Permanently unregisters and deletes the callbacks in the group.
+			void DeleteCallbacks();
+		};
+
 		// The last input as the engine received it, including escape codes.
 		extern std::string input;
-		// Input handlers.
-		extern std::vector<Handler> handlers;
 		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
 		extern size_t handlerIndex;
 
@@ -201,7 +227,7 @@ namespace Engine
 		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
 		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
 		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
-		void RegisterHandler(const std::string& stringKey, std::function<void()> callback, bool onTick = false);
+		Handler::Callback* RegisterCallback(const std::string& stringKey, std::function<void()> callback, bool onTick = false);
 		// Get inputs (and calls registered input handler accordingly).
 		// Returns the input (also updates Engine::Input::buf).
 		std::string& Get();

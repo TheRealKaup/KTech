@@ -20,16 +20,13 @@ private:
 
 	void InsideOnPress()
 	{
-		if (selected)
-		{
-			for (size_t i = 0; i < obj.textures.size(); i++)
-				obj.textures[i].SetForeground(downRGBA);
-			
-			Engine::Time::Invoke(std::bind(&Button::RemovePressColor, this), 100, Engine::Time::Measurement::milliseconds);
+		for (size_t i = 0; i < obj.textures.size(); i++)
+			obj.textures[i].SetForeground(downRGBA);
+		
+		Engine::Time::Invoke(std::bind(&Button::RemovePressColor, this), 100, Engine::Time::Measurement::milliseconds);
 
-			if (OnPress)
-				OnPress();
-		}
+		if (OnPress)
+			OnPress();
 	}
 
 public:
@@ -38,6 +35,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
+		callbackGroup.Enable();
 	}  
 
 	virtual void Deselect()
@@ -45,6 +43,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
+		callbackGroup.Disable();
 	}
 
 	Button(Engine::Layer* layer,
@@ -91,8 +90,8 @@ public:
 		}
 
 		// Input handlers
-		Engine::Input::RegisterHandler(key, std::bind(&Button::InsideOnPress, this), true);
-		
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback(key, std::bind(&Button::InsideOnPress, this), true));
+
 		// Add object
 		layer->AddObject(&obj);
 	}

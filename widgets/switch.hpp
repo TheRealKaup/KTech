@@ -35,20 +35,17 @@ private:
 
 	void InsideOnPress()
 	{
-		if (selected)
-		{
-			on = !on;
+		on = !on;
 
-			for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
-				obj.textures[0].t[0][x].f = downRGBA;
-			for (size_t i = 1; i < obj.textures.size(); i++)
-				obj.textures[i].value.f = downRGBA;
-			
-			Engine::Time::Invoke(std::bind(&Switch::RemovePressColor, this), 100, Engine::Time::Measurement::milliseconds);
+		for (size_t x = 0; x < obj.textures[0].t[0].size(); x++)
+			obj.textures[0].t[0][x].f = downRGBA;
+		for (size_t i = 1; i < obj.textures.size(); i++)
+			obj.textures[i].value.f = downRGBA;
+		
+		Engine::Time::Invoke(std::bind(&Switch::RemovePressColor, this), 100, Engine::Time::Measurement::milliseconds);
 
-			if (OnPress)
-				OnPress();
-		}
+		if (OnPress)
+			OnPress();
 	}
 
 public:
@@ -61,6 +58,7 @@ public:
 			for (size_t i = 0; i < obj.textures.size(); i++)
 				obj.textures[i].SetForeground(selectedOffRGBA);
 		selected = true;
+		callbackGroup.Enable();
 	}  
 
 	virtual void Deselect()
@@ -72,6 +70,7 @@ public:
 			for (size_t i = 0; i < obj.textures.size(); i++)
 				obj.textures[i].SetForeground(unselectedOffRGBA);
 		selected = false;
+		callbackGroup.Disable();
 	}
 
 	void ChangeValue(bool _on)
@@ -161,7 +160,7 @@ public:
 		}
 
 		// Input handlers
-		Engine::Input::RegisterHandler(key, std::bind(&Switch::InsideOnPress, this), true);
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), true));
 		
 		// Add object
 		layer->AddObject(&obj);

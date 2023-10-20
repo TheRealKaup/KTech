@@ -6,7 +6,7 @@
 #define Characters_Special '`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[','{',']','}','\\','|',';',':','\'','"',',','<','.','>','/','?'
 #define Characters_All Characters_Lower, Characters_Upper, Characters_Digits, Characters_Special
 
-class StringInputField : public Widget
+class StringField : public Widget
 {
 public:
 	std::string string = "";
@@ -21,29 +21,26 @@ private:
 
 	void InternalInsert()
 	{
-		if (selected)
+		if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
 		{
-			if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
-			{
-				if (currentChar == 0)
-					return;
-
-				currentChar--;
-				string.pop_back();
-
-				obj.textures[0].t[0][currentChar].c = ' ';
-			}
-			else if (currentChar == maxChars)
+			if (currentChar == 0)
 				return;
-			else
-			{
-				obj.textures[0].t[0][currentChar].c = Engine::Input::input.at(0);
-				string.push_back(Engine::Input::input.at(0));
-				currentChar++;
-			}
-			if (OnInsert)
-				OnInsert();
+
+			currentChar--;
+			string.pop_back();
+
+			obj.textures[0].t[0][currentChar].c = ' ';
 		}
+		else if (currentChar == maxChars)
+			return;
+		else
+		{
+			obj.textures[0].t[0][currentChar].c = Engine::Input::input.at(0);
+			string.push_back(Engine::Input::input.at(0));
+			currentChar++;
+		}
+		if (OnInsert)
+			OnInsert();
 	}
 
 public:
@@ -52,6 +49,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
+		callbackGroup.Enable();
 	}
 
 	virtual void Deselect()
@@ -59,6 +57,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
+		callbackGroup.Disable();
 	}
 
 	void ChangeValue(std::string newString)
@@ -77,16 +76,16 @@ public:
 		currentChar = string.length();
 	}
 
-	StringInputField(Engine::Layer* layer = 0,
+	StringField(Engine::Layer* layer = 0,
 		std::function<void()> OnInsert = 0,
-		std::vector<char> allowedCharacters = {},
+		std::vector<char> allowedCharacters = { Characters_All },
 		Engine::Point pos = { 0, 0 },
 		const std::string& text = "Value = ",
 		unsigned int maxChars = 8,
 		const std::string& defaultString = "String",
 		bool withFrame = false,
-		Engine::RGBA unselectedRGBA = { 150, 150, 150, 255 },
-		Engine::RGBA selectedRGBA = { 255, 255, 255, 255 })
+		Engine::RGBA unselectedRGBA = Engine::RGBA(150, 150, 150, 255),
+		Engine::RGBA selectedRGBA = Engine::RGBAColors::white)
 		: OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
 	{
 		obj.pos = pos;
@@ -137,9 +136,9 @@ public:
 		
 		// Input handlers
 		for (size_t i = 0; i < allowedCharacters.size(); i++)
-			Engine::Input::RegisterHandler({allowedCharacters[i]}, std::bind(&StringInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(Engine::Input::K::delete_, std::bind(&StringInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(Engine::Input::K::backspace, std::bind(&StringInputField::InternalInsert, this), true);
+			callbackGroup.AddCallback(Engine::Input::RegisterCallback({allowedCharacters[i]}, std::bind(&StringField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::delete_, std::bind(&StringField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::backspace, std::bind(&StringField::InternalInsert, this), true));
 		
 		// Add object
 		layer->AddObject(&obj);

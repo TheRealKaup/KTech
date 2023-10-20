@@ -1,6 +1,6 @@
 #include "widget.hpp"
 
-class IntInputField : public Widget
+class IntField : public Widget
 {
 public:
 	uint32_t number = 0;
@@ -18,38 +18,35 @@ private:
 	
 	void InternalInsert()
 	{
-		if (selected)
+		if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
 		{
-			if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
-			{
-				if (currentDigit == 0)
-					return;
+			if (currentDigit == 0)
+				return;
 
-				visibleNumber /= 10;
+			visibleNumber /= 10;
 
-				currentDigit--;
-				obj.textures[0].t[0][currentDigit].c = ' ';
-			}
-			else if (Engine::Input::IsNum())
-			{
-				if (currentDigit == maxDigits)
-					return;
-
-				obj.textures[0].t[0][currentDigit].c = Engine::Input::input.at(0);
-				currentDigit++;
-
-				visibleNumber = visibleNumber * 10 + Engine::Input::GetNum();
-			}
-
-			number = visibleNumber;
-			if (number < min)
-				number = min;
-			if (number > max)
-				number = max;
-
-			if (OnInsert)
-				OnInsert();
+			currentDigit--;
+			obj.textures[0].t[0][currentDigit].c = ' ';
 		}
+		else if (Engine::Input::IsNum())
+		{
+			if (currentDigit == maxDigits)
+				return;
+
+			obj.textures[0].t[0][currentDigit].c = Engine::Input::input.at(0);
+			currentDigit++;
+
+			visibleNumber = visibleNumber * 10 + Engine::Input::GetNum();
+		}
+
+		number = visibleNumber;
+		if (number < min)
+			number = min;
+		if (number > max)
+			number = max;
+
+		if (OnInsert)
+			OnInsert();
 	}
 
 public:
@@ -58,6 +55,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
+		callbackGroup.Enable();
 	}
 
 	virtual void Deselect()
@@ -91,6 +89,7 @@ public:
 			obj.textures[i].SetForeground(unselectedRGBA);
 
 		selected = false;
+		callbackGroup.Disable();
 	}
 
 	void ChangeValue(std::string newNumber)
@@ -108,7 +107,7 @@ public:
 		visibleNumber = number;
 	}
 
-	IntInputField(Engine::Layer* layer,
+	IntField(Engine::Layer* layer,
 		std::function<void()> OnInsert,
 		uint32_t min = 0,
 		uint32_t max = 255,
@@ -188,18 +187,18 @@ public:
 		}
 
 		// Input handlers
-		Engine::Input::RegisterHandler("0", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("1", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("2", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("3", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("4", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("5", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("6", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("7", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("8", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler("9", std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(Engine::Input::K::backspace, std::bind(&IntInputField::InternalInsert, this), true);
-		Engine::Input::RegisterHandler(Engine::Input::K::delete_, std::bind(&IntInputField::InternalInsert, this), true);
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("0", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("1", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("2", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("3", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("4", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("5", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("6", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("7", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("8", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback("9", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::backspace, std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::delete_, std::bind(&IntField::InternalInsert, this), true));
 
 		// Add object
 		layer->AddObject(&obj);

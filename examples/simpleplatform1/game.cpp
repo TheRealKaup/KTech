@@ -77,18 +77,18 @@ struct Character
 
 		cam = Engine::Camera(Engine::Point( 0, 0 ), Engine::UPoint( 15, 15 ));
 
-		Engine::Input::RegisterHandler("w", std::bind(&Character::Jump, this), true);
-		Engine::Input::RegisterHandler("W", std::bind(&Character::Jump, this), true);
-		Engine::Input::RegisterHandler(" ", std::bind(&Character::Jump, this), true);
-		Engine::Input::RegisterHandler(Engine::Input::K::up, std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterCallback("w", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterCallback("W", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterCallback(" ", std::bind(&Character::Jump, this), true);
+		Engine::Input::RegisterCallback(Engine::Input::K::up, std::bind(&Character::Jump, this), true);
 
-		Engine::Input::RegisterHandler("d", std::bind(&Character::Right, this));
-		Engine::Input::RegisterHandler("D", std::bind(&Character::Right, this));
-		Engine::Input::RegisterHandler(Engine::Input::K::right, std::bind(&Character::Right, this));
+		Engine::Input::RegisterCallback("d", std::bind(&Character::Right, this));
+		Engine::Input::RegisterCallback("D", std::bind(&Character::Right, this));
+		Engine::Input::RegisterCallback(Engine::Input::K::right, std::bind(&Character::Right, this));
 
-		Engine::Input::RegisterHandler("a", std::bind(&Character::Left, this));
-		Engine::Input::RegisterHandler("A", std::bind(&Character::Left, this));
-		Engine::Input::RegisterHandler(Engine::Input::K::left, std::bind(&Character::Left, this));
+		Engine::Input::RegisterCallback("a", std::bind(&Character::Left, this));
+		Engine::Input::RegisterCallback("A", std::bind(&Character::Left, this));
+		Engine::Input::RegisterCallback(Engine::Input::K::left, std::bind(&Character::Left, this));
 
 		obj.OnTick = std::bind(&Character::OnTick, this);
 		layer->AddObject(&obj);
@@ -235,7 +235,7 @@ int main()
 	house.textures[0].File("assets/house.ktecht", { 0, 0 });
 	layer.AddObject(&house);
 
-	Engine::Input::RegisterHandler("m", TurnOnCharacterCamera);
+	Engine::Input::RegisterCallback("m", TurnOnCharacterCamera);
 
 	Engine::Layer darkLayer;
 	darkLayer.alpha = 127;

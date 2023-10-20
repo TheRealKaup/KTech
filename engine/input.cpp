@@ -2,45 +2,58 @@
 
 #define maxInputLength 7
 
-std::vector<Engine::Input::Handler> Engine::Input::handlers = {};
 size_t Engine::Input::handlerIndex = -1;
 
 std::string Engine::Input::input(maxInputLength, '\0');
 
 Engine::Input::Handler::Handler(const std::string& input, std::function<void()> callback, bool onTick) : input(input)
 {
-	callbacks.push_back({callback, onTick});
+	// So the pointers that groups have stay correct
+	callbacks.push_back(new Handler::Callback(callback, onTick, this));
 }
 
-void Engine::Input::RegisterHandler(const std::string& input, std::function<void()> callback, bool onTick)
+Engine::Input::Handler::Callback* Engine::Input::RegisterCallback(const std::string& input, std::function<void()> callback, bool onTick)
 {
-	// If a handler already exists for this input, add the call to the calls vector
-	for (size_t i = 0; i < handlers.size(); i++)
-		if (handlers[i].input == input)
+	// If a handler already exists for this input, add the callback to the calls vector
+	for (size_t i = 0; i < Handler::handlers.size(); i++)
+	{
+		if (Handler::handlers[i]->input == input)
 		{
-			handlers[i].callbacks.push_back({callback, onTick});
-			return;
+			Handler::handlers[i]->callbacks.push_back(new Handler::Callback(callback, onTick, Handler::handlers[i]));
+			return Handler::handlers[i]->callbacks[Handler::handlers[i]->callbacks.size() - 1]; // Last callback
 		}
-	handlers.push_back(Handler(input, callback, onTick));
+	}
+	// Otherwise, create a new handler
+	Handler::handlers.push_back(new Handler(input, callback, onTick));
+	return Handler::handlers[Handler::handlers.size() - 1]->callbacks[Handler::handlers[Handler::handlers.size() - 1]->callbacks.size() - 1]; // Last callback of last handler
 }
 
 uint32_t Engine::Input::Call()
 {
-	uint32_t counter = 0;
-	for (size_t i = 0; i < handlers.size(); i++)
+	for (CallbacksGroup*& group : CallbacksGroup::groups)
 	{
-		if (handlers[i].timesPressed > 0)
+		if (!group->synced)
 		{
-			for (size_t j = 0; j < handlers[i].callbacks.size(); j++)
+			for (Handler::Callback*& callback : group->callbacks)
+				callback->enabled = group->enabled;
+			group->synced = true;
+		}
+	}
+	uint32_t counter = 0;
+	for (Handler*& handler : Handler::handlers)
+	{
+		if (handler->timesPressed > 0)
+		{
+			for (Handler::Callback*& callback : handler->callbacks)
 			{
-				if (handlers[i].callbacks[j].onTick && handlers[i].callbacks[j].callback)
+				if (callback->enabled && callback->onTick && callback->callback)
 				{
 					counter++;
-					input = handlers[i].input;
-					handlers[i].callbacks[j].callback();
+					input = handler->input;
+					callback->callback();
 				}
 			}
-			handlers[i].timesPressed = 0;
+			handler->timesPressed = 0;
 		}
 	}
 	return counter;
@@ -60,14 +73,14 @@ std::string& Engine::Input::Get()
 	input.assign(buf);
 
 	// Call handlers
-	for (size_t i = 0; i < handlers.size(); i++)
+	for (size_t i = 0; i < Handler::handlers.size(); i++)
 	{
-		if (input == handlers[i].input) // If the strings are equal
+		if (input == Handler::handlers[i]->input) // If the strings are equal
 		{
-			handlers[i].timesPressed++;
-			for (size_t j = 0; j < handlers[i].callbacks.size(); j++) // Call the calls
-				if (!handlers[i].callbacks[j].onTick && handlers[i].callbacks[j].callback) // Check if the call shouldn't be called on tick and isn't null
-					handlers[i].callbacks[j].callback(); // Call
+			Handler::handlers[i]->timesPressed++;
+			for (size_t j = 0; j < Handler::handlers[i]->callbacks.size(); j++) // Call the calls
+				if (Handler::handlers[i]->callbacks[j]->enabled && !Handler::handlers[i]->callbacks[j]->onTick && Handler::handlers[i]->callbacks[j]->callback) // Check if the call shouldn't be called on tick and isn't null
+					Handler::handlers[i]->callbacks[j]->callback(); // Call
 			break;
 		}
 	}
@@ -114,4 +127,22 @@ bool Engine::Input::Smaller(char charKey)
 bool Engine::Input::Between(char charKey1, char charKey2)
 {
 	return (input[0] >= charKey1) && (input[0] <= charKey2) && (input[1] == 0);
+}
+
+void Engine::Input::CallbacksGroup::DeleteCallbacks()
+{
+	for (Handler::Callback*& callback : callbacks)
+	{
+		// Access all of the callbacks' parent handlers
+		for (size_t i = 0; i < callback->handlerParent->callbacks.size(); i++)
+		{
+			// Find the callback's pointer within its parent handler and erase it from the handler's vector
+			if (callback == callback->handlerParent->callbacks[i])
+				callback->handlerParent->callbacks.erase(callback->handlerParent->callbacks.begin() + i);
+		}
+		// Delete the callback itself
+		delete callback;
+	}
+	// Clear the callbacks vector within the group
+	callbacks.clear();
 }
