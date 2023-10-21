@@ -46,8 +46,8 @@ void Engine::Map::CallOnTicks()
 
 		for (size_t o = 0; o < layers[l]->objects.size(); o++)
 		{
-			if (layers[l]->objects[o]->OnTick)
-				layers[l]->objects[o]->OnTick();
+			if (layers[l]->objects[o]->OnEvent)
+				layers[l]->objects[o]->OnEvent(Object::EventType::onTick);
 		}
 	}
 	for (size_t c = 0; c < cameras.size(); c++)

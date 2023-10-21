@@ -41,7 +41,7 @@ void ExpandMovementTree(Object* thisObj, Point dir,
 
 		for (c = 0; c < thisObj->colliders.size(); c++)
 		{
-			collider = &thisObj->colliders[c];
+	 		collider = &thisObj->colliders[c];
 
 			if (!collider->active || collider->size.x == 0 || collider->size.y == 0)
 				continue;
@@ -159,11 +159,11 @@ bool Object::Move(Point dir)
 			pushData[i].passiveObject->otherObject = pushData[i].activeObject;
 			pushData[i].passiveObject->otherColliderIndex = pushData[i].activeCollider;
 			
-			if (pushData[i].activeObject->OnPush)
-				pushData[i].activeObject->OnPush();
-
-			if (pushData[i].passiveObject->OnPushed)
-				pushData[i].passiveObject->OnPushed();
+			if (pushData[i].activeObject->OnEvent)
+				pushData[i].activeObject->OnEvent(EventType::onPush);
+			
+			if (pushData[i].passiveObject->OnEvent)
+				pushData[i].passiveObject->OnEvent(EventType::onPushed);
 		}
 		// Call overlap events
 		for (size_t i = 0; i < overlapData.size(); i++)
@@ -178,11 +178,11 @@ bool Object::Move(Point dir)
 			overlapData[i].passiveObject->otherObject = overlapData[i].activeObject;
 			overlapData[i].passiveObject->otherColliderIndex = overlapData[i].activeCollider;
 
-			if (overlapData[i].activeObject->OnOverlap)
-				overlapData[i].activeObject->OnOverlap();
+			if (overlapData[i].activeObject->OnEvent)
+				overlapData[i].activeObject->OnEvent(EventType::onOverlap);
 
-			if (overlapData[i].passiveObject->OnOverlapped)
-				overlapData[i].passiveObject->OnOverlapped();
+			if (overlapData[i].passiveObject->OnEvent)
+				overlapData[i].passiveObject->OnEvent(EventType::onOverlapped);
 		}
 		// Call overlap exit events
 		for (size_t i = 0; i < exitOverlapData.size(); i++)
@@ -197,11 +197,11 @@ bool Object::Move(Point dir)
 			exitOverlapData[i].passiveObject->otherObject = exitOverlapData[i].activeObject;
 			exitOverlapData[i].passiveObject->otherColliderIndex = exitOverlapData[i].activeCollider;
 
-			if (exitOverlapData[i].activeObject->OnOverlapExit)
-				exitOverlapData[i].activeObject->OnOverlapExit();
+			if (exitOverlapData[i].activeObject->OnEvent)
+				exitOverlapData[i].activeObject->OnEvent(EventType::onOverlapExit);
 
-			if (exitOverlapData[i].passiveObject->OnOverlappedExit)
-				exitOverlapData[i].passiveObject->OnOverlappedExit();
+			if (exitOverlapData[i].passiveObject->OnEvent)
+				exitOverlapData[i].passiveObject->OnEvent(EventType::onOverlappedExit);
 		}
 		return true;
 	}
@@ -224,11 +224,11 @@ bool Object::Move(Point dir)
 			blockData[i].passiveObject->otherObject = blockData[i].activeObject;
 			blockData[i].passiveObject->otherColliderIndex = blockData[i].activeCollider;
 
-			if (blockData[i].activeObject->OnBlocked)
-				blockData[i].activeObject->OnBlocked();
+			if (blockData[i].activeObject->OnEvent)
+				blockData[i].activeObject->OnEvent(EventType::onBlocked);
 
-			if (blockData[i].passiveObject->OnBlock)
-				blockData[i].passiveObject->OnBlock();
+			if (blockData[i].passiveObject->OnEvent)
+				blockData[i].passiveObject->OnEvent(EventType::onBlock);
 		}
 		return false; 
 	}

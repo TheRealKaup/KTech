@@ -489,11 +489,9 @@ namespace Engine
 
 	struct Object
 	{
-		Layer* parentLayer = NULL;
+		Layer* parentLayer = nullptr;
 
-		std::function<void()> OnTick = nullptr;
-		
-		std::string name = "Unnamed Object";
+		std::string name = "";
 		Point pos = { 0, 0 };
 
 		std::vector<Texture> textures = {};
@@ -504,22 +502,19 @@ namespace Engine
 		Object* otherObject = NULL;
 		size_t otherColliderIndex = -1;
 
-		// This event can be called after calling Move. OnPushed means that another object pushed this one.
-		std::function<void()> OnPushed = nullptr;
-		// This event can be called after calling Move. OnPush means that this objects pushed another object.
-		std::function<void()> OnPush = nullptr;
-		// This event can be called after calling Move. OnBlocked means that another objects blocked this one.
-		std::function<void()> OnBlocked = nullptr;
-		// This event can be called after calling Move. OnBlock means that this object blocked another object.
-		std::function<void()> OnBlock = nullptr;
-		// This event can be called after calling Move if a collider from this object started overlapping a collider from another object.
-		std::function<void()> OnOverlap = nullptr;
-		// This event can be called after calling Move if a collider from this object stopped overlapping a collider from another object.
-		std::function<void()> OnOverlapExit = nullptr;
-		// This event can be called after calling Move if a collider from another object started overlapping a collider from this object.
-		std::function<void()> OnOverlapped = nullptr;
-		// This event can be called after calling Move if a collider from another object stopped overlapping a collider from this object.
-		std::function<void()> OnOverlappedExit = nullptr;
+		enum class EventType : uint8_t
+		{
+			onTick,
+			onPushed,
+			onPush,
+			onBlocked,
+			onBlock,
+			onOverlap,
+			onOverlapExit,
+			onOverlapped,
+			onOverlappedExit
+		};
+		std::function<void(EventType)> OnEvent;
 
 		// Tries to move the object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
 		bool Move(Point dir);

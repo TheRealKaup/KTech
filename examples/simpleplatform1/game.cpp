@@ -34,8 +34,11 @@ struct Character
 		obj.Move({ -1 });
 	}
 
-	void OnTick()
+	void OnEvent(Engine::Object::EventType eventType)
 	{
+		if (eventType != Engine::Object::EventType::onTick)
+			return;
+
 		if (yVelocity < 1) {
 			yVelocity++;
 		}
@@ -90,7 +93,7 @@ struct Character
 		Engine::Input::RegisterCallback("A", std::bind(&Character::Left, this));
 		Engine::Input::RegisterCallback(Engine::Input::K::left, std::bind(&Character::Left, this));
 
-		obj.OnTick = std::bind(&Character::OnTick, this);
+		obj.OnEvent = std::bind(&Character::OnEvent, this, std::placeholders::_1);
 		layer->AddObject(&obj);
 	}
 };
@@ -103,8 +106,11 @@ struct GravityBox
 
 	unsigned fallingSpeed;
 
-	void OnTick()
+	void OnEvent(Engine::Object::EventType eventType)
 	{
+		if (eventType != Engine::Object::EventType::onTick)
+			return;
+
 		// If catched, do not fall.
 		for (size_t i = 0; i < fallingSpeed; i++)
 			obj.Move({ 0, 1 });
@@ -126,7 +132,7 @@ struct GravityBox
 		obj.colliders.resize(1);
 		obj.colliders[0].Simple(Engine::UPoint(3, 3), 2, Engine::Point(0, 0));
 
-		obj.OnTick = std::bind(&GravityBox::OnTick, this);
+		obj.OnEvent = std::bind(&GravityBox::OnEvent, this, std::placeholders::_1);
 		
 		layer->AddObject(&obj);
 	}
@@ -137,8 +143,11 @@ struct AutoUpdatingText
 	float* data;
 	Engine::Object obj;
 
-	void OnTick()
+	void OnEvent(Engine::Object::EventType eventType)
 	{
+		if (eventType != Engine::Object::EventType::onTick)
+			return;
+		
 		obj.textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
 	}
 
@@ -146,7 +155,7 @@ struct AutoUpdatingText
 	{
 		obj.textures.resize(1);
 		obj.pos = pos;
-		obj.OnTick = std::bind(&AutoUpdatingText::OnTick, this);
+		obj.OnEvent = std::bind(&AutoUpdatingText::OnEvent, this, std::placeholders::_1);
 		layer->AddObject(&obj);
 	}
 };
