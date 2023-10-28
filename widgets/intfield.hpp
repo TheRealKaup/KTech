@@ -187,16 +187,7 @@ public:
 		}
 
 		// Input handlers
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("0", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("1", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("2", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("3", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("4", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("5", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("6", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("7", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("8", std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback("9", std::bind(&IntField::InternalInsert, this), true));
+		callbackGroup.AddCallback(Engine::Input::RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
 		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::backspace, std::bind(&IntField::InternalInsert, this), true));
 		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::delete_, std::bind(&IntField::InternalInsert, this), true));
 

@@ -1,10 +1,15 @@
 #include "widget.hpp"
 
-#define Characters_Lower 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
-#define Characters_Upper 'Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','G','H','J','K','L','Z','X','C','V','B','N','M'
-#define Characters_Digits '1','2','3','4','5','6','7','8','9','0'
-#define Characters_Special '`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[','{',']','}','\\','|',';',':','\'','"',',','<','.','>','/','?'
-#define Characters_All Characters_Lower, Characters_Upper, Characters_Digits, Characters_Special
+struct KeyRange
+{
+	char key1, key2;
+	inline constexpr KeyRange(char key1, char key2) : key1(key1), key2(key2) {}
+};
+
+inline constexpr KeyRange keyrange_lower = KeyRange('a', 'z');
+inline constexpr KeyRange keyrange_upper = KeyRange('A', 'Z');
+inline constexpr KeyRange keyrange_numbers = KeyRange('0', '9');
+inline constexpr KeyRange keyrange_all = KeyRange(' ', '~');
 
 class StringField : public Widget
 {
@@ -21,6 +26,7 @@ private:
 
 	void InternalInsert()
 	{
+		std::cerr << Engine::Input::input << std::endl; 
 		if (Engine::Input::Is(Engine::Input::K::backspace) || Engine::Input::Is(Engine::Input::K::delete_))
 		{
 			if (currentChar == 0)
@@ -78,7 +84,7 @@ public:
 
 	StringField(Engine::Layer* layer = 0,
 		std::function<void()> OnInsert = 0,
-		std::vector<char> allowedCharacters = { Characters_All },
+		std::vector<KeyRange> allowedCharacters = {keyrange_all},
 		Engine::Point pos = { 0, 0 },
 		const std::string& text = "Value = ",
 		unsigned int maxChars = 8,
@@ -135,8 +141,8 @@ public:
 		}
 		
 		// Input handlers
-		for (size_t i = 0; i < allowedCharacters.size(); i++)
-			callbackGroup.AddCallback(Engine::Input::RegisterCallback({allowedCharacters[i]}, std::bind(&StringField::InternalInsert, this), true));
+		for (KeyRange& keyRange : allowedCharacters)
+			callbackGroup.AddCallback(Engine::Input::RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
 		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::delete_, std::bind(&StringField::InternalInsert, this), true));
 		callbackGroup.AddCallback(Engine::Input::RegisterCallback(Engine::Input::K::backspace, std::bind(&StringField::InternalInsert, this), true));
 		

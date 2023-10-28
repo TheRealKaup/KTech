@@ -7,44 +7,49 @@ float Engine::Time::fps = 0.0f;
 Engine::Time::TimePoint Engine::Time::engineStartTP;
 int32_t Engine::Time::totalTicks = 0;
 
-void Engine::Time::Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement, uint32_t instances)
+Engine::Time::Invocation* Engine::Time::Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement)
 {
 	if (timeMeasurement == Measurement::ticks)
-		invocations.push_back(Invocation(callback, time, instances));
+		invocations.push_back(new Invocation(callback, time));
 	else if (timeMeasurement == Measurement::seconds)
-		invocations.push_back(Invocation(callback, time * tps, instances));
+		invocations.push_back(new Invocation(callback, time * tps));
 	else
-		invocations.push_back(Invocation(callback, time * tps / 1000, instances));
+		invocations.push_back(new Invocation(callback, time * tps / 1000));
+	return invocations[invocations.size() - 1];
 }
+
+bool Engine::Time::CancelInvocation(Invocation* invocation)
+{
+	for (size_t i = 0; i < invocations.size(); i++)
+	{
+		if (invocation == invocations[i])
+		{
+			invocations.erase(invocations.begin() + i);
+			delete invocation;
+			return true;
+		}
+	}
+	return false;
+}
+
 
 void Engine::Time::CallInvocations()
 {
 	for (size_t i = 0; i < invocations.size(); i++)
 	{
-		// Check at the start if already should call (invocations can requested with no delay)
-		if (invocations[i].ticksLeft == 0)
+		if (invocations[i]->ticksLeft > 0)
+			invocations[i]->ticksLeft--;
+		else
 		{
 			// Call
-			if (invocations[i].callback)
-				invocations[i].callback();
-			
-			if (invocations[i].instancesLeft > 1)
-			{
-				// More instances left, proceed to the next one.
-				invocations[i].instancesLeft--;
-				invocations[i].ticksLeft = invocations[i].ticks;
-			}
-			else
-			{
-				// No instances left, remove invocation from vector.
-				invocations.erase(invocations.begin() + i);
-				i--;
-				continue;
-			}
+			if (invocations[i]->callback)
+				invocations[i]->callback();
+			// Remove invocation
+			delete invocations[i];
+			invocations.erase(invocations.begin() + i);
+			i--;
+			continue;
 		}
-
-		if (invocations[i].ticksLeft != 0)
-			invocations[i].ticksLeft--;
 	}
 }
 

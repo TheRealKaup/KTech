@@ -170,32 +170,47 @@ namespace Engine
 			}
 		};
 
-
-		struct Handler
+		struct Callback
 		{
-			inline static std::vector<Handler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
-			
-			struct Callback
+			bool enabled = true;
+			std::function<void()> callback;
+			inline Callback(std::function<void()> callback) : callback(callback) {}
+		};
+
+		struct BasicHandler
+		{
+			struct BasicCallback : Callback
 			{
-				Handler* handlerParent;
-				bool enabled = true;
-				std::function<void()> callback;
+				BasicHandler* parentHandler;
 				bool onTick;
-				inline Callback(std::function<void()> callback, bool onTick, Handler* handlerParent) : callback(callback), onTick(onTick), handlerParent(handlerParent) {}
+				inline BasicCallback(std::function<void()> callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
 			};
-
+			inline static std::vector<BasicHandler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
+			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			std::string input;
-			std::vector<Callback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			uint8_t timesPressed = 0;
+			inline BasicHandler(const std::string& input) : input(input) {};
+		};
 
-			Handler(const std::string& input, std::function<void()> call, bool onTick);
+		struct RangedHandler
+		{
+			struct RangedCallback : Callback
+			{
+				RangedHandler* parentHandler;
+				inline RangedCallback(std::function<void()> callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
+			};
+			inline static std::vector<RangedHandler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
+			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
+			char key1, key2;
+			inline RangedHandler(char key1, char key2) : key1(key1), key2(key2) {};
 		};
 
 		struct CallbacksGroup
 		{
 			inline static std::vector<CallbacksGroup*> groups;
 
-			std::vector<Handler::Callback*> callbacks;
+			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
+			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
 			// What the callbacks' enabled status should be.
 			bool enabled;
 			// Is the enabled status already synced with the callbacks?
@@ -204,7 +219,8 @@ namespace Engine
 			inline CallbacksGroup(bool enabled = true) : enabled(enabled) { groups.push_back(this); }
 			// Automatically removes itself from the static groups vector
 			inline ~CallbacksGroup() { for (size_t i = 0; i < groups.size(); i++) if (groups[i] == this) groups.erase(groups.begin() + i); }
-			inline void AddCallback(Handler::Callback* callback) { callbacks.push_back(callback); callback->enabled = enabled; }
+			inline void AddCallback(BasicHandler::BasicCallback* callback) { basicCallbacks.push_back(callback); callback->enabled = enabled; }
+			inline void AddCallback(RangedHandler::RangedCallback* callback) { rangedCallbacks.push_back(callback); callback->enabled = enabled; }
 			// Enable the callbacks in the group at the start of the next tick.
 			inline void Enable() { enabled = true; synced = false; }
 			// Disable the callbacks in the group at the start of the next tick.
@@ -227,14 +243,19 @@ namespace Engine
 		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
 		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
 		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
-		Handler::Callback* RegisterCallback(const std::string& stringKey, std::function<void()> callback, bool onTick = false);
+		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, std::function<void()> callback, bool onTick = false);
+		// Register an input handler that would be called if a key between the given keys are detected.
+		// This is majorly better in initialzation speed and memory size than `RegisterCallback()` when it comes to registering a bunch of keys that are next to each other in the ASCII table.
+		// For example, field widgets use this.
+		// The `onTick` feature is not possible with the type of the callback's handler.
+		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, std::function<void()> callback);
 		// Get inputs (and calls registered input handler accordingly).
 		// Returns the input (also updates Engine::Input::buf).
 		std::string& Get();
 		// Call this function in order to call all handlers who got their input received since the last time you called this function.
 		// This function also resets all `Engine::Input::handlers[].timesPressed`.
 		// Returns the amount of calls.
-		uint32_t Call();
+		void Call();
 		// A premade loop for automatically getting inputs and calling handlers.
 		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
 		// Calls OnQuit automatically when Ctrl+C is received.
@@ -284,11 +305,9 @@ namespace Engine
 		struct Invocation
 		{
 			std::function<void()> callback;
-			uint32_t ticks; // Ticks, not a value that should change
 			uint32_t ticksLeft; // Current ticks left in this instance
-			uint32_t instancesLeft; // Instances left
-			inline Invocation(std::function<void()> callback, uint32_t ticks, uint32_t instances)
-				: callback(callback), ticks(ticks), ticksLeft(ticks), instancesLeft(instances) {}
+			inline Invocation(std::function<void()> callback, uint32_t ticks)
+				: callback(callback), ticksLeft(ticks) {}
 		};
 
 		inline int16_t tps = 24;
@@ -298,8 +317,8 @@ namespace Engine
 		extern float fps;
 		extern TimePoint engineStartTP;
 		extern int32_t totalTicks;
-		inline std::vector<Invocation> invocations = {};
-
+		inline std::vector<Invocation*> invocations;
+		
 		enum class Measurement
 		{
 			ticks,
@@ -311,8 +330,12 @@ namespace Engine
 		// `uint32_t` time - the given time.
 		// `TimeMeasurement timeMeasurement` - the time measurement for the given time, can be in ticks, seconds, milliseconds or microseconds (last three are converted into ticks).
 		// (optional) `uint32_t instances = 1` - how many times sequentially to invoke this callback function.
-		void Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement, uint32_t instances = 1);
+		Invocation* Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement);
+		// Cancel an invocation so the callback function will not be called (also deletes the invocation's memory).
+		// returns true if found the invocation and removed it.
+		bool CancelInvocation(Invocation* invocation);
 
+		// Make the invocations system proceed to the next tick (place inside game loop).
 		void CallInvocations();
 
 		inline void StartThisTick() { Time::thisTickStartTP.SetToNow(); }
@@ -499,7 +522,7 @@ namespace Engine
 
 		Point lastPush = { 0, 0 };
 		size_t colliderIndex = -1;
-		Object* otherObject = NULL;
+		Object* otherObject = nullptr;
 		size_t otherColliderIndex = -1;
 
 		enum class EventType : uint8_t
@@ -516,6 +539,8 @@ namespace Engine
 		};
 		std::function<void(EventType)> OnEvent;
 
+		void EnterLayer(Layer* layer);
+		
 		// Tries to move the object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
 		bool Move(Point dir);
 

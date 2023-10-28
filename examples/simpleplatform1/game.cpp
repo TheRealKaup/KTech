@@ -9,12 +9,18 @@ struct Character
 	Engine::AudioSource jumpSFX;
 	Engine::AudioSource groundHitSFX;
 
+	Engine::Layer* voidLayer;
+
+	// Object* last
+
 	const int jumpStreng = 4;
 
 	Engine::Object obj;
 	Engine::Camera cam;
 	bool onGround = false;
 	int yVelocity = 0;
+
+	Engine::Object* box = nullptr;
 
 	void Jump()
 	{
@@ -36,35 +42,65 @@ struct Character
 
 	void OnEvent(Engine::Object::EventType eventType)
 	{
-		if (eventType != Engine::Object::EventType::onTick)
-			return;
+		switch (eventType)
+		{
+			case Engine::Object::EventType::onTick:
+			{
+				if (yVelocity < 1) {
+					yVelocity++;
+				}
 
-		if (yVelocity < 1) {
-			yVelocity++;
+				bool left = false; // IsKeyDown(VK_LEFT);
+				bool right = false; // IsKeyDown(VK_RIGHT);
+				
+				bool priorOnGround = onGround;
+
+				if (yVelocity < 0)
+					for (size_t i = 0; i < -yVelocity; i++)
+						onGround = !obj.Move({ 0, -1 });
+				else if (yVelocity == 1)
+					onGround = !obj.Move({ 0, 1 });
+
+				cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
+
+				if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0, 0.5f);
+				break;
+			}
+			case Engine::Object::EventType::onOverlap:
+			{
+				if (obj.otherObject->colliders[obj.otherColliderIndex].type == 2)
+					box = obj.otherObject;
+				break;
+			}
+			case Engine::Object::EventType::onOverlapExit: case Engine::Object::EventType::onOverlappedExit:
+			{
+				if (obj.otherObject == box)
+					box = nullptr;
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
-
-		bool left = false; // IsKeyDown(VK_LEFT);
-		bool right = false; // IsKeyDown(VK_RIGHT);
 		
-		bool priorOnGround = onGround;
-
-		if (yVelocity < 0)
-			for (size_t i = 0; i < -yVelocity; i++)
-				onGround = !obj.Move({ 0, -1 });
-		else if (yVelocity == 1)
-			onGround = !obj.Move({ 0, 1 });
-
-		cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
-
-		if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0, 0.5f);
 	}
 
-	Character(Engine::Layer* layer)
+	void PushBoxToDifferentLayer()
+	{
+		if (box != nullptr) // nullptr for seemingly no reason
+		{
+			box->EnterLayer(voidLayer);
+			box = nullptr;
+		}
+	}
+
+	Character(Engine::Layer* layer, Engine::Layer* voidLayer) : voidLayer(voidLayer)
 	{
 		groundHitSFX.LoadWavFile("assets/groundHit.wav");
 		jumpSFX.LoadWavFile("assets/jump.wav");
 
-		obj.pos = { 5, 2 };//
+		obj.pos = { 5, 2 };
 		obj.textures.resize(1);
 		obj.textures[0].Write(
 			{
@@ -73,10 +109,11 @@ struct Character
 				"/ \\"
 			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
-		obj.colliders.resize(3);
+		obj.colliders.resize(4);
 		obj.colliders[0].Simple(Engine::UPoint(1, 2), 1, Engine::Point(0, 1));
 		obj.colliders[1].Simple(Engine::UPoint(1, 2), 1, Engine::Point(1, 0));
 		obj.colliders[2].Simple(Engine::UPoint(1, 2), 1, Engine::Point(2, 1));
+		obj.colliders[3].Simple(Engine::UPoint(5, 5), 3, Engine::Point(-1, -1));
 
 		cam = Engine::Camera(Engine::Point( 0, 0 ), Engine::UPoint( 15, 15 ));
 
@@ -93,8 +130,11 @@ struct Character
 		Engine::Input::RegisterCallback("A", std::bind(&Character::Left, this));
 		Engine::Input::RegisterCallback(Engine::Input::K::left, std::bind(&Character::Left, this));
 
+		Engine::Input::RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this));
+		Engine::Input::RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this));
+
 		obj.OnEvent = std::bind(&Character::OnEvent, this, std::placeholders::_1);
-		layer->AddObject(&obj);
+		obj.EnterLayer(layer);
 	}
 };
 
@@ -134,7 +174,7 @@ struct GravityBox
 
 		obj.OnEvent = std::bind(&GravityBox::OnEvent, this, std::placeholders::_1);
 		
-		layer->AddObject(&obj);
+		obj.EnterLayer(layer);
 	}
 };
 
@@ -156,7 +196,7 @@ struct AutoUpdatingText
 		obj.textures.resize(1);
 		obj.pos = pos;
 		obj.OnEvent = std::bind(&AutoUpdatingText::OnEvent, this, std::placeholders::_1);
-		layer->AddObject(&obj);
+		obj.EnterLayer(layer);
 	}
 };
 
@@ -184,7 +224,9 @@ int main()
 	pmap = &map;
 
 	Engine::Layer layer;
+	Engine::Layer voidLayer;
 	map.AddLayer(&layer);
+	map.AddLayer(&voidLayer);
 
 	Engine::Camera camera({ 0, 0 }, { 50, 50 });
 	map.AddCamera(&camera, true);
@@ -214,7 +256,7 @@ int main()
 	worldProps.colliders[11].Simple(Engine::UPoint(2, 1), 0, Engine::Point(41, base + 13));
 	worldProps.colliders[12].Simple(Engine::UPoint(2, 1), 0, Engine::Point( 43, base + 14));
 	worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
-	layer.AddObject(&worldProps);
+	worldProps.EnterLayer(&layer);
 
 	Engine::Object frame(Engine::Point(0, 0), "L");
 	frame.textures.resize(4);
@@ -227,10 +269,10 @@ int main()
 	frame.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
 	frame.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 49));
 	frame.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
-	layer.AddObject(&frame);
+	frame.EnterLayer(&layer);
 
 	// Character character(&layer);
-	Character character(&layer);
+	Character character(&layer, &voidLayer);
 	map.AddCamera(&character.cam);
 
 	GravityBox gbA(&layer, {10, 20}, 1);
@@ -242,7 +284,7 @@ int main()
 	house.textures.resize(1);
 	Engine::Log("<Main> Loading house", RGBColors::blue);
 	house.textures[0].File("assets/house.ktecht", { 0, 0 });
-	layer.AddObject(&house);
+	house.EnterLayer(&layer);
 
 	Engine::Input::RegisterCallback("m", TurnOnCharacterCamera);
 

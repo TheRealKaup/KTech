@@ -12,17 +12,19 @@ bool Engine::Layer::RemoveObject(size_t index)
 	if (objects.size() < index)
 		return false;
 	
-	objects.erase(objects.begin() + index - 1);
+	objects[index]->parentLayer = nullptr;
+	objects.erase(objects.begin() + index);
 	return true;
 }
 
 bool Engine::Layer::RemoveObject(const std::string& name)
 {
-	for (int i = 0; i < objects.size(); i ++)
+	for (int i = 0; i < objects.size(); i++)
 	{
 		if (objects[i]->name == name)
 		{
-			objects.erase(objects.begin() + i - 1);
+			objects[i]->parentLayer = nullptr;
+			objects.erase(objects.begin() + i);
 			return true;
 		}
 	}
@@ -36,7 +38,8 @@ bool Engine::Layer::RemoveObject(Object* object)
 	{
 		if (objects[i] == object)
 		{
-			objects.erase(objects.begin() + i - 1);
+			objects[i]->parentLayer = nullptr;
+			objects.erase(objects.begin() + i);
 			removed = true;
 		}
 		else
