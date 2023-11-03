@@ -121,7 +121,7 @@ int main()
 		Time::CallInvocations();
 		map.CallOnTicks();
 
-		map.Render();
+		map.RenderReversed();
 		map.Draw();
 		Print();
 

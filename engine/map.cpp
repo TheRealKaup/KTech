@@ -24,6 +24,16 @@ bool Engine::Map::Render()
 	return false;
 }
 
+bool Engine::Map::RenderReversed()
+{
+	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
+	{
+		cameras[activeCameraI]->RenderReversed(layers);
+		return true;
+	}
+	return false;
+}
+
 bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)

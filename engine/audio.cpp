@@ -31,35 +31,29 @@ int Callback(
 	PaStreamCallbackFlags statusFlags,
 	void *userData)
 {
-	// start.SetToNow();
-	static bool firstSourceFilled;
 	static size_t f;
 
 	// Set unlimitedOutput to the first source (which saves memsetting it)
 	if (activeSources.size() > 0)
 	{
-		firstSourceFilled = true;
+		size_t s = 1;
 		// Set to first source (which saves a memset at the start)
 		if (activeSources[0]->channels == 2)
 		{
 			for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[0]->cur++)
 			{
+				// Unregister audio source if reached its end
 				if (activeSources[0]->cur >= activeSources[0]->endpointToPlay)
 				{
-					if (activeSources[0]->loopsToPlay > 0)
-					{
-						activeSources[0]->loopsToPlay--;
-						activeSources[0]->cur = activeSources[0]->startPoint;
-					}
-					else
-					{
-						activeSources[0]->playing = false;
-						activeSources.erase(activeSources.begin());
-						memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
-						firstSourceFilled = false;
-						break;
-					}
+					activeSources[0]->playing = false;
+					if (activeSources[0]->OnEnd) // Callback
+						activeSources[0]->OnEnd();
+					activeSources.erase(activeSources.begin());
+					memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
+					s--; // First audio source didn't last until the end of the buffer
+					break;
 				}
+				// Otherwise, populate output buffer
 				unlimitedOutput[f] = activeSources[0]->data[activeSources[0]->cur * 2] * activeSources[0]->volume;
 				unlimitedOutput[f + 1] = activeSources[0]->data[activeSources[0]->cur * 2 + 1] * activeSources[0]->volume;
 			}
@@ -68,49 +62,40 @@ int Callback(
 		{
 			for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[0]->cur++)
 			{				
+				// Unregister audio source if reached its end
 				if (activeSources[0]->cur >= activeSources[0]->endpointToPlay)
 				{
-					if (activeSources[0]->loopsToPlay > 0)
-					{
-						activeSources[0]->loopsToPlay--;
-						activeSources[0]->cur = activeSources[0]->startPoint;
-					}
-					else
-					{
-						activeSources[0]->playing = false;
-						activeSources.erase(activeSources.begin());
-						memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
-						firstSourceFilled = false;
-						break;
-					}
+					activeSources[0]->playing = false;
+					if (activeSources[0]->OnEnd) // Callback
+						activeSources[0]->OnEnd();
+					activeSources.erase(activeSources.begin());
+					memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
+					s--; // First audio source didn't last until the end of the buffer
+					break;
 				}
+				// Otherwise, populate output buffer
 				unlimitedOutput[f] = activeSources[0]->data[activeSources[0]->cur] * activeSources[0]->volume;
 				unlimitedOutput[f + 1] = activeSources[0]->data[activeSources[0]->cur] * activeSources[0]->volume;
 			}
 		}
 		// Add the other sources
-		for (size_t s = firstSourceFilled ? 1 : 0; s < activeSources.size(); s++)
+		for (; s < activeSources.size(); s++)
 		{
-
 			if (activeSources[s]->channels == 2)
 			{
 				for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[s]->cur++)
 				{
+					// Unregister audio source if reached its end
 					if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
 					{
-						if (activeSources[s]->loopsToPlay > 0) // Loop
-						{
-							activeSources[s]->loopsToPlay--;
-							activeSources[s]->cur = activeSources[s]->startPoint;
-						}
-						else
-						{
-							activeSources[s]->playing = false;
-							activeSources.erase(activeSources.begin() + s);
-							s--;
-							break;
-						}
+						activeSources[s]->playing = false;
+						if (activeSources[s]->OnEnd) // Callback
+							activeSources[s]->OnEnd();
+						activeSources.erase(activeSources.begin() + s);
+						s--;
+						break;
 					}
+					// Otherwise, populate output buffer
 					unlimitedOutput[f] += activeSources[s]->data[activeSources[s]->cur * 2] * activeSources[s]->volume;
 					unlimitedOutput[f + 1] += activeSources[s]->data[activeSources[s]->cur * 2 + 1] * activeSources[s]->volume;
 				}
@@ -119,21 +104,17 @@ int Callback(
 			{
 				for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[s]->cur++)
 				{				
+					// Unregister audio source if reached its end
 					if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
 					{
-						if (activeSources[s]->loopsToPlay > 0) // Loop
-						{
-							activeSources[s]->loopsToPlay--;
-							activeSources[s]->cur = activeSources[s]->startPoint;
-						}
-						else
-						{
-							activeSources[s]->playing = false;
-							activeSources.erase(activeSources.begin() + s);
-							s--;
-							break;
-						}
+						activeSources[s]->playing = false;
+						if (activeSources[s]->OnEnd) // Callback
+							activeSources[s]->OnEnd();
+						activeSources.erase(activeSources.begin() + s);
+						s--;
+						break;
 					}
+					// Otherwise, populate output buffer
 					unlimitedOutput[f] += activeSources[s]->data[activeSources[s]->cur] * activeSources[s]->volume;
 					unlimitedOutput[f + 1] += activeSources[s]->data[activeSources[s]->cur] * activeSources[s]->volume;
 				}
@@ -176,7 +157,8 @@ void Engine::TerminateAudio()
 	Pa_Terminate();
 }
 
-bool Engine::AudioSource::LoadWavFile(const std::string& fileName)
+Engine::AudioSource::AudioSource(const std::string& fileName, std::function<void()> OnEnd)
+	: OnEnd(OnEnd)
 {
 	int32_t temp = 0UL;
 	int16_t temp2 = 0UL;
@@ -185,7 +167,10 @@ bool Engine::AudioSource::LoadWavFile(const std::string& fileName)
 
 	// Couldn't open file
 	if (!file.is_open())
-		return false;
+	{
+		loaded = false;
+		return;
+	}
 	
 	// RIFF chunk
 	while (true) // Find the chunk
@@ -210,10 +195,16 @@ bool Engine::AudioSource::LoadWavFile(const std::string& fileName)
 	}
 	file.read((char*)&temp, 4); // FMT size -8 (16)
 	if (temp != 16) // something something 16 is for PCM?
-		return false;
+	{
+		loaded = false;
+		return;
+	}
 	file.read((char*)&temp2, 2); // Compression state
 	if (temp2 != 1) // Other than 1 means some form of compression.
-		return false;
+	{
+		loaded = false;
+		return;
+	}
 	file.read((char*)&channels, 2); // Channels
 	file.read((char*)&sampleRate, 4); // Sample rate
 	file.read((char*)&byteRate, 4); // Byte rate
@@ -244,11 +235,13 @@ bool Engine::AudioSource::LoadWavFile(const std::string& fileName)
 
 	frames = dataSize / blockAlign;
 	
-	return true;
+	loaded = true;
 }
 
-void Engine::AudioSource::Play(uint32_t start, uint32_t length, uint16_t loops, float volume)
+bool Engine::AudioSource::Play(uint32_t start, uint32_t length, float volume)
 {
+	if (!loaded)
+		return false;
 	playing = true;
 	this->volume = volume;
 	if (length == 0)
@@ -257,16 +250,14 @@ void Engine::AudioSource::Play(uint32_t start, uint32_t length, uint16_t loops, 
 		length = frames;
 	else
 		endpointToPlay = length + start;
-	loopsToPlay = loops;
 	cur = start;
 	startPoint = cur;
 	for (unsigned i = 0; i < activeSources.size(); i++)
 		if (activeSources[i] == this)
-			return; // Don't add to activeSources if already there.
+			return true; // Don't add to activeSources if already there.
 	activeSources.push_back(this);
+	return true;
 }
-
-Engine::AudioSource::AudioSource() {}
 
 void Engine::AudioSource::Pause()
 {

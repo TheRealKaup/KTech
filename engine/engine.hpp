@@ -580,8 +580,6 @@ namespace Engine
 		uint32_t frames = 0UL;
 		// The end point in samples
 		uint32_t endpointToPlay = 0UL;
-		// Loops to play
-		uint32_t loopsToPlay = 0UL;
 		// Start point to play in samples
 		uint32_t startPoint = 0UL;
 		// Volume
@@ -609,19 +607,22 @@ namespace Engine
 		// The audio in bytes after it was loaded.
 		int16_t* data = nullptr;
 
-		// Default constructer, doesn't do anything.
-		AudioSource();
+		std::function<void()> OnEnd;
+
+		bool loaded;
+
 		// Load .wav file.
 		// `fileName` - the name of the file.
 		// Returns true if succeeded
-		bool LoadWavFile(const std::string& fileName);
+		AudioSource(const std::string& fileName, std::function<void()> OnEnd = nullptr);
 
 		// Play the sound from the beginning.
 		// start - the start point in samples. 0 means the first sample.
 		// length - the length in samples. 0 means the entire sound.
-		// loops - how many times to loop. 0 and 1 mean play once. 
-		// a vector of floats between 0.0f to 1.0f, each element will be the volume of each corresponding channel.
-		void Play(uint32_t start = 0, uint32_t length = 0, uint16_t loops = 0, float volume = 1.0f);
+		// volume - a float between 0.0f to 1.0f.
+		// Returns false if the audio source isn't loaded. Otherwise, true.
+		// If the audio source is already playing, it will restart the playing.
+		bool Play(uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
 		// Pause playing the sound.
 		void Pause();
 		// Resume playing the sound.
@@ -635,17 +636,23 @@ namespace Engine
 		std::function<void()> OnTick = nullptr;
 		std::string name = "";
 		Point pos = Point(0, 0);
+		// The resolution of the camera, in cells. Changing this could potentially result in a segmentation fault. To change the resoultion, call `Camera::Resize()`.
 		UPoint res = UPoint(10, 10);
 		std::vector<std::vector<Cell>> image = {};
+		std::vector<std::vector<uint8_t>> fAlphaMap = {};
+		std::vector<std::vector<uint8_t>> bAlphaMap = {};
 
 		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 		
 		void Render(std::vector<Layer*> layers);
+		void RenderReversed(std::vector<Layer*> layers);
 		// This function will draw what was rendered (Camera::image's contents) into the "final" image (Engine::image), which will be printed at once with Engine::Print.
 		// pos is the position desired to draw the rendered image to the final image.
 		// left, top, right and bottom are a rectangle representing the area of the rendered image desired to draw to the final image.
 		// Setting right/bottom to 0 will default to the rendered image's size.
 		void Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
+		// Resizes `image`, `fAlphaMap` and `bAlphaMap`, and updates `res`,
+		void Resize(UPoint res);
 	};
 	
 	struct Map
@@ -661,6 +668,8 @@ namespace Engine
 
 		// Returns true if managed to render (active camera is valid), otherwise, false.
 		bool Render();
+		// Returns true if managed to render (active camera is valid), otherwise, false.
+		bool RenderReversed();
 		// Returns true if managed to draw (active camera is valid), otherwise, false.
 		bool Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
 		// Calls all of the OnTick callback functions of the `Camera`s, `Layer`s and `Object`s within this map, and this `Map`'s OnTick as well.

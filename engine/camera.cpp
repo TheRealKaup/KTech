@@ -1,19 +1,22 @@
 #include "engine.hpp"
 
 Engine::Camera::Camera(Point position, UPoint resolution, const std::string& name)
-	: pos(position), res(resolution) {}
+	: pos(position), res(resolution)
+{
+	image.resize(res.y, std::vector<Cell>(res.x));
+	fAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
+	bAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
+}
 
 static Engine::Layer* layer;
 static Engine::Object* obj;
 static Engine::Texture* texture;
-static size_t t, o, l, x, y;
+static long t, o, l, x, y;
 static Engine::Point final;
-static u_int32_t temp;
 
 void Engine::Camera::Render(std::vector<Layer*> layers)
 {
-	if (image.size() != res.y)
-		image.resize(res.y, std::vector<Cell>(res.x));
+	// Reset the image.
 	for (y = 0; y < res.y; y++)
 	{
 		for (x = 0; x < res.x; x++)
@@ -43,21 +46,12 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 
 				if (texture->simple)
 				{
-					for (y = 0; y < texture->size.y; y++)
+					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->size.y && final.y < res.y; y++, final.y++)
 					{
-						final.y = y + obj->pos.y + texture->pos_r.y - pos.y;
-						if (final.y < 0)
-							continue;
-						if (final.y >= res.y)
-							break;
-	
-						for (x = 0; x < texture->size.x; x++)
+						final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->size.x && final.x < res.x; x++, final.x++)
 						{
-							final.x = x + obj->pos.x + texture->pos_r.x - pos.x;
-							if (final.x < 0)
-								continue;
-							if (final.x >= res.x)
-								break;
 							if (texture->value.c != ' ')
 							{
 								image[final.y][final.x].c = texture->value.c;
@@ -73,22 +67,12 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 				}
 				else
 				{
-					for (y = 0; y < texture->t.size(); y++)
+					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->t.size() && final.y < res.y; y++, final.y++)
 					{
-						final.y = y + obj->pos.y + texture->pos_r.y - pos.y;
-						if (final.y < 0)
-							continue;
-						if (final.y >= res.y)
-							break;
-
-						for (x = 0; x < texture->t[y].size(); x++)
+						final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->t[y].size() && final.x < res.x; x++, final.x++)
 						{
-							final.x = x + obj->pos.x + texture->pos_r.x - pos.x;
-							if (final.x < 0)
-								continue;
-							if (final.x >= res.x)
-								break;
-
 							if (texture->t[y][x].c != ' ')
 							{
 								image[final.y][final.x].c = texture->t[y][x].c;
@@ -133,6 +117,204 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 	}
 }
 
+void Engine::Camera::RenderReversed(std::vector<Layer*> layers)
+{
+	// Reset the image and the alpha maps.
+	for (y = 0; y < res.y; y++)
+	{
+		for (x = 0; x < res.x; x++)
+		{
+			image[y][x].f = { 0, 0, 0 };
+			image[y][x].b = { 0, 0, 0 };
+			image[y][x].c = ' ';
+			fAlphaMap[y][x] = 255;
+			bAlphaMap[y][x] = 255;
+		}
+	}
+	static uint32_t fAlphaMapCounter = 0;
+	static uint32_t bAlphaMapCounter = 0;
+	fAlphaMapCounter = res.x * res.y;
+	bAlphaMapCounter = fAlphaMapCounter;
+
+	// std::cerr << "--- New Print:" << '\n';
+	// std::cerr << "F alphaMapCounter:" << fAlphaMapCounter << '\n';
+	// std::cerr << "B alphaMapCounter:" << bAlphaMapCounter << '\n';
+
+	// --== FOREGROUND ==--
+	for (l = layers.size() - 1; l >= 0 && fAlphaMapCounter > 0; l--)
+	{
+		if (!layers[l]->active)
+			continue;
+
+		layer = layers[l];
+
+		// `&& alphaMapCounter != 0` - proceed with rendering objects only if there are more free cells on the image.
+		for (o = layer->objects.size() - 1; o >= 0 && fAlphaMapCounter > 0; o--)
+		{
+			obj = layer->objects[o];
+			// `&& alphaMapCounter != 0` - proceed with rendering textures only if there are more free cells on the image.
+			for (t = obj->textures.size() - 1; t >= 0 && fAlphaMapCounter > 0; t--)
+			{
+				texture = &obj->textures[t];
+				
+				if (!texture->active)
+					continue;
+
+				if (texture->simple)
+				{
+					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->size.y && final.y < res.y; y++, final.y++)
+					{
+						final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->size.x && final.x < res.x; x++, final.x++)
+						{
+							if (image[final.y][final.x].c == ' ')
+								image[final.y][final.x].c = texture->value.c;
+							// Check if the cell is already filled
+							if (fAlphaMap[final.y][final.x] > 0)
+							{
+								image[final.y][final.x].f.r += texture->value.f.r * texture->value.f.a * fAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].f.g += texture->value.f.g * texture->value.f.a * fAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].f.b += texture->value.f.b * texture->value.f.a * fAlphaMap[final.y][final.x] / 65025;
+								fAlphaMap[final.y][final.x] = (255 - texture->value.f.a) * fAlphaMap[final.y][final.x] / 255;
+								// Update alphaMap is the cell is filled (could be optimized by not comparing it each cell)
+								if (fAlphaMap[final.y][final.x] == 0)
+									fAlphaMapCounter--;
+							}
+						}
+					}
+				}
+				else
+				{
+					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->t.size() && final.y < res.y; y++, final.y++)
+					{
+						final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->t[y].size() && final.x < res.x; x++, final.x++)
+						{
+							if (image[final.y][final.x].c == ' ')
+								image[final.y][final.x].c = texture->t[y][x].c;
+							// Check if the cell is already filled
+							if (fAlphaMap[final.y][final.x] > 0)
+							{
+								image[final.y][final.x].f.r += texture->t[y][x].f.r * texture->t[y][x].f.a * fAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].f.g += texture->t[y][x].f.g * texture->t[y][x].f.a * fAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].f.b += texture->t[y][x].f.b * texture->t[y][x].f.a * fAlphaMap[final.y][final.x] / 65025;
+								fAlphaMap[final.y][final.x] = (255 - texture->t[y][x].f.a) * fAlphaMap[final.y][final.x] / 255;
+								// Update alphaMap is the cell is filled (could be optimized by not comparing it each cell)
+								if (fAlphaMap[final.y][final.x] == 0)
+									fAlphaMapCounter--;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if (layer->frgba.a != 0)
+		{
+			for (size_t y = 0; y < res.y; y++)
+			{
+				for (size_t x = 0; x < res.x; x++)
+				{
+					image[y][x].f.r = layer->frgba.a * layer->frgba.r + (1.0f - layer->frgba.a) * image[y][x].f.r;
+					image[y][x].f.g = layer->frgba.a * layer->frgba.g + (1.0f - layer->frgba.a) * image[y][x].f.g;
+					image[y][x].f.b = layer->frgba.a * layer->frgba.b + (1.0f - layer->frgba.a) * image[y][x].f.b;
+				}
+			}
+		}
+	}
+
+	// --== BACKGROUND ==--
+	for (l = layers.size() - 1; l >= 0 && bAlphaMapCounter > 0; l--)
+	{
+		if (!layers[l]->active)
+			continue;
+
+		layer = layers[l];
+
+		// `&& alphaMapCounter != 0` - proceed with rendering objects only if there are more free cells on the image.
+		for (o = layer->objects.size() - 1; o >= 0 && bAlphaMapCounter > 0; o--)
+		{
+			obj = layer->objects[o];
+			// `&& alphaMapCounter != 0` - proceed with rendering textures only if there are more free cells on the image.
+			for (t = obj->textures.size() - 1; t >= 0 && bAlphaMapCounter > 0; t--)
+			{
+				texture = &obj->textures[t];
+				
+				if (!texture->active)
+					continue;
+
+				if (texture->simple)
+				{
+					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->size.y && final.y < res.y; y++, final.y++)
+					{
+						final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->size.x && final.x < res.x; x++, final.x++)
+						{
+							if (image[final.y][final.x].c == ' ')
+								image[final.y][final.x].c = texture->value.c;
+							// Check if the cell is already filled
+							if (bAlphaMap[final.y][final.x] > 0)
+							{
+								// It isn't, then draw
+								image[final.y][final.x].b.r += texture->value.b.r * texture->value.b.a * bAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].b.g += texture->value.b.g * texture->value.b.a * bAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].b.b += texture->value.b.b * texture->value.b.a * bAlphaMap[final.y][final.x] / 65025;
+								bAlphaMap[final.y][final.x] = (255 - texture->value.b.a) * bAlphaMap[final.y][final.x] / 255;
+								// Update alphaMap is the cell is filled (could be optimized by not comparing it each cell)
+								if (bAlphaMap[final.y][final.x] == 0)
+									bAlphaMapCounter--;
+							}
+						}
+					}
+				}
+				else
+				{
+					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->t.size() && final.y < res.y; y++, final.y++)
+					{
+						final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->t[y].size() && final.x < res.x; x++, final.x++)
+						{
+							if (image[final.y][final.x].c == ' ')
+								image[final.y][final.x].c = texture->t[y][x].c;
+							// Check if the cell is already filled
+							if (bAlphaMap[final.y][final.x] > 0)
+							{
+								image[final.y][final.x].b.r += texture->t[y][x].b.r * texture->t[y][x].b.a * bAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].b.g += texture->t[y][x].b.g * texture->t[y][x].b.a * bAlphaMap[final.y][final.x] / 65025;
+								image[final.y][final.x].b.b += texture->t[y][x].b.b * texture->t[y][x].b.a * bAlphaMap[final.y][final.x] / 65025;
+								bAlphaMap[final.y][final.x] = (255 - texture->t[y][x].b.a) * bAlphaMap[final.y][final.x] / 255;
+								// Update alphaMap is the cell is filled (could be optimized by not comparing it each cell)
+								if (bAlphaMap[final.y][final.x] == 0)
+									bAlphaMapCounter--;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (layer->brgba.a != 0)
+		{
+			for (size_t y = 0; y < res.y; y++)
+			{
+				for (size_t x = 0; x < res.x; x++)
+				{
+					image[y][x].b.r = layer->brgba.a * layer->brgba.r + (1.0f - layer->brgba.a) * image[y][x].b.r;
+					image[y][x].b.g = layer->brgba.a * layer->brgba.g + (1.0f - layer->brgba.a) * image[y][x].b.g;
+					image[y][x].b.b = layer->brgba.a * layer->brgba.b + (1.0f - layer->brgba.a) * image[y][x].b.b;
+				}
+			}
+		}
+	}
+
+	// std::cerr << "F alphaMapCounter:" << fAlphaMapCounter << '\n';
+	// std::cerr << "B alphaMapCounter:" << bAlphaMapCounter << '\n';
+}
+
 void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
 {
 	// Return if the image is sized 0
@@ -172,4 +354,18 @@ void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right
 			Engine::image[y - top + pos.y][x - left + pos.x] = image[y][x];
 		}
 	}
+}
+
+void Engine::Camera::Resize(UPoint _res)
+{
+	res = _res;
+	image.resize(_res.y);
+	fAlphaMap.resize(_res.y);
+	bAlphaMap.resize(_res.y);
+	for (y = 0; y < _res.y; y++)
+	{
+		image[y].resize(_res.x);
+		fAlphaMap[y].resize(_res.x);
+		bAlphaMap[y].resize(_res.x);
+	}	
 }

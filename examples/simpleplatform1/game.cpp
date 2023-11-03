@@ -6,8 +6,8 @@ Engine::Map* pmap;
 
 struct Character
 {
-	Engine::AudioSource jumpSFX;
-	Engine::AudioSource groundHitSFX;
+	Engine::AudioSource jumpSFX = Engine::AudioSource("assets/jump.wav");
+	Engine::AudioSource groundHitSFX = Engine::AudioSource("assets/groundHit.wav");
 
 	Engine::Layer* voidLayer;
 
@@ -26,7 +26,7 @@ struct Character
 	{
 		if (onGround) {
 			yVelocity -= jumpStreng;
-			jumpSFX.Play(0, 0, 0, 0.7f);
+			jumpSFX.Play(0, 0, 0.7f);
 		}
 	}
 
@@ -63,7 +63,7 @@ struct Character
 
 				cam.pos = { obj.pos.x - 6, obj.pos.y - 6 };
 
-				if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0, 0.5f);
+				if (!priorOnGround && onGround) groundHitSFX.Play(0, 0, 0.5f);
 				break;
 			}
 			case Engine::Object::EventType::onOverlap:
@@ -97,9 +97,6 @@ struct Character
 
 	Character(Engine::Layer* layer, Engine::Layer* voidLayer) : voidLayer(voidLayer)
 	{
-		groundHitSFX.LoadWavFile("assets/groundHit.wav");
-		jumpSFX.LoadWavFile("assets/jump.wav");
-
 		obj.pos = { 5, 2 };
 		obj.textures.resize(1);
 		obj.textures[0].Write(
@@ -238,7 +235,8 @@ int main()
 	Engine::Log("<Main> Loading assets/sky2.ktecht", RGBColors::blue);
 	worldProps.textures[1].File("assets/sky2.ktecht", { 0, 30 }), Engine::CellA(' ');
 	Engine::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
-	worldProps.textures[2].File("assets/land.ktecht", { 0, 20 });
+	for (size_t i = 2; i < 3; i++)
+		worldProps.textures[i].File("assets/land.ktecht", { 0, 20 });
 	
 	worldProps.colliders.resize(14);
 	uint8_t base = 29;
@@ -309,12 +307,15 @@ int main()
 			// continue;
 			if (charCamOn) {
 				map.cameras[0]->Render({ &layer, &darkLayer });
+				// map.cameras[0]->RenderReversed({ &layer, &darkLayer });
 				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
 				map.cameras[1]->Render(map.layers);
+				// map.cameras[1]->RenderReversed(map.layers);
 				map.cameras[1]->Draw({ 18, 18 }, 0, 0, 0, 0);
 			}
 			else {
 				map.cameras[0]->Render(map.layers);
+				// map.cameras[0]->RenderReversed(map.layers);
 				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
 			}
 			Engine::Print();
@@ -322,6 +323,8 @@ int main()
 		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;
 		// std::cout << "x=" << Engine::terminalSize.ws_col << ", y=" << Engine::terminalSize.ws_row << std::endl;
 		Engine::Time::WaitUntilNextTick();
+
+		// running = false;
 	}
 	
 	Engine::TerminateAudio();
