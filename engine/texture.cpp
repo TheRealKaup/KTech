@@ -11,14 +11,8 @@ void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
 {
 	simple = false;
 	pos_r = _pos;
-	
-	t.resize(_size.y, std::vector<CellA>(_size.y, _value));
-	for (std::vector<CellA>& row : t)
-	{
-		row.resize(_size.x);
-		for (CellA& cell : row)
-			cell = _value;
-	}
+	t.clear();
+	t.resize(_size.y, std::vector<CellA>(_size.x, _value));
 }
 
 Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
@@ -53,9 +47,8 @@ Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
 
 	Log("<Engine::Texture::File()> Resizing texture to fit texture in file.", RGB(128, 128, 255));
 	// Resize the texture
-	t.resize(maxTextureSize.y);
-	for (size_t y = 0; y < t.size(); y++)
-		t[y].resize(maxTextureSize.x, CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
+	t.clear();
+	t.resize(maxTextureSize.y, std::vector<CellA>(maxTextureSize.x));
 
 	Log("<Engine::Texture::File()> Reading rest of file and writing to texture.", RGB(128, 128, 255));
 	// Read and write to the texture	
@@ -71,11 +64,11 @@ Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
 		}
 	}
 
-		// Print old texture file
+	// Print old texture file
 	Log("<Engine::Texture::File()> Printing texture:", RGB(128, 128, 255));
-	for (const std::vector<CellA>& row : t)
+	for (std::vector<CellA>& row : t)
 	{
-		for (const CellA& cell : row)
+		for (CellA& cell : row)
 		{
 			std::cout << "\033[38;2;" << std::to_string(cell.f.r * cell.f.a / 255) << ';' << std::to_string(cell.f.g * cell.f.a / 255) << ';'<< std::to_string(cell.f.b * cell.f.a / 255) << 'm'
 				<< "\033[48;2;" << std::to_string(cell.b.r * cell.b.a / 255) << ';' << std::to_string(cell.b.g * cell.b.a / 255) << ';'<< std::to_string(cell.b.b * cell.b.a / 255) << 'm' << cell.c;
@@ -88,30 +81,6 @@ Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
     return maxTextureSize;
 }
 
-void Engine::Texture::ExportToFile(const std::string& fileName)
-{
-	std::ofstream file(fileName);
-	
-	UPoint maxTextureSize(0, t.size());
-
-	for (size_t y = 0; y < t.size(); y++)
-		if (t[y].size() > maxTextureSize.x)
-			maxTextureSize.x = t[y].size();
-
-	file.write((char*)&maxTextureSize, 8);
-
-	for (size_t y = 0; y < maxTextureSize.y; y++)
-	{
-		for (size_t x = 0; x < maxTextureSize.x; x++)
-		{
-			if (x < t[y].size())
-				file.write((char*)&t[y][x], 9);
-			else
-				file.write("\0\0\0\0\0\0\0\0\0", 9);
-		}
-	}
-}
-
 void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point _pos) {
 	simple = false;
 	pos_r = _pos;
@@ -120,29 +89,24 @@ void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA f
 	{
 		t[y].resize(stringVector[y].length());
 		for (size_t x = 0; x < stringVector[y].length(); x++)
-		{
-			t[y][x].c = stringVector[y][x];
-			t[y][x].f = frgba;
-			t[y][x].b = brgba;
-		}
-	}
+			t[y][x] = CellA(stringVector[y][x], frgba, brgba);
+	}	
 }
 
-void Engine::Texture::Resize(UPoint newSize, CellA newValue)
+void Engine::Texture::Resize(UPoint newSize, CellA _value)
 {
 	if (simple)
 	{
 		size = newSize;
-		value = newValue;
+		value = _value;
 	}
 	else
 	{
 		t.resize(newSize.y);
 		for (std::vector<CellA>& row : t)
-			row.resize(newSize.x, newValue);
+			row.resize(newSize.x, _value);
 	}
 }
-
 
 void Engine::Texture::SetCell(CellA _value)
 {
@@ -215,4 +179,28 @@ Engine::UPoint Engine::Texture::GetSize()
 		if (t[y].size() > size.x)
 			size.x = t[y].size();
 	return size;
+}
+
+void Engine::Texture::ExportToFile(const std::string& fileName)
+{
+	// Create/open file
+	std::ofstream file(fileName);
+	// Get the size of the texture
+	UPoint maxTextureSize(0, t.size());
+	for (size_t y = 0; y < t.size(); y++)
+		if (t[y].size() > maxTextureSize.x)
+			maxTextureSize.x = t[y].size();
+	// Write the size of the texture at the start of the file
+	file.write((char*)&maxTextureSize, 8);
+	// Write the texture itself
+	for (size_t y = 0; y < maxTextureSize.y; y++)
+	{
+		for (size_t x = 0; x < maxTextureSize.x; x++)
+		{
+			if (x < t[y].size())
+				file.write((char*)&t[y][x], 9);
+			else
+				file.write("\0\0\0\0\0\0\0\0\0", 9);
+		}
+	}
 }

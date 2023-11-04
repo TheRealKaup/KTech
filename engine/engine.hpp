@@ -456,10 +456,10 @@ namespace Engine
 		Engine::UPoint File(const std::string& fileName, Point relative_position);
 		// * CONSTRUCTOR * [Complex] Construct a texture by writing it (limited to single foreground and background RGBA values)
 		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point relative_position);
-		
+
 		// [Simple/Complex] Resize the texture, keeps previous values in the given size.
 		// `UPoint newSize` - The new rectangle size of the texture.
-		// `CellA newValue` - The value which only new cells will be set to. 
+		// `CellA newValue` - [Complex] The value which *only new cells* will be set to. [Simple] The new value *of all cells*.
 		void Resize(UPoint newSize, CellA newValue);
 		// [Simple/Complex] Change all the cells' values
 		void SetCell(CellA value);
@@ -471,10 +471,11 @@ namespace Engine
 		void SetCharacter(char value);
 		// [Simple/Complex] Change all the cells' alpha values
 		void SetAlpha(uint8_t value);
-		// [Complex] Export the texture to a file (existent or non existent), uses standard ktech texture file format.
-		void ExportToFile(const std::string& fileName);
+		
 		// [Simple/Complex] Get the size of the texture.
 		UPoint GetSize();
+		// [Complex] Export the texture to a file (existent or non existent), uses standard ktech texture file format.
+		void ExportToFile(const std::string& fileName);
 	};
 
 	struct Collider

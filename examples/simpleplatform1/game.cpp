@@ -235,8 +235,7 @@ int main()
 	Engine::Log("<Main> Loading assets/sky2.ktecht", RGBColors::blue);
 	worldProps.textures[1].File("assets/sky2.ktecht", { 0, 30 }), Engine::CellA(' ');
 	Engine::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
-	for (size_t i = 2; i < 3; i++)
-		worldProps.textures[i].File("assets/land.ktecht", { 0, 20 });
+	worldProps.textures[2].File("assets/land.ktecht", { 0, 20 });
 	
 	worldProps.colliders.resize(14);
 	uint8_t base = 29;
@@ -269,7 +268,6 @@ int main()
 	frame.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
 	frame.EnterLayer(&layer);
 
-	// Character character(&layer);
 	Character character(&layer, &voidLayer);
 	map.AddCamera(&character.cam);
 

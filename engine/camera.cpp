@@ -16,6 +16,10 @@ static Engine::Point final;
 
 void Engine::Camera::Render(std::vector<Layer*> layers)
 {
+	static RGB tempFRGB;
+	static RGB tempBRGB;
+	static uint8_t tempAlpha;
+
 	// Reset the image.
 	for (y = 0; y < res.y; y++)
 	{
@@ -44,9 +48,17 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 				if (!texture->active)
 					continue;
 
+				// Simple texture
 				if (texture->simple)
 				{
 					final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					// Precalculate fixed values (8 bit depth)
+					//             8 ->                 16 ->                32 ->          8.     8 ->                 16 ->                32 ->          8.     8 ->                 16 ->                32 ->          8.
+					tempFRGB = RGB(texture->value.f.r * texture->value.f.a * layer->alpha / 65025, texture->value.f.g * texture->value.f.a * layer->alpha / 65025, texture->value.f.b * texture->value.f.a * layer->alpha / 65025);
+					tempBRGB = RGB(texture->value.b.r * texture->value.b.a * layer->alpha / 65025, texture->value.b.g * texture->value.b.a * layer->alpha / 65025, texture->value.b.b * texture->value.b.a * layer->alpha / 65025);
+					//                   8 ->                 16 ->           8.
+					tempAlpha = (65025 - texture->value.f.a * layer->alpha) / 255;
+
 					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->size.y && final.y < res.y; y++, final.y++)
 					{
 						final.x = obj->pos.x + texture->pos_r.x - pos.x;
@@ -55,16 +67,19 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 							if (texture->value.c != ' ')
 							{
 								image[final.y][final.x].c = texture->value.c;
-								image[final.y][final.x].f.r = (texture->value.f.r * texture->value.f.a * layer->alpha + image[final.y][final.x].f.r * (65025 - texture->value.f.a * layer->alpha)) / 65025;
-								image[final.y][final.x].f.g = (texture->value.f.g * texture->value.f.a * layer->alpha + image[final.y][final.x].f.g * (65025 - texture->value.f.a * layer->alpha)) / 65025;
-								image[final.y][final.x].f.b = (texture->value.f.b * texture->value.f.a * layer->alpha + image[final.y][final.x].f.b * (65025 - texture->value.f.a * layer->alpha)) / 65025;;
+								//                            8.           8 ->                          16 ->       8.
+								image[final.y][final.x].f.r = tempFRGB.r + image[final.y][final.x].f.r * tempAlpha / 255;
+								image[final.y][final.x].f.g = tempFRGB.g + image[final.y][final.x].f.g * tempAlpha / 255;
+								image[final.y][final.x].f.b = tempFRGB.b + image[final.y][final.x].f.b * tempAlpha / 255;
 							}
-							image[final.y][final.x].b.r = (texture->value.b.r * texture->value.b.a * layer->alpha + image[final.y][final.x].b.r * (65025 - texture->value.b.a * layer->alpha)) / 65025;
-							image[final.y][final.x].b.g = (texture->value.b.g * texture->value.b.a * layer->alpha + image[final.y][final.x].b.g * (65025 - texture->value.b.a * layer->alpha)) / 65025;
-							image[final.y][final.x].b.b = (texture->value.b.b * texture->value.b.a * layer->alpha + image[final.y][final.x].b.b * (65025 - texture->value.b.a * layer->alpha)) / 65025;
+							//                            8.           8 ->                          16 ->       8.
+							image[final.y][final.x].b.r = tempBRGB.r + image[final.y][final.x].b.r * tempAlpha / 255;
+							image[final.y][final.x].b.g = tempBRGB.g + image[final.y][final.x].b.g * tempAlpha / 255;
+							image[final.y][final.x].b.b = tempBRGB.b + image[final.y][final.x].b.b * tempAlpha / 255;
 						}
 					}
 				}
+				// Complex texture
 				else
 				{
 					final.y = obj->pos.y + texture->pos_r.y - pos.y;
@@ -75,14 +90,22 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 						{
 							if (texture->t[y][x].c != ' ')
 							{
-								image[final.y][final.x].c = texture->t[y][x].c;
-								image[final.y][final.x].f.r = (texture->t[y][x].f.r * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.r * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
-								image[final.y][final.x].f.g = (texture->t[y][x].f.g * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.g * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;
-								image[final.y][final.x].f.b = (texture->t[y][x].f.b * texture->t[y][x].f.a * layer->alpha + image[final.y][final.x].f.b * (65025 - texture->t[y][x].f.a * layer->alpha)) / 65025;;
+								image[final.y][final.x].c = texture->t[y][x].c; // Character
+								// Precalculate foreground * layer alpha (8 bit depth)
+								//          8 ->                   16 ->          8.
+								tempAlpha = texture->t[y][x].f.a * layer->alpha / 255;
+								//                            (8 ->                   16.         8 ->                           16.) 16 ->          8.
+								image[final.y][final.x].f.r = (texture->t[y][x].f.r * tempAlpha + image[final.y][final.x].f.r * (255 - tempAlpha)) / 255;
+								image[final.y][final.x].f.g = (texture->t[y][x].f.g * tempAlpha + image[final.y][final.x].f.g * (255 - tempAlpha)) / 255;
+								image[final.y][final.x].f.b = (texture->t[y][x].f.b * tempAlpha + image[final.y][final.x].f.b * (255 - tempAlpha)) / 255;
 							}
-							image[final.y][final.x].b.r = (texture->t[y][x].b.r * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.r * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
-							image[final.y][final.x].b.g = (texture->t[y][x].b.g * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.g * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
-							image[final.y][final.x].b.b = (texture->t[y][x].b.b * texture->t[y][x].b.a * layer->alpha + image[final.y][final.x].b.b * (65025 - texture->t[y][x].b.a * layer->alpha)) / 65025;
+							// Precalculate background * layer alpha (8 bit depth)
+							//          8 ->                    16 ->                 8.
+							tempAlpha = texture->t[y][x].b.a * layer->alpha / 255;
+							//                            (8 ->                   16.         8 ->                           16.) 16 ->          8.
+							image[final.y][final.x].b.r = (texture->t[y][x].b.r * tempAlpha + image[final.y][final.x].b.r * (255 - tempAlpha)) / 255;
+							image[final.y][final.x].b.g = (texture->t[y][x].b.g * tempAlpha + image[final.y][final.x].b.g * (255 - tempAlpha)) / 255;
+							image[final.y][final.x].b.b = (texture->t[y][x].b.b * tempAlpha + image[final.y][final.x].b.b * (255 - tempAlpha)) / 255;
 						}
 					}
 				}
