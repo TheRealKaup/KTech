@@ -168,7 +168,7 @@ void Engine::Texture::SetAlpha(uint8_t _value)
 	}
 }
 
-Engine::UPoint Engine::Texture::GetSize()
+Engine::UPoint Engine::Texture::GetSize() const
 {
 	// If the texture is simple, then `size` already represents the texture's size.
 	if (simple)
@@ -181,7 +181,7 @@ Engine::UPoint Engine::Texture::GetSize()
 	return size;
 }
 
-void Engine::Texture::ExportToFile(const std::string& fileName)
+void Engine::Texture::ExportToFile(const std::string& fileName) const
 {
 	// Create/open file
 	std::ofstream file(fileName);

@@ -14,7 +14,7 @@ int Engine::Map::AddLayer(Layer* layer)
 	return layers.size() - 1;
 }
 
-bool Engine::Map::Render()
+bool Engine::Map::Render() const
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{
@@ -24,17 +24,17 @@ bool Engine::Map::Render()
 	return false;
 }
 
-bool Engine::Map::RenderReversed()
+bool Engine::Map::RenderReversed() const
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{
-		cameras[activeCameraI]->RenderReversed(layers);
+		// cameras[activeCameraI]->RenderReversed(layers);
 		return true;
 	}
 	return false;
 }
 
-bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
+bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) const
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{
@@ -44,7 +44,7 @@ bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, u
 	return false;
 }
 
-void Engine::Map::CallOnTicks()
+void Engine::Map::CallOnTicks() const
 {
 	if (OnTick)
 		OnTick();

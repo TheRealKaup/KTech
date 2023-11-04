@@ -7,16 +7,6 @@ int Engine::Layer::AddObject(Object* object)
 	return objects.size() - 1;
 }
 
-bool Engine::Layer::RemoveObject(size_t index)
-{
-	if (objects.size() < index)
-		return false;
-	
-	objects[index]->parentLayer = nullptr;
-	objects.erase(objects.begin() + index);
-	return true;
-}
-
 bool Engine::Layer::RemoveObject(const std::string& name)
 {
 	for (int i = 0; i < objects.size(); i++)
@@ -46,4 +36,12 @@ bool Engine::Layer::RemoveObject(Object* object)
 			i++;
 	}
 	return removed;
+}
+
+Engine::Layer::~Layer()
+{
+	// Reset the `parentLayer` of the objects that have it set to this layer
+	for (Object*& obj : objects)
+		if (obj->parentLayer == this)
+			obj->parentLayer = nullptr;
 }

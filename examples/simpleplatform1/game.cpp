@@ -228,7 +228,7 @@ int main()
 	Engine::Camera camera({ 0, 0 }, { 50, 50 });
 	map.AddCamera(&camera, true);
 
-	Engine::Object worldProps({ 1, 1 }, "");
+	Engine::Object worldProps({ 1, 1 }, &layer);
 	worldProps.textures.resize(3);
 	Engine::Log("<Main> Loading assets/sky.ktecht", RGBColors::blue);
 	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
@@ -253,9 +253,8 @@ int main()
 	worldProps.colliders[11].Simple(Engine::UPoint(2, 1), 0, Engine::Point(41, base + 13));
 	worldProps.colliders[12].Simple(Engine::UPoint(2, 1), 0, Engine::Point( 43, base + 14));
 	worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
-	worldProps.EnterLayer(&layer);
 
-	Engine::Object frame(Engine::Point(0, 0), "L");
+	Engine::Object frame(Engine::Point(0, 0), &layer, "L");
 	frame.textures.resize(4);
 	frame.textures[0].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
 	frame.textures[1].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
@@ -266,7 +265,6 @@ int main()
 	frame.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
 	frame.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 49));
 	frame.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
-	frame.EnterLayer(&layer);
 
 	Character character(&layer, &voidLayer);
 	map.AddCamera(&character.cam);
@@ -275,23 +273,22 @@ int main()
 	GravityBox gbB(&layer, {15, 20}, 2);
 	GravityBox gbC(&layer, {30, 20}, 3);
 
-	Engine::Object house({ 20, 32 }, "");
+	Engine::Object house({ 20, 32 }, &layer, "");
 
 	house.textures.resize(1);
 	Engine::Log("<Main> Loading house", RGBColors::blue);
 	house.textures[0].File("assets/house.ktecht", { 0, 0 });
-	house.EnterLayer(&layer);
 
 	Engine::Input::RegisterCallback("m", TurnOnCharacterCamera);
 
 	Engine::Layer darkLayer;
 	darkLayer.alpha = 127;
 	
-	AutoUpdatingText audioPerformance(&Engine::Time::potentialfps, {1, 1}, &layer);
+	AutoUpdatingText audioPerformance(&Engine::Time::tpsPotential, {1, 1}, &layer);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 
-	Engine::Time::tps = 24;
+	Engine::Time::tpsLimit = 24;
 
 	while (Engine::running)
 	{

@@ -1,11 +1,5 @@
 #include "engine.hpp"
 
-/*
-		// Used if the collider is complex.
-		// A 2D boolean vector 
-		std::vector<std::vector<bool>> c = {};
-*/
-
 void Engine::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
 {
     simple = true;

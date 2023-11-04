@@ -28,7 +28,7 @@ private:
 			currentDigit--;
 			obj.textures[0].t[0][currentDigit].c = ' ';
 		}
-		else if (Engine::Input::IsNum())
+		else if (Engine::Input::Between('0', '9'))
 		{
 			if (currentDigit == maxDigits)
 				return;
@@ -36,7 +36,7 @@ private:
 			obj.textures[0].t[0][currentDigit].c = Engine::Input::input.at(0);
 			currentDigit++;
 
-			visibleNumber = visibleNumber * 10 + Engine::Input::GetNum();
+			visibleNumber = visibleNumber * 10 + Engine::Input::GetInt();
 		}
 
 		number = visibleNumber;

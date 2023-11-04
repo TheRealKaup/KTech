@@ -46,6 +46,13 @@ namespace Engine
 
 	inline bool running = true;
 
+	// Reference to the size of the terminal, changing this won't change the terminal's size.
+	inline winsize terminalSize;
+	// The final image that will be printed. This allows multiple cameras to print at the same time
+	extern std::vector<std::vector<Cell>> image;
+	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
+	inline std::string stringImage;
+
 	// Collision Result
 	enum class CR : uint8_t
 	{
@@ -59,122 +66,17 @@ namespace Engine
 		{ CR::O, CR::O, CR::O } // Overlappable - 2
 	};
 
-	// Reference to the size of the terminal, changing this won't change the terminal's size.
-	inline winsize terminalSize;
-	// The final image that will be printed. This allows multiple cameras to print at the same time
-	extern std::vector<std::vector<Cell>> image;
-	// Instead of allocating a string (that will be printed to the console) every print, it is kept for next prints.
-	inline std::string stringImage;
-
 	// Keyboard input; input handlers, input loop...
 	namespace Input
 	{
-		// Key values
-		namespace K
-		{
-			constexpr char const* up = "\x1b[A";
-			constexpr char const* down = "\x1b[B";
-			constexpr char const* right = "\x1b[C";
-			constexpr char const* left = "\x1b[D";
-
-			constexpr char const* return_ = "\x0a";
-			constexpr char const* backspace = "\x7f";
-			constexpr char const* escape = "\x1b";
-
-			constexpr char const* pageUp = "\x1b[5~";
-			constexpr char const* pageDown = "\x1b[6~";
-			constexpr char const* home = "\x1b[H";
-			constexpr char const* end = "\x1b[F";
-			constexpr char const* insert = "\x1b[2~";
-			constexpr char const* delete_ = "\x1b[3~";
-			
-			constexpr char const* f1 = "\x1bOP";
-			constexpr char const* f2 = "\x1bOQ";
-			constexpr char const* f3 = "\x1bOR";
-			constexpr char const* f4 = "\x1bOS";
-			constexpr char const* f5 = "\x1b[15~";
-			constexpr char const* f6 = "\x1b[17~";
-			constexpr char const* f7 = "\x1b[18~";
-			constexpr char const* f8 = "\x1b[19~";
-			constexpr char const* f9 = "\x1b[20~";
-			constexpr char const* f10 = "\x1b[21~";
-			// No F11 because of fullscreen
-			constexpr char const* f12 = "\x1b[24~";
-
-			constexpr char const* tab = "\x09";
-			
-			namespace Shift
-			{
-				constexpr char const* return_ = "\x1bOM";
-				
-				constexpr char const* delete_ = "\x1b[3;2~";
-				
-				constexpr char const* tab = "\x1b[Z";
-			}
-
-			namespace Ctrl
-			{
-				constexpr char const* up = "\33[1;5A";
-				constexpr char const* down = "\33[1;5B";
-				constexpr char const* right = "\33[1;5C";
-				constexpr char const* left = "\33[1;5D";
-
-				constexpr char const* pageUp = "\x1b[5;5~";
-				constexpr char const* pageDown = "\x1b[6;5~";
-				constexpr char const* home = "\x1b[1;5H";
-				constexpr char const* end = "\x1b[1;5F";
-				constexpr char const* delete_ = "\x1b[3;5~";
-
-				constexpr char const* backspace = "\x08";
-			}
-
-			namespace Alt
-			{
-				constexpr char const* up = "\33[1;3A";
-				constexpr char const* down = "\33[1;3B";
-				constexpr char const* right = "\33[1;3C";
-				constexpr char const* left = "\33[1;3D";
-
-				constexpr char const* return_ = "\x1b\x0a";
-				constexpr char const* backspace = "\x1b\x7f";
-				constexpr char const* escape = "\x1b\x1b";
-
-				constexpr char const* pageUp = "\x1b[5;3~";
-				constexpr char const* pageDown = "\x1b[6;3~";
-				constexpr char const* home = "\x1b[1;3H";
-				constexpr char const* end = "\x1b[1;3F";
-				constexpr char const* insert = "\x1b[2;3~";
-				constexpr char const* delete_ = "\x1b[3;3~";
-			}
-
-			namespace CtrlAlt
-			{
-				constexpr char const* up = "\33[1;7A";
-				constexpr char const* down = "\33[1;7B";
-				constexpr char const* right = "\33[1;7C";
-				constexpr char const* left = "\33[1;7D";
-
-				constexpr char const* pageUp = "\x1b[5;7~";
-				constexpr char const* pageDown = "\x1b[6;7~";
-				constexpr char const* home = "\x1b[1;7H";
-				constexpr char const* end = "\x1b[1;7F";
-				constexpr char const* insert = "\x1b[2;7~";
-			}
-
-			namespace CtrlShift
-			{
-				constexpr char const* up = "\33[1;6A";
-				constexpr char const* down = "\33[1;6B";
-				constexpr char const* right = "\33[1;6C";
-				constexpr char const* left = "\33[1;6D";
-			}
-		};
+		// Input key values (declared at the end of this file)
+		namespace K {};
 
 		struct Callback
 		{
 			bool enabled = true;
 			std::function<void()> callback;
-			inline Callback(std::function<void()> callback) : callback(callback) {}
+			inline Callback(const std::function<void()>& callback) : callback(callback) {}
 		};
 
 		struct BasicHandler
@@ -183,7 +85,7 @@ namespace Engine
 			{
 				BasicHandler* parentHandler;
 				bool onTick;
-				inline BasicCallback(std::function<void()> callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
+				inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
 			};
 			inline static std::vector<BasicHandler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
 			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
@@ -197,7 +99,7 @@ namespace Engine
 			struct RangedCallback : Callback
 			{
 				RangedHandler* parentHandler;
-				inline RangedCallback(std::function<void()> callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
+				inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
 			};
 			inline static std::vector<RangedHandler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
 			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
@@ -231,8 +133,6 @@ namespace Engine
 
 		// The last input as the engine received it, including escape codes.
 		extern std::string input;
-		// You can use and `Engine::Input::handlers` to get some more information about the handler which last called.
-		extern size_t handlerIndex;
 
 		// Register an input handler in order to get your function called on a keyboard input event.
 		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
@@ -243,12 +143,12 @@ namespace Engine
 		// which in the case of the `Arrow Up` key, it's `"\033[A"`.
 		// Since it is hard to remember all of the escape codes, I have made for you some macros in `config.hpp`, such as `kUp` and `F3`
 		// `onTick` - False: calls the moment input is received. True: stores the input and calls once per tick, at the start of the tick.
-		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, std::function<void()> callback, bool onTick = false);
+		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		// Register an input handler that would be called if a key between the given keys are detected.
 		// This is majorly better in initialzation speed and memory size than `RegisterCallback()` when it comes to registering a bunch of keys that are next to each other in the ASCII table.
 		// For example, field widgets use this.
 		// The `onTick` feature is not possible with the type of the callback's handler.
-		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, std::function<void()> callback);
+		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
 		// Get inputs (and calls registered input handler accordingly).
 		// Returns the input (also updates Engine::Input::buf).
 		std::string& Get();
@@ -271,77 +171,75 @@ namespace Engine
 		bool Smaller(char charKey);
 		// Returns true if the last input is between or equal to the specified keys.
 		bool Between(char charKey1, char charKey2);
-		// Returns true if the last input is a number
-		bool IsNum();
-		// Returns the last value as a number
-		uint8_t GetNum();
+		// Returns the last input as an integer (assumes that the input is a digit character digit)
+		uint8_t GetInt();
 	}
 
-	// Time management; invocations, tps, fps...
+	// Time management; invocations, tps...
 	namespace Time
 	{
+		enum class Measurement
+		{
+			ticks,
+			seconds,
+			milliseconds,
+			microseconds
+		};
+
 		// Time point saving tool, std::chrono wrapper
 		struct TimePoint
 		{
 			// The std::chrono time point
 			std::chrono::high_resolution_clock::time_point chronoTimePoint;
-
-			// The default constructor will set the time point to the time it was created
-			TimePoint();
-
 			// Will reset the time point to the current time
 			void SetToNow();
-
-			// Get an int which represents the time point in seconds
-			long Seconds();
-			// Get an int which represents the time point in milliseconds
-			long Milliseconds();
-			// Get an int which represents the time point in microseconds
-			long Microseconds();
-			// Get an int which represents the time point in nanoseconds
-			long Nanoseconds();
+			// Get an int which represents the time point in ticks, seconds, milliseconds or microseconds
+			long GetInt(Measurement timeMeasurement) const;
+			// The default constructor will set the time point to the time it was created
+			TimePoint();
 		};
 
-		struct Invocation
-		{
-			std::function<void()> callback;
-			uint32_t ticksLeft; // Current ticks left in this instance
-			inline Invocation(std::function<void()> callback, uint32_t ticks)
-				: callback(callback), ticksLeft(ticks) {}
-		};
+		// The start of the program.
+		inline const TimePoint startTP;
+		// The start of this current tick (updated by `StartThisTick()`).
+		inline TimePoint thisTickStartTP;
 
-		inline int16_t tps = 24;
+		// Miximum (limit) for the ticks per second. Set this at any point. 
+		inline int16_t tpsLimit = 24;
+		// Actual current ticks per second value.
+		extern float tps;
+		// The ticks per second value if the game loop wasn't limited by `tpsLimit`.
+		extern float tpsPotential;
+		// The amount of time that passed between the last tick and the tick before it, in microseconds (updated by `WaitUntilNextTick()`).
 		extern int32_t deltaTime;
-		extern TimePoint thisTickStartTP;
-		extern float potentialfps;
-		extern float fps;
-		extern TimePoint engineStartTP;
-		extern int32_t totalTicks;
-		inline std::vector<Invocation*> invocations;
+		// The counter of the total ticks since the game started. Counted by `WaitUntilNextTick()`, each call it adds 1.
+		inline int32_t ticksCounter = 0;
 		
-		enum class Measurement
-		{
-			ticks,
-			seconds,
-			milliseconds
-		};
-		// Add a callback function to the `Engine::Time::invocations` vector, which will be called in a given time by `CallInvocations`.
-		// `std::function<void()> callback` - your callback function.
-		// `uint32_t` time - the given time.
-		// `TimeMeasurement timeMeasurement` - the time measurement for the given time, can be in ticks, seconds, milliseconds or microseconds (last three are converted into ticks).
-		// (optional) `uint32_t instances = 1` - how many times sequentially to invoke this callback function.
-		Invocation* Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement);
-		// Cancel an invocation so the callback function will not be called (also deletes the invocation's memory).
-		// returns true if found the invocation and removed it.
-		bool CancelInvocation(Invocation* invocation);
-
-		// Make the invocations system proceed to the next tick (place inside game loop).
-		void CallInvocations();
-
+		// Call this at the start of each tick so `WaitUntilNextTick()` can appropriately suspend the thread between the ticks in order to limit the TPS.
 		inline void StartThisTick() { Time::thisTickStartTP.SetToNow(); }
 		// Suspend the thread the amount of time should be left for the tick according to `tps`.
 		// Also adds 1 to `totalTicks` and resets `thisTickStartTP`.
 		void WaitUntilNextTick();
+		
+		struct Invocation
+		{
+			inline static std::vector<Invocation*> invocations;
+			std::function<void()> callback;
+			uint32_t ticksLeft; // Current ticks left in this instance
+			inline Invocation(const std::function<void()>& callback, uint32_t ticks)
+				: callback(callback), ticksLeft(ticks) {}
+		};
+		// Add a callback function to the `Engine::Time::invocations` vector, which will be called in a given time by `CallInvocations`.
+		// `std::function<void()> callback` - your callback function.
+		// `uint32_t` time - the given time.
+		// `TimeMeasurement timeMeasurement` - the time measurement for the given time, can be in ticks, seconds, milliseconds or microseconds
+		// (optional) `uint32_t instances = 1` - how many times sequentially to invoke this callback function.
+		Invocation* Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement);
+		// Cancel an invocation so the callback function will not be called (also deletes the invocation's memory).
+		// returns true if found the invocation and removed it.
+		bool CancelInvocation(Invocation* invocation);
+		// Make the invocations system proceed to the next tick (place inside game loop).
+		void CallInvocations();
 	}
 
 	struct RGB
@@ -356,45 +254,6 @@ namespace Engine
 		inline constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255) : r(red), g(green), b(blue), a(alpha) {}
 		inline constexpr RGBA(RGB rgb, uint8_t alpha) : r(rgb.r), g(rgb.g), b(rgb.b), a(alpha) {}
 	};
-	
-	namespace RGBColors
-	{
-		constexpr RGB red = RGB(255, 0, 0);
-		constexpr RGB orange = RGB(255, 128, 0);
-		constexpr RGB yellow = RGB(255, 255, 0);
-		constexpr RGB lime = RGB(128, 255, 0);
-		constexpr RGB green = RGB(0, 255, 0);
-		constexpr RGB mint = RGB(0, 255, 128);
-		constexpr RGB cyan = RGB(0, 255, 255);
-		constexpr RGB blue = RGB(0, 128, 255);
-		constexpr RGB primaryBlue = RGB(0, 0, 255);
-		constexpr RGB purple = RGB(128, 0, 255);
-		constexpr RGB pink = RGB(255, 0, 255);
-		constexpr RGB hotPink = RGB(255, 0, 128);
-		constexpr RGB white = RGB(255, 255, 255);
-		constexpr RGB gray = RGB(160, 160, 160);
-		constexpr RGB black = RGB(0, 0, 0);
-	}
-
-	namespace RGBAColors
-	{
-		constexpr RGBA red = RGBA(255, 0, 0, 255);
-		constexpr RGBA orange = RGBA(255, 128, 0, 255);
-		constexpr RGBA yellow = RGBA(255, 255, 0, 255);
-		constexpr RGBA lime = RGBA(128, 255, 0, 255);
-		constexpr RGBA green = RGBA(0, 255, 0, 255);
-		constexpr RGBA mint = RGBA(0, 255, 128, 255);
-		constexpr RGBA cyan = RGBA(0, 255, 255, 255);
-		constexpr RGBA blue = RGBA(0, 128, 255, 255);
-		constexpr RGBA primaryBlue = RGBA(0, 0, 255, 255);
-		constexpr RGBA purple = RGBA(128, 0, 255, 255);
-		constexpr RGBA pink = RGBA(255, 0, 255, 255);
-		constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
-		constexpr RGBA white = RGBA(255, 255, 255, 255);
-		constexpr RGBA gray = RGBA(160, 160, 160, 255);
-		constexpr RGBA black = RGBA(0, 0, 0, 255);
-		constexpr RGBA transparent = RGBA(0, 0, 0, 0);
-	}
 
 	struct Point
 	{
@@ -473,9 +332,9 @@ namespace Engine
 		void SetAlpha(uint8_t value);
 		
 		// [Simple/Complex] Get the size of the texture.
-		UPoint GetSize();
+		UPoint GetSize() const;
 		// [Complex] Export the texture to a file (existent or non existent), uses standard ktech texture file format.
-		void ExportToFile(const std::string& fileName);
+		void ExportToFile(const std::string& fileName) const;
 	};
 
 	struct Collider
@@ -528,51 +387,68 @@ namespace Engine
 
 		enum class EventType : uint8_t
 		{
-			onTick,
-			onPushed,
-			onPush,
-			onBlocked,
-			onBlock,
-			onOverlap,
-			onOverlapExit,
-			onOverlapped,
-			onOverlappedExit
+			onTick, // Called by `Map::CallOnTicks()`.
+			onPushed, // A different object (`otherObject`) pushed this object.
+			onPush, // This object pushed a different object (`otherObject`)
+			onBlocked, // A different object (`otherObject`) blocked this object
+			onBlock, // This object blocked a different object (`otherObject`)
+			onOverlap, // This object entered an overlap with a different object (`otherObject`)
+			onOverlapExit, // This object exited an overlap with a different object (`otherObject`)
+			onOverlapped, // A different object (`otherObject`) entered an overlap with this object
+			onOverlappedExit // A different object (`otherObject`) exited an overlap with this object
 		};
-		std::function<void(EventType)> OnEvent;
-
-		void EnterLayer(Layer* layer);
-		
-		// Tries to move the object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
+		// Callback function that gets called each time one of the events listed in the `EventType` enum occurs.
+		// EventType - specifies which type of event this call is for.
+		std::function<void(EventType)> OnEvent = nullptr;
+		// Tries to move this object by processing colliders in the object's parent layer and determining if the object should move, push, or be blocked.
+		// Returns `true` if managed to move, returns `false` if didn't manage to move.
 		bool Move(Point dir);
-
-		Object(Point position = Point(0, 0), const std::string& objectName = "");
+		
+		// Add the object to a layer.
+		// If the object is already in a layer, which should be specified by `parentLayer`, then first remove this object from the old parent layer.
+		void EnterLayer(Layer* layer);
+		// `Point position` - 2D position, not relative to anything.
+		// `Layer* layer` - the layer to automatically make the object enter into.
+		// `std::string objectName` - The name for the object.
+		Object(Point position = Point(0, 0), Layer* layer = nullptr, const std::string& objectName = "");
 
 		~Object();
 	};
 
 	struct Layer
 	{
-		bool active = true;
-
+		// Callback function which gets automatically called by `Map::CallOnTicks()`.
 		std::function<void()> OnTick = nullptr;
-
+		
+		// Pointers to the objects that are in this layer.
 		std::vector<Object*> objects = {};
 		
-		RGBA frgba = { 0, 0, 0, 0 };
-		RGBA brgba = { 0, 0, 0, 0 };
+		// Tells `Camera`s whether or not to render this layer.
+		// `True` - render this layer.
+		// `Flase` - don't render this layer.
+		bool visible = true;
+		// The alpha channel shared across all of the objects in the layer.
+		// While similar to `visible`, this is not optimized to simply cancel the rendering of a layer.
 		uint8_t alpha = 255;
+		// Foreground color overlay.
+		RGBA frgba = { 0, 0, 0, 0 };
+		// Background color overlay.
+		RGBA brgba = { 0, 0, 0, 0 };
 
+		// Add an object to the objects vector.
 		int AddObject(Object* object);
-		// Remove an object by its index, returns false if couldn't find the object.
-		bool RemoveObject(size_t index);
 		// Remove an object by its name, returns false if couldn't find the object.
 		bool RemoveObject(const std::string& name);
 		// Remove an object by its pointer, returns false if couldn't find the object.
 		bool RemoveObject(Object* object);
+		// Reset the `parentLayer` of the objects that are in this layer and have the variable set to this layer
+		~Layer();
 	};
 	
 	struct AudioSource
 	{
+		bool loaded;
+
 		// PortAudio's opaque stream pointer
 		PaStream* stream;
 		// Current sample
@@ -610,8 +486,6 @@ namespace Engine
 
 		std::function<void()> OnEnd;
 
-		bool loaded;
-
 		// Load .wav file.
 		// `fileName` - the name of the file.
 		// Returns true if succeeded
@@ -634,70 +508,197 @@ namespace Engine
 	
 	struct Camera
 	{
-		std::function<void()> OnTick = nullptr;
 		std::string name = "";
 		Point pos = Point(0, 0);
 		// The resolution of the camera, in cells. Changing this could potentially result in a segmentation fault. To change the resoultion, call `Camera::Resize()`.
 		UPoint res = UPoint(10, 10);
 		std::vector<std::vector<Cell>> image = {};
-		std::vector<std::vector<uint8_t>> fAlphaMap = {};
-		std::vector<std::vector<uint8_t>> bAlphaMap = {};
+
+		// Callback function which gets automatically called by `Map::CallOnTicks()`.
+		std::function<void()> OnTick = nullptr;
 
 		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 		
-		void Render(std::vector<Layer*> layers);
-		void RenderReversed(std::vector<Layer*> layers);
+		// Convert a vector of layers (can be simply taken from a map) into a cell-based image, which will get stored within `image`.
+		void Render(const std::vector<Layer*>& layers);
 		// This function will draw what was rendered (Camera::image's contents) into the "final" image (Engine::image), which will be printed at once with Engine::Print.
 		// pos is the position desired to draw the rendered image to the final image.
 		// left, top, right and bottom are a rectangle representing the area of the rendered image desired to draw to the final image.
 		// Setting right/bottom to 0 will default to the rendered image's size.
-		void Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
-		// Resizes `image`, `fAlphaMap` and `bAlphaMap`, and updates `res`,
+		void Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0) const;
+		// Resizes `image` and updates `res`,
 		void Resize(UPoint res);
 	};
 	
 	struct Map
 	{
 	public:
-		std::function<void()> OnTick = NULL;
+		// Pointers to the cameras that are in this map.
 		std::vector<Camera*> cameras = {};
+		// Pointers to the layers that are in this map.
 		std::vector<Layer*> layers = {};
+		// The index of the active camera from the `cameras` vector.
+		// Used by `Render()`, `RenderReversed()` and `Draw()` for executing camera operations with a comfortable writing convention.
 		size_t activeCameraI = -1;
+
+		// Callback function which gets automatically called by `Map::CallOnTicks()`.
+		std::function<void()> OnTick = NULL;
 
 		int AddCamera(Camera* camera, bool asActiveCamera = false);
 		int AddLayer(Layer* layer);
 
-		// Returns true if managed to render (active camera is valid), otherwise, false.
-		bool Render();
-		// Returns true if managed to render (active camera is valid), otherwise, false.
-		bool RenderReversed();
-		// Returns true if managed to draw (active camera is valid), otherwise, false.
-		bool Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
-		// Calls all of the OnTick callback functions of the `Camera`s, `Layer`s and `Object`s within this map, and this `Map`'s OnTick as well.
-		void CallOnTicks();
+		// Render using the active camera with a comfortable writing convention.
+		// Returns `true` if managed to render (`activeCameraI` is valid), otherwise, `false`.
+		bool Render() const;
+		// Render in a reversed order using the active camera with a comfortable writing convention.
+		// Returns `true` if managed to render (`activeCameraI` is valid), otherwise, `false`.
+		bool RenderReversed() const;
+		// Draw the active camera's stored image to the engine's final image with a comfortable writing convention.
+		// Returns `true` if managed to draw (`activeCameraI` is valid), otherwise, `false`.
+		bool Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0) const;
+		// Calls all of the OnTick callback functions of the `Camera`s, `Layer`s and `Object`s within this map, and this `Map`'s OnTick itself as well.
+		void CallOnTicks() const;
 	};
 
-	// Storage, could be used for many things.
-	inline std::vector<Object> storedObjects = {};
-	inline std::vector<Layer> storedLayers = {};
-	// If you don't want to store an object yourself, add it to this function which will store it for you. Add the returned pointer to the desired layer.
-	// This is used by the engine when you load a map.
-	Object* StoreObject(Object object);
-	// If you don't want to store a layer yourself, add it to this function which will store it for you. Add the returned pointer to the desired map.
-	// This is used by the engine when you load a map.
-	Layer* StoreLayer(Layer layer);
-
-	// Prepare the audio library (AudioPort) for AudioSources.
+	// Prepare the terminal for printing and receiving input.
+	void PrepareTerminal(UPoint imageSize);
+	// Reset the terminal before exiting the game (turn it back to normal for further terminal use).
+	void ResetTerminal();
+	// Prepare the audio library (PortAudio) for AudioSources.
 	void InitializeAudio();
 	// Terminate (deallocate) the audio library (PortAudio).
 	void TerminateAudio();
-	// Prepare the terminal for printing and receiving input
-	void PrepareTerminal(UPoint imageSize);
-	// Reset the terminal before exiting the game (turn in back to normal).
-	void ResetTerminal();
-	// Print the final image to the console.
+	// Print the engine's final image (`Engine::image`) to the console.
 	void Print();
 
 	// Prints text to the terminal, text will only appear if you are not printing.
 	void Log(const std::string& text, RGB color);
+
+	namespace RGBColors
+	{
+		constexpr RGB red = RGB(255, 0, 0);
+		constexpr RGB orange = RGB(255, 128, 0);
+		constexpr RGB yellow = RGB(255, 255, 0);
+		constexpr RGB lime = RGB(128, 255, 0);
+		constexpr RGB green = RGB(0, 255, 0);
+		constexpr RGB mint = RGB(0, 255, 128);
+		constexpr RGB cyan = RGB(0, 255, 255);
+		constexpr RGB blue = RGB(0, 128, 255);
+		constexpr RGB primaryBlue = RGB(0, 0, 255);
+		constexpr RGB purple = RGB(128, 0, 255);
+		constexpr RGB pink = RGB(255, 0, 255);
+		constexpr RGB hotPink = RGB(255, 0, 128);
+		constexpr RGB white = RGB(255, 255, 255);
+		constexpr RGB gray = RGB(160, 160, 160);
+		constexpr RGB black = RGB(0, 0, 0);
+	}
+
+	namespace RGBAColors
+	{
+		constexpr RGBA red = RGBA(255, 0, 0, 255);
+		constexpr RGBA orange = RGBA(255, 128, 0, 255);
+		constexpr RGBA yellow = RGBA(255, 255, 0, 255);
+		constexpr RGBA lime = RGBA(128, 255, 0, 255);
+		constexpr RGBA green = RGBA(0, 255, 0, 255);
+		constexpr RGBA mint = RGBA(0, 255, 128, 255);
+		constexpr RGBA cyan = RGBA(0, 255, 255, 255);
+		constexpr RGBA blue = RGBA(0, 128, 255, 255);
+		constexpr RGBA primaryBlue = RGBA(0, 0, 255, 255);
+		constexpr RGBA purple = RGBA(128, 0, 255, 255);
+		constexpr RGBA pink = RGBA(255, 0, 255, 255);
+		constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
+		constexpr RGBA white = RGBA(255, 255, 255, 255);
+		constexpr RGBA gray = RGBA(160, 160, 160, 255);
+		constexpr RGBA black = RGBA(0, 0, 0, 255);
+		constexpr RGBA transparent = RGBA(0, 0, 0, 0);
+	}
+
+	namespace Input::K
+	{
+		constexpr char const* up = "\x1b[A";
+		constexpr char const* down = "\x1b[B";
+		constexpr char const* right = "\x1b[C";
+		constexpr char const* left = "\x1b[D";
+		constexpr char const* return_ = "\x0a";
+		constexpr char const* backspace = "\x7f";
+		constexpr char const* escape = "\x1b";
+		constexpr char const* pageUp = "\x1b[5~";
+		constexpr char const* pageDown = "\x1b[6~";
+		constexpr char const* home = "\x1b[H";
+		constexpr char const* end = "\x1b[F";
+		constexpr char const* insert = "\x1b[2~";
+		constexpr char const* delete_ = "\x1b[3~";
+		constexpr char const* f1 = "\x1bOP";
+		constexpr char const* f2 = "\x1bOQ";
+		constexpr char const* f3 = "\x1bOR";
+		constexpr char const* f4 = "\x1bOS";
+		constexpr char const* f5 = "\x1b[15~";
+		constexpr char const* f6 = "\x1b[17~";
+		constexpr char const* f7 = "\x1b[18~";
+		constexpr char const* f8 = "\x1b[19~";
+		constexpr char const* f9 = "\x1b[20~";
+		constexpr char const* f10 = "\x1b[21~";
+		// No F11 because of fullscreen
+		constexpr char const* f12 = "\x1b[24~";
+		constexpr char const* tab = "\x09";
+		
+		namespace Shift
+		{
+			constexpr char const* return_ = "\x1bOM";
+			constexpr char const* delete_ = "\x1b[3;2~";
+			constexpr char const* tab = "\x1b[Z";
+		}
+
+		namespace Ctrl
+		{
+			constexpr char const* up = "\33[1;5A";
+			constexpr char const* down = "\33[1;5B";
+			constexpr char const* right = "\33[1;5C";
+			constexpr char const* left = "\33[1;5D";
+			constexpr char const* pageUp = "\x1b[5;5~";
+			constexpr char const* pageDown = "\x1b[6;5~";
+			constexpr char const* home = "\x1b[1;5H";
+			constexpr char const* end = "\x1b[1;5F";
+			constexpr char const* delete_ = "\x1b[3;5~";
+			constexpr char const* backspace = "\x08";
+		}
+
+		namespace Alt
+		{
+			constexpr char const* up = "\33[1;3A";
+			constexpr char const* down = "\33[1;3B";
+			constexpr char const* right = "\33[1;3C";
+			constexpr char const* left = "\33[1;3D";
+			constexpr char const* return_ = "\x1b\x0a";
+			constexpr char const* backspace = "\x1b\x7f";
+			constexpr char const* escape = "\x1b\x1b";
+			constexpr char const* pageUp = "\x1b[5;3~";
+			constexpr char const* pageDown = "\x1b[6;3~";
+			constexpr char const* home = "\x1b[1;3H";
+			constexpr char const* end = "\x1b[1;3F";
+			constexpr char const* insert = "\x1b[2;3~";
+			constexpr char const* delete_ = "\x1b[3;3~";
+		}
+
+		namespace CtrlAlt
+		{
+			constexpr char const* up = "\33[1;7A";
+			constexpr char const* down = "\33[1;7B";
+			constexpr char const* right = "\33[1;7C";
+			constexpr char const* left = "\33[1;7D";
+			constexpr char const* pageUp = "\x1b[5;7~";
+			constexpr char const* pageDown = "\x1b[6;7~";
+			constexpr char const* home = "\x1b[1;7H";
+			constexpr char const* end = "\x1b[1;7F";
+			constexpr char const* insert = "\x1b[2;7~";
+		}
+
+		namespace CtrlShift
+		{
+			constexpr char const* up = "\33[1;6A";
+			constexpr char const* down = "\33[1;6B";
+			constexpr char const* right = "\33[1;6C";
+			constexpr char const* left = "\33[1;6D";
+		}
+	}
 };

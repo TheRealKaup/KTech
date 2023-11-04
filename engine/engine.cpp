@@ -6,41 +6,6 @@ std::vector<std::vector<Engine::Cell>> Engine::image;
 
 // ---=== Functions ===---
 
-Engine::Object* Engine::StoreObject(Object object)
-{
-	storedObjects.push_back(object);
-	return &storedObjects[storedObjects.size() - 1];
-}
-Engine::Layer* Engine::StoreLayer(Layer layer)
-{
-	storedLayers.push_back(layer);
-	return &storedLayers[storedLayers.size() - 1];
-}
-
-// This is for a future update
-void BetterPrint()
-{
-	/*
-	Options:
-
-		1) Single string
-			1.1) Write to stringImage according to terminalSize (print whatever there is)
-		2) String for each row
-			2.1) Write to stringImage according to imageSize, print according to terminalSize
-				2.1.1) 2D Meta data vector stating where each chacater is (to know until where to print)
-				2.1.2) In printing, scan the line and figure out where each character is
-			2.2) Write to stringImage according to terminalSize
-				2.2.1)
-		3) String for each pixel, write to stringImage according to terminalSize.
-
-		Ok, so it makes sense to write to stringImage according to terminalSize in order to save processings.
-		stringImage though is kept at the maximum image size, because terminalSize is likely to change.
-
-		The issue with writing according to terminalSize is the stuttering when the terminal resizes, which are caused beacuse
-		the print isn't fast enough, so dark gaps are visible.
-	*/
-}
-
 void Engine::Print()
 {
 	// Get terminal size

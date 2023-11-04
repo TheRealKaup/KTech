@@ -4,8 +4,8 @@ Engine::Camera::Camera(Point position, UPoint resolution, const std::string& nam
 	: pos(position), res(resolution)
 {
 	image.resize(res.y, std::vector<Cell>(res.x));
-	fAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
-	bAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
+	// fAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
+	// bAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
 }
 
 static Engine::Layer* layer;
@@ -14,7 +14,7 @@ static Engine::Texture* texture;
 static long t, o, l, x, y;
 static Engine::Point final;
 
-void Engine::Camera::Render(std::vector<Layer*> layers)
+void Engine::Camera::Render(const std::vector<Layer*>& layers)
 {
 	static RGB tempFRGB;
 	static RGB tempBRGB;
@@ -33,7 +33,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 
 	for (l = 0; l < layers.size(); l++)
 	{
-		if (!layers[l]->active)
+		if (!layers[l]->visible)
 			continue;
 
 		layer = layers[l];
@@ -140,6 +140,7 @@ void Engine::Camera::Render(std::vector<Layer*> layers)
 	}
 }
 
+/*
 void Engine::Camera::RenderReversed(std::vector<Layer*> layers)
 {
 	// Reset the image and the alpha maps.
@@ -166,7 +167,7 @@ void Engine::Camera::RenderReversed(std::vector<Layer*> layers)
 	// --== FOREGROUND ==--
 	for (l = layers.size() - 1; l >= 0 && fAlphaMapCounter > 0; l--)
 	{
-		if (!layers[l]->active)
+		if (!layers[l]->visible)
 			continue;
 
 		layer = layers[l];
@@ -251,7 +252,7 @@ void Engine::Camera::RenderReversed(std::vector<Layer*> layers)
 	// --== BACKGROUND ==--
 	for (l = layers.size() - 1; l >= 0 && bAlphaMapCounter > 0; l--)
 	{
-		if (!layers[l]->active)
+		if (!layers[l]->visible)
 			continue;
 
 		layer = layers[l];
@@ -336,9 +337,9 @@ void Engine::Camera::RenderReversed(std::vector<Layer*> layers)
 
 	// std::cerr << "F alphaMapCounter:" << fAlphaMapCounter << '\n';
 	// std::cerr << "B alphaMapCounter:" << bAlphaMapCounter << '\n';
-}
+}*/
 
-void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
+void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) const
 {
 	// Return if the image is sized 0
 	if (image.size() == 0)
@@ -383,12 +384,12 @@ void Engine::Camera::Resize(UPoint _res)
 {
 	res = _res;
 	image.resize(_res.y);
-	fAlphaMap.resize(_res.y);
-	bAlphaMap.resize(_res.y);
+	// fAlphaMap.resize(_res.y);
+	// bAlphaMap.resize(_res.y);
 	for (y = 0; y < _res.y; y++)
 	{
 		image[y].resize(_res.x);
-		fAlphaMap[y].resize(_res.x);
-		bAlphaMap[y].resize(_res.x);
+		// fAlphaMap[y].resize(_res.x);
+		// bAlphaMap[y].resize(_res.x);
 	}	
 }

@@ -99,7 +99,7 @@ struct UI
 int main()
 {
 	PrepareTerminal(UPoint(20, 20));
-	Time::tps = 24;
+	Time::tpsLimit = 24;
 	
 	Map map;
 

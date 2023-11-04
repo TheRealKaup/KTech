@@ -1,30 +1,46 @@
 #include "engine.hpp"
 
 int32_t Engine::Time::deltaTime = 0;
-Engine::Time::TimePoint Engine::Time::thisTickStartTP ;
-float Engine::Time::potentialfps = 0.0f;
-float Engine::Time::fps = 0.0f;
-Engine::Time::TimePoint Engine::Time::engineStartTP;
-int32_t Engine::Time::totalTicks = 0;
+float Engine::Time::tpsPotential = 0.0f;
+float Engine::Time::tps = 0.0f;
 
-Engine::Time::Invocation* Engine::Time::Invoke(std::function<void()> callback, uint32_t time, Measurement timeMeasurement)
+Engine::Time::Invocation* Engine::Time::Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement)
 {
-	if (timeMeasurement == Measurement::ticks)
-		invocations.push_back(new Invocation(callback, time));
-	else if (timeMeasurement == Measurement::seconds)
-		invocations.push_back(new Invocation(callback, time * tps));
-	else
-		invocations.push_back(new Invocation(callback, time * tps / 1000));
-	return invocations[invocations.size() - 1];
+	switch (timeMeasurement)
+	{
+		case Measurement::ticks:
+		{
+			Invocation::invocations.push_back(new Invocation(callback, time));
+			break;
+		}
+		case Measurement::seconds:
+		{
+			Invocation::invocations.push_back(new Invocation(callback, time * tpsLimit));
+			break;
+		}
+		case Measurement::milliseconds:
+		{
+			Invocation::invocations.push_back(new Invocation(callback, time * tpsLimit / 1000));
+			break;
+		}
+		case Measurement::microseconds:
+		{
+			Invocation::invocations.push_back(new Invocation(callback, time * tpsLimit / 1000000));
+			break;
+		}
+		default:
+			return nullptr;
+	}
+	return Invocation::invocations[Invocation::invocations.size() - 1];
 }
 
 bool Engine::Time::CancelInvocation(Invocation* invocation)
 {
-	for (size_t i = 0; i < invocations.size(); i++)
+	for (size_t i = 0; i < Invocation::invocations.size(); i++)
 	{
-		if (invocation == invocations[i])
+		if (invocation == Invocation::invocations[i])
 		{
-			invocations.erase(invocations.begin() + i);
+			Invocation::invocations.erase(Invocation::invocations.begin() + i);
 			delete invocation;
 			return true;
 		}
@@ -35,18 +51,18 @@ bool Engine::Time::CancelInvocation(Invocation* invocation)
 
 void Engine::Time::CallInvocations()
 {
-	for (size_t i = 0; i < invocations.size(); i++)
+	for (size_t i = 0; i < Invocation::invocations.size(); i++)
 	{
-		if (invocations[i]->ticksLeft > 0)
-			invocations[i]->ticksLeft--;
+		if (Invocation::invocations[i]->ticksLeft > 0)
+			Invocation::invocations[i]->ticksLeft--;
 		else
 		{
 			// Call
-			if (invocations[i]->callback)
-				invocations[i]->callback();
+			if (Invocation::invocations[i]->callback)
+				Invocation::invocations[i]->callback();
 			// Remove invocation
-			delete invocations[i];
-			invocations.erase(invocations.begin() + i);
+			delete Invocation::invocations[i];
+			Invocation::invocations.erase(Invocation::invocations.begin() + i);
 			i--;
 			continue;
 		}
@@ -55,11 +71,11 @@ void Engine::Time::CallInvocations()
 
 void Engine::Time::WaitUntilNextTick()
 {
-	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::engineStartTP.chronoTimePoint).count() - thisTickStartTP.Microseconds();
-	potentialfps = 1000000.0f / deltaTime;
-	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / tps - deltaTime));
-	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::engineStartTP.chronoTimePoint).count() - thisTickStartTP.Microseconds();
-	fps = 1000000.0f / deltaTime;
+	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::startTP.chronoTimePoint).count() - thisTickStartTP.GetInt(Measurement::microseconds);
+	tpsPotential = 1000000.0f / deltaTime;
+	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / tpsLimit - deltaTime));
+	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::startTP.chronoTimePoint).count() - thisTickStartTP.GetInt(Measurement::microseconds);
+	tps = 1000000.0f / deltaTime;
 	thisTickStartTP.SetToNow();
-	totalTicks++;
+	ticksCounter++;
 }

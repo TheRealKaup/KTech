@@ -10,22 +10,27 @@ void Engine::Time::TimePoint::SetToNow()
 	chronoTimePoint = std::chrono::high_resolution_clock::now();
 }
 
-long Engine::Time::TimePoint::Seconds()
+long Engine::Time::TimePoint::GetInt(Measurement timeMeasurement) const
 {
-	return std::chrono::duration_cast<std::chrono::seconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-
-long Engine::Time::TimePoint::Milliseconds()
-{
-	return std::chrono::duration_cast<std::chrono::milliseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-
-long Engine::Time::TimePoint::Microseconds()
-{
-	return std::chrono::duration_cast<std::chrono::microseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
-}
-
-long Engine::Time::TimePoint::Nanoseconds()
-{
-	return std::chrono::duration_cast<std::chrono::nanoseconds>(chronoTimePoint - engineStartTP.chronoTimePoint).count();
+	switch (timeMeasurement)
+	{
+		case Measurement::ticks:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(chronoTimePoint - startTP.chronoTimePoint).count() * Engine::running;
+		}
+		case Measurement::seconds:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(chronoTimePoint - startTP.chronoTimePoint).count();
+		}
+		case Measurement::milliseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::milliseconds>(chronoTimePoint - startTP.chronoTimePoint).count();
+		}
+		case Measurement::microseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::microseconds>(chronoTimePoint - startTP.chronoTimePoint).count();
+		}
+		default:
+			return 0;
+	}
 }

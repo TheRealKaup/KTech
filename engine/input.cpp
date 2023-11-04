@@ -2,13 +2,11 @@
 
 #define maxInputLength 7
 
-size_t Engine::Input::handlerIndex = -1;
-
 std::string Engine::Input::input(maxInputLength, '\0');
 
 // callbacks.push_back(new Handler::Callback(callback, onTick, this));
 
-Engine::Input::BasicHandler::BasicCallback* Engine::Input::RegisterCallback(const std::string& input, std::function<void()> callback, bool onTick)
+Engine::Input::BasicHandler::BasicCallback* Engine::Input::RegisterCallback(const std::string& input, const std::function<void()>& callback, bool onTick)
 {
 	// If a handler already exists for this input, add the callback to the calls vector
 	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
@@ -27,7 +25,7 @@ Engine::Input::BasicHandler::BasicCallback* Engine::Input::RegisterCallback(cons
 	return BasicHandler::handlers[i]->callbacks[BasicHandler::handlers[i]->callbacks.size() - 1]; // Last callback of last handler
 }
 
-Engine::Input::RangedHandler::RangedCallback* Engine::Input::RegisterRangedCallback(char key1, char key2, std::function<void()> callback)
+Engine::Input::RangedHandler::RangedCallback* Engine::Input::RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback)
 {
 	// If a handler already exists for this input, add the callback to the calls vector
 	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
@@ -136,12 +134,7 @@ bool Engine::Input::Is(char charKey)
 	return input.length() == 1 && input[0] == charKey;
 }
 
-bool Engine::Input::IsNum()
-{
-	return (input[0] >= '0') && (input[0] <= '9') && (input.length() == 1);
-}
-
-uint8_t Engine::Input::GetNum()
+uint8_t Engine::Input::GetInt()
 {
 	return input[0] - '0';
 }

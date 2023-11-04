@@ -7,7 +7,12 @@ void Engine::Object::EnterLayer(Engine::Layer* layer)
 	layer->AddObject(this);
 }
 
-Engine::Object::Object(Point pos, const std::string& name) : pos(pos), name(name) {}
+Engine::Object::Object(Point pos, Layer* layer, const std::string& name)
+	: pos(pos), name(name)
+{
+	if(layer)
+		EnterLayer(layer);
+}
 
 Engine::Object::~Object()
 {
