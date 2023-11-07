@@ -47,7 +47,7 @@ void Engine::Collider::Write(const std::vector<std::string>& stringVector, uint8
 	}
 }
 
-void Engine::Collider::ByTexture(const Texture& texture, uint8_t _type)
+void Engine::Collider::ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
 {
     simple = false;
     type = _type;
@@ -59,6 +59,37 @@ void Engine::Collider::ByTexture(const Texture& texture, uint8_t _type)
 		// potentially broken if one of the values = 10 ('\n')
 		c[y].resize(texture.t[y].size());
 		for (size_t x = 0; x < c[y].size(); x++)
-			c[y][x] = texture.t[y][x].c == ' ' ? false : true;
+			c[y][x] = ((texture.t[y][x].c != ' ' && texture.t[y][x].f.a >= alphaThreshold) ? true : false);
+	}
+}
+
+void Engine::Collider::ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
+{
+    simple = false;
+    type = _type;
+    pos_r = texture.pos_r;
+
+	c.resize(texture.t.size());
+	for (size_t y = 0; y < texture.t.size(); y++)
+	{
+		// potentially broken if one of the values = 10 ('\n')
+		c[y].resize(texture.t[y].size());
+		for (size_t x = 0; x < c[y].size(); x++)
+			c[y][x] = (texture.t[y][x].b.a >= alphaThreshold ? true : false);
+	}
+}
+
+// [Simple/Complex] Get the size of the texture.
+Engine::UPoint Engine::Collider::GetSize() const
+{
+	if (simple)
+		return size;
+	else
+	{
+		UPoint result(0, c.size());
+		for (const std::vector<bool>& row : c)
+			if (row.size() > result.x)
+				result.x = row.size();
+		return result;
 	}
 }

@@ -360,14 +360,21 @@ namespace Engine
 		// A 2D boolean vector 
 		std::vector<std::vector<bool>> c = {};
 
-		// A rectangle.
+		// * CONSTRUCTOR * [Simple] Construct a rectangle.
 		void Simple(UPoint size, uint8_t type, Point relative_position);
-		// Load from a file.
+		// * CONSTRUCTOR * [Complex] Load from a file.
 		bool File(const std::string& fileName, uint8_t type, Point relative_position);
-		// Create a collider by writing it.
+		// * CONSTRUCTOR * [Complex] Construct a collider by writing it.
 		void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relative_position);
-		// Create a collider which corrosponds to a texture (also takes its position)
-		void ByTexture(const Texture& texture, uint8_t type);
+		// * CONSTRUCTOR * [Complex] Construct a collider which corrosponds to the characters of a texture (also inherits the texture's relative position).
+		// Will activate a cell of the collider if its corrosponding texture cell's character isn't space (`' '`) and foreground alpha value is above or equal to the `alphaThreshold`.
+		void ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
+		// * CONSTRUCTOR * [Complex] Construct a collider which corrosponds to the background color of a texture (also inherits the texture's relative position)
+		// Will activate a cell of the collider if its corrosponding texture cell's background alpha value is above or equal to the `alphaThreshold`.
+		void ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
+
+		// [Simple/Complex] Get the size of the texture.
+		UPoint GetSize() const;
 	};
 
 	struct Object

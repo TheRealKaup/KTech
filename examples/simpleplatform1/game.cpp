@@ -13,7 +13,7 @@ struct Character
 
 	// Object* last
 
-	const int jumpStreng = 4;
+	static constexpr int jumpStreng = 6;
 
 	Engine::Object obj;
 	Engine::Camera cam;
@@ -106,11 +106,12 @@ struct Character
 				"/ \\"
 			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
-		obj.colliders.resize(4);
-		obj.colliders[0].Simple(Engine::UPoint(1, 2), 1, Engine::Point(0, 1));
-		obj.colliders[1].Simple(Engine::UPoint(1, 2), 1, Engine::Point(1, 0));
-		obj.colliders[2].Simple(Engine::UPoint(1, 2), 1, Engine::Point(2, 1));
-		obj.colliders[3].Simple(Engine::UPoint(5, 5), 3, Engine::Point(-1, -1));
+		obj.colliders.resize(1);
+		obj.colliders[0].ByTextureCharacter(obj.textures[0], 100, 1);
+		// obj.colliders[0].Simple(Engine::UPoint(1, 2), 1, Engine::Point(0, 1));
+		// obj.colliders[1].Simple(Engine::UPoint(1, 2), 1, Engine::Point(1, 0));
+		// obj.colliders[2].Simple(Engine::UPoint(1, 2), 1, Engine::Point(2, 1));
+		// obj.colliders[3].Simple(Engine::UPoint(5, 5), 3, Engine::Point(-1, -1));
 
 		cam = Engine::Camera(Engine::Point( 0, 0 ), Engine::UPoint( 15, 15 ));
 
@@ -237,22 +238,23 @@ int main()
 	Engine::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
 	worldProps.textures[2].File("assets/land.ktecht", { 0, 20 });
 	
-	worldProps.colliders.resize(14);
+	worldProps.colliders.resize(1);
+	worldProps.colliders[0].ByTextureBackground(worldProps.textures[2], 100, 0);
 	uint8_t base = 29;
-	worldProps.colliders[0].Simple(Engine::UPoint(1, 1), 0, Engine::Point(0, base));
-	worldProps.colliders[1].Simple(Engine::UPoint(1, 1), 0, Engine::Point(1, base + 2));
-	worldProps.colliders[2].Simple(Engine::UPoint(1, 1), 0, Engine::Point(2, base + 3));
-	worldProps.colliders[3].Simple(Engine::UPoint(1, 1), 0, Engine::Point(3, base + 5));
-	worldProps.colliders[4].Simple(Engine::UPoint(2, 1), 0, Engine::Point(4, base + 6));
-	worldProps.colliders[5].Simple(Engine::UPoint(2, 1), 0, Engine::Point(6, base + 7));
-	worldProps.colliders[6].Simple(Engine::UPoint(5, 1), 0, Engine::Point(8, base + 8));
-	worldProps.colliders[7].Simple(Engine::UPoint(14, 1), 0, Engine::Point(13, base + 9));
-	worldProps.colliders[8].Simple(Engine::UPoint(6, 1), 0, Engine::Point(27, base + 10));
-	worldProps.colliders[9].Simple(Engine::UPoint(5, 1), 0, Engine::Point(33, base + 11));
-	worldProps.colliders[10].Simple(Engine::UPoint(3, 1), 0, Engine::Point(38, base + 12));
-	worldProps.colliders[11].Simple(Engine::UPoint(2, 1), 0, Engine::Point(41, base + 13));
-	worldProps.colliders[12].Simple(Engine::UPoint(2, 1), 0, Engine::Point( 43, base + 14));
-	worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
+	// worldProps.colliders[0].Simple(Engine::UPoint(1, 1), 0, Engine::Point(0, base));
+	// worldProps.colliders[1].Simple(Engine::UPoint(1, 1), 0, Engine::Point(1, base + 2));
+	// worldProps.colliders[2].Simple(Engine::UPoint(1, 1), 0, Engine::Point(2, base + 3));
+	// worldProps.colliders[3].Simple(Engine::UPoint(1, 1), 0, Engine::Point(3, base + 5));
+	// worldProps.colliders[4].Simple(Engine::UPoint(2, 1), 0, Engine::Point(4, base + 6));
+	// worldProps.colliders[5].Simple(Engine::UPoint(2, 1), 0, Engine::Point(6, base + 7));
+	// worldProps.colliders[6].Simple(Engine::UPoint(5, 1), 0, Engine::Point(8, base + 8));
+	// worldProps.colliders[7].Simple(Engine::UPoint(14, 1), 0, Engine::Point(13, base + 9));
+	// worldProps.colliders[8].Simple(Engine::UPoint(6, 1), 0, Engine::Point(27, base + 10));
+	// worldProps.colliders[9].Simple(Engine::UPoint(5, 1), 0, Engine::Point(33, base + 11));
+	// worldProps.colliders[10].Simple(Engine::UPoint(3, 1), 0, Engine::Point(38, base + 12));
+	// worldProps.colliders[11].Simple(Engine::UPoint(2, 1), 0, Engine::Point(41, base + 13));
+	// worldProps.colliders[12].Simple(Engine::UPoint(2, 1), 0, Engine::Point( 43, base + 14));
+	// worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
 
 	Engine::Object frame(Engine::Point(0, 0), &layer, "L");
 	frame.textures.resize(4);
