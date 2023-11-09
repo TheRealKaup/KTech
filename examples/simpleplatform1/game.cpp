@@ -27,6 +27,7 @@ struct Character
 		if (onGround) {
 			yVelocity -= jumpStreng;
 			jumpSFX.Play(0, 0, 0.7f);
+			onGround = false;
 		}
 	}
 
@@ -57,7 +58,7 @@ struct Character
 
 				if (yVelocity < 0)
 					for (size_t i = 0; i < -yVelocity; i++)
-						onGround = !obj.Move({ 0, -1 });
+						obj.Move({ 0, -1 });
 				else if (yVelocity == 1)
 					onGround = !obj.Move({ 0, 1 });
 
@@ -106,12 +107,9 @@ struct Character
 				"/ \\"
 			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
-		obj.colliders.resize(1);
+		obj.colliders.resize(2);
 		obj.colliders[0].ByTextureCharacter(obj.textures[0], 100, 1);
-		// obj.colliders[0].Simple(Engine::UPoint(1, 2), 1, Engine::Point(0, 1));
-		// obj.colliders[1].Simple(Engine::UPoint(1, 2), 1, Engine::Point(1, 0));
-		// obj.colliders[2].Simple(Engine::UPoint(1, 2), 1, Engine::Point(2, 1));
-		// obj.colliders[3].Simple(Engine::UPoint(5, 5), 3, Engine::Point(-1, -1));
+		obj.colliders[1].Simple(Engine::UPoint(5, 5), 3, Engine::Point(-1, -1));
 
 		cam = Engine::Camera(Engine::Point( 0, 0 ), Engine::UPoint( 15, 15 ));
 
@@ -120,16 +118,16 @@ struct Character
 		Engine::Input::RegisterCallback(" ", std::bind(&Character::Jump, this), true);
 		Engine::Input::RegisterCallback(Engine::Input::K::up, std::bind(&Character::Jump, this), true);
 
-		Engine::Input::RegisterCallback("d", std::bind(&Character::Right, this));
-		Engine::Input::RegisterCallback("D", std::bind(&Character::Right, this));
-		Engine::Input::RegisterCallback(Engine::Input::K::right, std::bind(&Character::Right, this));
+		Engine::Input::RegisterCallback("d", std::bind(&Character::Right, this), true);
+		Engine::Input::RegisterCallback("D", std::bind(&Character::Right, this), true);
+		Engine::Input::RegisterCallback(Engine::Input::K::right, std::bind(&Character::Right, this), true);
 
-		Engine::Input::RegisterCallback("a", std::bind(&Character::Left, this));
-		Engine::Input::RegisterCallback("A", std::bind(&Character::Left, this));
-		Engine::Input::RegisterCallback(Engine::Input::K::left, std::bind(&Character::Left, this));
+		Engine::Input::RegisterCallback("a", std::bind(&Character::Left, this), true);
+		Engine::Input::RegisterCallback("A", std::bind(&Character::Left, this), true);
+		Engine::Input::RegisterCallback(Engine::Input::K::left, std::bind(&Character::Left, this), true);
 
-		Engine::Input::RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this));
-		Engine::Input::RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this));
+		Engine::Input::RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this), true);
+		Engine::Input::RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this), true);
 
 		obj.OnEvent = std::bind(&Character::OnEvent, this, std::placeholders::_1);
 		obj.EnterLayer(layer);
@@ -241,27 +239,22 @@ int main()
 	worldProps.colliders.resize(1);
 	worldProps.colliders[0].ByTextureBackground(worldProps.textures[2], 100, 0);
 	uint8_t base = 29;
-	// worldProps.colliders[0].Simple(Engine::UPoint(1, 1), 0, Engine::Point(0, base));
-	// worldProps.colliders[1].Simple(Engine::UPoint(1, 1), 0, Engine::Point(1, base + 2));
-	// worldProps.colliders[2].Simple(Engine::UPoint(1, 1), 0, Engine::Point(2, base + 3));
-	// worldProps.colliders[3].Simple(Engine::UPoint(1, 1), 0, Engine::Point(3, base + 5));
-	// worldProps.colliders[4].Simple(Engine::UPoint(2, 1), 0, Engine::Point(4, base + 6));
-	// worldProps.colliders[5].Simple(Engine::UPoint(2, 1), 0, Engine::Point(6, base + 7));
-	// worldProps.colliders[6].Simple(Engine::UPoint(5, 1), 0, Engine::Point(8, base + 8));
-	// worldProps.colliders[7].Simple(Engine::UPoint(14, 1), 0, Engine::Point(13, base + 9));
-	// worldProps.colliders[8].Simple(Engine::UPoint(6, 1), 0, Engine::Point(27, base + 10));
-	// worldProps.colliders[9].Simple(Engine::UPoint(5, 1), 0, Engine::Point(33, base + 11));
-	// worldProps.colliders[10].Simple(Engine::UPoint(3, 1), 0, Engine::Point(38, base + 12));
-	// worldProps.colliders[11].Simple(Engine::UPoint(2, 1), 0, Engine::Point(41, base + 13));
-	// worldProps.colliders[12].Simple(Engine::UPoint(2, 1), 0, Engine::Point( 43, base + 14));
-	// worldProps.colliders[13].Simple(Engine::UPoint(3, 1), 0, Engine::Point(45, base + 15));
 
 	Engine::Object frame(Engine::Point(0, 0), &layer, "L");
-	frame.textures.resize(4);
+	frame.textures.resize(5);
 	frame.textures[0].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
 	frame.textures[1].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
 	frame.textures[2].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
 	frame.textures[3].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
+	frame.textures[4].Write(
+		{
+			"'WASD'/'Arrow keys' to move.",
+			"'Space' to jump.",
+			"'f' to throw a gravity box off the layer.",
+			"'m' to turn on following camera."
+		}, RGBAColors::black, RGBAColors::transparent, Point(2, 2));
+	frame.textures[4].Resize(frame.textures[4].GetSize(), CellA());
+	frame.textures[4].SetBackground(RGBA(255, 255, 255, 100));
 	frame.colliders.resize(4);
 	frame.colliders[0].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 0));
 	frame.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
@@ -282,11 +275,12 @@ int main()
 	house.textures[0].File("assets/house.ktecht", { 0, 0 });
 
 	Engine::Input::RegisterCallback("m", TurnOnCharacterCamera);
+	Engine::Input::RegisterCallback("M", TurnOnCharacterCamera);
 
 	Engine::Layer darkLayer;
 	darkLayer.alpha = 127;
 	
-	AutoUpdatingText audioPerformance(&Engine::Time::tpsPotential, {1, 1}, &layer);
+	AutoUpdatingText audioPerformance(&Engine::Time::tpsPotential, Point(2, 47), &layer);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 
@@ -304,15 +298,12 @@ int main()
 			// continue;
 			if (charCamOn) {
 				map.cameras[0]->Render({ &layer, &darkLayer });
-				// map.cameras[0]->RenderReversed({ &layer, &darkLayer });
 				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
 				map.cameras[1]->Render(map.layers);
-				// map.cameras[1]->RenderReversed(map.layers);
-				map.cameras[1]->Draw({ 18, 18 }, 0, 0, 0, 0);
+				map.cameras[1]->Draw({ 18, 9 }, 0, 0, 0, 0);
 			}
 			else {
 				map.cameras[0]->Render(map.layers);
-				// map.cameras[0]->RenderReversed(map.layers);
 				map.cameras[0]->Draw({ 0, 0 }, 0, 0, 0, 0);
 			}
 			Engine::Print();

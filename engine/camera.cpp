@@ -8,14 +8,15 @@ Engine::Camera::Camera(Point position, UPoint resolution, const std::string& nam
 	// bAlphaMap.resize(res.y, std::vector<uint8_t>(res.x));
 }
 
-static Engine::Layer* layer;
-static Engine::Object* obj;
-static Engine::Texture* texture;
-static long t, o, l, x, y;
-static Engine::Point final;
-
 void Engine::Camera::Render(const std::vector<Layer*>& layers)
 {
+	static Engine::Layer* layer;
+	static Engine::Object* obj;
+	static Engine::Texture* texture;
+	static long t, o, l, x, y;
+
+	// Point final - the relative position between the camera and the texture (image index).
+	static Engine::Point final;
 	static RGB tempFRGB;
 	static RGB tempBRGB;
 	static uint8_t tempAlpha;
@@ -51,7 +52,6 @@ void Engine::Camera::Render(const std::vector<Layer*>& layers)
 				// Simple texture
 				if (texture->simple)
 				{
-					final.y = obj->pos.y + texture->pos_r.y - pos.y;
 					// Precalculate fixed values (8 bit depth)
 					//             8 ->                 16 ->                32 ->          8.     8 ->                 16 ->                32 ->          8.     8 ->                 16 ->                32 ->          8.
 					tempFRGB = RGB(texture->value.f.r * texture->value.f.a * layer->alpha / 65025, texture->value.f.g * texture->value.f.a * layer->alpha / 65025, texture->value.f.b * texture->value.f.a * layer->alpha / 65025);
@@ -59,10 +59,34 @@ void Engine::Camera::Render(const std::vector<Layer*>& layers)
 					//                   8 ->                 16 ->           8.
 					tempAlpha = (65025 - texture->value.f.a * layer->alpha) / 255;
 
-					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->size.y && final.y < res.y; y++, final.y++)
+					// If the texture is before the camera, iterate with Y from point in which camera view starts, and iterate with final.y from 0.
+					if (obj->pos.y + texture->pos_r.y < pos.y)
 					{
-						final.x = obj->pos.x + texture->pos_r.x - pos.x;
-						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->size.x && final.x < res.x; x++, final.x++)
+						y = pos.y - obj->pos.y - texture->pos_r.y;
+						final.y = 0;
+					}
+					// Otherwise, iterate with Y from 0, and iterate with final.y from point in which texture starts.
+					else
+					{
+						y = 0;
+						final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					}
+					// Stop iterating through the texture until y reached the end of the texture, or final.y reached the end of the image.
+					for (; y < texture->size.y && final.y < res.y; y++, final.y++)
+					{
+						// Same goes for X
+						if (obj->pos.x + texture->pos_r.x < pos.x)
+						{
+							x = pos.x - obj->pos.x - texture->pos_r.x;
+							final.x = 0;
+						}
+						else
+						{
+							x = 0;
+							final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						}
+
+						for (; x < texture->size.x && final.x < res.x; x++, final.x++)
 						{
 							if (texture->value.c != ' ')
 							{
@@ -82,11 +106,35 @@ void Engine::Camera::Render(const std::vector<Layer*>& layers)
 				// Complex texture
 				else
 				{
-					final.y = obj->pos.y + texture->pos_r.y - pos.y;
-					for (y = (final.y < 0 ? 0 - final.y : 0); y < texture->t.size() && final.y < res.y; y++, final.y++)
+					// If the texture is before the camera, iterate with Y from point in which camera view starts, and iterate with final.y from 0.
+					if (obj->pos.y + texture->pos_r.y < pos.y)
 					{
-						final.x = obj->pos.x + texture->pos_r.x - pos.x;
-						for (x = (final.x < 0 ? 0 - final.x : 0); x < texture->t[y].size() && final.x < res.x; x++, final.x++)
+						y = pos.y - obj->pos.y - texture->pos_r.y;
+						final.y = 0;
+					}
+					// Otherwise, iterate with Y from 0, and iterate with final.y from point in which texture starts.
+					else
+					{
+						y = 0;
+						final.y = obj->pos.y + texture->pos_r.y - pos.y;
+					}
+
+					// Stop iterating through the texture until y reached the end of the texture, or final.y reached the end of the image.
+					for (; y < texture->t.size() && final.y < res.y; y++, final.y++)
+					{
+						// Same goes for X
+						if (obj->pos.x + texture->pos_r.x < pos.x)
+						{
+							x = pos.x - obj->pos.x - texture->pos_r.x;
+							final.x = 0;
+						}
+						else
+						{
+							x = 0;
+							final.x = obj->pos.x + texture->pos_r.x - pos.x;
+						}
+
+						for (; x < texture->t[y].size() && final.x < res.x; x++, final.x++)
 						{
 							if (texture->t[y][x].c != ' ')
 							{
@@ -353,13 +401,13 @@ void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right
 	if (right == 0)
 		right = image[0].size();
 	// Return if rectangle is invalid
-	if (left > right || top > bottom)
-		return; // Maybe reversed?
+	if (left >= right || top >= bottom)
+		return;
 
 	// The assumption is that Engine::image and Camera::image are not evenly sized
 
-	int ySkip = 0;
-	int xSkip = 0;
+	long ySkip = 0;
+	long xSkip = 0;
 	if (pos.y < 0)
 		ySkip = -pos.y;
 	if (pos.x < 0)
@@ -367,11 +415,11 @@ void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right
 	
 	// Draw
 	// y - camera's Y, yE - engine's Y
-	for (int y = top + ySkip, yE = pos.y + ySkip;
+	for (long y = top + ySkip, yE = pos.y + ySkip;
 		y < bottom && y < image.size() && yE < Engine::image.size(); 
 		y++, yE++)
 	{
-		for (int x = left + xSkip, xE = pos.x + xSkip;
+		for (long x = left + xSkip, xE = pos.x + xSkip;
 			x < right && x < image[y].size() && xE < Engine::image[yE].size();
 			x++, xE++)
 		{
@@ -382,6 +430,7 @@ void Engine::Camera::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right
 
 void Engine::Camera::Resize(UPoint _res)
 {
+	static size_t y;
 	res = _res;
 	image.resize(_res.y);
 	// fAlphaMap.resize(_res.y);

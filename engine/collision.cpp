@@ -44,7 +44,6 @@ static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simpleP
 				if (simplePos.x <= complexPos.x + x && complexPos.x + x <= simplePos.x + simple.x && simplePos.y <= complexPos.y + y && complexPos.y + y <= simplePos.y + simple.y)
 					return true;
 	}
-	std::cerr << "asacco FALSE" << std::endl;
 	return false;
 }
 // `c` - complex (2d vector)
