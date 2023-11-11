@@ -3,23 +3,11 @@
 ***KTech*** is Kaup's C++ terminal game engine library. It is like any other basic 2D game engine, but its graphics are terminal based.
 
 Table of contents of this readme file:
-- [Documentation](#documentation) - links to projects's documentation (intentionally on top for quicker access).
 - [Introduction](#introduction) - non-specific, general explanation of what KTech is.
 - [Manifesto](#manifesto) - what this project solves, goals of the project.
-
----
-
-## Documentation
-
-KTech's entire documentation is stored within KTech's GitHub repostiroy (this very one).
-
-In front of you are listed all of the files that comprise KTech's documentation: 
-
-- [tutorials.md](tutorials.md) - tutorials about getting KTech, using its different elements, creating a game with it and compiling.
-- [references.md](references.md) - direct information about each element of the engine.
-- [examples.md](examples.md) - analyses and explanations of the examples included in the "examples" directory in this repository.
-- [faq.md](faq.md) - answers for frequently asked questions.
-- [LICENSE](LICENSE) - the license which covers KTech.
+- [Capabilities](#capabilities) - general list of features included in the library. 
+- [Documentation](#documentation) - links to projects's documentation.
+- [Intereseting Details](#intereseting-details) - some specifics that could arouse your curiosity.
 
 ---
 
@@ -71,7 +59,6 @@ Game development, from creating textures, to coding a game, to compiling a game 
 - Become a powerful game engine. To make this explicit, KTech is not as powerful as I wish it to be, at all.
 - While not a part of the KTech project itself, create a software development kit around KTech to make KTech game development efficient and as modern as possible, while still remaining in the terminal, as goes the principle.
 
-
 ---
 
 ## Capabilities
@@ -90,14 +77,27 @@ KTech is capable of:
 
 ---
 
-## Intereseting Details About KTech
+## Intereseting Details
 
-- KTech is simply a library, but I made an application (using KTech itself) called "TextureCreator" which helps creating terminal cell-based textures, and perhaps in the future more applications similar to this will be created, and a proper software development kit will come to be.
-- The game developer (the KTech user) constructs their own game loop with functions that the engine comes with.
-- Although KTech's level is quite low, it attempts at being easy to use, friendly and intuitive for new game developers.
+- KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal cell-based textures. TextureCreator covers and improves one aspect of KTech game development. This kind of application is reminiscent of a part of a software development kit (SDK). In the future, as mentioned in the goals, more applications similar to this will be created, and a proper SDK for KTech will come to be.
+- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between game and engine different from popular game engines, this is the design I chose, because it gives the KTech user superior control and understanding of what's happening.
 - The engine relies only on the CPU for its processing (audio, graphics, collision...) and achieves more than playable performance.
-- Making a game with KTech can be done entirely from a terminal by using a terminal text editor (like Vim) for writing code, the TextureCreator application for creating textures, a C++ compiler accessible from a terminal to create an executable, and by simply running the game to play it in the terminal.
-- I, Kaup, started developing KTech in March 2022. I had many breaks, sometimes as long as a month. This is the biggest programming project I have ever had, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into developing it.
+- As explained in the manifesto, making a game with KTech can be done entirely from a terminal by using a terminal text editor (like Vim) for writing code, the TextureCreator application for creating textures, a C++ compiler accessible from a terminal to create an executable, and by simply running the game from a shell to play it in the terminal.
+- I, Kaup, started the development of KTech in March 2022. I had many breaks, sometimes as long as a month. This is the biggest programming project I have ever had, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into making it.
+
+---
+
+## Documentation
+
+KTech's entire documentation is stored within KTech's GitHub repostiroy (this very one).
+
+In front of you are listed all of the files that comprise KTech's documentation: 
+
+- [references.md](references.md) - direct information about each element of the library.
+- [tutorials.md](tutorials.md) - tutorials about getting KTech, using its different elements, creating a game with it and compiling.
+- [faq.md](faq.md) - answers for frequently asked questions.
+- [examples.md](examples.md) - analyses and explanations of the examples included in the "examples" directory in this repository.
+- [LICENSE](LICENSE) - the license which covers KTech.
 
 ---
 
@@ -113,6 +113,6 @@ Here's a screenshot of the game, from 9.10.2023 (d/m/y):
 
 ### TextureCreator
 
-An application made with KTech for creating KTech texture files. This program is needed for creating KTech textures because each terminal character cell has an RGB foreground, RGB background and a character values. This kind of texture can't be created by a normal pixel-based image creator.
+An application made with KTech for creating cell-based texture files for KTech games. This program is required because each terminal character cell has an RGB foreground color, an RGB background color and a character values. This kind of texture can't be created by a normal pixel-based image creator.
 
 ![TextureCreator Screenshot](https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png)
