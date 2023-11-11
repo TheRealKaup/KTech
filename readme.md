@@ -54,17 +54,17 @@ _In today's world, it is common for new games to release after most of their dev
 
 For the longest time, when I had to explain why my project exists, I answered with what it solves, usually as written above.
 
-While it's true that KTech's unique graphical style naturally compensates for lack of visual development and attention to detail from the side of the KTech user, I wouldn't say that this point is of a significance, nor would I say that the entire project exists for some kind of techincal necessity or even as a techincal solution at all in most cases.
+While it's true that KTech's unique graphical style naturally compensates for lack of visual development and attention to detail from the side of the KTech user, I wouldn't say that this point is significant, nor would I say that the entire project exists for some kind of techincal necessity or even as a superioir techincal solution in most cases.
 
-This is because for video games, you could use any other game engine that fundamentally enjoys from the benefits of modern I/O, and, of course, is a more developed and advanced project. And, for utility terminal applications, there are much better libraries.
+This is because for video games, you could use one of the many popular game engines that are fundamentally better because of the modern I/O they benefit from, and, of course, are more capable, supported and reliable projects. And, for utility terminal applications, there are much better libraries.
 
-But, for the very niche group of software that are both video games and terminal applications, KTech might be a possible solution. KTech could also be a solution for video games that want some uniqueness, which KTech's graphics and I/O could contribute.
+But, for the very niche group of software that are both video games and terminal applications, KTech might be a possible solution since it is specifically designed to support video games. Additionally, KTech could be a solution for video games that weren't originally planned to be terminal applications, and want some uniqueness, which KTech's graphics and I/O could definitely contribute.
 
 So, as for the question, KTech is a solution for video games needing to be displayed in a terminal, or for video games who wish for a unique element.
 
 ### The Principle
 
-- Game development, from creating textures, to coding a game, to compiling a game and running a game, shall be fully possible from the terminal with no limitations.
+Game development, from creating textures, to coding a game, to compiling a game and running a game, shall be fully possible from a terminal with no limitations.
 
 ### Goals
 
