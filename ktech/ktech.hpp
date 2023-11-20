@@ -1,11 +1,29 @@
 /*
+	KTech, Kaup's C++ 2D terminal game engine library.
+	Copyright (C) 2023 E. Kaufman (AKA Kaup)
 
+	This file is part of KTech.
+
+	KTech is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	any later version.
+
+	KTech is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with KTech. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/*        
 	  |  /  ----- ----- ----- -   -  
 	 || /\    |   |---  |     |---| 
-	|||/  \   |   \____ \____ |   |  kaup's terminal game engine
+	|||/  \   |   \____ \____ |   |  kaup's c++ 2d terminal game engine library
 
-	Tutorials and references are available at https://github.com/TheRealKaup/KTech in `tutorials.md` and `references.md` respectively. Capybaright � 2021-2023 Kaup. All rights reserved.
-
+	In order to contact me (Kaup), refer to the "readme.md" file.
 */
 
 #pragma once
@@ -29,20 +47,39 @@
 
 namespace Engine
 {
+	// A simple structure comprising 3 8-bit unsigned integers (`r`, `g`, `b`) representing a color.
 	struct RGB;
+	// A simple structure comprising 4 8-bit unsigned integers (`r`, `g`, `b`, `a`) representing a color with opacity.
+	// Used by:
+	// - `Engine::CellA` to store foreground and background colors.
+	// - `Texture::Write()` to set foreground and background colors to the written texture.
+	// - `Texture::SetForeground()` to set all of the foreground values of a texture.
+	// - `Texture::SetBackground()` to set all of the foreground values of a texture.
+	// - `Engine::Layer` to store the layer's foreground and background colors.
+	// - `Engine::RGBAColors` namespace to sture premade RGBA colors.
 	struct RGBA;
+	// A simple structure comprising 2 32 bit signed integers (`x`, `y`), usually representing a 2D position.
 	struct Point;
+	// A simple structure comprising 2 32 bit unsigned integers (`x`, `y`), usually representing a size.
 	struct UPoint;
+	// A simlpe structure comprising 2 RGBs (`f`, `b`), and a char (`c`), representing a cell of an image.
 	struct Cell;
+	// A simlpe structure comprising 2 RGBAs (`f`, `b`), and a char (`c`), representing a cell of an image with opacity, usually a texture.
 	struct CellA;
+	// Visual 2D structure that are stored within `Object`s. Textures are `CellA`-based.
 	struct Texture;
+	// Physical 2D structure that are stored within `Object`s. Colliders have a type which based on `Engine::colliderTypes` determines collision results with other colliders.
 	struct Collider;
+	// Group of textures and colliders that act as a single unit. `Object`s are stored within `Layer`s.
 	struct Object;
+	// Collection of `Object`s. `Layer`s are stored within `Map`s, and behave as physical separators and graphical organizers.
 	struct Layer;
+	// Tool which is able to render (`Camera::Render()`) a vector of `Layer`s (usually the one of a `Map`), and draw its rendered image to the engine's final iamge.
+	// `Camera`s are stored within `Map`s.
 	struct Camera;
+	// Collection of `Layer`s and `Camera`s.
+	// `Map`s behave as the top of the worlds hierarchies of your game, so they offer nice functions that handle certain things from the top.
 	struct Map;
-	struct AudioSource;
-	struct TimePoint;
 
 	inline bool running = true;
 

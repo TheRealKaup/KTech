@@ -4,18 +4,18 @@ project(game)
 
 add_executable(${PROJECT_NAME}
     game.cpp
-    ../../engine/audio.cpp
-    ../../engine/camera.cpp
-    ../../engine/collider.cpp
-    ../../engine/collision.cpp
-    ../../engine/engine.cpp
-    ../../engine/input.cpp
-    ../../engine/layer.cpp
-    ../../engine/map.cpp
-    ../../engine/object.cpp
-    ../../engine/texture.cpp
-    ../../engine/time.cpp
-    ../../engine/timepoint.cpp
+    ../../ktech/audio.cpp
+    ../../ktech/camera.cpp
+    ../../ktech/collider.cpp
+    ../../ktech/collision.cpp
+    ../../ktech/engine.cpp
+    ../../ktech/input.cpp
+    ../../ktech/layer.cpp
+    ../../ktech/map.cpp
+    ../../ktech/object.cpp
+    ../../ktech/texture.cpp
+    ../../ktech/time.cpp
+    ../../ktech/timepoint.cpp
 )
 
 target_link_directories(game PUBLIC "/usr/lib")

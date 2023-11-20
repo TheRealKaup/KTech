@@ -1,4 +1,22 @@
-#include "../../engine/engine.hpp"
+/*
+	simpleplatform1, a platform game example based on KTech.
+	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "../../ktech/ktech.hpp"
 
 bool catchingCharacterB = false;
 
@@ -213,7 +231,7 @@ int main()
 		{ CR::O, CR::O, CR::O, CR::O } // Overlappable - 3
 	};
 
-	Engine::PrepareTerminal({50, 50});
+	Engine::PrepareTerminal({50, 30});
 	Engine::InitializeAudio();
 
 	Engine::Map map;
@@ -224,17 +242,15 @@ int main()
 	map.AddLayer(&layer);
 	map.AddLayer(&voidLayer);
 
-	Engine::Camera camera({ 0, 0 }, { 50, 50 });
+	Engine::Camera camera({ 0, 0 }, { 50, 30 });
 	map.AddCamera(&camera, true);
 
 	Engine::Object worldProps({ 1, 1 }, &layer);
 	worldProps.textures.resize(3);
 	Engine::Log("<Main> Loading assets/sky.ktecht", RGBColors::blue);
 	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
-	Engine::Log("<Main> Loading assets/sky2.ktecht", RGBColors::blue);
-	worldProps.textures[1].File("assets/sky2.ktecht", { 0, 30 }), Engine::CellA(' ');
 	Engine::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
-	worldProps.textures[2].File("assets/land.ktecht", { 0, 20 });
+	worldProps.textures[2].File("assets/land.ktecht", { 0, 3 });
 	
 	worldProps.colliders.resize(1);
 	worldProps.colliders[0].ByTextureBackground(worldProps.textures[2], 100, 0);
@@ -242,10 +258,10 @@ int main()
 
 	Engine::Object frame(Engine::Point(0, 0), &layer, "L");
 	frame.textures.resize(5);
-	frame.textures[0].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
-	frame.textures[1].Simple({ 50, 1 }, Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 49 });
-	frame.textures[2].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 0, 0 });
-	frame.textures[3].Simple({ 1, 50 }, Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), { 49, 0 });
+	frame.textures[0].Simple(Engine::UPoint(1, 30), Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), Engine::Point(0, 0));
+	frame.textures[1].Simple(Engine::UPoint(1, 30), Engine::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), Engine::Point(49, 0));
+	frame.textures[2].Simple(Engine::UPoint(50, 1), Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), Engine::Point(0, 0));
+	frame.textures[3].Simple(Engine::UPoint(50, 1), Engine::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), Engine::Point(0, 29));
 	frame.textures[4].Write(
 		{
 			"'WASD'/'Arrow keys' to move.",
@@ -257,16 +273,16 @@ int main()
 	frame.textures[4].SetBackground(RGBA(255, 255, 255, 100));
 	frame.colliders.resize(4);
 	frame.colliders[0].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 0));
-	frame.colliders[1].Simple(Engine::UPoint(1, 50), 0, Engine::Point(0, 0));
-	frame.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 49));
-	frame.colliders[3].Simple(Engine::UPoint(1, 50), 0, Engine::Point(49, 0));
+	frame.colliders[1].Simple(Engine::UPoint(1, 30), 0, Engine::Point(0, 0));
+	frame.colliders[2].Simple(Engine::UPoint(50, 1), 0, Engine::Point(0, 29));
+	frame.colliders[3].Simple(Engine::UPoint(1, 30), 0, Engine::Point(49, 0));
 
 	Character character(&layer, &voidLayer);
 	map.AddCamera(&character.cam);
 
-	GravityBox gbA(&layer, {10, 20}, 1);
-	GravityBox gbB(&layer, {15, 20}, 2);
-	GravityBox gbC(&layer, {30, 20}, 3);
+	GravityBox gbA(&layer, {10, 5}, 1);
+	GravityBox gbB(&layer, {15, 5}, 2);
+	GravityBox gbC(&layer, {30, 5}, 3);
 
 	Engine::Object house({ 20, 32 }, &layer, "");
 
@@ -280,7 +296,7 @@ int main()
 	Engine::Layer darkLayer;
 	darkLayer.alpha = 127;
 	
-	AutoUpdatingText audioPerformance(&Engine::Time::tpsPotential, Point(2, 47), &layer);
+	AutoUpdatingText audioPerformance(&Engine::Time::tpsPotential, Point(2, 27), &layer);
 
 	std::thread t_inputLoop(Engine::Input::Loop);
 

@@ -1,8 +1,26 @@
-#include "../../engine/engine.hpp"
-#include "../../widgets/button.hpp"
-#include "../../widgets/intfield.hpp"
-#include "../../widgets/stringfield.hpp"
-#include "../../widgets/switch.hpp"
+/*
+	widgetstest, a user interface example based on KTech.
+	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "../../ktech/ktech.hpp"
+#include "../../ktech/widgets/button.hpp"
+#include "../../ktech/widgets/intfield.hpp"
+#include "../../ktech/widgets/stringfield.hpp"
+#include "../../ktech/widgets/switch.hpp"
 
 using namespace Engine;
 
