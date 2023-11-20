@@ -10,6 +10,8 @@ Table of contents of this readme file:
 - [Manifesto](#manifesto) - what this project solves, goals of the project.
 - [Interrelated Projects](#interrelated-projects) - other projects that are very connected to KTech.
 
+![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
+
 ---
 
 ## Introduction
@@ -73,7 +75,7 @@ In front of you are listed all of the files that comprise KTech's documentation:
 - [tutorials.md](tutorials.md) - tutorials about getting KTech, using its different elements, creating a game with it and compiling.
 - [faq.md](faq.md) - answers for frequently asked questions.
 - [examples.md](examples.md) - analyses and explanations of the examples included in the "examples" directory in this repository.
-- [LICENSE](LICENSE) - the license which covers KTech (GPLv3).
+- [LICENSE](LICENSE) - the license which covers KTech (GPLv3-or-later).
 
 ---
 
