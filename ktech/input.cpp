@@ -99,49 +99,53 @@ void Engine::Input::Call()
 std::string& Engine::Input::Get()
 {
 	static char* buf = new char[maxInputLength];
-
+	
 	// Clear previous buffer
 	memset(buf, 0, maxInputLength);
-
 	// Read to buffer (blocking)
 	read(0, buf, maxInputLength);
-
 	// Update `std::string Input::input`
 	input.assign(buf);
 
-	// Call basic handlers
-	for (size_t i = 0; i < BasicHandler::handlers.size(); i++)
-	{
-		if (input == BasicHandler::handlers[i]->input) // If the strings are equal
-		{
-			BasicHandler::handlers[i]->timesPressed++;
-			for (size_t j = 0; j < BasicHandler::handlers[i]->callbacks.size(); j++) // Call the calls
-				if (BasicHandler::handlers[i]->callbacks[j]->enabled && !BasicHandler::handlers[i]->callbacks[j]->onTick) // Check if the callback is enabled and shouldn't be called on tick
-					BasicHandler::handlers[i]->callbacks[j]->callback(); // Call
-			break; // Break because there shouldn't be a similar handler
-		}
-	}
-	// Call ranged handlers, only if the input is 1 letter in length
-	if (input.length() == 1)
-	{
-		for (size_t i = 0; i < RangedHandler::handlers.size(); i++)
-		{
-			if (RangedHandler::handlers[i]->key1 <= input[0] && input[0] <= RangedHandler::handlers[i]->key2) // If the key is in range
-			{
-				for (RangedHandler::RangedCallback*& callback: RangedHandler::handlers[i]->callbacks)
-					if (callback->enabled) // Check if the callback is enabled
-						callback->callback(); // Call
-				// Don't break since there can be more handlers which manage an area in which the input is located in
-			}
-		}
-	}
 	return input;
 }
 
 void Engine::Input::Loop()
 {
 	while (Engine::running)
+	{
+		// Get input
 		Get();
+		// Quit
+		if (input == quitKey)
+			running = false;
+		// Call basic handlers
+		for (size_t i = 0; i < BasicHandler::handlers.size(); i++)
+		{
+			if (input == BasicHandler::handlers[i]->input) // If the strings are equal
+			{
+				BasicHandler::handlers[i]->timesPressed++;
+				for (size_t j = 0; j < BasicHandler::handlers[i]->callbacks.size(); j++) // Call the calls
+					if (BasicHandler::handlers[i]->callbacks[j]->enabled && !BasicHandler::handlers[i]->callbacks[j]->onTick) // Check if the callback is enabled and shouldn't be called on tick
+						BasicHandler::handlers[i]->callbacks[j]->callback(); // Call
+				break; // Break because there shouldn't be a similar handler
+			}
+		}
+		// Call ranged handlers, only if the input is 1 letter in length
+		if (input.length() == 1)
+		{
+			for (size_t i = 0; i < RangedHandler::handlers.size(); i++)
+			{
+				if (RangedHandler::handlers[i]->key1 <= input[0] && input[0] <= RangedHandler::handlers[i]->key2) // If the key is in range
+				{
+					for (RangedHandler::RangedCallback*& callback: RangedHandler::handlers[i]->callbacks)
+						if (callback->enabled) // Check if the callback is enabled
+							callback->callback(); // Call
+					// Don't break since there can be more handlers which manage an area in which the input is located in
+				}
+			}
+		}
+	}
 }
 
 bool Engine::Input::Is(const std::string& stringKey)

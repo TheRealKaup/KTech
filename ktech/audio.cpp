@@ -170,6 +170,8 @@ void Engine::InitializeAudio()
 	Pa_OpenStream(&stream, NULL, &outputParameters, Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultSampleRate, config_framesPerBuffer, paClipOff, Callback, nullptr);
 	// Start the stream
 	Pa_StartStream(stream);
+
+	audioInitialized = true;
 }
 void Engine::TerminateAudio()
 {

@@ -230,9 +230,11 @@ int main()
 		{ CR::B, CR::B, CR::P, CR::O }, // Light - 2
 		{ CR::O, CR::O, CR::O, CR::O } // Overlappable - 3
 	};
-
+	
 	Engine::PrepareTerminal({50, 30});
 	Engine::InitializeAudio();
+
+	Engine::PrintStartupNotice("simpleplatform1, a platform game example based on KTech.", "2023", "E. Kaufman (AKA Kaup)", "simpleplatform1");
 
 	Engine::Map map;
 	pmap = &map;
@@ -327,11 +329,7 @@ int main()
 		// std::cout << "n="<< Engine::totalTicks << " | delta=" << Engine::deltaTime << " | fps=" << Engine::fps << " | pfps=" << Engine::potentialfps << std::endl;
 		// std::cout << "x=" << Engine::terminalSize.ws_col << ", y=" << Engine::terminalSize.ws_row << std::endl;
 		Engine::Time::WaitUntilNextTick();
-
-		// running = false;
 	}
-	
-	Engine::TerminateAudio();
-	Engine::ResetTerminal();
-	exit(0);
+
+	Engine::Terminate();
 }

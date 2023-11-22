@@ -171,6 +171,11 @@ namespace Engine
 		// The last input as the engine received it, including escape codes.
 		extern std::string input;
 
+		// Set this to the key that the player should press in order to quit the game.
+		// There should always be an available key that allows the player to quit the game.
+		// Ctrl-c by default.
+		inline std::string quitKey = "\x03";
+
 		// Register an input handler in order to get your function called on a keyboard input event.
 		// Unlike most game engines, this one uses the terminal to recieve keyboard input.
 		// This means that the engine receives ASCII and asynchronous input. For example:
@@ -186,8 +191,7 @@ namespace Engine
 		// For example, field widgets use this.
 		// The `onTick` feature is not possible with the type of the callback's handler.
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
-		// Get inputs (and calls registered input handler accordingly).
-		// Returns the input (also updates Engine::Input::buf).
+		// Blocks the thread and returns the next input (also updates Engine::Input::input).
 		std::string& Get();
 		// Call this function in order to call all handlers who got their input received since the last time you called this function.
 		// This function also resets all `Engine::Input::handlers[].timesPressed`.
@@ -195,7 +199,6 @@ namespace Engine
 		void Call();
 		// A premade loop for automatically getting inputs and calling handlers.
 		// You need to create a new thread for this loop (as in `std::thread t_inputLoop(Engine::Input::Loop);`).
-		// Calls OnQuit automatically when Ctrl+C is received.
 		void Loop();
 		
 		// Returns true if the last input is equal to stringKey
@@ -604,6 +607,9 @@ namespace Engine
 		void CallOnTicks() const;
 	};
 
+	inline termios oldTerminalAttributes;
+	inline bool terminalPrepared = false;
+	inline bool audioInitialized = false;
 	// Prepare the terminal for printing and receiving input.
 	void PrepareTerminal(UPoint imageSize);
 	// Reset the terminal before exiting the game (turn it back to normal for further terminal use).
@@ -612,6 +618,16 @@ namespace Engine
 	void InitializeAudio();
 	// Terminate (deallocate) the audio library (PortAudio).
 	void TerminateAudio();
+	// Automatically calls `ResetTerminal()` if `PrepareTerminal()` was called and `TerminateAudio()` if `InitializeAudio()`, and sets `running` to false. 
+	void Terminate();
+	// Print start up legal notices. 
+	// It's recommended to call this right after `Engine::PrepareTerminal()`, and before creating an input loop thread.
+	// This will block the thread, print Appropriate Legal Notices, and will free the thread until the player presses any key.
+	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
+	// Print start up legal notices. 
+	// It's recommended to call this right after `Engine::PrepareTerminal()`, and before creating an input loop thread.
+	// This will block the thread, print Appropriate Legal Notices, and will free the thread until the player presses any key.
+	void PrintStartupNotice(const std::string& text);
 	// Print the engine's final image (`Engine::image`) to the console.
 	void Print();
 

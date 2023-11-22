@@ -32,7 +32,7 @@ void Engine::Print()
 	ioctl(fileno(stdout), TIOCGWINSZ, &Engine::terminalSize);
 
 	// Obtain the maximum length for the stringImage
-	if (image.size() == 0)
+	if (image.size() == 0 || !terminalPrepared)
 		return;
 
 	// Resize the stringImage if needed
@@ -176,32 +176,16 @@ void Engine::Print()
 		l += 3;
 	}
 	// ".substr(0, l)" - print until the end which was set by the writing sequence above.
-	std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
+	if (terminalPrepared)
+		std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
 }
 
 void Engine::ResetTerminal()
 {
-	// Reenable canonical mode and echo
-	termios terminalAttributes;
-	tcgetattr(0, &terminalAttributes);
-	terminalAttributes.c_lflag |= ICANON;
-	terminalAttributes.c_lflag |= ECHO;
-	tcsetattr(0, TCSANOW, &terminalAttributes);
+	// Return to the old terminal attributes
+	tcsetattr(0, TCSANOW, &oldTerminalAttributes);
 	// Show cursor, and disable alternative buffer (return to previous terminal)
 	std::cout << "\033[?25h\033[?1049l" << std::flush;
-}
-
-void SignalHandler(int signal)
-{
-	if (signal == SIGWINCH)
-	{
-		// Currntly contains nothing until BetterPrint update
-
-		// std::cout << "\033[H\033[3J\033[2J#####" << std::flush;
-		// Engine::Print();
-	}
-	if (signal == SIGINT) // I just find it so cool these signals work :)
-		Engine::running = false;
 }
 
 void Engine::PrepareTerminal(Engine::UPoint imageSize)
@@ -212,13 +196,14 @@ void Engine::PrepareTerminal(Engine::UPoint imageSize)
 	// Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
 	std::cout << "\033[?25l\033[?1049h";
 
-	// Disable canonical mode and echo
-	termios terminalAttributes;
-	tcgetattr(0, &terminalAttributes);
-	terminalAttributes.c_lflag &= ~ICANON;
-	terminalAttributes.c_lflag &= ~ECHO;
-	terminalAttributes.c_cc[VMIN] = 1;
-	terminalAttributes.c_cc[VTIME] = 1;
+	// Set terminal attributes
+	tcgetattr(0, &oldTerminalAttributes);
+	termios terminalAttributes = oldTerminalAttributes;
+	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
+	terminalAttributes.c_lflag &= ~ECHO; // Disable echo
+	terminalAttributes.c_lflag &= ~ISIG; // Disable signals
+	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
+	terminalAttributes.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSANOW, &terminalAttributes);
 
 	// Size the image
@@ -233,10 +218,55 @@ void Engine::PrepareTerminal(Engine::UPoint imageSize)
 	if (stringImage.size() < maxStringSize)
 		stringImage.resize(maxStringSize);
 
-	// Resize signal
-	signal(SIGWINCH, SignalHandler);
-	// Exit signal
-	signal(SIGINT, SignalHandler);
+	terminalPrepared = true;
+}
+
+void Engine::Terminate()
+{
+	if (Engine::terminalPrepared)
+	{
+		Engine::ResetTerminal();
+		Engine::terminalPrepared = false;
+	}
+	if (Engine::audioInitialized)
+	{
+		Engine::TerminateAudio();
+		Engine::audioInitialized = false;
+	}
+	running = false;
+}
+
+void Engine::PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string nameOfProject)
+{
+	// Clear the terminal
+	std::cout << "\033[H\033[3J\033[2J";
+
+	// Title
+	std::cout << title << "\n";
+	// Copyright (C)
+	std::cout << "Copyright (C) " << years << " " << author << "\n\n";
+	// Copying
+	std::cout << nameOfProject << " is free software: you can redistribute it and/or modify\n";
+	std::cout << "it under the terms of the GNU General Public License as published by\n";
+	std::cout << "he Free Software Foundation, either version 3 of the License, or\n";
+	std::cout << "any later version.\n\n";
+	// No warranty
+	std::cout << nameOfProject << " is distributed in the hope that it will be useful,\n";
+	std::cout << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n";
+	std::cout << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n";
+	std::cout << "GNU General Public License for more details.\n\n";
+	// GPL link
+	std::cout << "You should have received a copy of the GNU General Public License\n";
+	std::cout << "along with this program. If not, see <https://www.gnu.org/licenses/>.\n\n\n";
+
+	// Wait for user input
+	std::cout << "Read the legal notices, and then press the 'return' key (enter) to proceed..." << std::flush;
+	while (Input::input != Input::K::return_)
+	{
+		std::cout << Input::Get() << Input::input << std::endl << std::flush;
+		if (!running)
+			exit(0);
+	}
 }
 
 void Engine::Log(const std::string& text, RGB color)
