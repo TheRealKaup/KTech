@@ -8,6 +8,7 @@ Table of contents of this readme file:
 - [Intereseting Details](#intereseting-details) - some specifics that could arouse your curiosity.
 - [Documentation](#documentation) - links to projects's documentation.
 - [Manifesto](#manifesto) - what this project solves, goals of the project.
+- [Contact](#contact) - how to contact me (Kaup) and how to contribute to KTech.
 - [Interrelated Projects](#interrelated-projects) - other projects that are very connected to KTech.
 
 ![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
@@ -105,6 +106,12 @@ Game development, from creating textures, to coding a game, to compiling a game 
 
 - Become a powerful game engine. To make this explicit, KTech is not as powerful as I wish it to be, at all.
 - Though to mention not a part of the KTech project itself; create a software development kit around KTech to make KTech game development efficient and as modern as possible, while still remaining in the terminal, as goes the principle.
+
+--- 
+
+## Contact
+
+
 
 ---
 
