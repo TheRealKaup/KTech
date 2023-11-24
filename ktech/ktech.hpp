@@ -202,38 +202,6 @@ namespace KTech
 		~Layer();
 	};
 	
-	struct AudioSource
-	{
-		bool loaded;
-
-		PaStream* stream;
-		uint32_t cur = 0UL;
-		uint32_t frames = 0UL;
-		uint32_t endpointToPlay = 0UL;
-		uint32_t startPoint = 0UL;
-		float volume = 1.0f;
-		bool playing = false;
-
-		uint32_t fileSize = 0UL;
-		uint8_t channels = 0U;
-		uint32_t sampleRate = 0UL;
-		uint32_t byteRate = 0UL;
-		uint8_t blockAlign = 0U;
-		uint16_t bitsPerSample = 0U;
-		uint32_t dataSize = 0UL;
-
-		int16_t* data = nullptr;
-
-		std::function<void()> OnEnd;
-
-		AudioSource(const std::string& fileName, std::function<void()> OnEnd = nullptr);
-
-		bool Play(uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
-		void Pause();
-		void Resume();
-		void Stop();
-	};
-	
 	struct Camera
 	{
 		std::string name = "";
@@ -268,6 +236,38 @@ namespace KTech
 		void CallOnTicks() const;
 	};
 
+	struct AudioSource
+	{
+		bool loaded;
+
+		PaStream* stream;
+		uint32_t cur = 0UL;
+		uint32_t frames = 0UL;
+		uint32_t endpointToPlay = 0UL;
+		uint32_t startPoint = 0UL;
+		float volume = 1.0f;
+		bool playing = false;
+
+		uint32_t fileSize = 0UL;
+		uint8_t channels = 0U;
+		uint32_t sampleRate = 0UL;
+		uint32_t byteRate = 0UL;
+		uint8_t blockAlign = 0U;
+		uint16_t bitsPerSample = 0U;
+		uint32_t dataSize = 0UL;
+
+		int16_t* data = nullptr;
+
+		std::function<void()> OnEnd;
+
+		AudioSource(const std::string& fileName, std::function<void()> OnEnd = nullptr);
+
+		bool Play(uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
+		void Pause();
+		void Resume();
+		void Stop();
+	};
+
 	// Collision Result
 	enum class CR : uint8_t
 	{
@@ -276,10 +276,29 @@ namespace KTech
 		O	// Overlap
 	};
 
-	// Collection of user input handling tools
-	namespace Input
+	// Manager of all things that directly work with terminal I/O.
+	class IOManager
 	{
-		namespace K {}
+	public:
+		// Prepares terminal, creates input loop thread
+		IOManager();
+		// Resets terminal
+		~IOManager();
+
+		termios oldTerminalAttributes;
+		
+		winsize terminalSize;
+		std::vector<std::vector<Cell>> image;
+		std::string stringImage;
+
+		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
+		void PrintStartupNotice(const std::string& text);
+			
+		void Print();
+
+		void Log(const std::string& text, RGB color);
+
+		std::string& Get();
 
 		struct Callback
 		{
@@ -333,32 +352,27 @@ namespace KTech
 			void DeleteCallbacks();
 		};
 
-		std::string input;
-
-		std::string quitKey = "\x03";
-
 		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
-		std::string& Get();
+
+		std::string input;
+		std::string quitKey = "\x03";
+
 		void Call();
 		void Loop();
-		
+
 		bool Is(const std::string& stringKey);
 		bool Is(char charKey);
 		bool Bigger(char charKey);
 		bool Smaller(char charKey);
 		bool Between(char charKey1, char charKey2);
 		uint8_t GetInt();
-
-		class Manager
-		{
-			
-		};
 	};
 
-	// Collection of time management tools
-	namespace Time
+	// Time manager
+	class TimeManager
 	{
+	public:
 		enum class Measurement
 		{
 			ticks,
@@ -384,7 +398,7 @@ namespace KTech
 		int32_t deltaTime;
 		int32_t ticksCounter = 0;
 		
-		inline void StartThisTick() { Time::thisTickStartTP.SetToNow(); }
+		inline void StartThisTick() { thisTickStartTP.SetToNow(); }
 		void WaitUntilNextTick();
 		
 		struct Invocation
@@ -398,46 +412,43 @@ namespace KTech
 		Invocation* Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement);
 		bool CancelInvocation(Invocation* invocation);
 		void CallInvocations();
-	}
 
-	// Core class, the user should create one of these
+		// 
+		TimeManager(int16_t tps);
+		
+		~TimeManager();
+	};
+
+	class AudioManager
+	{
+	public:
+		AudioManager();
+		~AudioManager();
+	};
+
+	// Core class, the user should create one of these, and shouldn't have to construct themselves 
+	// a system using the other namespaces themselves
 	class Engine
 	{
 	public:
+		bool running = true;
+
+		IOManager io;
+		TimeManager time;
+		AudioManager audio;
+
 		std::vector<std::vector<CR>> colliderTypes = {
 			{ CR::B, CR::P, CR::O }, // Heavy - 0
 			{ CR::B, CR::P, CR::O }, // Normal - 1
 			{ CR::O, CR::O, CR::O } // Overlappable - 2
 		};
-	
-		bool running = true;
 
-		winsize terminalSize;
-		std::vector<std::vector<Cell>> image;
-		std::string stringImage;
-
-		termios oldTerminalAttributes;
-		bool terminalPrepared = false;
-		bool audioInitialized = false;
-		void PrepareTerminal(UPoint imageSize);
-		void ResetTerminal();
-		void InitializeAudio();
-		void TerminateAudio();
-		void Terminate();
-		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
-		void PrintStartupNotice(const std::string& text);
-		void Print();
-
-		void Log(const std::string& text, RGB color);
-
-		Engine()
+		Engine(int16_t tps = 24) : time(TimeManager(tps))
 		{
-
 		}
 
 		~Engine()
 		{
-
 		}
 	};
 
