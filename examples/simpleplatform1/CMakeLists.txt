@@ -8,11 +8,11 @@ add_executable(${PROJECT_NAME}
     ../../ktech/camera.cpp
     ../../ktech/collider.cpp
     ../../ktech/collision.cpp
-    ../../ktech/engine.cpp
     ../../ktech/input.cpp
     ../../ktech/layer.cpp
     ../../ktech/map.cpp
     ../../ktech/object.cpp
+    ../../ktech/output.cpp
     ../../ktech/texture.cpp
     ../../ktech/time.cpp
     ../../ktech/timepoint.cpp

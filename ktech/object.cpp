@@ -20,21 +20,27 @@
 
 #include "ktech.hpp"
 
-void Engine::Object::EnterLayer(Engine::Layer* layer)
+void KTech::Object::EnterLayer(KTech::Layer* layer)
 {
 	if (parentLayer != nullptr)
 		parentLayer->RemoveObject(this);
 	layer->AddObject(this);
 }
 
-Engine::Object::Object(Point pos, Layer* layer, const std::string& name)
+bool KTech::Object::Move(Point dir)
+{
+	// Request the collision manager of the engine to move this object.
+	return parentLayer->parentMap->parentEngine->collision.MoveObject(this, dir);
+}
+
+KTech::Object::Object(Point pos, Layer* layer, const std::string& name)
 	: pos(pos), name(name)
 {
 	if(layer)
 		EnterLayer(layer);
 }
 
-Engine::Object::~Object()
+KTech::Object::~Object()
 {
 	if (parentLayer)
 		parentLayer->RemoveObject(this);

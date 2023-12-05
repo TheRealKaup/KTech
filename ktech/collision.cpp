@@ -20,16 +20,9 @@
 
 #include "ktech.hpp"
 
-using namespace Engine;
+using namespace KTech;
 
-struct CollisionData{
-	Object* activeObject;
-	Object* passiveObject;
-	size_t activeCollider;
-	size_t passiveCollider;
-};
-
-static CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
+CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
 {
 	CR result = CR::O;
 	if (t1 >= 0 && t1 < colliderTypes.size())
@@ -40,14 +33,14 @@ static CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
 
 // `s` - simple (rectangle)
 // `p` - global position
-static bool AreSimpleCollidersOverlapping(UPoint s1, Point p1, UPoint s2, Point p2)
+bool Collision::AreSimpleCollidersOverlapping(UPoint s1, Point p1, UPoint s2, Point p2)
 {
  	return (p1.x < p2.x + s2.x && p1.x + s1.x > p2.x && p1.y < p2.y + s2.y && p1.y + s1.y > p2.y);
 }
 // `s` - simple (rectangle)
 // `c` - complex (2d vector)
 // `p` - global position
-static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos)
+bool Collision::AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos)
 {
 	// Start Y from 0 if the simple is before the complex, or at the same position.
 	// Otherwise, add some to Y so the scanning will start from the point in which the simple collider starts.
@@ -66,9 +59,10 @@ static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simpleP
 	}
 	return false;
 }
+
 // `c` - complex (2d vector)
 // `p` - global position
-static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2)
+bool Collision::AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2)
 {
 	size_t y1 = 0;
 	size_t y2 = 0;
@@ -99,7 +93,7 @@ static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>&
 	return false;
 }
 
-static void ExpandMovementTree(Object* thisObj, Point dir,
+void Collision::ExpandMovementTree(Object* thisObj, Point dir,
 	std::vector<CollisionData>& pushData,
 	std::vector<CollisionData>& blockData,
 	std::vector<CollisionData>& overlapData,
@@ -234,7 +228,7 @@ static void ExpandMovementTree(Object* thisObj, Point dir,
 	}
 }
 
-bool Object::Move(Point dir)
+bool Collision::MoveObject(Object* object, Point dir)
 {
 	std::vector<CollisionData> pushData;
 	std::vector<CollisionData> blockData;
@@ -242,22 +236,22 @@ bool Object::Move(Point dir)
 	std::vector<CollisionData> exitOverlapData;
 	
 	// Start root of movement trees
-	ExpandMovementTree(this, dir, pushData, blockData, overlapData, exitOverlapData);
+	ExpandMovementTree(object, dir, pushData, blockData, overlapData, exitOverlapData);
 	// Expand until no more objects in the area can be pushed
 	for (size_t i = 0; i < pushData.size(); i++)
 		ExpandMovementTree(pushData[i].passiveObject, dir, pushData, blockData, overlapData, exitOverlapData);
 
+	// Able to move - no blocks at the end (could be that no blocking objects were found or all blocking objects were found to be pushable)
 	if (blockData.size() == 0)
 	{
-		// Able to move.
 		// Change positions
 		for (size_t i = 0; i < pushData.size(); i++)
 		{
 			pushData[i].passiveObject->pos.x += dir.x;
 			pushData[i].passiveObject->pos.y += dir.y;
 		}
-		pos.x += dir.x;
-		pos.y += dir.y;
+		object->pos.x += dir.x;
+		object->pos.y += dir.y;
 		// Call push events
 		for (size_t i = 0; i < pushData.size(); i++)
 		{
@@ -271,11 +265,8 @@ bool Object::Move(Point dir)
 			pushData[i].passiveObject->otherObject = pushData[i].activeObject;
 			pushData[i].passiveObject->otherColliderIndex = pushData[i].activeCollider;
 			
-			if (pushData[i].activeObject->OnEvent)
-				pushData[i].activeObject->OnEvent(EventType::onPush);
-			
-			if (pushData[i].passiveObject->OnEvent)
-				pushData[i].passiveObject->OnEvent(EventType::onPushed);
+			pushData[i].activeObject->OnEvent(Object::EventType::onPush);
+			pushData[i].passiveObject->OnEvent(Object::EventType::onPushed);
 		}
 		// Call overlap events
 		for (size_t i = 0; i < overlapData.size(); i++)
@@ -290,11 +281,8 @@ bool Object::Move(Point dir)
 			overlapData[i].passiveObject->otherObject = overlapData[i].activeObject;
 			overlapData[i].passiveObject->otherColliderIndex = overlapData[i].activeCollider;
 
-			if (overlapData[i].activeObject->OnEvent)
-				overlapData[i].activeObject->OnEvent(EventType::onOverlap);
-
-			if (overlapData[i].passiveObject->OnEvent)
-				overlapData[i].passiveObject->OnEvent(EventType::onOverlapped);
+			overlapData[i].activeObject->OnEvent(Object::EventType::onOverlap);
+			overlapData[i].passiveObject->OnEvent(Object::EventType::onOverlapped);
 		}
 		// Call overlap exit events
 		for (size_t i = 0; i < exitOverlapData.size(); i++)
@@ -309,17 +297,14 @@ bool Object::Move(Point dir)
 			exitOverlapData[i].passiveObject->otherObject = exitOverlapData[i].activeObject;
 			exitOverlapData[i].passiveObject->otherColliderIndex = exitOverlapData[i].activeCollider;
 
-			if (exitOverlapData[i].activeObject->OnEvent)
-				exitOverlapData[i].activeObject->OnEvent(EventType::onOverlapExit);
-
-			if (exitOverlapData[i].passiveObject->OnEvent)
-				exitOverlapData[i].passiveObject->OnEvent(EventType::onOverlappedExit);
+			exitOverlapData[i].activeObject->OnEvent(Object::EventType::onOverlapExit);
+			exitOverlapData[i].passiveObject->OnEvent(Object::EventType::onOverlappedExit);
 		}
 		return true;
 	}
+	// Unable to move - there are blocking objects.
 	else
 	{
-		// Unable to move, blocked.
 		Object* theOtherObject = NULL;
 		Point lastPush = { 0, 0 };
 		int theColliderIndex = -1;
@@ -336,11 +321,8 @@ bool Object::Move(Point dir)
 			blockData[i].passiveObject->otherObject = blockData[i].activeObject;
 			blockData[i].passiveObject->otherColliderIndex = blockData[i].activeCollider;
 
-			if (blockData[i].activeObject->OnEvent)
-				blockData[i].activeObject->OnEvent(EventType::onBlocked);
-
-			if (blockData[i].passiveObject->OnEvent)
-				blockData[i].passiveObject->OnEvent(EventType::onBlock);
+			blockData[i].activeObject->OnEvent(Object::EventType::onBlocked);
+			blockData[i].passiveObject->OnEvent(Object::EventType::onBlock);
 		}
 		return false; 
 	}

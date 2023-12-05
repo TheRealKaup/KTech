@@ -20,7 +20,7 @@
 
 #include "ktech.hpp"
 
-int Engine::Map::AddCamera(Camera* camera, bool asActiveCamera)
+int KTech::Map::AddCamera(Camera* camera, bool asActiveCamera)
 {
 	cameras.push_back(camera);
 	if (asActiveCamera)
@@ -28,13 +28,14 @@ int Engine::Map::AddCamera(Camera* camera, bool asActiveCamera)
 	return cameras.size() - 1;
 }
 
-int Engine::Map::AddLayer(Layer* layer)
+int KTech::Map::AddLayer(Layer* layer)
 {
 	layers.push_back(layer);
+	layer->parentMap = this;
 	return layers.size() - 1;
 }
 
-bool Engine::Map::Render() const
+bool KTech::Map::Render() const
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{
@@ -44,7 +45,7 @@ bool Engine::Map::Render() const
 	return false;
 }
 
-bool Engine::Map::RenderReversed() const
+bool KTech::Map::RenderReversed() const
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{
@@ -54,17 +55,7 @@ bool Engine::Map::RenderReversed() const
 	return false;
 }
 
-bool Engine::Map::Draw(Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) const
-{
-	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
-	{
-		cameras[0]->Draw(pos, left, top, right, bottom);
-		return true;
-	}
-	return false;
-}
-
-void Engine::Map::CallOnTicks() const
+void KTech::Map::CallOnTicks() const
 {
 	if (OnTick)
 		OnTick();
@@ -75,10 +66,7 @@ void Engine::Map::CallOnTicks() const
 			layers[l]->OnTick();
 
 		for (size_t o = 0; o < layers[l]->objects.size(); o++)
-		{
-			if (layers[l]->objects[o]->OnEvent)
-				layers[l]->objects[o]->OnEvent(Object::EventType::onTick);
-		}
+			layers[l]->objects[o]->OnEvent(Object::EventType::onTick);
 	}
 	for (size_t c = 0; c < cameras.size(); c++)
 	{

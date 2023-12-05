@@ -24,9 +24,9 @@
 
 struct Widget
 {
-	Engine::Object obj;
+	KTech::Object obj;
 	bool selected = false;
-	Engine::Input::CallbacksGroup callbackGroup{false};
+	KTech::IO::CallbacksGroup callbackGroup{false};
 	inline virtual void Select() {}
 	inline virtual void Deselect() {}
 	~Widget() { obj.parentLayer->RemoveObject(&obj); callbackGroup.DeleteCallbacks(); }

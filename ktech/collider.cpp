@@ -20,7 +20,7 @@
 
 #include "ktech.hpp"
 
-void Engine::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
+void KTech::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
 {
     simple = true;
     type = _type;
@@ -28,7 +28,7 @@ void Engine::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
     size = _size;
 }
 
-bool Engine::Collider::File(const std::string& fileName, uint8_t _type, Point _pos)
+bool KTech::Collider::File(const std::string& fileName, uint8_t _type, Point _pos)
 {
     simple = false;
     type = _type;
@@ -51,7 +51,7 @@ bool Engine::Collider::File(const std::string& fileName, uint8_t _type, Point _p
 	return true;
 }
 
-void Engine::Collider::Write(const std::vector<std::string>& stringVector, uint8_t _type, Point _pos)
+void KTech::Collider::Write(const std::vector<std::string>& stringVector, uint8_t _type, Point _pos)
 {
     simple = false;
     type = _type;
@@ -67,7 +67,7 @@ void Engine::Collider::Write(const std::vector<std::string>& stringVector, uint8
 	}
 }
 
-void Engine::Collider::ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
+void KTech::Collider::ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
 {
     simple = false;
     type = _type;
@@ -83,7 +83,7 @@ void Engine::Collider::ByTextureCharacter(const Texture& texture, uint8_t alphaT
 	}
 }
 
-void Engine::Collider::ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
+void KTech::Collider::ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
 {
     simple = false;
     type = _type;
@@ -100,7 +100,7 @@ void Engine::Collider::ByTextureBackground(const Texture& texture, uint8_t alpha
 }
 
 // [Simple/Complex] Get the size of the texture.
-Engine::UPoint Engine::Collider::GetSize() const
+KTech::UPoint KTech::Collider::GetSize() const
 {
 	if (simple)
 		return size;

@@ -20,14 +20,14 @@
 
 #include "ktech.hpp"
 
-void Engine::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
+void KTech::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
 	simple = true;
 	pos_r = _pos;
 	size = _size;
 	value = _value;
 }
 
-void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
+void KTech::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
 {
 	simple = false;
 	pos_r = _pos;
@@ -35,42 +35,42 @@ void Engine::Texture::Rectangle(UPoint _size, CellA _value, Point _pos)
 	t.resize(_size.y, std::vector<CellA>(_size.x, _value));
 }
 
-Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
+KTech::UPoint KTech::Texture::File(const std::string& fileName, Point _pos)
 {
 	simple = false;
 	pos_r = _pos;
 
-	Log("<Engine::Texture::File()> Opening file " + fileName + "." , RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Opening file " + fileName + "." , RGB(128, 128, 255));
 	// Open file
 	std::ifstream file(fileName);
 	if (!file.is_open())
 	{
-		Log("<Engine::Texture::File()> Error! Failed to open file " + fileName + ".", RGB(255, 0, 0));
+		IO::Log("<KTech::Texture::File()> Error! Failed to open file " + fileName + ".", RGB(255, 0, 0));
 		return UPoint(0, 0);
 	}
 
-	Log("<Engine::Texture::File()> Reading size of texture.", RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Reading size of texture.", RGB(128, 128, 255));
 	// Get the texture size (first 8 bytes of the file)
 	UPoint maxTextureSize;
 	file.read((char*)&maxTextureSize, 8);
-	Log("<Engine::Texture::File()> Size of texture in file: { " + std::to_string(maxTextureSize.x) + ", " + std::to_string(maxTextureSize.y) + " }.", RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Size of texture in file: { " + std::to_string(maxTextureSize.x) + ", " + std::to_string(maxTextureSize.y) + " }.", RGB(128, 128, 255));
 	if (maxTextureSize.y > 9999)
 	{
-		Log("<Engine::Texture::File()> Warning! Y size of texture in file is too big. Scaling Y down to 9999.", RGB(255, 0, 0));
+		IO::Log("<KTech::Texture::File()> Warning! Y size of texture in file is too big. Scaling Y down to 9999.", RGB(255, 0, 0));
 		maxTextureSize.y = 9999;
 	}
 	if (maxTextureSize.x > 9999)
 	{
-		Log("<Engine::Texture::File()> Warning! X size of texture in file is too big. Scaling X down to 9999.", RGB(255, 0, 0));
+		IO::Log("<KTech::Texture::File()> Warning! X size of texture in file is too big. Scaling X down to 9999.", RGB(255, 0, 0));
 		maxTextureSize.x = 9999;
 	}
 
-	Log("<Engine::Texture::File()> Resizing texture to fit texture in file.", RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Resizing texture to fit texture in file.", RGB(128, 128, 255));
 	// Resize the texture
 	t.clear();
 	t.resize(maxTextureSize.y, std::vector<CellA>(maxTextureSize.x));
 
-	Log("<Engine::Texture::File()> Reading rest of file and writing to texture.", RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Reading rest of file and writing to texture.", RGB(128, 128, 255));
 	// Read and write to the texture	
 	for (size_t y = 0; y < t.size(); y++)
 	{
@@ -85,7 +85,7 @@ Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
 	}
 
 	// Print old texture file
-	Log("<Engine::Texture::File()> Printing texture:", RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Printing texture:", RGB(128, 128, 255));
 	for (std::vector<CellA>& row : t)
 	{
 		for (CellA& cell : row)
@@ -97,11 +97,11 @@ Engine::UPoint Engine::Texture::File(const std::string& fileName, Point _pos)
 	}
 	std::cout << std::flush;
 
-	Log("<Engine::Texture::File()> Returning.", RGB(128, 128, 255));
+	IO::Log("<KTech::Texture::File()> Returning.", RGB(128, 128, 255));
     return maxTextureSize;
 }
 
-void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point _pos) {
+void KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point _pos) {
 	simple = false;
 	pos_r = _pos;
 	t.resize(stringVector.size());
@@ -113,7 +113,7 @@ void Engine::Texture::Write(const std::vector<std::string>& stringVector, RGBA f
 	}	
 }
 
-void Engine::Texture::Resize(UPoint newSize, CellA _value)
+void KTech::Texture::Resize(UPoint newSize, CellA _value)
 {
 	if (simple)
 	{
@@ -128,7 +128,7 @@ void Engine::Texture::Resize(UPoint newSize, CellA _value)
 	}
 }
 
-void Engine::Texture::SetCell(CellA _value)
+void KTech::Texture::SetCell(CellA _value)
 {
 	if (simple)
 		value = _value;
@@ -138,7 +138,7 @@ void Engine::Texture::SetCell(CellA _value)
 				t[y][x] = _value;
 }
 
-void Engine::Texture::SetForeground(RGBA _value)
+void KTech::Texture::SetForeground(RGBA _value)
 {
 	if (simple)
 		value.f = _value;
@@ -148,7 +148,7 @@ void Engine::Texture::SetForeground(RGBA _value)
 				t[y][x].f = _value;
 }
 
-void Engine::Texture::SetBackground(RGBA _value)
+void KTech::Texture::SetBackground(RGBA _value)
 {
 	if (simple)
 		value.b = _value;
@@ -158,7 +158,7 @@ void Engine::Texture::SetBackground(RGBA _value)
 				t[y][x].b = _value;
 }
 
-void Engine::Texture::SetCharacter(char _value)
+void KTech::Texture::SetCharacter(char _value)
 {
 	if (simple)
 		value.c = _value;
@@ -168,7 +168,7 @@ void Engine::Texture::SetCharacter(char _value)
 				t[y][x].c = _value;
 }
 
-void Engine::Texture::SetAlpha(uint8_t _value)
+void KTech::Texture::SetAlpha(uint8_t _value)
 {
 	if (simple)
 	{
@@ -188,7 +188,7 @@ void Engine::Texture::SetAlpha(uint8_t _value)
 	}
 }
 
-Engine::UPoint Engine::Texture::GetSize() const
+KTech::UPoint KTech::Texture::GetSize() const
 {
 	// If the texture is simple, then `size` already represents the texture's size.
 	if (simple)
@@ -201,7 +201,7 @@ Engine::UPoint Engine::Texture::GetSize() const
 	return size;
 }
 
-void Engine::Texture::ExportToFile(const std::string& fileName) const
+void KTech::Texture::ExportToFile(const std::string& fileName) const
 {
 	// Create/open file
 	std::ofstream file(fileName);

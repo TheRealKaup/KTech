@@ -20,11 +20,57 @@
 
 #include "ktech.hpp"
 
-int32_t Engine::Time::deltaTime = 0;
-float Engine::Time::tpsPotential = 0.0f;
-float Engine::Time::tps = 0.0f;
+long KTech::Time::GetDelta(const TimePoint& a, const TimePoint& b, Measurement timeMeasurement)
+{
+	switch (timeMeasurement)
+	{
+		case Measurement::ticks:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(b.chronoTimePoint - a.chronoTimePoint).count() * tps;
+		}
+		case Measurement::seconds:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(b.chronoTimePoint - a.chronoTimePoint).count();
+		}
+		case Measurement::milliseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::milliseconds>(b.chronoTimePoint - a.chronoTimePoint).count();
+		}
+		case Measurement::microseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::microseconds>(b.chronoTimePoint - a.chronoTimePoint).count();
+		}
+		default:
+			return 0;
+	}
+}
 
-Engine::Time::Invocation* Engine::Time::Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement)
+long KTech::Time::GetInt(const TimePoint& tp, Measurement timeMeasurement)
+{
+	switch (timeMeasurement)
+	{
+		case Measurement::ticks:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count() * tps;
+		}
+		case Measurement::seconds:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count();
+		}
+		case Measurement::milliseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::milliseconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count();
+		}
+		case Measurement::microseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::microseconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count();
+		}
+		default:
+			return 0;
+	}
+}
+
+KTech::Time::Invocation* KTech::Time::Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement)
 {
 	switch (timeMeasurement)
 	{
@@ -54,7 +100,7 @@ Engine::Time::Invocation* Engine::Time::Invoke(const std::function<void()>& call
 	return Invocation::invocations[Invocation::invocations.size() - 1];
 }
 
-bool Engine::Time::CancelInvocation(Invocation* invocation)
+bool KTech::Time::CancelInvocation(Invocation* invocation)
 {
 	for (size_t i = 0; i < Invocation::invocations.size(); i++)
 	{
@@ -69,7 +115,7 @@ bool Engine::Time::CancelInvocation(Invocation* invocation)
 }
 
 
-void Engine::Time::CallInvocations()
+void KTech::Time::CallInvocations()
 {
 	for (size_t i = 0; i < Invocation::invocations.size(); i++)
 	{
@@ -89,12 +135,15 @@ void Engine::Time::CallInvocations()
 	}
 }
 
-void Engine::Time::WaitUntilNextTick()
+void KTech::Time::WaitUntilNextTick()
 {
-	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::startTP.chronoTimePoint).count() - thisTickStartTP.GetInt(Measurement::microseconds);
+	// Calcualte `tpsPotential`
+	deltaTime = GetDelta(thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
 	tpsPotential = 1000000.0f / deltaTime;
+	// Sleep according to `tpsLimit`
 	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / tpsLimit - deltaTime));
-	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - Engine::Time::startTP.chronoTimePoint).count() - thisTickStartTP.GetInt(Measurement::microseconds);
+	// Calculate (actual) `tps`
+	deltaTime = GetDelta(thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
 	tps = 1000000.0f / deltaTime;
 	thisTickStartTP.SetToNow();
 	ticksCounter++;

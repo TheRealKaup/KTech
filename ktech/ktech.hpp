@@ -154,7 +154,7 @@ namespace KTech
 		Layer* parentLayer = nullptr;
 
 		std::string name = "";
-		Point pos = { 0, 0 };
+		Point pos = Point(0, 0);
 
 		std::vector<Texture> textures = {};
 		std::vector<Collider> colliders = {};
@@ -176,17 +176,20 @@ namespace KTech
 			onOverlapped, // A different object (`otherObject`) entered an overlap with this object
 			onOverlappedExit // A different object (`otherObject`) exited an overlap with this object
 		};
-		std::function<void(EventType)> OnEvent = nullptr;
+		virtual void OnEvent(EventType eventType) {};
+
 		bool Move(Point dir);
 		
 		void EnterLayer(Layer* layer);
-		Object(Point position = Point(0, 0), Layer* layer = nullptr, const std::string& objectName = "");
+		Object(Point position = Point(0, 0), Layer* layer = nullptr, const std::string& name = "");
 
 		~Object();
 	};
 
 	struct Layer
 	{
+		Map* parentMap = nullptr;
+
 		std::function<void()> OnTick = nullptr;
 		
 		std::vector<Object*> objects = {};
@@ -201,9 +204,11 @@ namespace KTech
 		bool RemoveObject(Object* object);
 		~Layer();
 	};
-	
+
 	struct Camera
 	{
+		Map* parentMap = nullptr;
+
 		std::string name = "";
 		Point pos = Point(0, 0);
 		UPoint res = UPoint(10, 10);
@@ -214,13 +219,14 @@ namespace KTech
 		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 		
 		void Render(const std::vector<Layer*>& layers);
-		void Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0) const;
 		void Resize(UPoint res);
 	};
-	
+
 	struct Map
 	{
 	public:
+		Engine* parentEngine;
+
 		std::vector<Camera*> cameras = {};
 		std::vector<Layer*> layers = {};
 		size_t activeCameraI = -1;
@@ -232,40 +238,9 @@ namespace KTech
 
 		bool Render() const;
 		bool RenderReversed() const;
-		bool Draw(Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0) const;
 		void CallOnTicks() const;
-	};
 
-	struct AudioSource
-	{
-		bool loaded;
-
-		PaStream* stream;
-		uint32_t cur = 0UL;
-		uint32_t frames = 0UL;
-		uint32_t endpointToPlay = 0UL;
-		uint32_t startPoint = 0UL;
-		float volume = 1.0f;
-		bool playing = false;
-
-		uint32_t fileSize = 0UL;
-		uint8_t channels = 0U;
-		uint32_t sampleRate = 0UL;
-		uint32_t byteRate = 0UL;
-		uint8_t blockAlign = 0U;
-		uint16_t bitsPerSample = 0U;
-		uint32_t dataSize = 0UL;
-
-		int16_t* data = nullptr;
-
-		std::function<void()> OnEnd;
-
-		AudioSource(const std::string& fileName, std::function<void()> OnEnd = nullptr);
-
-		bool Play(uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
-		void Pause();
-		void Resume();
-		void Stop();
+		Map(Engine* parentEngine) : parentEngine(parentEngine) {};
 	};
 
 	// Collision Result
@@ -277,13 +252,15 @@ namespace KTech
 	};
 
 	// Manager of all things that directly work with terminal I/O.
-	class IOManager
+	class IO
 	{
 	public:
+		Engine* engine;
+
 		// Prepares terminal, creates input loop thread
-		IOManager();
+		IO(KTech::UPoint imageSize, Engine* engine);
 		// Resets terminal
-		~IOManager();
+		~IO();
 
 		termios oldTerminalAttributes;
 		
@@ -291,14 +268,18 @@ namespace KTech
 		std::vector<std::vector<Cell>> image;
 		std::string stringImage;
 
+		std::thread t_inputLoop;
+
 		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
-		void PrintStartupNotice(const std::string& text);
-			
+
+		// Draw, usually the image of a camera, to the IO
+		void Draw(const std::vector<std::vector<Cell>>& image, Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+
 		void Print();
 
-		void Log(const std::string& text, RGB color);
+		static void Log(const std::string& text, RGB color);
 
-		std::string& Get();
+		static char* Get();
 
 		struct Callback
 		{
@@ -355,11 +336,10 @@ namespace KTech
 		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
 
-		std::string input;
+		std::string input = std::string(7, '\0');
 		std::string quitKey = "\x03";
 
 		void Call();
-		void Loop();
 
 		bool Is(const std::string& stringKey);
 		bool Is(char charKey);
@@ -367,13 +347,17 @@ namespace KTech
 		bool Smaller(char charKey);
 		bool Between(char charKey1, char charKey2);
 		uint8_t GetInt();
+
+		void Loop();
 	};
 
 	// Time manager
-	class TimeManager
+	class Time
 	{
 	public:
-		enum class Measurement
+		const bool& running;
+		
+		enum class Measurement : uint8_t
 		{
 			ticks,
 			seconds,
@@ -385,19 +369,23 @@ namespace KTech
 		{
 			std::chrono::high_resolution_clock::time_point chronoTimePoint;
 			void SetToNow();
-			long GetInt(Measurement timeMeasurement) const;
 			TimePoint();
 		};
+
+		// Get the amount of time that has passed since `TimePoint a` until `TimePoint b`.
+		long GetDelta(const TimePoint& a, const TimePoint& b, Measurement timeMeasurement);
+		// Get the amount of time that has passed since the creation of `Time` and `TimePoint tp`.
+		long GetInt(const TimePoint& tp, Measurement timeMeasurement);
 
 		const TimePoint startTP;
 		TimePoint thisTickStartTP;
 
 		int16_t tpsLimit = 24;
-		float tps;
-		float tpsPotential;
-		int32_t deltaTime;
+		float tps = 0.0f;
+		float tpsPotential = 0.0f;
+		int32_t deltaTime = 0;
 		int32_t ticksCounter = 0;
-		
+
 		inline void StartThisTick() { thisTickStartTP.SetToNow(); }
 		void WaitUntilNextTick();
 		
@@ -413,17 +401,109 @@ namespace KTech
 		bool CancelInvocation(Invocation* invocation);
 		void CallInvocations();
 
-		// 
-		TimeManager(int16_t tps);
-		
-		~TimeManager();
+		inline Time(int16_t tps, const bool& running) : tps(tps), running(running) {}
 	};
 
-	class AudioManager
+	// Exists to store `colliderTypes`.
+	class Collision
 	{
 	public:
-		AudioManager();
-		~AudioManager();
+		std::vector<std::vector<CR>> colliderTypes = {
+			{ CR::B, CR::P, CR::O }, // Heavy - 0
+			{ CR::B, CR::P, CR::O }, // Normal - 1
+			{ CR::O, CR::O, CR::O } // Overlappable - 2
+		};
+
+		struct CollisionData{
+			KTech::Object* activeObject;
+			KTech::Object* passiveObject;
+			size_t activeCollider;
+			size_t passiveCollider;
+		};
+
+		CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2);
+
+		static bool AreSimpleCollidersOverlapping(UPoint s1, Point p1, UPoint s2, Point p2);
+		static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos);
+		static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2);
+	
+		void ExpandMovementTree(Object* thisObj, Point dir,
+			std::vector<CollisionData>& pushData,
+			std::vector<CollisionData>& blockData,
+			std::vector<CollisionData>& overlapData,
+			std::vector<CollisionData>& exitOverlapData);
+	
+		bool MoveObject(Object* object, Point dir);
+	};
+
+	// Audio manager, creates its own audio stream using the PortAudio library, after making sure it is initialized.
+	class Audio
+	{
+	public:
+
+		class Source
+		{
+		public:
+			bool loaded = false;
+			bool playing = false;
+
+			uint32_t cur = 0UL;
+			uint32_t frames = 0UL;
+			uint32_t endpointToPlay = 0UL;
+			uint32_t startPoint = 0UL;
+			float volume = 1.0f;
+
+			uint8_t channels = 0U;
+			uint32_t dataSize = 0UL;
+
+			int16_t* data = nullptr;
+
+			std::function<void()> OnEnd;
+
+			// For the play chain
+			size_t nextSource;
+
+			// Set the settings of the source to play.
+			// This does not actually play the source. For that you need an AudioManager.
+			void SetSettingsToPlay(uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
+
+			Source(const std::string& fileName, std::function<void()> OnEnd = nullptr);
+			~Source();
+		};
+
+		// Instances - not pointers!
+		std::vector<Source> sources;
+
+		// Chain of the playing sources. Made to replace iterating through all of the sources in the callback.
+		size_t playChain;
+		size_t chainLength = 0;
+
+		// Creates a source, stores it in `sources`, returns index (not UUID yet, that will be in the future)
+		size_t CreateSource(const std::string& fileName, std::function<void()> OnEnd = nullptr);
+
+		bool PlaySource(size_t index, uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
+		void PauseSource(size_t index);
+		bool ResumeSource(size_t index);
+		void StopSource(size_t index);
+
+		const uint16_t bufferSize;
+		int32_t* unlimitedOutput;
+
+		Audio(uint16_t bufferSize = 256);
+		
+		~Audio();
+
+	private:
+		inline static bool paInitialized = false;
+		PaStream* stream = nullptr;
+		PaStreamParameters outputParameters;
+		int32_t tempAudioLimiter = 0;
+
+		// This class and its static instance will automatically terminate PortAudio.
+		// Its only way to know whether PortAudio was initialized is usign the static boolean `paInitialized` which, if `AudioStream`s were created, should be true.
+		// Terminating isn't done in `AudioManager::~AudioManager()`, because there could be multiple `AudioManager`s, that are created and destoryed in different times.
+		class PortAudioAutomaticTerminator { inline ~PortAudioAutomaticTerminator() { if (paInitialized) Pa_Terminate(); } };
+		static PortAudioAutomaticTerminator portAudioAutomaticTerminator;
 	};
 
 	// Core class, the user should create one of these, and shouldn't have to construct themselves 
@@ -433,153 +513,139 @@ namespace KTech
 	public:
 		bool running = true;
 
-		IOManager io;
-		TimeManager time;
-		AudioManager audio;
+		IO io;
+		Time time;
+		Audio audio;
+		Collision collision;
 
-		std::vector<std::vector<CR>> colliderTypes = {
-			{ CR::B, CR::P, CR::O }, // Heavy - 0
-			{ CR::B, CR::P, CR::O }, // Normal - 1
-			{ CR::O, CR::O, CR::O } // Overlappable - 2
-		};
-
-		Engine(int16_t tps = 24) : time(TimeManager(tps))
-		{
-		}
-
-		~Engine()
-		{
-		}
+		inline Engine(UPoint imageSize, int16_t tps = 24) : io(IO(imageSize, this)), time(Time(tps, running)) {}
 	};
 
-	namespace RGBColors {}
-	namespace RGBAColors {}
-}
+	namespace RGBColors
+	{
+		constexpr RGB red = RGB(255, 0, 0);
+		constexpr RGB orange = RGB(255, 128, 0);
+		constexpr RGB yellow = RGB(255, 255, 0);
+		constexpr RGB lime = RGB(128, 255, 0);
+		constexpr RGB green = RGB(0, 255, 0);
+		constexpr RGB mint = RGB(0, 255, 128);
+		constexpr RGB cyan = RGB(0, 255, 255);
+		constexpr RGB blue = RGB(0, 128, 255);
+		constexpr RGB primaryBlue = RGB(0, 0, 255);
+		constexpr RGB purple = RGB(128, 0, 255);
+		constexpr RGB pink = RGB(255, 0, 255);
+		constexpr RGB hotPink = RGB(255, 0, 128);
+		constexpr RGB white = RGB(255, 255, 255);
+		constexpr RGB gray = RGB(160, 160, 160);
+		constexpr RGB black = RGB(0, 0, 0);
+	}
 
-namespace KTech::RGBColors
-{
-	constexpr RGB red = RGB(255, 0, 0);
-	constexpr RGB orange = RGB(255, 128, 0);
-	constexpr RGB yellow = RGB(255, 255, 0);
-	constexpr RGB lime = RGB(128, 255, 0);
-	constexpr RGB green = RGB(0, 255, 0);
-	constexpr RGB mint = RGB(0, 255, 128);
-	constexpr RGB cyan = RGB(0, 255, 255);
-	constexpr RGB blue = RGB(0, 128, 255);
-	constexpr RGB primaryBlue = RGB(0, 0, 255);
-	constexpr RGB purple = RGB(128, 0, 255);
-	constexpr RGB pink = RGB(255, 0, 255);
-	constexpr RGB hotPink = RGB(255, 0, 128);
-	constexpr RGB white = RGB(255, 255, 255);
-	constexpr RGB gray = RGB(160, 160, 160);
-	constexpr RGB black = RGB(0, 0, 0);
-}
-
-namespace KTech::RGBAColors
-{
-	constexpr RGBA red = RGBA(255, 0, 0, 255);
-	constexpr RGBA orange = RGBA(255, 128, 0, 255);
-	constexpr RGBA yellow = RGBA(255, 255, 0, 255);
-	constexpr RGBA lime = RGBA(128, 255, 0, 255);
-	constexpr RGBA green = RGBA(0, 255, 0, 255);
-	constexpr RGBA mint = RGBA(0, 255, 128, 255);
-	constexpr RGBA cyan = RGBA(0, 255, 255, 255);
-	constexpr RGBA blue = RGBA(0, 128, 255, 255);
-	constexpr RGBA primaryBlue = RGBA(0, 0, 255, 255);
-	constexpr RGBA purple = RGBA(128, 0, 255, 255);
-	constexpr RGBA pink = RGBA(255, 0, 255, 255);
-	constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
-	constexpr RGBA white = RGBA(255, 255, 255, 255);
-	constexpr RGBA gray = RGBA(160, 160, 160, 255);
-	constexpr RGBA black = RGBA(0, 0, 0, 255);
-	constexpr RGBA transparent = RGBA(0, 0, 0, 0);
-}
-
-namespace KTech::Input::K
-{
-	constexpr char const* up = "\x1b[A";
-	constexpr char const* down = "\x1b[B";
-	constexpr char const* right = "\x1b[C";
-	constexpr char const* left = "\x1b[D";
-	constexpr char const* return_ = "\x0a";
-	constexpr char const* backspace = "\x7f";
-	constexpr char const* escape = "\x1b";
-	constexpr char const* pageUp = "\x1b[5~";
-	constexpr char const* pageDown = "\x1b[6~";
-	constexpr char const* home = "\x1b[H";
-	constexpr char const* end = "\x1b[F";
-	constexpr char const* insert = "\x1b[2~";
-	constexpr char const* delete_ = "\x1b[3~";
-	constexpr char const* f1 = "\x1bOP";
-	constexpr char const* f2 = "\x1bOQ";
-	constexpr char const* f3 = "\x1bOR";
-	constexpr char const* f4 = "\x1bOS";
-	constexpr char const* f5 = "\x1b[15~";
-	constexpr char const* f6 = "\x1b[17~";
-	constexpr char const* f7 = "\x1b[18~";
-	constexpr char const* f8 = "\x1b[19~";
-	constexpr char const* f9 = "\x1b[20~";
-	constexpr char const* f10 = "\x1b[21~";
-	// No F11 because of fullscreen
-	constexpr char const* f12 = "\x1b[24~";
-	constexpr char const* tab = "\x09";
+	namespace RGBAColors
+	{
+		constexpr RGBA red = RGBA(255, 0, 0, 255);
+		constexpr RGBA orange = RGBA(255, 128, 0, 255);
+		constexpr RGBA yellow = RGBA(255, 255, 0, 255);
+		constexpr RGBA lime = RGBA(128, 255, 0, 255);
+		constexpr RGBA green = RGBA(0, 255, 0, 255);
+		constexpr RGBA mint = RGBA(0, 255, 128, 255);
+		constexpr RGBA cyan = RGBA(0, 255, 255, 255);
+		constexpr RGBA blue = RGBA(0, 128, 255, 255);
+		constexpr RGBA primaryBlue = RGBA(0, 0, 255, 255);
+		constexpr RGBA purple = RGBA(128, 0, 255, 255);
+		constexpr RGBA pink = RGBA(255, 0, 255, 255);
+		constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
+		constexpr RGBA white = RGBA(255, 255, 255, 255);
+		constexpr RGBA gray = RGBA(160, 160, 160, 255);
+		constexpr RGBA black = RGBA(0, 0, 0, 255);
+		constexpr RGBA transparent = RGBA(0, 0, 0, 0);
+	}
 	
-	namespace Shift
+	namespace Keys
 	{
-		constexpr char const* return_ = "\x1bOM";
-		constexpr char const* delete_ = "\x1b[3;2~";
-		constexpr char const* tab = "\x1b[Z";
-	}
+		constexpr char const* up = "\x1b[A";
+		constexpr char const* down = "\x1b[B";
+		constexpr char const* right = "\x1b[C";
+		constexpr char const* left = "\x1b[D";
+		constexpr char const* return_ = "\x0a";
+		constexpr char const* backspace = "\x7f";
+		constexpr char const* escape = "\x1b";
+		constexpr char const* pageUp = "\x1b[5~";
+		constexpr char const* pageDown = "\x1b[6~";
+		constexpr char const* home = "\x1b[H";
+		constexpr char const* end = "\x1b[F";
+		constexpr char const* insert = "\x1b[2~";
+		constexpr char const* delete_ = "\x1b[3~";
+		constexpr char const* f1 = "\x1bOP";
+		constexpr char const* f2 = "\x1bOQ";
+		constexpr char const* f3 = "\x1bOR";
+		constexpr char const* f4 = "\x1bOS";
+		constexpr char const* f5 = "\x1b[15~";
+		constexpr char const* f6 = "\x1b[17~";
+		constexpr char const* f7 = "\x1b[18~";
+		constexpr char const* f8 = "\x1b[19~";
+		constexpr char const* f9 = "\x1b[20~";
+		constexpr char const* f10 = "\x1b[21~";
+		// No F11 because of fullscreen
+		constexpr char const* f12 = "\x1b[24~";
+		constexpr char const* tab = "\x09";
 
-	namespace Ctrl
-	{
-		constexpr char const* up = "\33[1;5A";
-		constexpr char const* down = "\33[1;5B";
-		constexpr char const* right = "\33[1;5C";
-		constexpr char const* left = "\33[1;5D";
-		constexpr char const* pageUp = "\x1b[5;5~";
-		constexpr char const* pageDown = "\x1b[6;5~";
-		constexpr char const* home = "\x1b[1;5H";
-		constexpr char const* end = "\x1b[1;5F";
-		constexpr char const* delete_ = "\x1b[3;5~";
-		constexpr char const* backspace = "\x08";
-	}
+		namespace Shift
+		{
+			constexpr char const* return_ = "\x1bOM";
+			constexpr char const* delete_ = "\x1b[3;2~";
+			constexpr char const* tab = "\x1b[Z";
+		}
 
-	namespace Alt
-	{
-		constexpr char const* up = "\33[1;3A";
-		constexpr char const* down = "\33[1;3B";
-		constexpr char const* right = "\33[1;3C";
-		constexpr char const* left = "\33[1;3D";
-		constexpr char const* return_ = "\x1b\x0a";
-		constexpr char const* backspace = "\x1b\x7f";
-		constexpr char const* escape = "\x1b\x1b";
-		constexpr char const* pageUp = "\x1b[5;3~";
-		constexpr char const* pageDown = "\x1b[6;3~";
-		constexpr char const* home = "\x1b[1;3H";
-		constexpr char const* end = "\x1b[1;3F";
-		constexpr char const* insert = "\x1b[2;3~";
-		constexpr char const* delete_ = "\x1b[3;3~";
-	}
+		namespace Ctrl
+		{
+			constexpr char const* up = "\33[1;5A";
+			constexpr char const* down = "\33[1;5B";
+			constexpr char const* right = "\33[1;5C";
+			constexpr char const* left = "\33[1;5D";
+			constexpr char const* pageUp = "\x1b[5;5~";
+			constexpr char const* pageDown = "\x1b[6;5~";
+			constexpr char const* home = "\x1b[1;5H";
+			constexpr char const* end = "\x1b[1;5F";
+			constexpr char const* delete_ = "\x1b[3;5~";
+			constexpr char const* backspace = "\x08";
+		}
 
-	namespace CtrlAlt
-	{
-		constexpr char const* up = "\33[1;7A";
-		constexpr char const* down = "\33[1;7B";
-		constexpr char const* right = "\33[1;7C";
-		constexpr char const* left = "\33[1;7D";
-		constexpr char const* pageUp = "\x1b[5;7~";
-		constexpr char const* pageDown = "\x1b[6;7~";
-		constexpr char const* home = "\x1b[1;7H";
-		constexpr char const* end = "\x1b[1;7F";
-		constexpr char const* insert = "\x1b[2;7~";
-	}
+		namespace Alt
+		{
+			constexpr char const* up = "\33[1;3A";
+			constexpr char const* down = "\33[1;3B";
+			constexpr char const* right = "\33[1;3C";
+			constexpr char const* left = "\33[1;3D";
+			constexpr char const* return_ = "\x1b\x0a";
+			constexpr char const* backspace = "\x1b\x7f";
+			constexpr char const* escape = "\x1b\x1b";
+			constexpr char const* pageUp = "\x1b[5;3~";
+			constexpr char const* pageDown = "\x1b[6;3~";
+			constexpr char const* home = "\x1b[1;3H";
+			constexpr char const* end = "\x1b[1;3F";
+			constexpr char const* insert = "\x1b[2;3~";
+			constexpr char const* delete_ = "\x1b[3;3~";
+		}
 
-	namespace CtrlShift
-	{
-		constexpr char const* up = "\33[1;6A";
-		constexpr char const* down = "\33[1;6B";
-		constexpr char const* right = "\33[1;6C";
-		constexpr char const* left = "\33[1;6D";
+		namespace CtrlAlt
+		{
+			constexpr char const* up = "\33[1;7A";
+			constexpr char const* down = "\33[1;7B";
+			constexpr char const* right = "\33[1;7C";
+			constexpr char const* left = "\33[1;7D";
+			constexpr char const* pageUp = "\x1b[5;7~";
+			constexpr char const* pageDown = "\x1b[6;7~";
+			constexpr char const* home = "\x1b[1;7H";
+			constexpr char const* end = "\x1b[1;7F";
+			constexpr char const* insert = "\x1b[2;7~";
+		}
+
+		namespace CtrlShift
+		{
+			constexpr char const* up = "\33[1;6A";
+			constexpr char const* down = "\33[1;6B";
+			constexpr char const* right = "\33[1;6C";
+			constexpr char const* left = "\33[1;6D";
+		}
 	}
 }

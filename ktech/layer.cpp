@@ -20,14 +20,14 @@
 
 #include "ktech.hpp"
 
-int Engine::Layer::AddObject(Object* object)
+int KTech::Layer::AddObject(Object* object)
 {
 	objects.push_back(object);
 	object->parentLayer = this;
 	return objects.size() - 1;
 }
 
-bool Engine::Layer::RemoveObject(const std::string& name)
+bool KTech::Layer::RemoveObject(const std::string& name)
 {
 	for (int i = 0; i < objects.size(); i++)
 	{
@@ -41,7 +41,7 @@ bool Engine::Layer::RemoveObject(const std::string& name)
 	return false;
 }
 
-bool Engine::Layer::RemoveObject(Object* object)
+bool KTech::Layer::RemoveObject(Object* object)
 {
 	bool removed = false;
 	for (size_t i = 0; i < objects.size();)
@@ -58,7 +58,7 @@ bool Engine::Layer::RemoveObject(Object* object)
 	return removed;
 }
 
-Engine::Layer::~Layer()
+KTech::Layer::~Layer()
 {
 	// Reset the `parentLayer` of the objects that have it set to this layer
 	for (Object*& obj : objects)

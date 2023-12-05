@@ -20,8 +20,6 @@
 
 #include "ktech.hpp"
 
-#define config_framesPerBuffer 256
-
 // Audio values: 16 bit depth, 2 channels, default (probably 44100) sample rate
 
 static void Log(std::string string)
@@ -33,16 +31,6 @@ static void Log(std::string string, unsigned number)
 	std::cout << "\033[38;2;255;255;0m" << string << number << "\033[m" << std::endl << std::flush;
 }
 
-static PaStream* stream = nullptr;
-
-// default device info
-static PaStreamParameters outputParameters;
-
-static std::vector<Engine::AudioSource*> activeSources;
-static int32_t tempAudioLimiter = 0;
-
-static int32_t unlimitedOutput[config_framesPerBuffer * 2];
-
 int Callback(
 	const void *input,
 	void *output,
@@ -51,137 +39,99 @@ int Callback(
 	PaStreamCallbackFlags statusFlags,
 	void *userData)
 {
-	static size_t f;
+	KTech::Audio* audioManager = (KTech::Audio*)userData;
 
-	// Set unlimitedOutput to the first source (which saves memsetting it)
-	if (activeSources.size() > 0)
+	// Clear unlimitedOutput
+	memset(audioManager->unlimitedOutput, 0, audioManager->bufferSize * 8);
+
+	// No audio sources, return
+	if (audioManager->chainLength == 0)
+		return paContinue;
+
+	// There are audio sources, populate and send
+	for (size_t s = audioManager->playChain; s != audioManager->sources[s].nextSource /*End of chain*/; s = audioManager->sources[s].nextSource)
 	{
-		size_t s = 1;
-		// Set to first source (which saves a memset at the start)
-		if (activeSources[0]->channels == 2)
+		// 2 channels
+		if (audioManager->sources[s].channels == 2)
 		{
-			for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[0]->cur++)
+			for (size_t f = 0; f < audioManager->bufferSize * 2; f+=2, audioManager->sources[s].cur++)
 			{
 				// Unregister audio source if reached its end
-				if (activeSources[0]->cur >= activeSources[0]->endpointToPlay)
+				if (audioManager->sources[s].cur >= audioManager->sources[s].endpointToPlay)
 				{
-					activeSources[0]->playing = false;
-					if (activeSources[0]->OnEnd) // Callback
-						activeSources[0]->OnEnd();
-					activeSources.erase(activeSources.begin());
-					memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
-					s--; // First audio source didn't last until the end of the buffer
+					audioManager->sources[s].playing = false;
+					if (audioManager->sources[s].OnEnd) // Callback
+						audioManager->sources[s].OnEnd();
+					s--;
 					break;
 				}
 				// Otherwise, populate output buffer
-				unlimitedOutput[f] = activeSources[0]->data[activeSources[0]->cur * 2] * activeSources[0]->volume;
-				unlimitedOutput[f + 1] = activeSources[0]->data[activeSources[0]->cur * 2 + 1] * activeSources[0]->volume;
+				audioManager->unlimitedOutput[f] += audioManager->sources[s].data[audioManager->sources[s].cur * 2] * audioManager->sources[s].volume;
+				audioManager->unlimitedOutput[f + 1] += audioManager->sources[s].data[audioManager->sources[s].cur * 2 + 1] * audioManager->sources[s].volume;
 			}
 		}
-		else if (activeSources[0]->channels == 1)
+		// 1 channel
+		else if (audioManager->sources[s].channels == 1)
 		{
-			for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[0]->cur++)
+			for (size_t f = 0; f < audioManager->bufferSize * 2; f+=2, audioManager->sources[s].cur++)
 			{				
 				// Unregister audio source if reached its end
-				if (activeSources[0]->cur >= activeSources[0]->endpointToPlay)
+				if (audioManager->sources[s].cur >= audioManager->sources[s].endpointToPlay)
 				{
-					activeSources[0]->playing = false;
-					if (activeSources[0]->OnEnd) // Callback
-						activeSources[0]->OnEnd();
-					activeSources.erase(activeSources.begin());
-					memset(unlimitedOutput + f, 0, (config_framesPerBuffer * 2 - f) * 4);
-					s--; // First audio source didn't last until the end of the buffer
+					audioManager->sources[s].playing = false;
+					if (audioManager->sources[s].OnEnd) // Callback
+						audioManager->sources[s].OnEnd();
+					s--;
 					break;
 				}
 				// Otherwise, populate output buffer
-				unlimitedOutput[f] = activeSources[0]->data[activeSources[0]->cur] * activeSources[0]->volume;
-				unlimitedOutput[f + 1] = activeSources[0]->data[activeSources[0]->cur] * activeSources[0]->volume;
+				audioManager->unlimitedOutput[f] += audioManager->sources[s].data[audioManager->sources[s].cur] * audioManager->sources[s].volume;
+				audioManager->unlimitedOutput[f + 1] += audioManager->sources[s].data[audioManager->sources[s].cur] * audioManager->sources[s].volume;
 			}
-		}
-		// Add the other sources
-		for (; s < activeSources.size(); s++)
-		{
-			if (activeSources[s]->channels == 2)
-			{
-				for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[s]->cur++)
-				{
-					// Unregister audio source if reached its end
-					if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
-					{
-						activeSources[s]->playing = false;
-						if (activeSources[s]->OnEnd) // Callback
-							activeSources[s]->OnEnd();
-						activeSources.erase(activeSources.begin() + s);
-						s--;
-						break;
-					}
-					// Otherwise, populate output buffer
-					unlimitedOutput[f] += activeSources[s]->data[activeSources[s]->cur * 2] * activeSources[s]->volume;
-					unlimitedOutput[f + 1] += activeSources[s]->data[activeSources[s]->cur * 2 + 1] * activeSources[s]->volume;
-				}
-			}
-			else if (activeSources[s]->channels == 1)
-			{
-				for (f = 0; f < config_framesPerBuffer * 2; f+=2, activeSources[s]->cur++)
-				{				
-					// Unregister audio source if reached its end
-					if (activeSources[s]->cur >= activeSources[s]->endpointToPlay)
-					{
-						activeSources[s]->playing = false;
-						if (activeSources[s]->OnEnd) // Callback
-							activeSources[s]->OnEnd();
-						activeSources.erase(activeSources.begin() + s);
-						s--;
-						break;
-					}
-					// Otherwise, populate output buffer
-					unlimitedOutput[f] += activeSources[s]->data[activeSources[s]->cur] * activeSources[s]->volume;
-					unlimitedOutput[f + 1] += activeSources[s]->data[activeSources[s]->cur] * activeSources[s]->volume;
-				}
-			}
-		}
-		// At last, limit `unlimitedOutput` and add it to `output`.
-		for (f = 0; f < config_framesPerBuffer * 2; f++)
-		{
-			if (unlimitedOutput[f] > 32767)
-				((int16_t*)(output))[f] = 32767;
-			else if (unlimitedOutput[f] < -32767)
-				((int16_t*)(output))[f] = -32767;
-			else
-				((int16_t*)(output))[f] = unlimitedOutput[f];
 		}
 	}
-	else
-		memset(output, 0, config_framesPerBuffer * 4);
-
+	// At last, limit `unlimitedOutput` and add it to `output`.
+	for (size_t f = 0; f < audioManager->bufferSize * 2; f++)
+	{
+		if (audioManager->unlimitedOutput[f] > 32767)
+			((int16_t*)(output))[f] = 32767;
+		else if (audioManager->unlimitedOutput[f] < -32767)
+			((int16_t*)(output))[f] = -32767;
+		else
+			((int16_t*)(output))[f] = audioManager->unlimitedOutput[f];
+	}
 	return paContinue;
 }
 
-void Engine::InitializeAudio()
+KTech::Audio::Audio(uint16_t bufferSize) : bufferSize(bufferSize)
 {
-	// Start PortAudio
-	Pa_Initialize();
+	unlimitedOutput = new int32_t[bufferSize * 2];
+	// Initialize PortAudio if it isn't already initialized
+	if (!paInitialized)
+	{
+		Pa_Initialize();
+		paInitialized = true;
+	}
 	// Open PortAudio stream
 	outputParameters.device = Pa_GetDefaultOutputDevice();
 	outputParameters.channelCount = 2;
 	outputParameters.sampleFormat = paInt16;
 	outputParameters.suggestedLatency = Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultHighOutputLatency;
 	outputParameters.hostApiSpecificStreamInfo = NULL;
-	Pa_OpenStream(&stream, NULL, &outputParameters, Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultSampleRate, config_framesPerBuffer, paClipOff, Callback, nullptr);
+	Pa_OpenStream(&stream, NULL, &outputParameters, Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice())->defaultSampleRate, bufferSize, paClipOff, Callback, this);
 	// Start the stream
 	Pa_StartStream(stream);
-
-	audioInitialized = true;
 }
-void Engine::TerminateAudio()
+
+KTech::Audio::~Audio()
 {
 	Pa_AbortStream(stream);
-	Pa_Terminate();
 }
 
-Engine::AudioSource::AudioSource(const std::string& fileName, std::function<void()> OnEnd)
+KTech::Audio::Source::Source(const std::string& fileName, std::function<void()> OnEnd)
 	: OnEnd(OnEnd)
 {
+
 	int32_t temp = 0UL;
 	int16_t temp2 = 0UL;
 	
@@ -203,7 +153,7 @@ Engine::AudioSource::AudioSource(const std::string& fileName, std::function<void
 		else
 			break;
 	}
-	file.read((char*)&fileSize, 4); 
+	file.read((char*)&temp, 4); 
 	file.read((char*)&temp, 4); // "WAVE"
 
 	// FMT chunk
@@ -228,12 +178,11 @@ Engine::AudioSource::AudioSource(const std::string& fileName, std::function<void
 		return;
 	}
 	file.read((char*)&channels, 2); // Channels
-	file.read((char*)&sampleRate, 4); // Sample rate
-	file.read((char*)&byteRate, 4); // Byte rate
+	file.read((char*)&temp, 4); // Sample rate
+	file.read((char*)&temp, 4); // Byte rate
+	int16_t blockAlign;
 	file.read((char*)&blockAlign, 2); // Block align
-	file.read((char*)&bitsPerSample, 2); // Bits per sample
-	
-	Log("SampleRate=", sampleRate);
+	file.read((char*)&temp, 2); // Bits per sample
 
 	// Data chunk
 	while (true) // Find the chunk
@@ -255,15 +204,18 @@ Engine::AudioSource::AudioSource(const std::string& fileName, std::function<void
 	data = new int16_t[dataSize / 2]; // Resize data array to fit the data
 	file.read((char*)data, dataSize);// Read the data into the data array
 
-	frames = dataSize / blockAlign;
+	frames = dataSize / temp;
 	
 	loaded = true;
 }
 
-bool Engine::AudioSource::Play(uint32_t start, uint32_t length, float volume)
+KTech::Audio::Source::~Source()
 {
-	if (!loaded)
-		return false;
+	delete [] data; 
+}
+
+void KTech::Audio::Source::SetSettingsToPlay(uint32_t start, uint32_t length, float volume)
+{
 	playing = true;
 	this->volume = volume;
 	if (length == 0)
@@ -274,25 +226,115 @@ bool Engine::AudioSource::Play(uint32_t start, uint32_t length, float volume)
 		endpointToPlay = length + start;
 	cur = start;
 	startPoint = cur;
-	for (unsigned i = 0; i < activeSources.size(); i++)
-		if (activeSources[i] == this)
-			return true; // Don't add to activeSources if already there.
-	activeSources.push_back(this);
+}
+
+size_t KTech::Audio::CreateSource(const std::string& fileName, std::function<void()> OnEnd)
+{
+	// Create the source and push it 
+	sources.push_back(Source(fileName, OnEnd));
+	return sources.size() - 1;
+}
+
+bool KTech::Audio::PlaySource(size_t i, uint32_t start, uint32_t length, float volume)
+{
+	// Not loaded
+	if (!sources[i].loaded)
+		return false;
+	// Iterate playChain
+	for (size_t node = playChain;; node = sources[node].nextSource)
+	{
+		// Already playing
+		if (node == i)
+		{
+			// Reset play
+			sources[i].SetSettingsToPlay(start, length, volume);
+			return true;
+		}
+		// Reached end (not already playing)
+		else if (node == sources[node].nextSource)
+		{
+			// Set to play and add to play chain
+			sources[i].SetSettingsToPlay(start, length, volume);
+			sources[node].nextSource = i; // Add to chain
+			sources[i].nextSource = i; // If a node's next node is itself, then that node is the end of the chain
+			break;
+			chainLength++;
+		}
+	}
 	return true;
 }
 
-void Engine::AudioSource::Pause()
+void KTech::Audio::PauseSource(size_t i)
 {
-	playing = false;
+	// Not loaded
+	if (!sources[i].loaded)
+		return;
+	// Pause
+	sources[i].playing = false;
+	// Iterate playChain
+	for (size_t node = playChain; node != sources[node].nextSource /*Reached end*/; node = sources[node].nextSource)
+	{
+		// The next source is the one being paused
+		if (sources[node].nextSource == i)
+		{
+			// The node being removed is the last node in the chain
+			if (sources[i].nextSource == i)
+				sources[node].nextSource = node; // Make this node the last node
+			else // Otherwise, there is a node after the one being removed
+				sources[node].nextSource = sources[i].nextSource; // Set the next node to the one after the node being removed
+			chainLength--;
+			break;
+		}
+	}
 }
 
-void Engine::AudioSource::Resume()
+bool KTech::Audio::ResumeSource(size_t i)
 {
-	playing = true;
+	// Not loaded
+	if (!sources[i].loaded)
+		return false;
+	// Iterate playChain
+	for (size_t node = playChain;; node = sources[node].nextSource)
+	{
+		// Already playing
+		if (node == i)
+		{
+			sources[i].playing = true; // Resume
+			break;
+		}
+		// Reached end (not already playing)
+		else if (node == sources[node].nextSource)
+		{
+			sources[i].playing = true; // Resume
+			sources[node].nextSource = i; // Add to chain
+			sources[i].nextSource = i; // If a node's next node is itself, then that node is the end of the chain
+			chainLength++;
+			break;
+		}
+	}
+	return true;
 }
 
-void Engine::AudioSource::Stop()
+void KTech::Audio::StopSource(size_t i)
 {
-	playing = false;
-	cur = 0;
+	// Not loaded
+	if (!sources[i].loaded)
+		return;
+	// Pause
+	sources[i].playing = false;
+	sources[i].cur = 0;
+	// Iterate playChain
+	for (size_t node = playChain; node != sources[node].nextSource /*Reached end*/; node = sources[node].nextSource)
+	{
+		// The next source is the one being paused
+		if (sources[node].nextSource == i)
+		{
+			// The node being removed is the last node in the chain
+			if (sources[i].nextSource == i)
+				sources[node].nextSource = node; // Make this node the last node
+			else // Otherwise, there is a node after the one being removed
+				sources[node].nextSource = sources[i].nextSource; // Set the next node to the one after the node being removed
+			chainLength--;
+		}
+	}
 }

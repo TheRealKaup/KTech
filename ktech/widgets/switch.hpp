@@ -28,7 +28,7 @@ public:
 
 	std::function<void()> OnPress;
 	
-	Engine::RGBA unselectedOffRGBA, selectedOffRGBA, unselectedOnRGBA, selectedOnRGBA, downRGBA;
+	KTech::RGBA unselectedOffRGBA, selectedOffRGBA, unselectedOnRGBA, selectedOnRGBA, downRGBA;
 
 private:
 	void RemovePressColor()
@@ -62,7 +62,7 @@ private:
 		for (size_t i = 1; i < obj.textures.size(); i++)
 			obj.textures[i].value.f = downRGBA;
 		
-		Engine::Time::Invoke(std::bind(&Switch::RemovePressColor, this), 100, Engine::Time::Measurement::milliseconds);
+		obj.parentLayer->parentMap->parentEngine->time.Invoke(std::bind(&Switch::RemovePressColor, this), 100, KTech::Time::Measurement::milliseconds);
 
 		if (OnPress)
 			OnPress();
@@ -99,18 +99,18 @@ public:
 		RemovePressColor();
 	}
 
-	Switch(Engine::Layer* layer,
+	Switch(KTech::Layer* layer,
 		std::function<void()> OnPress,
-		const std::string& key = Engine::Input::K::return_,
-		Engine::Point pos = { 0, 0 },
+		const std::string& key = KTech::Keys::return_,
+		KTech::Point pos = { 0, 0 },
 		const std::string& text = "Switch",
 		bool on = false,
 		bool withFrame = false,
-		Engine::RGBA unselectedOffRGBA = Engine::RGBA( 150, 150, 150, 255 ),
-		Engine::RGBA selectedOffRGBA = Engine::RGBA( 255, 255, 255, 255 ),
-		Engine::RGBA unselectedOnRGBA = Engine::RGBA( 88, 150, 88, 255 ),
-		Engine::RGBA selectedOnRGBA = Engine::RGBA( 150, 255, 150, 255 ),
-		Engine::RGBA downRGBA = Engine::RGBA(150, 150, 255, 255))
+		KTech::RGBA unselectedOffRGBA = KTech::RGBA( 150, 150, 150, 255 ),
+		KTech::RGBA selectedOffRGBA = KTech::RGBA( 255, 255, 255, 255 ),
+		KTech::RGBA unselectedOnRGBA = KTech::RGBA( 88, 150, 88, 255 ),
+		KTech::RGBA selectedOnRGBA = KTech::RGBA( 150, 255, 150, 255 ),
+		KTech::RGBA downRGBA = KTech::RGBA(150, 150, 255, 255))
 		: OnPress(OnPress), on(on), unselectedOffRGBA(unselectedOffRGBA), selectedOffRGBA(selectedOffRGBA), unselectedOnRGBA(unselectedOnRGBA), selectedOnRGBA(selectedOnRGBA), downRGBA(downRGBA)
 	{
 		obj.pos = pos;
@@ -122,45 +122,45 @@ public:
 			{
 				obj.textures.resize(9);
 				// text
-				obj.textures[0].Write({text}, unselectedOnRGBA, Engine::RGBA(0, 0, 0, 0), Engine::Point(1, 1));
+				obj.textures[0].Write({text}, unselectedOnRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 				// up-left corner
-				obj.textures[1].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOnRGBA), Engine::Point(0, 0));
+				obj.textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(0, 0));
 				// up-right corner
-				obj.textures[2].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOnRGBA), Engine::Point(1 + text.length(), 0));
+				obj.textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(1 + text.length(), 0));
 				// bottom-left corner
-				obj.textures[3].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOnRGBA), Engine::Point(0, 2));
+				obj.textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(0, 2));
 				// bottom-right corner
-				obj.textures[4].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOnRGBA), Engine::Point(1 + text.length(), 2));
+				obj.textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(1 + text.length(), 2));
 				// up frame
-				obj.textures[5].Simple(Engine::UPoint(text.length(), 1), Engine::CellA('-', unselectedOnRGBA), Engine::Point(1, 0));
+				obj.textures[5].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOnRGBA), KTech::Point(1, 0));
 				// left frame
-				obj.textures[6].Simple(Engine::UPoint(1, 1), Engine::CellA('|', unselectedOnRGBA), Engine::Point(0, 1));
+				obj.textures[6].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOnRGBA), KTech::Point(0, 1));
 				// bottom frame
-				obj.textures[7].Simple(Engine::UPoint(text.length(), 1), Engine::CellA('-', unselectedOnRGBA), Engine::Point(1, 2));
+				obj.textures[7].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOnRGBA), KTech::Point(1, 2));
 				// right frame
-				obj.textures[8].Simple(Engine::UPoint(1, 1), Engine::CellA('|', unselectedOnRGBA), Engine::Point(1 + text.length(), 1));
+				obj.textures[8].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOnRGBA), KTech::Point(1 + text.length(), 1));
 			}
 			else
 			{
 				obj.textures.resize(9);
 				// text
-				obj.textures[0].Write({text}, unselectedOffRGBA, Engine::RGBA(0, 0, 0, 0), Engine::Point(1, 1));
+				obj.textures[0].Write({text}, unselectedOffRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 				// up-left corner
-				obj.textures[1].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOffRGBA), Engine::Point(0, 0));
+				obj.textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(0, 0));
 				// up-right corner
-				obj.textures[2].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOffRGBA), Engine::Point(1 + text.length(), 0));
+				obj.textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(1 + text.length(), 0));
 				// bottom-left corner
-				obj.textures[3].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOffRGBA), Engine::Point(0, 2));
+				obj.textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(0, 2));
 				// bottom-right corner
-				obj.textures[4].Simple(Engine::UPoint(1, 1), Engine::CellA('#', unselectedOffRGBA), Engine::Point(1 + text.length(), 2));
+				obj.textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(1 + text.length(), 2));
 				// up frame
-				obj.textures[5].Simple(Engine::UPoint(text.length(), 1), Engine::CellA('-', unselectedOffRGBA), Engine::Point(1, 0));
+				obj.textures[5].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOffRGBA), KTech::Point(1, 0));
 				// left frame
-				obj.textures[6].Simple(Engine::UPoint(1, 1), Engine::CellA('|', unselectedOffRGBA), Engine::Point(0, 1));
+				obj.textures[6].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOffRGBA), KTech::Point(0, 1));
 				// bottom frame
-				obj.textures[7].Simple(Engine::UPoint(text.length(), 1), Engine::CellA('-', unselectedOffRGBA), Engine::Point(1, 2));
+				obj.textures[7].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOffRGBA), KTech::Point(1, 2));
 				// right frame
-				obj.textures[8].Simple(Engine::UPoint(1, 1), Engine::CellA('|', unselectedOffRGBA), Engine::Point(1 + text.length(), 1));
+				obj.textures[8].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOffRGBA), KTech::Point(1 + text.length(), 1));
 			}
 		}
 		else
@@ -169,18 +169,18 @@ public:
 			{
 				obj.textures.resize(1);
 				// text
-				obj.textures[0].Write({text}, unselectedOnRGBA, Engine::RGBA(0, 0, 0, 0), Engine::Point(1, 1));
+				obj.textures[0].Write({text}, unselectedOnRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 			}
 			else
 			{
 				obj.textures.resize(1);
 				// text
-				obj.textures[0].Write({text}, unselectedOffRGBA, Engine::RGBA(0, 0, 0, 0), Engine::Point(1, 1));
+				obj.textures[0].Write({text}, unselectedOffRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 			}
 		}
 
 		// Input handlers
-		callbackGroup.AddCallback(Engine::Input::RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), true));
+		callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), true));
 		
 		// Add object
 		layer->AddObject(&obj);

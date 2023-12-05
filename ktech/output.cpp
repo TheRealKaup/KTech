@@ -19,20 +19,59 @@
 */
 
 #include "ktech.hpp"
+#include <cstring>
 
-// ---=== Variables ===---
+void KTech::IO::Draw(const std::vector<std::vector<Cell>>& render, Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
+{
+	// Default the rectangle
+	if (bottom == 0)
+		bottom = render.size();
+	if (right == 0)
+		right = render[0].size();
+	// Return if rectangle is invalid
+	if (left >= right || top >= bottom)
+		return;
 
-std::vector<std::vector<Engine::Cell>> Engine::image;
+	// The assumption is that Engine::image and Camera::image are not evenly sized
 
-// ---=== Functions ===---
+	size_t yI, yX;
+	
+	for ()
+	{
+		
+	}
 
-void Engine::Print()
+
+
+	long ySkip = 0;
+	long xSkip = 0;
+	if (pos.y < 0)
+		ySkip = -pos.y;
+	if (pos.x < 0)
+		xSkip = -pos.x;
+
+	// Draw
+	// y - camera's Y, yE - engine's Y
+	for (long y = top + ySkip, yE = pos.y + ySkip;
+		y < bottom && y < render.size() && yE < image.size();
+		y++, yE++)
+	{
+		for (long x = left + xSkip, xE = pos.x + xSkip;
+			x < right && x < render[y].size() && xE < image[yE].size();
+			x++, xE++)
+		{
+			image[y - top + pos.y][x - left + pos.x] = render[y][x];
+		}
+	}
+}
+
+void KTech::IO::Print()
 {
 	// Get terminal size
-	ioctl(fileno(stdout), TIOCGWINSZ, &Engine::terminalSize);
+	ioctl(fileno(stdout), TIOCGWINSZ, &KTech::IO::terminalSize);
 
 	// Obtain the maximum length for the stringImage
-	if (image.size() == 0 || !terminalPrepared)
+	if (image.size() == 0)
 		return;
 
 	// Resize the stringImage if needed
@@ -175,68 +214,9 @@ void Engine::Print()
 		stringImage[l + 2] = 'm';
 		l += 3;
 	}
-	// ".substr(0, l)" - print until the end which was set by the writing sequence above.
-	if (terminalPrepared)
-		std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
 }
 
-void Engine::ResetTerminal()
-{
-	// Return to the old terminal attributes
-	tcsetattr(0, TCSANOW, &oldTerminalAttributes);
-	// Show cursor, and disable alternative buffer (return to previous terminal)
-	std::cout << "\033[?25h\033[?1049l" << std::flush;
-}
-
-void Engine::PrepareTerminal(Engine::UPoint imageSize)
-{
-	// Redirect stderr to a file to supress ALSA's warnings spam in the terminal.
-	freopen("errfile.txt", "w", stderr);
-
-	// Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
-	std::cout << "\033[?25l\033[?1049h";
-
-	// Set terminal attributes
-	tcgetattr(0, &oldTerminalAttributes);
-	termios terminalAttributes = oldTerminalAttributes;
-	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
-	terminalAttributes.c_lflag &= ~ECHO; // Disable echo
-	terminalAttributes.c_lflag &= ~ISIG; // Disable signals
-	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
-	terminalAttributes.c_cc[VTIME] = 0;
-	tcsetattr(0, TCSANOW, &terminalAttributes);
-
-	// Size the image
-	image.resize(imageSize.y);
-	for (size_t y = 0; y < image.size(); y++)
-		image[y].resize(imageSize.x);
-	unsigned maxStringSize = image.size() * 4; // reserved for '\n'
-	for (unsigned y = 0; y < image.size(); y++)
-		maxStringSize += image[y].size() * 39; // reserved for characters
-	if (maxStringSize == 0)
-		return;
-	if (stringImage.size() < maxStringSize)
-		stringImage.resize(maxStringSize);
-
-	terminalPrepared = true;
-}
-
-void Engine::Terminate()
-{
-	if (Engine::terminalPrepared)
-	{
-		Engine::ResetTerminal();
-		Engine::terminalPrepared = false;
-	}
-	if (Engine::audioInitialized)
-	{
-		Engine::TerminateAudio();
-		Engine::audioInitialized = false;
-	}
-	running = false;
-}
-
-void Engine::PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string nameOfProject)
+void KTech::IO::PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string nameOfProject)
 {
 	// Clear the terminal
 	std::cout << "\033[H\033[3J\033[2J";
@@ -261,17 +241,56 @@ void Engine::PrintStartupNotice(const std::string& title, const std::string& yea
 
 	// Wait for user input
 	std::cout << "Read the legal notices, and then press the 'return' key (enter) to proceed..." << std::flush;
-	while (Input::input != Input::K::return_)
-	{
-		std::cout << Input::Get() << Input::input << std::endl << std::flush;
-		if (!running)
-			exit(0);
-	}
+	while (input != Keys::return_ && engine->running);
+	if (!engine->running)
+		exit(0);
 }
 
-void Engine::Log(const std::string& text, RGB color)
+void KTech::IO::Log(const std::string& text, RGB color)
 {
 	static uint32_t logIndex = 0;
 	std::cout << "\033[38;2;" << std::to_string(color.r) << ';' << std::to_string(color.g) << ';' << std::to_string(color.b) << 'm' << logIndex << "] " << text << "\033[m" << std::endl << std::flush;
 	logIndex++;
+}
+
+KTech::IO::IO(KTech::UPoint imageSize, Engine* engine) : engine(engine)
+{
+	// (AUDIO/OUTPUT) Redirect stderr to a file to supress ALSA's warnings spam in the terminal.
+	freopen("errfile.txt", "w", stderr);
+
+	// (OUTPUT) Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
+	std::cout << "\033[?25l\033[?1049h";
+
+	// (INPUT) Set terminal attributes
+	tcgetattr(0, &oldTerminalAttributes);
+	termios terminalAttributes = oldTerminalAttributes;
+	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
+	terminalAttributes.c_lflag &= ~ECHO; // Disable echo
+	terminalAttributes.c_lflag &= ~ISIG; // Disable signals
+	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
+	terminalAttributes.c_cc[VTIME] = 0;
+	tcsetattr(0, TCSANOW, &terminalAttributes);
+
+	// (OUTPUT) Size the image
+	image.resize(imageSize.y);
+	for (size_t y = 0; y < image.size(); y++)
+		image[y].resize(imageSize.x);
+	unsigned maxStringSize = image.size() * 4; // reserved for '\n'
+	for (unsigned y = 0; y < image.size(); y++)
+		maxStringSize += image[y].size() * 39; // reserved for characters
+	if (maxStringSize == 0)
+		return;
+	if (stringImage.size() < maxStringSize)
+		stringImage.resize(maxStringSize);
+
+	// (INPUT) Create input loop
+	t_inputLoop = std::thread(std::bind(&IO::Loop, this));
+}
+
+KTech::IO::~IO()
+{
+	// Return to the old terminal attributes
+	tcsetattr(0, TCSANOW, &oldTerminalAttributes);
+	// Show cursor, and disable alternative buffer (return to previous terminal)
+	std::cout << "\033[?25h\033[?1049l" << std::flush;
 }
