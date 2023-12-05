@@ -32,37 +32,10 @@ void KTech::IO::Draw(const std::vector<std::vector<Cell>>& render, Point pos, ui
 	if (left >= right || top >= bottom)
 		return;
 
-	// The assumption is that Engine::image and Camera::image are not evenly sized
-
-	size_t yI, yX;
-	
-	for ()
-	{
-		
-	}
-
-
-
-	long ySkip = 0;
-	long xSkip = 0;
-	if (pos.y < 0)
-		ySkip = -pos.y;
-	if (pos.x < 0)
-		xSkip = -pos.x;
-
 	// Draw
-	// y - camera's Y, yE - engine's Y
-	for (long y = top + ySkip, yE = pos.y + ySkip;
-		y < bottom && y < render.size() && yE < image.size();
-		y++, yE++)
-	{
-		for (long x = left + xSkip, xE = pos.x + xSkip;
-			x < right && x < render[y].size() && xE < image[yE].size();
-			x++, xE++)
-		{
-			image[y - top + pos.y][x - left + pos.x] = render[y][x];
-		}
-	}
+	for (size_t yF = (pos.y < 0 ? 0 : pos.y), yR = top; yF < image.size() && yR < bottom; yF++, yR++)
+		for (size_t xF = (pos.x < 0 ? 0 : pos.x), xR = left; xF < image.size() && xR < right; xF++, xR++)
+			image[yF][xF] = render[yR][xR];
 }
 
 void KTech::IO::Print()
@@ -214,6 +187,7 @@ void KTech::IO::Print()
 		stringImage[l + 2] = 'm';
 		l += 3;
 	}
+	std::cout << "\033[H\033[3J\033[2J" << stringImage << std::flush;
 }
 
 void KTech::IO::PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string nameOfProject)
