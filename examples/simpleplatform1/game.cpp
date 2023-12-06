@@ -18,26 +18,9 @@
 
 #include "../../ktech/ktech.hpp"
 
-bool catchingCharacterB = false;
-
 using namespace KTech;
 
 Engine engine(UPoint(50, 30), 24);
-
-/*
-		Layer* parentLayer = nullptr;
-
-		std::string name = "";
-		Point pos = { 0, 0 };
-
-		std::vector<Texture> textures = {};
-		std::vector<Collider> colliders = {};
-
-		Point lastPush = { 0, 0 };
-		size_t colliderIndex = -1;
-		Object* otherObject = nullptr;
-		size_t otherColliderIndex = -1;
-*/
 
 struct Character : Object
 {
@@ -46,7 +29,7 @@ struct Character : Object
 
 	KTech::Layer* voidLayer;
 
-	static constexpr int jumpStreng = 6;
+	static constexpr int jumpStreng = 5;
 
 	KTech::Camera cam;
 	bool onGround = false;
@@ -57,7 +40,7 @@ struct Character : Object
 	void Jump()
 	{
 		if (onGround) {
-			yVelocity -= jumpStreng;
+			yVelocity = jumpStreng;
 			engine.audio.PlaySource(jumpSFX);
 			onGround = false;
 		}
@@ -73,51 +56,51 @@ struct Character : Object
 		Move({ -1 });
 	}
 
-	virtual void OnEvent(KTech::Object::EventType eventType)
+	virtual void OnTick()
 	{
-		switch (eventType)
-		{
-			case KTech::Object::EventType::onTick:
-			{
-				if (yVelocity < 1) {
-					yVelocity++;
-				}
+		IO::Log("<Character::OnTick> Start of function...", RGBColors::pink);
 
-				bool left = false; // IsKeyDown(VK_LEFT);
-				bool right = false; // IsKeyDown(VK_RIGHT);
-				
-				bool priorOnGround = onGround;
-
-				if (yVelocity < 0)
-					for (size_t i = 0; i < -yVelocity; i++)
-						Move({ 0, -1 });
-				else if (yVelocity == 1)
-					onGround = Move({ 0, 1 });
-
-				cam.pos = { pos.x - 6, pos.y - 6 };
-
-				if (!priorOnGround && onGround)
-					engine.audio.PlaySource(groundHitSFX, 0, 0, 0.5f);
-				break;
-			}
-			case KTech::Object::EventType::onOverlap:
-			{
-				if (otherObject->colliders[otherColliderIndex].type == 2)
-					box = otherObject;
-				break;
-			}
-			case KTech::Object::EventType::onOverlapExit: case KTech::Object::EventType::onOverlappedExit:
-			{
-				if (otherObject == box)
-					box = nullptr;
-				break;
-			}
-			default:
-			{
-				break;
-			}
-		}
+		bool left = false;
+		bool right = false;
 		
+		bool priorOnGround = onGround;
+
+		IO::Log("<Character::OnTick> Moving", RGBColors::pink);
+
+		if (yVelocity > 0)
+		{
+			for (size_t i = 0; i < yVelocity; i++)
+				Move(Point(0, -1));
+			yVelocity--;
+		}
+		else
+			onGround = !Move(Point(0, 1));
+
+		IO::Log("<Character::OnTick> Moving camera", RGBColors::pink);
+
+		cam.pos = { pos.x - 6, pos.y - 6 };
+	
+		if (!priorOnGround && onGround)
+		 	engine.audio.PlaySource(groundHitSFX, 0, 0, 0.5f);
+
+		IO::Log("<Character::OnTick> End of function.", RGBColors::pink);
+	}
+	
+	virtual void OnOverlap(Point dir, size_t collider, Object* otherObject, size_t otherCollider)
+	{
+		if (otherObject->colliders[otherCollider].type == 2)
+			box = otherObject;
+	}
+
+	virtual void OnOverlapExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider)
+	{
+		if (otherObject == box)
+			box = nullptr;
+	}
+	virtual void OnOverlappedExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider)
+	{
+		if (otherObject == box)
+			box = nullptr;
 	}
 
 	void PushBoxToDifferentLayer()
@@ -129,7 +112,7 @@ struct Character : Object
 		}
 	}
 
-	Character(KTech::Layer* layer, KTech::Layer* voidLayer) : Object(Point(5, 2), layer), voidLayer(voidLayer)
+	Character(KTech::Layer* layer, KTech::Layer* voidLayer) : Object(Point(5, 2), layer, "character"), voidLayer(voidLayer)
 	{
 		textures.resize(1);
 		textures[0].Write(
@@ -143,6 +126,22 @@ struct Character : Object
 		colliders[0].ByTextureCharacter(textures[0], 100, 1);
 		colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
 
+		layer->parentMap->parentEngine->io.RegisterCallback("w", std::bind(&Character::Jump, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback("W", std::bind(&Character::Jump, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback(" ", std::bind(&Character::Jump, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this), true);
+
+		layer->parentMap->parentEngine->io.RegisterCallback("d", std::bind(&Character::Right, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback("D", std::bind(&Character::Right, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::right, std::bind(&Character::Right, this), true);
+
+		layer->parentMap->parentEngine->io.RegisterCallback("a", std::bind(&Character::Left, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback("A", std::bind(&Character::Left, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::left, std::bind(&Character::Left, this), true);
+
+		layer->parentMap->parentEngine->io.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this), true);
+		layer->parentMap->parentEngine->io.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this), true);
+
 		cam = KTech::Camera(KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 ));
 	}
 };
@@ -153,14 +152,11 @@ struct GravityBox : Object
 
 	unsigned fallingSpeed;
 
-	void OnEvent(KTech::Object::EventType eventType)
+	void OnTick()
 	{
-		if (eventType != KTech::Object::EventType::onTick)
-			return;
-
 		// If catched, do not fall.
 		for (size_t i = 0; i < fallingSpeed; i++)
-			Move({ 0, 1 });
+			Move(Point(0, 1));
 	}
 
 	GravityBox(KTech::Layer* layer, KTech::Point pos, unsigned fallingSpeed = 1U) : Object(pos, layer), fallingSpeed(fallingSpeed)
@@ -183,11 +179,8 @@ struct AutoUpdatingText : Object
 {
 	float* data;
 
-	void OnEvent(KTech::Object::EventType eventType)
+	void OnTick()
 	{
-		if (eventType != KTech::Object::EventType::onTick)
-			return;
-		
 		textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
 	}
 
@@ -219,15 +212,13 @@ int main()
 
 	KTech::Map map(&engine);
 
-	KTech::Layer layer;
-	KTech::Layer voidLayer;
-	map.AddLayer(&layer);
-	map.AddLayer(&voidLayer);
+	KTech::Layer layer(&map);
+	KTech::Layer voidLayer(&map);
 
 	KTech::Camera camera({ 0, 0 }, { 50, 30 });
 	map.AddCamera(&camera, true);
 
-	KTech::Object worldProps({ 1, 1 }, &layer);
+	KTech::Object worldProps({ 1, 1 }, &layer, "worldProps");
 	worldProps.textures.resize(3);
 	KTech::IO::Log("<Main> Loading assets/sky.ktecht", RGBColors::blue);
 	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
@@ -238,7 +229,7 @@ int main()
 	worldProps.colliders[0].ByTextureBackground(worldProps.textures[2], 100, 0);
 	uint8_t base = 29;
 
-	KTech::Object frame(KTech::Point(0, 0), &layer, "L");
+	KTech::Object frame(KTech::Point(0, 0), &layer, "frame");
 	frame.textures.resize(5);
 	frame.textures[0].Simple(KTech::UPoint(1, 30), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 0));
 	frame.textures[1].Simple(KTech::UPoint(1, 30), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(49, 0));
@@ -274,7 +265,7 @@ int main()
 	engine.io.RegisterCallback("m", TurnOnCharacterCamera);
 	engine.io.RegisterCallback("M", TurnOnCharacterCamera);
 
-	KTech::Layer darkLayer;
+	KTech::Layer darkLayer(&map);
 	darkLayer.alpha = 127;
 	
 	AutoUpdatingText audioPerformance(&engine.time.tpsPotential, Point(2, 27), &layer);
@@ -283,11 +274,13 @@ int main()
 
 	while (engine.running)
 	{
-		KTech::IO::Log("engine loop iteration", RGBColors::blue);
-
+		KTech::IO::Log("engine-loop-iteration start", RGBColors::blue);
+		
+		KTech::IO::Log("engine-loop-iteration StartThisTick", RGBColors::yellow);
 		engine.time.StartThisTick();
-
+		KTech::IO::Log("engine-loop-iteration Call", RGBColors::yellow);
 		engine.io.Call();
+		KTech::IO::Log("engine-loop-iteration CallOnTicks", RGBColors::yellow);
 		map.CallOnTicks();
 
 		if (map.activeCameraI != -1 && map.activeCameraI < map.cameras.size())
@@ -300,13 +293,19 @@ int main()
 				engine.io.Draw(map.cameras[1]->image, Point(18, 9), 0, 0, 0, 0);
 			}
 			else {
-				map.cameras[0]->Render(map.layers);
+				KTech::IO::Log("engine-loop-iteration Render", RGBColors::yellow);
+				map.cameras[0]->Render({ &layer });
+				KTech::IO::Log("engine-loop-iteration Draw", RGBColors::yellow);
 				engine.io.Draw(map.cameras[0]->image, Point(0, 0), 0, 0, 0, 0);
 			}
+			KTech::IO::Log("engine-loop-iteration Print", RGBColors::yellow);
 			engine.io.Print();
 		}
 		// std::cout << "n="<< KTech::totalTicks << " | delta=" << KTech::deltaTime << " | fps=" << KTech::fps << " | pfps=" << KTech::potentialfps << std::endl;
 		// std::cout << "x=" << KTech::terminalSize.ws_col << ", y=" << KTech::terminalSize.ws_row << std::endl;
+		KTech::IO::Log("engine-loop-iteration WaitUntilNextTick", RGBColors::yellow);
 		engine.time.WaitUntilNextTick();
+
+		KTech::IO::Log("engine-loop-iteration end", RGBColors::green);
 	}
 }

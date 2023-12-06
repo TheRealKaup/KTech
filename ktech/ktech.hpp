@@ -159,24 +159,15 @@ namespace KTech
 		std::vector<Texture> textures = {};
 		std::vector<Collider> colliders = {};
 
-		Point lastPush = { 0, 0 };
-		size_t colliderIndex = -1;
-		Object* otherObject = nullptr;
-		size_t otherColliderIndex = -1;
-
-		enum class EventType : uint8_t
-		{
-			onTick, // Called by `Map::CallOnTicks()`.
-			onPushed, // A different object (`otherObject`) pushed this object.
-			onPush, // This object pushed a different object (`otherObject`)
-			onBlocked, // A different object (`otherObject`) blocked this object
-			onBlock, // This object blocked a different object (`otherObject`)
-			onOverlap, // This object entered an overlap with a different object (`otherObject`)
-			onOverlapExit, // This object exited an overlap with a different object (`otherObject`)
-			onOverlapped, // A different object (`otherObject`) entered an overlap with this object
-			onOverlappedExit // A different object (`otherObject`) exited an overlap with this object
-		};
-		virtual void OnEvent(EventType eventType) {};
+		virtual void OnTick() {} // Called by `Map::CallOnTicks()`.
+		virtual void OnPushed(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
+		virtual void OnPush(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
+		virtual void OnBlocked(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) blocked this object
+		virtual void OnBlock(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object blocked a different object (`otherObject`)
+		virtual void OnOverlap(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object entered an overlap with a different object (`otherObject`)
+		virtual void OnOverlapExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object exited an overlap with a different object (`otherObject`)
+		virtual void OnOverlapped(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
+		virtual void OnOverlappedExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
 
 		bool Move(Point dir);
 		
@@ -202,6 +193,9 @@ namespace KTech
 		int AddObject(Object* object);
 		bool RemoveObject(const std::string& name);
 		bool RemoveObject(Object* object);
+
+		Layer(Map* map);
+
 		~Layer();
 	};
 
@@ -295,8 +289,13 @@ namespace KTech
 				BasicHandler* parentHandler;
 				bool onTick;
 				inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
+				inline ~BasicCallback()
+				{
+					for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
+						if (this == parentHandler->callbacks[i])
+							parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
+				}
 			};
-			inline static std::vector<BasicHandler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
 			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			std::string input;
 			uint8_t timesPressed = 0;
@@ -309,8 +308,13 @@ namespace KTech
 			{
 				RangedHandler* parentHandler;
 				inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
+				inline ~RangedCallback()
+				{
+					for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
+						if (this == parentHandler->callbacks[i])
+							parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
+				}
 			};
-			inline static std::vector<RangedHandler*> handlers; // Handlers are stored as pointers because the vector changes its size, and Callbacks need a consistent pointer to their parent handler.
 			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			char key1, key2;
 			inline RangedHandler(char key1, char key2) : key1(key1), key2(key2) {};
@@ -318,23 +322,22 @@ namespace KTech
 
 		struct CallbacksGroup
 		{
-			inline static std::vector<CallbacksGroup*> groups;
-
-			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
-			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
+			std::vector<Callback*> callbacks;
 			bool enabled;
 			bool synced = true;
-			inline CallbacksGroup(bool enabled = true) : enabled(enabled) { groups.push_back(this); }
-			inline ~CallbacksGroup() { for (size_t i = 0; i < groups.size(); i++) if (groups[i] == this) groups.erase(groups.begin() + i); }
-			inline void AddCallback(BasicHandler::BasicCallback* callback) { basicCallbacks.push_back(callback); callback->enabled = enabled; }
-			inline void AddCallback(RangedHandler::RangedCallback* callback) { rangedCallbacks.push_back(callback); callback->enabled = enabled; }
+			inline CallbacksGroup(bool enabled = true) : enabled(enabled) { }
+			inline void AddCallback(Callback* callback) { callbacks.push_back(callback); synced = false; }
 			inline void Enable() { enabled = true; synced = false; }
 			inline void Disable() { enabled = false; synced = false; }
 			void DeleteCallbacks();
 		};
+		std::vector<BasicHandler> basicHandlers;
+		std::vector<RangedHandler> rangedHandlers;
+		std::vector<CallbacksGroup> groups;
 
 		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
+		size_t CreateCallbackGroup(bool enabled = true);
 
 		std::string input = std::string(7, '\0');
 		std::string quitKey = "\x03";

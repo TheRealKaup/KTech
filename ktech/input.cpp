@@ -26,68 +26,66 @@ KTech::IO::BasicHandler::BasicCallback* KTech::IO::RegisterCallback(const std::s
 {
 	// If a handler already exists for this input, add the callback to the calls vector
 	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
-	for (; i < BasicHandler::handlers.size(); i++)
+	for (; i < basicHandlers.size(); i++)
 	{
-		if (BasicHandler::handlers[i]->input == input)
+		if (basicHandlers[i].input == input)
 		{
-			BasicHandler::handlers[i]->callbacks.push_back(new BasicHandler::BasicCallback(callback, BasicHandler::handlers[i], onTick));
-			return BasicHandler::handlers[i]->callbacks[BasicHandler::handlers[i]->callbacks.size() - 1]; // Last callback
+			basicHandlers[i].callbacks.push_back(new BasicHandler::BasicCallback(callback, &(basicHandlers[i]), onTick));
+			return basicHandlers[i].callbacks[basicHandlers[i].callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	BasicHandler::handlers.push_back(new BasicHandler(input));
+	basicHandlers.push_back(BasicHandler(input));
 	// And add a callback to it
-	BasicHandler::handlers[i]->callbacks.push_back(new BasicHandler::BasicCallback(callback, BasicHandler::handlers[i], onTick));
-	return BasicHandler::handlers[i]->callbacks[BasicHandler::handlers[i]->callbacks.size() - 1]; // Last callback of last handler
+	basicHandlers[i].callbacks.push_back(new BasicHandler::BasicCallback(callback, &basicHandlers[i], onTick));
+	return basicHandlers[i].callbacks[basicHandlers[i].callbacks.size() - 1]; // Last callback of last handler
 }
 
 KTech::IO::RangedHandler::RangedCallback* KTech::IO::RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback)
 {
 	// If a handler already exists for this input, add the callback to the calls vector
 	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
-	for (; i < RangedHandler::handlers.size(); i++)
+	for (; i < rangedHandlers.size(); i++)
 	{
-		if (RangedHandler::handlers[i]->key1 == key1 && RangedHandler::handlers[i]->key2 == key2)
+		if (rangedHandlers[i].key1 == key1 && rangedHandlers[i].key2 == key2)
 		{
-			RangedHandler::handlers[i]->callbacks.push_back(new RangedHandler::RangedCallback(callback, RangedHandler::handlers[i]));
-			return RangedHandler::handlers[i]->callbacks[RangedHandler::handlers[i]->callbacks.size() - 1]; // Last callback
+			rangedHandlers[i].callbacks.push_back(new RangedHandler::RangedCallback(callback, &rangedHandlers[i]));
+			return rangedHandlers[i].callbacks[rangedHandlers[i].callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	RangedHandler::handlers.push_back(new RangedHandler(key1, key2));
+	rangedHandlers.push_back(RangedHandler(key1, key2));
 	// And add a callback to it
-	RangedHandler::handlers[i]->callbacks.push_back(new RangedHandler::RangedCallback(callback, RangedHandler::handlers[i]));
-	return RangedHandler::handlers[i]->callbacks[RangedHandler::handlers[i]->callbacks.size() - 1]; // Last callback
+	rangedHandlers[i].callbacks.push_back(new RangedHandler::RangedCallback(callback, &rangedHandlers[i]));
+	return rangedHandlers[i].callbacks[rangedHandlers[i].callbacks.size() - 1]; // Last callback
 }
 
 void KTech::IO::Call()
 {
 	// Update groups' callbacks' `enabled` if `synced` is false
-	for (CallbacksGroup*& group : CallbacksGroup::groups)
+	for (CallbacksGroup& group : groups)
 	{
-		if (!group->synced)
+		if (!group.synced)
 		{
-			for (BasicHandler::BasicCallback*& callback : group->basicCallbacks)
-				callback->enabled = group->enabled;
-			for (RangedHandler::RangedCallback*& callback: group->rangedCallbacks)
-				callback->enabled = group->enabled;
-			group->synced = true;
+			for (Callback*& callback : group.callbacks)
+				callback->enabled = group.enabled;
+			group.synced = true;
 		}
 	}
 	// Call basic handlers' callbacks
-	for (BasicHandler*& handler : BasicHandler::handlers)
+	for (BasicHandler& handler : basicHandlers)
 	{
-		if (handler->timesPressed > 0)
+		if (handler.timesPressed > 0)
 		{
-			for (BasicHandler::BasicCallback*& callback : handler->callbacks)
+			for (BasicHandler::BasicCallback*& callback : handler.callbacks)
 			{
 				if (callback->enabled && callback->onTick && callback->callback)
 				{
-					input = handler->input;
+					input = handler.input;
 					callback->callback();
 				}
 			}
-			handler->timesPressed = 0;
+			handler.timesPressed = 0;
 		}
 	}
 }
@@ -112,27 +110,30 @@ void KTech::IO::Loop()
 		input.assign(Get());
 		// Quit
 		if (input == quitKey)
-			engine->running = false;
-		// Call basic handlers
-		for (size_t i = 0; i < BasicHandler::handlers.size(); i++)
 		{
-			if (input == BasicHandler::handlers[i]->input) // If the strings are equal
+			engine->running = false;
+			return;
+		}
+		// Call basic handlers
+		for (size_t i = 0; i < basicHandlers.size(); i++)
+		{
+			if (input == basicHandlers[i].input) // If the strings are equal
 			{
-				BasicHandler::handlers[i]->timesPressed++;
-				for (size_t j = 0; j < BasicHandler::handlers[i]->callbacks.size(); j++) // Call the calls
-					if (BasicHandler::handlers[i]->callbacks[j]->enabled && !BasicHandler::handlers[i]->callbacks[j]->onTick) // Check if the callback is enabled and shouldn't be called on tick
-						BasicHandler::handlers[i]->callbacks[j]->callback(); // Call
+				basicHandlers[i].timesPressed++;
+				for (size_t j = 0; j < basicHandlers[i].callbacks.size(); j++) // Call the calls
+					if (basicHandlers[i].callbacks[j]->enabled && !basicHandlers[i].callbacks[j]->onTick) // Check if the callback is enabled and shouldn't be called on tick
+						basicHandlers[i].callbacks[j]->callback(); // Call
 				break; // Break because there shouldn't be a similar handler
 			}
 		}
 		// Call ranged handlers, only if the input is 1 letter in length
 		if (input.length() == 1)
 		{
-			for (size_t i = 0; i < RangedHandler::handlers.size(); i++)
+			for (size_t i = 0; i < rangedHandlers.size(); i++)
 			{
-				if (RangedHandler::handlers[i]->key1 <= input[0] && input[0] <= RangedHandler::handlers[i]->key2) // If the key is in range
+				if (rangedHandlers[i].key1 <= input[0] && input[0] <= rangedHandlers[i].key2) // If the key is in range
 				{
-					for (RangedHandler::RangedCallback*& callback: RangedHandler::handlers[i]->callbacks)
+					for (RangedHandler::RangedCallback*& callback: rangedHandlers[i].callbacks)
 						if (callback->enabled) // Check if the callback is enabled
 							callback->callback(); // Call
 					// Don't break since there can be more handlers which manage an area in which the input is located in
@@ -174,34 +175,9 @@ bool KTech::IO::Between(char charKey1, char charKey2)
 
 void KTech::IO::CallbacksGroup::DeleteCallbacks()
 {
-	// Basic handlers
-	for (BasicHandler::BasicCallback*& callback : basicCallbacks)
-	{
-		// Access all of the callbacks' parent handlers
-		for (size_t i = 0; i < callback->parentHandler->callbacks.size(); i++)
-		{
-			// Find the callback's pointer within its parent handler and erase it from the handler's vector
-			if (callback == callback->parentHandler->callbacks[i])
-				callback->parentHandler->callbacks.erase(callback->parentHandler->callbacks.begin() + i);
-		}
-		// Delete the callback itself
+	// Delete memory (also calls the callbacks' destructors which removes themselves from their parent handlers)
+	for (Callback*& callback : callbacks)
 		delete callback;
-	}
-	// Clear the callbacks vector within the group
-	basicCallbacks.clear();
-	// Ranged handlers
-	for (RangedHandler::RangedCallback*& callback : rangedCallbacks)
-	{
-		// Access all of the callbacks' parent handlers
-		for (size_t i = 0; i < callback->parentHandler->callbacks.size(); i++)
-		{
-			// Find the callback's pointer within its parent handler and erase it from the handler's vector
-			if (callback == callback->parentHandler->callbacks[i])
-				callback->parentHandler->callbacks.erase(callback->parentHandler->callbacks.begin() + i);
-		}
-		// Delete the callback itself
-		delete callback;
-	}
-	// Clear the callbacks vector within the group
-	rangedCallbacks.clear();
+	// Clear this group's vector.
+	callbacks.clear();
 }

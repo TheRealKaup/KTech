@@ -255,50 +255,20 @@ bool Collision::MoveObject(Object* object, Point dir)
 		// Call push events
 		for (size_t i = 0; i < pushData.size(); i++)
 		{
-			pushData[i].activeObject->lastPush = dir;
-			pushData[i].activeObject->colliderIndex = pushData[i].activeCollider;
-			pushData[i].activeObject->otherObject = pushData[i].passiveObject;
-			pushData[i].activeObject->otherColliderIndex = pushData[i].passiveCollider;
-
-			pushData[i].passiveObject->lastPush = dir;
-			pushData[i].passiveObject->colliderIndex = pushData[i].passiveCollider;
-			pushData[i].passiveObject->otherObject = pushData[i].activeObject;
-			pushData[i].passiveObject->otherColliderIndex = pushData[i].activeCollider;
-			
-			pushData[i].activeObject->OnEvent(Object::EventType::onPush);
-			pushData[i].passiveObject->OnEvent(Object::EventType::onPushed);
+			pushData[i].activeObject->OnPush(dir, pushData[i].activeCollider, pushData[i].passiveObject, pushData[i].passiveCollider);
+			pushData[i].passiveObject->OnPushed(dir, pushData[i].passiveCollider, pushData[i].activeObject, pushData[i].activeCollider);
 		}
 		// Call overlap events
 		for (size_t i = 0; i < overlapData.size(); i++)
 		{
-			overlapData[i].activeObject->lastPush = dir;
-			overlapData[i].activeObject->colliderIndex = overlapData[i].activeCollider;
-			overlapData[i].activeObject->otherObject = overlapData[i].passiveObject;
-			overlapData[i].activeObject->otherColliderIndex = overlapData[i].passiveCollider;
-
-			overlapData[i].passiveObject->lastPush = dir;
-			overlapData[i].passiveObject->colliderIndex = overlapData[i].passiveCollider;
-			overlapData[i].passiveObject->otherObject = overlapData[i].activeObject;
-			overlapData[i].passiveObject->otherColliderIndex = overlapData[i].activeCollider;
-
-			overlapData[i].activeObject->OnEvent(Object::EventType::onOverlap);
-			overlapData[i].passiveObject->OnEvent(Object::EventType::onOverlapped);
+			overlapData[i].activeObject->OnOverlap(dir, overlapData[i].activeCollider, overlapData[i].passiveObject, overlapData[i].passiveCollider);
+			overlapData[i].passiveObject->OnOverlapped(dir, overlapData[i].passiveCollider, overlapData[i].activeObject, overlapData[i].activeCollider);
 		}
 		// Call overlap exit events
 		for (size_t i = 0; i < exitOverlapData.size(); i++)
 		{
-			exitOverlapData[i].activeObject->lastPush = dir;
-			exitOverlapData[i].activeObject->colliderIndex = exitOverlapData[i].activeCollider;
-			exitOverlapData[i].activeObject->otherObject = exitOverlapData[i].passiveObject;
-			exitOverlapData[i].activeObject->otherColliderIndex = exitOverlapData[i].passiveCollider;
-
-			exitOverlapData[i].passiveObject->lastPush = dir;
-			exitOverlapData[i].passiveObject->colliderIndex = exitOverlapData[i].passiveCollider;
-			exitOverlapData[i].passiveObject->otherObject = exitOverlapData[i].activeObject;
-			exitOverlapData[i].passiveObject->otherColliderIndex = exitOverlapData[i].activeCollider;
-
-			exitOverlapData[i].activeObject->OnEvent(Object::EventType::onOverlapExit);
-			exitOverlapData[i].passiveObject->OnEvent(Object::EventType::onOverlappedExit);
+			exitOverlapData[i].activeObject->OnOverlapExit(dir, exitOverlapData[i].activeCollider, exitOverlapData[i].passiveObject, exitOverlapData[i].passiveCollider);
+			exitOverlapData[i].passiveObject->OnOverlappedExit(dir, exitOverlapData[i].passiveCollider, exitOverlapData[i].activeObject, exitOverlapData[i].activeCollider);
 		}
 		return true;
 	}
@@ -311,18 +281,8 @@ bool Collision::MoveObject(Object* object, Point dir)
 		int theOtherColliderIndex = -1;
 		for (size_t i = 0; i < blockData.size(); i++)
 		{
-			blockData[i].activeObject->lastPush = dir;
-			blockData[i].activeObject->colliderIndex = blockData[i].activeCollider;
-			blockData[i].activeObject->otherObject = blockData[i].passiveObject;
-			blockData[i].activeObject->otherColliderIndex = blockData[i].passiveCollider;
-
-			blockData[i].passiveObject->lastPush = dir;
-			blockData[i].passiveObject->colliderIndex = blockData[i].passiveCollider;
-			blockData[i].passiveObject->otherObject = blockData[i].activeObject;
-			blockData[i].passiveObject->otherColliderIndex = blockData[i].activeCollider;
-
-			blockData[i].activeObject->OnEvent(Object::EventType::onBlocked);
-			blockData[i].passiveObject->OnEvent(Object::EventType::onBlock);
+			blockData[i].activeObject->OnBlocked(dir, blockData[i].activeCollider, blockData[i].passiveObject, blockData[i].passiveCollider);
+			blockData[i].passiveObject->OnBlock(dir, blockData[i].passiveCollider, blockData[i].activeObject, blockData[i].activeCollider);
 		}
 		return false; 
 	}

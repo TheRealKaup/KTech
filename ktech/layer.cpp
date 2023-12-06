@@ -58,6 +58,12 @@ bool KTech::Layer::RemoveObject(Object* object)
 	return removed;
 }
 
+// Currently layers must be forced to be added to maps ASAP, otherwise there would be seg faults, for example, whenever objects try to move (since they can't access engine.collision). 
+KTech::Layer::Layer(Map* map)
+{
+	map->AddLayer(this);
+}
+
 KTech::Layer::~Layer()
 {
 	// Reset the `parentLayer` of the objects that have it set to this layer

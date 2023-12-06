@@ -34,22 +34,22 @@ void KTech::IO::Draw(const std::vector<std::vector<Cell>>& render, Point pos, ui
 
 	// Draw
 	for (size_t yF = (pos.y < 0 ? 0 : pos.y), yR = top; yF < image.size() && yR < bottom; yF++, yR++)
-		for (size_t xF = (pos.x < 0 ? 0 : pos.x), xR = left; xF < image.size() && xR < right; xF++, xR++)
+		for (size_t xF = (pos.x < 0 ? 0 : pos.x), xR = left; xF < image[yF].size() && xR < right; xF++, xR++)
 			image[yF][xF] = render[yR][xR];
 }
 
 void KTech::IO::Print()
 {
 	// Get terminal size
-	ioctl(fileno(stdout), TIOCGWINSZ, &KTech::IO::terminalSize);
+	ioctl(fileno(stdout), TIOCGWINSZ, &terminalSize);
 
 	// Obtain the maximum length for the stringImage
 	if (image.size() == 0)
 		return;
 
 	// Resize the stringImage if needed
-	unsigned maxStringSize = image.size() * 3; // reserved for '\n'
-	for (unsigned y = 0; y < image.size(); y++)
+	size_t maxStringSize = image.size() * 3; // reserved for '\n'
+	for (size_t y = 0; y < image.size(); y++)
 		maxStringSize += image[y].size() * 39; // reserved for characters
 	if (maxStringSize == 0)
 		return;
@@ -57,12 +57,12 @@ void KTech::IO::Print()
 		stringImage.resize(maxStringSize);
 
 	// Write the image to stringImage
-	unsigned int l = 0;
-	unsigned char lfr = 0, lfg = 0, lfb = 0, lbr = 0, lbg = 0, lbb = 0;
+	size_t l = 0;
+	uint8_t lfr = 0, lfg = 0, lfb = 0, lbr = 0, lbg = 0, lbb = 0;
 
 	// "&& y < size.ws_row" - fit into the terminal, in the case that it is too small
 	// "&& printRequests == 1" - stop working on a print if there is a newer print request
-	for (unsigned y = 0; y < image.size() && y < terminalSize.ws_row; y++)
+	for (size_t y = 0; y < image.size() && y < terminalSize.ws_row; y++)
 	{
 		if (y != 0) {
 			stringImage[l] = '\n';
@@ -119,7 +119,7 @@ void KTech::IO::Print()
 		else
 			stringImage[l + 38] = '?';
 		l += 39;
-		for (unsigned x = 1; x < image[y].size() && x < terminalSize.ws_col; x++)
+		for (size_t x = 1; x < image[y].size() && x < terminalSize.ws_col; x++)
 		{
 			// foreground
 			if ((image[y][x].c != ' ') && (image[y][x].f.r != lfr || image[y][x].f.g != lfg || image[y][x].f.b != lfb))
@@ -187,7 +187,7 @@ void KTech::IO::Print()
 		stringImage[l + 2] = 'm';
 		l += 3;
 	}
-	std::cout << "\033[H\033[3J\033[2J" << stringImage << std::flush;
+	std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
 }
 
 void KTech::IO::PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string nameOfProject)
@@ -217,7 +217,7 @@ void KTech::IO::PrintStartupNotice(const std::string& title, const std::string& 
 	std::cout << "Read the legal notices, and then press the 'return' key (enter) to proceed..." << std::flush;
 	while (input != Keys::return_ && engine->running);
 	if (!engine->running)
-		exit(0);
+		exit(0); // exit the thread completely
 }
 
 void KTech::IO::Log(const std::string& text, RGB color)
@@ -249,8 +249,8 @@ KTech::IO::IO(KTech::UPoint imageSize, Engine* engine) : engine(engine)
 	image.resize(imageSize.y);
 	for (size_t y = 0; y < image.size(); y++)
 		image[y].resize(imageSize.x);
-	unsigned maxStringSize = image.size() * 4; // reserved for '\n'
-	for (unsigned y = 0; y < image.size(); y++)
+	size_t maxStringSize = image.size() * 4; // reserved for '\n'
+	for (size_t y = 0; y < image.size(); y++)
 		maxStringSize += image[y].size() * 39; // reserved for characters
 	if (maxStringSize == 0)
 		return;

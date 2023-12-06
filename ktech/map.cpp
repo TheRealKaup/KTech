@@ -57,17 +57,23 @@ bool KTech::Map::RenderReversed() const
 
 void KTech::Map::CallOnTicks() const
 {
+	KTech::IO::Log("<Map::CallOnTicks> Map's OnTick.", RGBColors::orange);
 	if (OnTick)
 		OnTick();
 
+	KTech::IO::Log("<Map::CallOnTicks> Layers' OnTick.", RGBColors::orange);
 	for (size_t l = 0; l < layers.size(); l++)
 	{
 		if (layers[l]->OnTick)
 			layers[l]->OnTick();
 
 		for (size_t o = 0; o < layers[l]->objects.size(); o++)
-			layers[l]->objects[o]->OnEvent(Object::EventType::onTick);
+		{
+			KTech::IO::Log("<Map::CallOnTicks> Object #" + std::to_string(o) + "'s OnTick. " + layers[l]->objects[o]->name, RGBColors::orange);
+			layers[l]->objects[o]->OnTick();
+		}
 	}
+	KTech::IO::Log("<Map::CallOnTicks> Cameras' OnTick.", RGBColors::orange);
 	for (size_t c = 0; c < cameras.size(); c++)
 	{
 		if (cameras[c]->OnTick)
