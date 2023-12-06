@@ -55,7 +55,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
-		callbackGroup.Enable();
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
 	}  
 
 	virtual void Deselect()
@@ -63,7 +63,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
-		callbackGroup.Disable();
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
 	}
 
 	Button(KTech::Layer* layer,
@@ -75,10 +75,8 @@ public:
 		KTech::RGBA unselectedRGBA = KTech::RGBA( 150, 150, 150, 255 ),
 		KTech::RGBA selectedRGBA = KTech::RGBA( 255, 255, 255, 255 ),
 		KTech::RGBA downRGBA = KTech::RGBA(150, 150, 255, 255))
-		: OnPress(OnPress), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), downRGBA(downRGBA)
+		: Widget(layer, pos), OnPress(OnPress), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), downRGBA(downRGBA)
 	{
-		obj.pos = pos;
-
 		// Texture
 		if (withFrame)
 		{	
@@ -110,9 +108,7 @@ public:
 		}
 
 		// Input handlers
-		callbackGroup.AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), true));
-
-		// Add object
-		layer->AddObject(&obj);
+		// This is insane.
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), true));
 	}
 };

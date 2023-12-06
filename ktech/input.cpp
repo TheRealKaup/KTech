@@ -112,7 +112,7 @@ void KTech::IO::Loop()
 		if (input == quitKey)
 		{
 			engine->running = false;
-			return;
+			break;
 		}
 		// Call basic handlers
 		for (size_t i = 0; i < basicHandlers.size(); i++)
@@ -171,6 +171,12 @@ bool KTech::IO::Smaller(char charKey)
 bool KTech::IO::Between(char charKey1, char charKey2)
 {
 	return (input[0] >= charKey1) && (input[0] <= charKey2) && (input[1] == 0);
+}
+
+size_t KTech::IO::CreateCallbackGroup(bool enabled)
+{
+	groups.push_back(CallbacksGroup(enabled));
+	return groups.size() - 1;
 }
 
 void KTech::IO::CallbacksGroup::DeleteCallbacks()

@@ -274,13 +274,8 @@ int main()
 
 	while (engine.running)
 	{
-		KTech::IO::Log("engine-loop-iteration start", RGBColors::blue);
-		
-		KTech::IO::Log("engine-loop-iteration StartThisTick", RGBColors::yellow);
 		engine.time.StartThisTick();
-		KTech::IO::Log("engine-loop-iteration Call", RGBColors::yellow);
 		engine.io.Call();
-		KTech::IO::Log("engine-loop-iteration CallOnTicks", RGBColors::yellow);
 		map.CallOnTicks();
 
 		if (map.activeCameraI != -1 && map.activeCameraI < map.cameras.size())
@@ -293,19 +288,11 @@ int main()
 				engine.io.Draw(map.cameras[1]->image, Point(18, 9), 0, 0, 0, 0);
 			}
 			else {
-				KTech::IO::Log("engine-loop-iteration Render", RGBColors::yellow);
 				map.cameras[0]->Render({ &layer });
-				KTech::IO::Log("engine-loop-iteration Draw", RGBColors::yellow);
 				engine.io.Draw(map.cameras[0]->image, Point(0, 0), 0, 0, 0, 0);
 			}
-			KTech::IO::Log("engine-loop-iteration Print", RGBColors::yellow);
 			engine.io.Print();
 		}
-		// std::cout << "n="<< KTech::totalTicks << " | delta=" << KTech::deltaTime << " | fps=" << KTech::fps << " | pfps=" << KTech::potentialfps << std::endl;
-		// std::cout << "x=" << KTech::terminalSize.ws_col << ", y=" << KTech::terminalSize.ws_row << std::endl;
-		KTech::IO::Log("engine-loop-iteration WaitUntilNextTick", RGBColors::yellow);
 		engine.time.WaitUntilNextTick();
-
-		KTech::IO::Log("engine-loop-iteration end", RGBColors::green);
 	}
 }

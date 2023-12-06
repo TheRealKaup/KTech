@@ -75,7 +75,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
-		callbackGroup.Enable();
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
 	}
 
 	virtual void Deselect()
@@ -109,7 +109,7 @@ public:
 			obj.textures[i].SetForeground(unselectedRGBA);
 
 		selected = false;
-		callbackGroup.Disable();
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
 	}
 
 	void ChangeValue(std::string newNumber)
@@ -137,10 +137,8 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselectedRGBA = { 150, 150, 150, 255 },
 		KTech::RGBA selectedRGBA = { 255, 255, 255, 255 })
-		: OnInsert(OnInsert), min(min), max(max), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
+		: Widget(layer, pos), OnInsert(OnInsert), min(min), max(max), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
 	{
-		obj.pos = pos;
-
 		for (size_t i = 1; true; i *= 10)
 		{
 			if (max / i > 0)
@@ -207,11 +205,8 @@ public:
 		}
 
 		// Input handlers
-		callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
-		callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), true));
-		callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), true));
-
-		// Add object
-		layer->AddObject(&obj);
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), true));
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), true));
 	}
 };

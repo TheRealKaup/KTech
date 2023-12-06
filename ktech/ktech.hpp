@@ -267,7 +267,7 @@ namespace KTech
 		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
 
 		// Draw, usually the image of a camera, to the IO
-		void Draw(const std::vector<std::vector<Cell>>& image, Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+		void Draw(const std::vector<std::vector<Cell>>& image, Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
 
 		void Print();
 
@@ -291,6 +291,7 @@ namespace KTech
 				inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
 				inline ~BasicCallback()
 				{
+					Log("<BasicCallback::~BasicCallback()>", RGB(255, 0, 255));
 					for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
 						if (this == parentHandler->callbacks[i])
 							parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
@@ -310,6 +311,7 @@ namespace KTech
 				inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
 				inline ~RangedCallback()
 				{
+					Log("<RangedCallback::~RangedCallback()>", RGB(255, 0, 255));
 					for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
 						if (this == parentHandler->callbacks[i])
 							parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);

@@ -74,7 +74,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
-		callbackGroup.Enable();
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
 	}
 
 	virtual void Deselect()
@@ -82,7 +82,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
-		callbackGroup.Disable();
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
 	}
 
 	void ChangeValue(std::string newString)
@@ -111,10 +111,8 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselectedRGBA = KTech::RGBA(150, 150, 150, 255),
 		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
-		: OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
+		: Widget(layer, pos), OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
 	{
-		obj.pos = pos;
-
 		// Texture
 		if (withFrame)
 		{
@@ -161,11 +159,8 @@ public:
 		
 		// Input handlers
 		for (KeyRange& keyRange : allowedCharacters)
-			callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
-		callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), true));
-		callbackGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), true));
-		
-		// Add object
-		layer->AddObject(&obj);
+			obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), true));
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), true));
 	}
 };
