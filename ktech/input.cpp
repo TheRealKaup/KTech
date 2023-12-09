@@ -67,8 +67,10 @@ void KTech::IO::Call()
 	{
 		if (!group.synced)
 		{
-			for (Callback*& callback : group.callbacks)
-				callback->enabled = group.enabled;
+			for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+				basicCallback->enabled = group.enabled;
+			for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+				rangedCallback->enabled = group.enabled;
 			group.synced = true;
 		}
 	}
@@ -182,8 +184,29 @@ size_t KTech::IO::CreateCallbackGroup(bool enabled)
 void KTech::IO::CallbacksGroup::DeleteCallbacks()
 {
 	// Delete memory (also calls the callbacks' destructors which removes themselves from their parent handlers)
-	for (Callback*& callback : callbacks)
-		delete callback;
+	for (BasicHandler::BasicCallback* basicCallback : basicCallbacks)
+		delete basicCallback;
+	for (RangedHandler::RangedCallback* rangedCallback : rangedCallbacks)
+		delete rangedCallback;
 	// Clear this group's vector.
-	callbacks.clear();
+	basicCallbacks.clear();
+	rangedCallbacks.clear();
+}
+
+KTech::IO::BasicHandler::BasicCallback::~BasicCallback()
+{
+	Log("<BasicCallback::~BasicCallback()> Start of function...", RGB(255, 0, 255));
+	for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
+		if (this == parentHandler->callbacks[i])
+			parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
+	Log("<BasicCallback::~BasicCallback()> End of function.", RGB(255, 0, 255));
+}
+
+KTech::IO::RangedHandler::RangedCallback::~RangedCallback()
+{
+	Log("<RangedCallback::~RangedCallback()> Start of function...", RGB(255, 0, 255));
+	for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
+		if (this == parentHandler->callbacks[i])
+			parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
+	Log("<RangedCallback::~RangedCallback()> End of function.", RGB(255, 0, 255));
 }

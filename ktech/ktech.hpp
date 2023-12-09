@@ -289,13 +289,7 @@ namespace KTech
 				BasicHandler* parentHandler;
 				bool onTick;
 				inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
-				inline ~BasicCallback()
-				{
-					Log("<BasicCallback::~BasicCallback()>", RGB(255, 0, 255));
-					for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
-						if (this == parentHandler->callbacks[i])
-							parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
-				}
+				~BasicCallback();
 			};
 			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			std::string input;
@@ -309,13 +303,7 @@ namespace KTech
 			{
 				RangedHandler* parentHandler;
 				inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
-				inline ~RangedCallback()
-				{
-					Log("<RangedCallback::~RangedCallback()>", RGB(255, 0, 255));
-					for (size_t i = 0; i < parentHandler->callbacks.size(); i++)
-						if (this == parentHandler->callbacks[i])
-							parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
-				}
+				~RangedCallback();
 			};
 			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			char key1, key2;
@@ -324,11 +312,13 @@ namespace KTech
 
 		struct CallbacksGroup
 		{
-			std::vector<Callback*> callbacks;
+			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
+			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
 			bool enabled;
 			bool synced = true;
 			inline CallbacksGroup(bool enabled = true) : enabled(enabled) { }
-			inline void AddCallback(Callback* callback) { callbacks.push_back(callback); synced = false; }
+			inline void AddCallback(BasicHandler::BasicCallback* callback) { basicCallbacks.push_back(callback); callback->enabled = false; }
+			inline void AddCallback(RangedHandler::RangedCallback* callback) { rangedCallbacks.push_back(callback); callback->enabled = false; }
 			inline void Enable() { enabled = true; synced = false; }
 			inline void Disable() { enabled = false; synced = false; }
 			void DeleteCallbacks();
