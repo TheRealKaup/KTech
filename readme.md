@@ -36,7 +36,7 @@ Currently, KTech is available only for GNU/Linux, but it will be made available 
 
 Here is how a very simple game made with KTech can look:
 
-![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-11-23.png)
+![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png)
 
 ---
 
