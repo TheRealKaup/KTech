@@ -3,13 +3,13 @@
 ***KTech*** is Kaup's C++ terminal game engine library. It is like any other basic 2D game engine, but its graphics are terminal based.
 
 Table of contents of this readme file:
-- [Introduction](#introduction) - non-specific, general explanation of what KTech is.
-- [Capabilities](#capabilities) - general list of features included in the library. 
+- [Introduction](#introduction) - general explanation of what KTech is.
+- [Capabilities](#capabilities) - key features included in the library. 
 - [Intereseting Details](#intereseting-details) - some specifics that could arouse your curiosity.
-- [Documentation](#documentation) - links to projects's documentation.
-- [Manifesto](#manifesto) - what this project solves, goals of the project.
+- [Documentation](#documentation) - links to the projects's documentation.
+- [Manifesto](#manifesto) - what this project solves; goals of the project.
 - [Contact](#contact) - how to contact me (Kaup) and how to contribute to KTech.
-- [Interrelated Projects](#interrelated-projects) - other projects that are very connected to KTech.
+- [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
 
 ![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
 
