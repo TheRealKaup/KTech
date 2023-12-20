@@ -8,7 +8,7 @@ Table of contents of this readme file:
 - [Intereseting Details](#intereseting-details) - some specifics that could arouse your curiosity.
 - [Documentation](#documentation) - links to the projects's documentation.
 - [Manifesto](#manifesto) - what this project solves; goals of the project.
-- [Contact Information](#contact-information) - how to contact me (Kaup) and how to contribute to KTech.
+- [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
 
 ![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
