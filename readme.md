@@ -3,13 +3,13 @@
 ***KTech*** is Kaup's C++ terminal game engine library. It is like any other basic 2D game engine, but its graphics are terminal based.
 
 Table of contents of this readme file:
-- [Introduction](#introduction) - non-specific, general explanation of what KTech is.
-- [Capabilities](#capabilities) - general list of features included in the library. 
+- [Introduction](#introduction) - general explanation of what KTech is.
+- [Capabilities](#capabilities) - key features included in the library. 
 - [Intereseting Details](#intereseting-details) - some specifics that could arouse your curiosity.
-- [Documentation](#documentation) - links to projects's documentation.
-- [Manifesto](#manifesto) - what this project solves, goals of the project.
-- [Contact](#contact) - how to contact me (Kaup) and how to contribute to KTech.
-- [Interrelated Projects](#interrelated-projects) - other projects that are very connected to KTech.
+- [Documentation](#documentation) - links to the projects's documentation.
+- [Manifesto](#manifesto) - what this project solves; goals of the project.
+- [Contact Information](#contact-information) - how to contact me (Kaup).
+- [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
 
 ![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
 
@@ -36,7 +36,7 @@ Currently, KTech is available only for GNU/Linux, but it will be made available 
 
 Here is how a very simple game made with KTech can look:
 
-![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-11-23.png)
+![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png)
 
 ---
 
@@ -107,11 +107,12 @@ Game development, from creating textures, to coding a game, to compiling a game 
 - Become a powerful game engine. To make this explicit, KTech is not as powerful as I wish it to be, at all.
 - Though to mention not a part of the KTech project itself; create a software development kit around KTech to make KTech game development efficient and as modern as possible, while still remaining in the terminal, as goes the principle.
 
---- 
+---
 
-## Contact
+## Contact Information
 
-
+Kaup (Ethan Kaufman):
+- Email: ethan.kauf736@gmail.com
 
 ---
 
