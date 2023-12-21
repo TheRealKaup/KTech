@@ -1,6 +1,6 @@
 /*
 	KTech, Kaup's C++ 2D terminal game engine library.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This file is part of KTech.
 
@@ -109,6 +109,6 @@ public:
 
 		// Input handlers
 		// This is insane.
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), true));
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), false));
 	}
 };

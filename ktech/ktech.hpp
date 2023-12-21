@@ -1,6 +1,6 @@
 /*
 	KTech, Kaup's C++ 2D terminal game engine library.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This file is part of KTech.
 
@@ -314,13 +314,21 @@ namespace KTech
 		{
 			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
 			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
-			bool enabled;
+			enum class Status : uint8_t
+			{
+				disabled,
+				enabled,
+				removeDisabled, // Remove and then return status to disabled
+				removeEnabled, // Remove and then return status to enabled
+			};
+			Status status;
 			bool synced = true;
-			inline CallbacksGroup(bool enabled = true) : enabled(enabled) { }
+			inline CallbacksGroup(bool enabled = true) : status(enabled ? Status::enabled : Status::disabled) { }
 			inline void AddCallback(BasicHandler::BasicCallback* callback) { basicCallbacks.push_back(callback); callback->enabled = false; }
 			inline void AddCallback(RangedHandler::RangedCallback* callback) { rangedCallbacks.push_back(callback); callback->enabled = false; }
-			inline void Enable() { enabled = true; synced = false; }
-			inline void Disable() { enabled = false; synced = false; }
+			inline void Enable() { status = Status::enabled; synced = false; }
+			inline void Disable() { status = Status::disabled; synced = false; }
+			// Remove
 			void DeleteCallbacks();
 		};
 		std::vector<BasicHandler> basicHandlers;

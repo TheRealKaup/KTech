@@ -1,6 +1,6 @@
 /*
 	widgetstest, a user interface example based on KTech.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -62,9 +62,13 @@ struct UI
 
 	void CancelCountdown(Layer* layer)
 	{
+		engine.io.Log("<UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
+		engine.io.Log("<UI::StartExitCountdown()> Create", RGBColors::orange);
 		widgets[0] = new Button(layer, std::bind(&UI::StartExitCountdown, this, layer), Keys::return_, Point(0, 0), "Exit", true);
+		engine.io.Log("<UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
+		engine.io.Log("<UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
 		engine.time.CancelInvocation(countdownInvocation);
 	}
 

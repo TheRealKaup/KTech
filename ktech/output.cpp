@@ -1,6 +1,6 @@
 ﻿/*
 	KTech, Kaup's C++ 2D terminal game engine library.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This file is part of KTech.
 
@@ -270,5 +270,5 @@ KTech::IO::~IO()
 	// Officially destroy the thread..? Frankly I do not understand this.
 	// Without joining/detaching the thread, the program ends with a "core dumped" error,
 	// although the thread must be over if reached this point. 
-	t_inputLoop.join();
+	t_inputLoop.detach();
 }

@@ -1,6 +1,6 @@
 /*
 	KTech, Kaup's C++ 2D terminal game engine library.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This file is part of KTech.
 
@@ -35,5 +35,9 @@ struct Widget
 		obj.pos = pos;
 		callbackGroup = obj.parentLayer->parentMap->parentEngine->io.CreateCallbackGroup(false);
 	}
-	inline ~Widget() { obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].DeleteCallbacks(); obj.parentLayer->RemoveObject(&obj); }
+	inline ~Widget()
+	{
+		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].DeleteCallbacks();
+		obj.parentLayer->RemoveObject(&obj);
+	}
 };

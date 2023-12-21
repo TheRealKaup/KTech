@@ -1,6 +1,6 @@
 /*
 	simpleplatform1, a platform game example based on KTech.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -201,7 +201,7 @@ int main()
 	using namespace KTech;
 
 	// It would be preferable to have the startup notice drawn within the engine's image, but this is temporary.
-	engine.io.PrintStartupNotice("simpleplatform1, a platform game example based on KTech.", "2023", "E. Kaufman (AKA Kaup)", "simpleplatform1");
+	engine.io.PrintStartupNotice("simpleplatform1, a platform game example based on KTech.", "2023", "Ethan Kaufman (AKA Kaup)", "simpleplatform1");
 
 	engine.collision.colliderTypes = { // For "simpleplatform1" example
 		{ CR::B, CR::P, CR::P, CR::O }, // Heavy - 0
@@ -222,6 +222,8 @@ int main()
 	worldProps.textures.resize(3);
 	KTech::IO::Log("<Main> Loading assets/sky.ktecht", RGBColors::blue);
 	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
+	KTech::IO::Log("<Main> Loading assets/house.ktecht", RGBColors::blue);
+	worldProps.textures[1].File("assets/house.ktecht", Point(18, 14));
 	KTech::IO::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
 	worldProps.textures[2].File("assets/land.ktecht", { 0, 3 });
 	

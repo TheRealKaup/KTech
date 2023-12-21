@@ -1,6 +1,6 @@
 /*
 	KTech, Kaup's C++ 2D terminal game engine library.
-	Copyright (C) 2023 E. Kaufman (AKA Kaup)
+	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
 
 	This file is part of KTech.
 
@@ -67,10 +67,43 @@ void KTech::IO::Call()
 	{
 		if (!group.synced)
 		{
-			for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
-				basicCallback->enabled = group.enabled;
-			for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
-				rangedCallback->enabled = group.enabled;
+			switch (group.status)
+			{
+				case CallbacksGroup::Status::disabled:
+				{
+					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+						basicCallback->enabled = false;
+					break;
+				}
+				case CallbacksGroup::Status::enabled:
+				{
+					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+						basicCallback->enabled = true;
+					break;
+				}
+				case CallbacksGroup::Status::removeDisabled:
+				{
+					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+						delete basicCallback;
+					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+						delete rangedCallback;
+					group.basicCallbacks.clear();
+					group.rangedCallbacks.clear();
+					group.status = CallbacksGroup::Status::disabled;
+					break;
+				}
+				case CallbacksGroup::Status::removeEnabled:
+				{
+					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+						delete basicCallback;
+					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+						delete rangedCallback;
+					group.basicCallbacks.clear();
+					group.rangedCallbacks.clear();
+					group.status = CallbacksGroup::Status::enabled;
+					break;
+				}
+			}
 			group.synced = true;
 		}
 	}
@@ -98,7 +131,7 @@ char* KTech::IO::Get()
 	
 	// Clear previous buffer
 	memset(buf, 0, maxInputLength);
-	// Read to buffer (blocking)
+	// Read input to buffer (blocking)
 	read(0, buf, maxInputLength);
 
 	return buf;
@@ -181,18 +214,6 @@ size_t KTech::IO::CreateCallbackGroup(bool enabled)
 	return groups.size() - 1;
 }
 
-void KTech::IO::CallbacksGroup::DeleteCallbacks()
-{
-	// Delete memory (also calls the callbacks' destructors which removes themselves from their parent handlers)
-	for (BasicHandler::BasicCallback* basicCallback : basicCallbacks)
-		delete basicCallback;
-	for (RangedHandler::RangedCallback* rangedCallback : rangedCallbacks)
-		delete rangedCallback;
-	// Clear this group's vector.
-	basicCallbacks.clear();
-	rangedCallbacks.clear();
-}
-
 KTech::IO::BasicHandler::BasicCallback::~BasicCallback()
 {
 	Log("<BasicCallback::~BasicCallback()> Start of function...", RGB(255, 0, 255));
@@ -209,4 +230,16 @@ KTech::IO::RangedHandler::RangedCallback::~RangedCallback()
 		if (this == parentHandler->callbacks[i])
 			parentHandler->callbacks.erase(parentHandler->callbacks.begin() + i);
 	Log("<RangedCallback::~RangedCallback()> End of function.", RGB(255, 0, 255));
+}
+
+void KTech::IO::CallbacksGroup::DeleteCallbacks()
+{
+	// Disable as soon as possible the callbacks (since the function pointers are probably deleted right after)
+	for (BasicHandler::BasicCallback* basicCallback : basicCallbacks)
+		basicCallback->enabled = false;
+	// Then cleanly delete the callbacks from memory 
+	status = (status == Status::disabled ? Status::removeDisabled : Status::removeEnabled);
+	synced = false;
+
+
 }
