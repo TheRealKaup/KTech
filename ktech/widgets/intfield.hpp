@@ -75,7 +75,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
+		callbacksGroup.Enable();
 	}
 
 	virtual void Deselect()
@@ -109,7 +109,7 @@ public:
 			obj.textures[i].SetForeground(unselectedRGBA);
 
 		selected = false;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
+		callbacksGroup.Disable();
 	}
 
 	void ChangeValue(std::string newNumber)
@@ -205,8 +205,8 @@ public:
 		}
 
 		// Input handlers
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), true));
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), true));
+		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
+		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), true));
+		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), true));
 	}
 };

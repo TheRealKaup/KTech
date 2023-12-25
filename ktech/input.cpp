@@ -71,29 +71,40 @@ void KTech::IO::Call()
 			{
 				case CallbacksGroup::Status::disabled:
 				{
+					// Disalbe the callbacks
 					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
 						basicCallback->enabled = false;
+					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+						rangedCallback->enabled = false;
 					break;
 				}
 				case CallbacksGroup::Status::enabled:
 				{
+					// Enable the callbacks
 					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
 						basicCallback->enabled = true;
+					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+						rangedCallback->enabled = true;
 					break;
 				}
 				case CallbacksGroup::Status::removeDisabled:
 				{
+					// Delete the callbacks from memory (which will automatically delete the callbacks from
+					// their parent handlers' callback vector)
 					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
 						delete basicCallback;
 					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
 						delete rangedCallback;
+					// Clearthe group's vectors
 					group.basicCallbacks.clear();
 					group.rangedCallbacks.clear();
+					// Disable the group as requested
 					group.status = CallbacksGroup::Status::disabled;
 					break;
 				}
 				case CallbacksGroup::Status::removeEnabled:
 				{
+					// The same but enable the group afterwards
 					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
 						delete basicCallback;
 					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
@@ -208,10 +219,10 @@ bool KTech::IO::Between(char charKey1, char charKey2)
 	return (input[0] >= charKey1) && (input[0] <= charKey2) && (input[1] == 0);
 }
 
-size_t KTech::IO::CreateCallbackGroup(bool enabled)
+KTech::IO::CallbacksGroup& KTech::IO::CreateCallbackGroup(bool enabled)
 {
 	groups.push_back(CallbacksGroup(enabled));
-	return groups.size() - 1;
+	return groups[groups.size() - 1];
 }
 
 KTech::IO::BasicHandler::BasicCallback::~BasicCallback()
@@ -237,9 +248,10 @@ void KTech::IO::CallbacksGroup::DeleteCallbacks()
 	// Disable as soon as possible the callbacks (since the function pointers are probably deleted right after)
 	for (BasicHandler::BasicCallback* basicCallback : basicCallbacks)
 		basicCallback->enabled = false;
-	// Then cleanly delete the callbacks from memory 
+	for (RangedHandler::RangedCallback* rangedCallback : rangedCallbacks)
+		rangedCallback->enabled = false;
+	// Then request to delete the callbacks
+	// (removeDisabled will set the group to be disabled later, removeEnabled will set to enabled)
 	status = (status == Status::disabled ? Status::removeDisabled : Status::removeEnabled);
 	synced = false;
-
-
 }

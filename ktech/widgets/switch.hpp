@@ -78,7 +78,7 @@ public:
 			for (size_t i = 0; i < obj.textures.size(); i++)
 				obj.textures[i].SetForeground(selectedOffRGBA);
 		selected = true;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
+		callbacksGroup.Enable();
 	}  
 
 	virtual void Deselect()
@@ -90,7 +90,7 @@ public:
 			for (size_t i = 0; i < obj.textures.size(); i++)
 				obj.textures[i].SetForeground(unselectedOffRGBA);
 		selected = false;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
+		callbacksGroup.Disable();
 	}
 
 	void ChangeValue(bool _on)
@@ -178,6 +178,6 @@ public:
 		}
 
 		// Input handlers
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), true));
+		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), true));
 	}
 };

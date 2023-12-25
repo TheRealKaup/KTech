@@ -337,7 +337,7 @@ namespace KTech
 
 		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
-		size_t CreateCallbackGroup(bool enabled = true);
+		CallbacksGroup& CreateCallbackGroup(bool enabled = true);
 
 		std::string input = std::string(7, '\0');
 		std::string quitKey = "\x03";

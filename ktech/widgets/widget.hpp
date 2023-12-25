@@ -26,18 +26,9 @@ struct Widget
 {
 	KTech::Object obj;
 	bool selected = false;
-	size_t callbackGroup;
+	KTech::IO::CallbacksGroup& callbacksGroup;
 	inline virtual void Select() {}
 	inline virtual void Deselect() {}
-	inline Widget(KTech::Layer* layer, KTech::Point pos)
-	{
-		layer->AddObject(&obj);
-		obj.pos = pos;
-		callbackGroup = obj.parentLayer->parentMap->parentEngine->io.CreateCallbackGroup(false);
-	}
-	inline ~Widget()
-	{
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].DeleteCallbacks();
-		obj.parentLayer->RemoveObject(&obj);
-	}
+	inline Widget(KTech::Layer* layer, KTech::Point pos) : obj(pos, layer), callbacksGroup(obj.parentLayer->parentMap->parentEngine->io.CreateCallbackGroup(false)) { }
+	inline ~Widget() { callbacksGroup.DeleteCallbacks(); }
 };

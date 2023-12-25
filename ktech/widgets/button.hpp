@@ -55,7 +55,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
+		callbacksGroup.Enable();
 	}  
 
 	virtual void Deselect()
@@ -63,7 +63,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
+		callbacksGroup.Disable();
 	}
 
 	Button(KTech::Layer* layer,
@@ -109,6 +109,6 @@ public:
 
 		// Input handlers
 		// This is insane.
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), false));
+		callbacksGroup.AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), false));
 	}
 };

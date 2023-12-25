@@ -74,7 +74,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
 		selected = true;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Enable();
+		callbacksGroup.Enable();
 	}
 
 	virtual void Deselect()
@@ -82,7 +82,7 @@ public:
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
 		selected = false;
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].Disable();
+		callbacksGroup.Disable();
 	}
 
 	void ChangeValue(std::string newString)
@@ -159,8 +159,8 @@ public:
 		
 		// Input handlers
 		for (KeyRange& keyRange : allowedCharacters)
-			obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), true));
-		obj.parentLayer->parentMap->parentEngine->io.groups[callbackGroup].AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), true));
+			callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
+		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), true));
+		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), true));
 	}
 };
