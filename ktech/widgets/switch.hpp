@@ -69,7 +69,7 @@ private:
 	}
 
 public:
-	virtual void Select()
+	virtual void RenderSelected()
 	{
 		if (on)
 			for (size_t i = 0; i < obj.textures.size(); i++)
@@ -77,11 +77,9 @@ public:
 		if (!on)
 			for (size_t i = 0; i < obj.textures.size(); i++)
 				obj.textures[i].SetForeground(selectedOffRGBA);
-		selected = true;
-		callbacksGroup.Enable();
 	}  
 
-	virtual void Deselect()
+	virtual void RenderUnselected()
 	{
 		if (on)
 			for (size_t i = 0; i < obj.textures.size(); i++)
@@ -89,8 +87,6 @@ public:
 		if (!on)
 			for (size_t i = 0; i < obj.textures.size(); i++)
 				obj.textures[i].SetForeground(unselectedOffRGBA);
-		selected = false;
-		callbacksGroup.Disable();
 	}
 
 	void ChangeValue(bool _on)

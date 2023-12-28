@@ -42,7 +42,7 @@ struct UI
 		w_stringfield,
 		w_switch,
 	};
-	size_t currentWidget = w_stringfield;
+	size_t currentWidget = w_intfield;
 	
 	Time::Invocation* countdownInvocation;
 

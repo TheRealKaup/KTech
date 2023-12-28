@@ -70,15 +70,13 @@ private:
 	}
 
 public:
-	virtual void Select()
+	virtual void RenderSelected()
 	{
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(selectedRGBA);
-		selected = true;
-		callbacksGroup.Enable();
 	}
 
-	virtual void Deselect()
+	virtual void RenderUnselected()
 	{
 		// Correct visible number
 		if (visibleNumber < min)
@@ -107,9 +105,6 @@ public:
 		// Change color
 		for (size_t i = 0; i < obj.textures.size(); i++)
 			obj.textures[i].SetForeground(unselectedRGBA);
-
-		selected = false;
-		callbacksGroup.Disable();
 	}
 
 	void ChangeValue(std::string newNumber)

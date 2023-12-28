@@ -167,12 +167,12 @@ void KTech::IO::Loop()
 			{
 				basicHandlers[i].timesPressed++;
 				for (size_t j = 0; j < basicHandlers[i].callbacks.size(); j++) // Call the calls
-					if (basicHandlers[i].callbacks[j]->enabled && !basicHandlers[i].callbacks[j]->onTick) // Check if the callback is enabled and shouldn't be called on tick
+					if (basicHandlers[i].callbacks[j]->enabled && !basicHandlers[i].callbacks[j]->onTick) // Check if the callback shouldn't be called on tick
 						basicHandlers[i].callbacks[j]->callback(); // Call
 				break; // Break because there shouldn't be a similar handler
 			}
 		}
-		// Call ranged handlers, only if the input is 1 letter in length
+		// Call ranged handlers, only if the input a single character
 		if (input.length() == 1)
 		{
 			for (size_t i = 0; i < rangedHandlers.size(); i++)
@@ -180,7 +180,7 @@ void KTech::IO::Loop()
 				if (rangedHandlers[i].key1 <= input[0] && input[0] <= rangedHandlers[i].key2) // If the key is in range
 				{
 					for (RangedHandler::RangedCallback*& callback: rangedHandlers[i].callbacks)
-						if (callback->enabled) // Check if the callback is enabled
+						if (callback->enabled)
 							callback->callback(); // Call
 					// Don't break since there can be more handlers which manage an area in which the input is located in
 				}
@@ -245,7 +245,7 @@ KTech::IO::RangedHandler::RangedCallback::~RangedCallback()
 
 void KTech::IO::CallbacksGroup::DeleteCallbacks()
 {
-	// Disable as soon as possible the callbacks (since the function pointers are probably deleted right after)
+	// Disable as soon as possible the callbacks (since the actual callbacks are probably deleted right after)
 	for (BasicHandler::BasicCallback* basicCallback : basicCallbacks)
 		basicCallback->enabled = false;
 	for (RangedHandler::RangedCallback* rangedCallback : rangedCallbacks)
