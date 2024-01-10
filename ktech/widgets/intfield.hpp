@@ -200,8 +200,8 @@ public:
 		}
 
 		// Input handlers
-		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
-		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), true));
-		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), true));
+		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
+		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), false));
+		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), false));
 	}
 };

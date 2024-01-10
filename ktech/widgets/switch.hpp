@@ -174,6 +174,6 @@ public:
 		}
 
 		// Input handlers
-		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), true));
+		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), false));
 	}
 };

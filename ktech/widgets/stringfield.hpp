@@ -155,8 +155,8 @@ public:
 		
 		// Input handlers
 		for (KeyRange& keyRange : allowedCharacters)
-			callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
-		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), true));
-		callbacksGroup.AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), true));
+			callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
+		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), false));
+		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), false));
 	}
 };

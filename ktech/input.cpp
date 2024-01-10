@@ -63,27 +63,27 @@ KTech::IO::RangedHandler::RangedCallback* KTech::IO::RegisterRangedCallback(char
 void KTech::IO::Call()
 {
 	// Update groups' callbacks' `enabled` if `synced` is false
-	for (CallbacksGroup& group : groups)
+	for (CallbacksGroup*& group : groups)
 	{
-		if (!group.synced)
+		if (!group->synced)
 		{
-			switch (group.status)
+			switch (group->status)
 			{
 				case CallbacksGroup::Status::disabled:
 				{
 					// Disalbe the callbacks
-					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+					for (BasicHandler::BasicCallback* basicCallback : group->basicCallbacks)
 						basicCallback->enabled = false;
-					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+					for (RangedHandler::RangedCallback* rangedCallback : group->rangedCallbacks)
 						rangedCallback->enabled = false;
 					break;
 				}
 				case CallbacksGroup::Status::enabled:
 				{
 					// Enable the callbacks
-					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+					for (BasicHandler::BasicCallback* basicCallback : group->basicCallbacks)
 						basicCallback->enabled = true;
-					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+					for (RangedHandler::RangedCallback* rangedCallback : group->rangedCallbacks)
 						rangedCallback->enabled = true;
 					break;
 				}
@@ -91,31 +91,31 @@ void KTech::IO::Call()
 				{
 					// Delete the callbacks from memory (which will automatically delete the callbacks from
 					// their parent handlers' callback vector)
-					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+					for (BasicHandler::BasicCallback* basicCallback : group->basicCallbacks)
 						delete basicCallback;
-					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+					for (RangedHandler::RangedCallback* rangedCallback : group->rangedCallbacks)
 						delete rangedCallback;
 					// Clearthe group's vectors
-					group.basicCallbacks.clear();
-					group.rangedCallbacks.clear();
+					group->basicCallbacks.clear();
+					group->rangedCallbacks.clear();
 					// Disable the group as requested
-					group.status = CallbacksGroup::Status::disabled;
+					group->status = CallbacksGroup::Status::disabled;
 					break;
 				}
 				case CallbacksGroup::Status::removeEnabled:
 				{
 					// The same but enable the group afterwards
-					for (BasicHandler::BasicCallback* basicCallback : group.basicCallbacks)
+					for (BasicHandler::BasicCallback* basicCallback : group->basicCallbacks)
 						delete basicCallback;
-					for (RangedHandler::RangedCallback* rangedCallback : group.rangedCallbacks)
+					for (RangedHandler::RangedCallback* rangedCallback : group->rangedCallbacks)
 						delete rangedCallback;
-					group.basicCallbacks.clear();
-					group.rangedCallbacks.clear();
-					group.status = CallbacksGroup::Status::enabled;
+					group->basicCallbacks.clear();
+					group->rangedCallbacks.clear();
+					group->status = CallbacksGroup::Status::enabled;
 					break;
 				}
 			}
-			group.synced = true;
+			group->synced = true;
 		}
 	}
 	// Call basic handlers' callbacks
@@ -125,13 +125,12 @@ void KTech::IO::Call()
 		{
 			for (BasicHandler::BasicCallback*& callback : handler.callbacks)
 			{
-				if (callback->enabled && callback->onTick && callback->callback)
+				if (callback->enabled && callback->onTick && (callback->callback != nullptr))
 				{
-					input = handler.input;
+					input = handler.input; // Would be preferable to not copy it this way each iteration
 					callback->callback();
 				}
 			}
-			handler.timesPressed = 0;
 		}
 	}
 }
@@ -163,16 +162,16 @@ void KTech::IO::Loop()
 		// Call basic handlers
 		for (size_t i = 0; i < basicHandlers.size(); i++)
 		{
-			if (input == basicHandlers[i].input) // If the strings are equal
+			if (input == basicHandlers[i].input) // The input is of this handler, call handler's callbacks
 			{
-				basicHandlers[i].timesPressed++;
+				basicHandlers[i].timesPressed++; // Used in synced calling
 				for (size_t j = 0; j < basicHandlers[i].callbacks.size(); j++) // Call the calls
 					if (basicHandlers[i].callbacks[j]->enabled && !basicHandlers[i].callbacks[j]->onTick) // Check if the callback shouldn't be called on tick
 						basicHandlers[i].callbacks[j]->callback(); // Call
 				break; // Break because there shouldn't be a similar handler
 			}
 		}
-		// Call ranged handlers, only if the input a single character
+		// Call ranged handlers, only if the input is a single character
 		if (input.length() == 1)
 		{
 			for (size_t i = 0; i < rangedHandlers.size(); i++)
@@ -219,9 +218,9 @@ bool KTech::IO::Between(char charKey1, char charKey2)
 	return (input[0] >= charKey1) && (input[0] <= charKey2) && (input[1] == 0);
 }
 
-KTech::IO::CallbacksGroup& KTech::IO::CreateCallbackGroup(bool enabled)
+KTech::IO::CallbacksGroup* KTech::IO::CreateCallbackGroup(bool enabled)
 {
-	groups.push_back(CallbacksGroup(enabled));
+	groups.push_back(new CallbacksGroup(enabled));
 	return groups[groups.size() - 1];
 }
 

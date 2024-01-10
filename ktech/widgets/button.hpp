@@ -105,6 +105,6 @@ public:
 
 		// Input handlers
 		// This is insane.
-		callbacksGroup.AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), false));
+		callbacksGroup->AddCallback(layer->parentMap->parentEngine->io.RegisterCallback(key, std::bind(&Button::InsideOnPress, this), false));
 	}
 };

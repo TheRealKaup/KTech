@@ -26,11 +26,11 @@ struct Widget
 {
 	KTech::Object obj;
 	bool selected = false;
-	KTech::IO::CallbacksGroup& callbacksGroup;
+	KTech::IO::CallbacksGroup* callbacksGroup;
 	inline virtual void RenderSelected () {}
 	inline virtual void RenderUnselected () {}
-	inline void Select() { selected = true; callbacksGroup.Enable(); RenderSelected(); }
-	inline void Deselect() { selected = false; callbacksGroup.Disable(); RenderUnselected(); }
+	inline void Select() { selected = true; callbacksGroup->Enable(); RenderSelected(); }
+	inline void Deselect() { selected = false; callbacksGroup->Disable(); RenderUnselected(); }
 	inline Widget(KTech::Layer* layer, KTech::Point pos) : obj(pos, layer), callbacksGroup(obj.parentLayer->parentMap->parentEngine->io.CreateCallbackGroup(false)) { }
-	inline ~Widget() { callbacksGroup.DeleteCallbacks(); }
+	inline ~Widget() { callbacksGroup->DeleteCallbacks(); }
 };

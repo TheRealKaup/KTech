@@ -32,7 +32,7 @@
 #include <iostream> // Printing, strings, et cetera
 #include <string> // to_string
 #include <vector> // Heavily based
-#include <functional> // For sharing functions with the engine for it to call on events
+#include <functional> // Callback functions
 #include <thread> // For sleeping, time management.
 #include <chrono> // Time management
 #include <fstream> // Reading textures and audio files
@@ -331,13 +331,13 @@ namespace KTech
 			// Remove
 			void DeleteCallbacks();
 		};
-		std::vector<BasicHandler> basicHandlers;
-		std::vector<RangedHandler> rangedHandlers;
-		std::vector<CallbacksGroup> groups;
+		std::vector<BasicHandler> basicHandlers; // Never deleted, no need to store in pointers; handleded by indices
+		std::vector<RangedHandler> rangedHandlers; // Never deleted, no need to store in pointers; handleded by indices
+		std::vector<CallbacksGroup*> groups; // Usually experiences deletions; handleded by pointers
 
 		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
-		CallbacksGroup& CreateCallbackGroup(bool enabled = true);
+		CallbacksGroup* CreateCallbackGroup(bool enabled = true);
 
 		std::string input = std::string(7, '\0');
 		std::string quitKey = "\x03";
