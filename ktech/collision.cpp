@@ -22,7 +22,7 @@
 
 using namespace KTech;
 
-CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
+Collision::CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
 {
 	CR result = CR::O;
 	if (t1 >= 0 && t1 < colliderTypes.size())

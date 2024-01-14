@@ -62,30 +62,30 @@ struct UI
 
 	void CancelCountdown(Layer* layer)
 	{
-		engine.io.Log("<UI::StartExitCountdown()> Delete", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
-		engine.io.Log("<UI::StartExitCountdown()> Create", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
 		widgets[0] = new Button(layer, std::bind(&UI::StartExitCountdown, this, layer), Keys::return_, Point(0, 0), "Exit", true);
-		engine.io.Log("<UI::StartExitCountdown()> Select", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
-		engine.io.Log("<UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
 		engine.time.CancelInvocation(countdownInvocation);
 	}
 
 	void StartExitCountdown(Layer* layer)
 	{
-		engine.io.Log("<UI::StartExitCountdown()> Delete", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
-		engine.io.Log("<UI::StartExitCountdown()> Create", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
 		widgets[0] = new Button(layer, std::bind(&UI::CancelCountdown, this, layer), Keys::return_, Point(0, 0), "Exiting in 3", true);
 		countdown = 3;
 		// Invoke countdown
-		engine.io.Log("<UI::StartExitCountdown()> Invoke", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
 		countdownInvocation = engine.time.Invoke(std::bind(&UI::Countdown, this), 1, Time::Measurement::seconds);
 		// As can be seen, the first `return_` press does not also call `Exit()`! Nice!
-		engine.io.Log("<UI::StartExitCountdown()> Select", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
-		engine.io.Log("<UI::StartExitCountdown()> EOF", RGBColors::orange);
+		engine.io.Log("(GAME) <UI::StartExitCountdown()> EOF", RGBColors::orange);
 	}
 	
 	void MoveUp()
@@ -134,24 +134,24 @@ int main()
 
 	while (engine.running)
 	{
-		engine.io.Log("<main()::GameLoop> StartThisTick", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> StartThisTick", RGBColors::green);
 		engine.time.StartThisTick();
 
-		engine.io.Log("<main()::GameLoop> Call inputs", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> Call inputs", RGBColors::green);
 		engine.io.Call();
-		engine.io.Log("<main()::GameLoop> Call invocations", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> Call invocations", RGBColors::green);
 		engine.time.CallInvocations();
-		engine.io.Log("<main()::GameLoop> Call OnTicks", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> Call OnTicks", RGBColors::green);
 		map.CallOnTicks();
 
-		engine.io.Log("<main()::GameLoop> Render", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> Render", RGBColors::green);
 		map.Render();
-		engine.io.Log("<main()::GameLoop> Draw", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> Draw", RGBColors::green);
 		engine.io.Draw(camera.image);
-		engine.io.Log("<main()::GameLoop> Print", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> Print", RGBColors::green);
 		engine.io.Print();
 
-		engine.io.Log("<main()::GameLoop> WaitUntilNextTicks", RGBColors::green);
+		engine.io.Log("(GAME) <main()::GameLoop> WaitUntilNextTicks", RGBColors::green);
 		engine.time.WaitUntilNextTick();
 	}
 }

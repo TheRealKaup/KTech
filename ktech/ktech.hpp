@@ -159,6 +159,10 @@ namespace KTech
 		std::vector<Texture> textures = {};
 		std::vector<Collider> colliders = {};
 
+		bool Move(Point dir);
+		
+		void EnterLayer(Layer* layer);
+
 		virtual void OnTick() {} // Called by `Map::CallOnTicks()`.
 		virtual void OnPushed(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
 		virtual void OnPush(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
@@ -169,9 +173,6 @@ namespace KTech
 		virtual void OnOverlapped(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
 		virtual void OnOverlappedExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
 
-		bool Move(Point dir);
-		
-		void EnterLayer(Layer* layer);
 		Object(Point position = Point(0, 0), Layer* layer = nullptr, const std::string& name = "");
 
 		~Object();
@@ -181,8 +182,6 @@ namespace KTech
 	{
 		Map* parentMap = nullptr;
 
-		std::function<void()> OnTick = nullptr;
-		
 		std::vector<Object*> objects = {};
 		
 		bool visible = true;
@@ -193,6 +192,8 @@ namespace KTech
 		int AddObject(Object* object);
 		bool RemoveObject(const std::string& name);
 		bool RemoveObject(Object* object);
+		
+		inline virtual void OnTick() {};
 
 		Layer(Map* map);
 
@@ -208,12 +209,12 @@ namespace KTech
 		UPoint res = UPoint(10, 10);
 		std::vector<std::vector<Cell>> image = {};
 
-		std::function<void()> OnTick = nullptr;
-
-		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
-		
 		void Render(const std::vector<Layer*>& layers);
 		void Resize(UPoint res);
+
+		inline virtual void OnTick() {};
+		
+		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	};
 
 	struct Map
@@ -225,24 +226,15 @@ namespace KTech
 		std::vector<Layer*> layers = {};
 		size_t activeCameraI = -1;
 
-		std::function<void()> OnTick = NULL;
-
 		int AddCamera(Camera* camera, bool asActiveCamera = false);
 		int AddLayer(Layer* layer);
 
-		bool Render() const;
-		bool RenderReversed() const;
-		void CallOnTicks() const;
+		bool Render();
+		void CallOnTicks();
 
+		inline virtual void OnTick() {};
+		
 		Map(Engine* parentEngine) : parentEngine(parentEngine) {};
-	};
-
-	// Collision Result
-	enum class CR : uint8_t
-	{
-		B,	// Block
-		P,	// Push
-		O	// Overlap
 	};
 
 	// Manager of all things that directly work with terminal I/O.
@@ -278,8 +270,8 @@ namespace KTech
 		struct Callback
 		{
 			bool enabled = true;
-			std::function<void()> callback;
-			inline Callback(const std::function<void()>& callback) : callback(callback) {}
+			std::function<void()> ptr;
+			inline Callback(const std::function<void()>& callback) : ptr(callback) {}
 		};
 
 		struct BasicHandler
@@ -294,6 +286,7 @@ namespace KTech
 			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			std::string input;
 			uint8_t timesPressed = 0;
+			void RemoveCallback(BasicCallback*);
 			inline BasicHandler(const std::string& input) : input(input) {};
 		};
 
@@ -307,6 +300,7 @@ namespace KTech
 			};
 			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			char key1, key2;
+			void RemoveCallback(RangedCallback*);
 			inline RangedHandler(char key1, char key2) : key1(key1), key2(key2) {};
 		};
 
@@ -331,13 +325,14 @@ namespace KTech
 			// Remove
 			void DeleteCallbacks();
 		};
-		std::vector<BasicHandler> basicHandlers; // Never deleted, no need to store in pointers; handleded by indices
-		std::vector<RangedHandler> rangedHandlers; // Never deleted, no need to store in pointers; handleded by indices
+
+		std::vector<BasicHandler*> basicHandlers; // Never deleted, no need to store in pointers; handleded by indices
+		std::vector<RangedHandler*> rangedHandlers; // Never deleted, no need to store in pointers; handleded by indices
 		std::vector<CallbacksGroup*> groups; // Usually experiences deletions; handleded by pointers
 
 		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
 		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
-		CallbacksGroup* CreateCallbackGroup(bool enabled = true);
+		CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
 
 		std::string input = std::string(7, '\0');
 		std::string quitKey = "\x03";
@@ -411,6 +406,14 @@ namespace KTech
 	class Collision
 	{
 	public:
+		// Collision Result
+		enum class CR : uint8_t
+		{
+			B,	// Block
+			P,	// Push
+			O	// Overlap
+		};
+
 		std::vector<std::vector<CR>> colliderTypes = {
 			{ CR::B, CR::P, CR::O }, // Heavy - 0
 			{ CR::B, CR::P, CR::O }, // Normal - 1
@@ -426,7 +429,7 @@ namespace KTech
 
 		CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2);
 
-		static bool AreSimpleCollidersOverlapping(UPoint s1, Point p1, UPoint s2, Point p2);
+		static bool AreSimpleCollidersOverlapping(UPoint simple1, Point pos1, UPoint simple2, Point pos2);
 		static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos);
 		static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2);
 	
@@ -507,6 +510,124 @@ namespace KTech
 		// Terminating isn't done in `AudioManager::~AudioManager()`, because there could be multiple `AudioManager`s, that are created and destoryed in different times.
 		class PortAudioAutomaticTerminator { inline ~PortAudioAutomaticTerminator() { if (paInitialized) Pa_Terminate(); } };
 		static PortAudioAutomaticTerminator portAudioAutomaticTerminator;
+	};
+
+	class Memory
+	{
+	private:
+		struct ID
+		{
+			size_t i; // Index
+			uint64_t u; // UUID
+			constexpr inline ID(size_t i, size_t u) : i(i), u(u) {};
+		};
+
+		template<typename T>
+		struct Storage
+		{
+			// Contains a pointer to the structure instnace and the UUID of the instnace
+			struct Cell
+			{
+				T* p; // Pointer
+				size_t u; // UUID
+			};
+
+			// The structures are stored within cells, with their UUIDs
+			Cell* arr;
+			// The size of the array
+			size_t size = 0;
+
+			// An RNG for multiplayer will be integrated later, but offline this works fine.
+			inline static uint64_t GenerateUUID()
+			{
+				static uint64_t uuid = 0;
+				return ++uuid;
+			}
+
+			inline ID Add(T* structure)
+			{
+				Cell* tmp = new Cell[size + 1]; // New array with one more cell
+				size_t i = 0; // Outside of for loop's scope for later use
+				for (; i < size; i++)
+					tmp[i] = arr[i]; // Move the cells to the new array
+				tmp[i] = {structure, GenerateUUID()}; // Create a new cell for the added structure
+				delete[] arr; // Delete the old array
+				arr = tmp; // Set the array as the new array
+				size++; // Increase the size by one
+				return ID(i, arr[i].u); // Return new ID of structure
+ 			}
+
+			// Returns the valid index of the ID.
+			// If the UUID is missing, return the size of the array making the index invalid.
+			inline size_t IDToIndex(const ID& id)
+			{
+				for (size_t i = (id.i < size ? id.i : size - 1);; i--)
+				{
+					if (arr[i].u == id.u)
+						return i;
+					if (i == 0)
+						return size;
+				}
+			}
+
+			// Remove a structure from storage.
+			// Returns true if the structure was found and removed.
+			// Returns false if the structre is missing.
+			inline bool Remove(const ID& id)
+			{
+				Cell* tmp = new Cell[size - 1]; // New array with one more cell
+				size_t toRemove = IDToIndex(id); // Convert the ID to a valid index
+				if (toRemove == size) // If the index is the size, then it's invalid
+					return false;
+				size_t i = 0;
+				for (; i < toRemove; i++, i++)
+					tmp[i] = arr[i]; // Move the cells to the new array
+				for (; i < size; i++)
+					tmp[i - 1] = arr[i]; // Move the cells to the new array
+				delete[] arr; // Delete the old array
+				arr = tmp; // Set the array as the new array
+				size--; // Increase the size by one
+				return true;
+			}
+
+			// Takes an ID reference, returns the pointer to the structure.
+			// If the ID is outdated (made so by structures being removed) then update it.
+			// If the ID's UUID doesn't exist in the storage at all, this will reset the ID and will return `nullptr`.
+			T* operator[](ID& id) const
+			{
+				for (size_t i = (id.i < size ? id.i : size -1);; i--)
+				{
+					if (arr[i].u == id.u)
+					{
+						id.i = i;
+						return arr[i].p;
+					}
+					if (i == 0)
+						break;
+				}
+				id = ID(0, 0);
+				return nullptr;
+			}
+
+			// Takes an ID reference, returns the pointer to the structure.
+			// Constant version of the previous operator, which will not update the given ID if it's outdated/missing.
+			T* operator[](const ID& id) const
+			{
+				for (size_t i = (id.i < size ? id.i : size -1);; i--)
+				{
+					if (arr[i].u == id.u)
+						return arr[i].p;
+					if (i == 0)
+						break;
+				}
+				return nullptr;
+			}
+		};
+
+		Storage<Object> objects;
+		Storage<Layer> layers;
+		Storage<Camera> cameras;
+		Storage<Map> maps;
 	};
 
 	// Core class, the user should create one of these, and shouldn't have to construct themselves 

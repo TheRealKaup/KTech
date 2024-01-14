@@ -31,6 +31,6 @@ struct Widget
 	inline virtual void RenderUnselected () {}
 	inline void Select() { selected = true; callbacksGroup->Enable(); RenderSelected(); }
 	inline void Deselect() { selected = false; callbacksGroup->Disable(); RenderUnselected(); }
-	inline Widget(KTech::Layer* layer, KTech::Point pos) : obj(pos, layer), callbacksGroup(obj.parentLayer->parentMap->parentEngine->io.CreateCallbackGroup(false)) { }
+	inline Widget(KTech::Layer* layer, KTech::Point pos) : obj(pos, layer), callbacksGroup(obj.parentLayer->parentMap->parentEngine->io.CreateCallbacksGroup(false)) { }
 	inline ~Widget() { callbacksGroup->DeleteCallbacks(); }
 };

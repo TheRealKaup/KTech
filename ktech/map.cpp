@@ -35,7 +35,7 @@ int KTech::Map::AddLayer(Layer* layer)
 	return layers.size() - 1;
 }
 
-bool KTech::Map::Render() const
+bool KTech::Map::Render()
 {
 	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
 	{
@@ -45,34 +45,17 @@ bool KTech::Map::Render() const
 	return false;
 }
 
-bool KTech::Map::RenderReversed() const
+void KTech::Map::CallOnTicks()
 {
-	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
-	{
-		// cameras[activeCameraI]->RenderReversed(layers);
-		return true;
-	}
-	return false;
-}
-
-void KTech::Map::CallOnTicks() const
-{
-	if (OnTick)
-		OnTick();
+	OnTick();
 
 	for (size_t l = 0; l < layers.size(); l++)
 	{
-		if (layers[l]->OnTick)
-			layers[l]->OnTick();
+		layers[l]->OnTick();
 
 		for (size_t o = 0; o < layers[l]->objects.size(); o++)
-		{
 			layers[l]->objects[o]->OnTick();
-		}
 	}
 	for (size_t c = 0; c < cameras.size(); c++)
-	{
-		if (cameras[c]->OnTick)
-			cameras[c]->OnTick();
-	}
+		cameras[c]->OnTick();
 }
