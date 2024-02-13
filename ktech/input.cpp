@@ -153,6 +153,7 @@ void KTech::IO::Call()
 					callback->ptr();
 				}
 			}
+			handler->timesPressed = 0;
 		}
 	}
 	Log("<IO::Call()> End of function.", RGBColors::hotPink);

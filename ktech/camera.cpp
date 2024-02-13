@@ -20,19 +20,21 @@
 
 #include "ktech.hpp"
 
-KTech::Camera::Camera(Point position, UPoint resolution, const std::string& name)
-	: pos(position), res(resolution)
+KTech::Camera::Camera(Engine& engine, Point position, UPoint resolution, const std::string& name)
+	: engine(engine), pos(position), res(resolution)
 {
+	engine.memory.cameras.Add(this);
 	image.resize(res.y, std::vector<Cell>(res.x));
 }
 
-void KTech::Camera::Render(const std::vector<Layer*>& layers)
+KTech::Camera::~Camera()
 {
-	static KTech::Layer* layer;
-	static KTech::Object* obj;
-	static KTech::Texture* texture;
-	static long t, o, l, x, y;
+	IO::Log("<Camera[" + name + "]::~Camera()>", RGBColors::red);
+	engine.memory.cameras.Remove(id);
+}
 
+void KTech::Camera::Render(const std::vector<ID<Layer>>& layers)
+{
 	// Point final - the relative position between the camera and the texture (image index).
 	static KTech::Point final;
 	static RGB tempFRGB;
@@ -40,75 +42,80 @@ void KTech::Camera::Render(const std::vector<Layer*>& layers)
 	static uint8_t tempAlpha;
 
 	// Reset the image.
-	for (y = 0; y < res.y; y++)
+	for (size_t y = 0; y < res.y; y++)
 	{
-		for (x = 0; x < res.x; x++)
+		for (size_t x = 0; x < res.x; x++)
 		{
-			image[y][x].f = { 0, 0, 0 };
-			image[y][x].b = { 0, 0, 0 };
+			image[y][x].f = RGB( 0, 0, 0 );
+			image[y][x].b = RGB( 0, 0, 0 );
 			image[y][x].c = ' ';
 		}
 	}
 
-	for (l = 0; l < layers.size(); l++)
+	for (size_t l = 0; l < layers.size(); l++)
 	{
-		if (!layers[l]->visible)
+		if (!engine.memory.layers.Exists(layers[l]) && !engine.memory.layers[layers[l]]->visible)
 			continue;
 
-		layer = layers[l];
+		KTech::Layer* layer = engine.memory.layers[layers[l]];
 
-		for (o = 0; o < layer->objects.size(); o++)
+		for (size_t o = 0; o < layer->objects.size(); o++)
 		{
-			obj = layer->objects[o];
-			for (t = 0; t < obj->textures.size(); t++)
+			if (!engine.memory.objects.Exists(layer->objects[o]))
+				continue;
+
+			KTech::Object* obj = engine.memory.objects[layer->objects[o]];
+			
+			for (size_t t = 0; t < obj->textures.size(); t++)
 			{
-				texture = &obj->textures[t];
+				KTech::Texture& texture = obj->textures[t];
 				
-				if (!texture->active)
+				if (!texture.active)
 					continue;
 
 				// Simple texture
-				if (texture->simple)
+				if (texture.simple)
 				{
 					// Precalculate fixed values (8 bit depth)
 					//             8 ->                 16 ->                32 ->          8.     8 ->                 16 ->                32 ->          8.     8 ->                 16 ->                32 ->          8.
-					tempFRGB = RGB(texture->value.f.r * texture->value.f.a * layer->alpha / 65025, texture->value.f.g * texture->value.f.a * layer->alpha / 65025, texture->value.f.b * texture->value.f.a * layer->alpha / 65025);
-					tempBRGB = RGB(texture->value.b.r * texture->value.b.a * layer->alpha / 65025, texture->value.b.g * texture->value.b.a * layer->alpha / 65025, texture->value.b.b * texture->value.b.a * layer->alpha / 65025);
+					tempFRGB = RGB(texture.value.f.r * texture.value.f.a * layer->alpha / 65025, texture.value.f.g * texture.value.f.a * layer->alpha / 65025, texture.value.f.b * texture.value.f.a * layer->alpha / 65025);
+					tempBRGB = RGB(texture.value.b.r * texture.value.b.a * layer->alpha / 65025, texture.value.b.g * texture.value.b.a * layer->alpha / 65025, texture.value.b.b * texture.value.b.a * layer->alpha / 65025);
 					//                   8 ->                 16 ->           8.
-					tempAlpha = (65025 - texture->value.f.a * layer->alpha) / 255;
+					tempAlpha = (65025 - texture.value.f.a * layer->alpha) / 255;
 
+					long y, x;
 					// If the texture is before the camera, iterate with Y from point in which camera view starts, and iterate with final.y from 0.
-					if (obj->pos.y + texture->pos_r.y < pos.y)
+					if (obj->pos.y + texture.pos_r.y < pos.y)
 					{
-						y = pos.y - obj->pos.y - texture->pos_r.y;
+						y = pos.y - obj->pos.y - texture.pos_r.y;
 						final.y = 0;
 					}
 					// Otherwise, iterate with Y from 0, and iterate with final.y from point in which texture starts.
 					else
 					{
 						y = 0;
-						final.y = obj->pos.y + texture->pos_r.y - pos.y;
+						final.y = obj->pos.y + texture.pos_r.y - pos.y;
 					}
 					// Stop iterating through the texture until y reached the end of the texture, or final.y reached the end of the image.
-					for (; y < texture->size.y && final.y < res.y; y++, final.y++)
+					for (; y < texture.size.y && final.y < res.y; y++, final.y++)
 					{
 						// Same goes for X
-						if (obj->pos.x + texture->pos_r.x < pos.x)
+						if (obj->pos.x + texture.pos_r.x < pos.x)
 						{
-							x = pos.x - obj->pos.x - texture->pos_r.x;
+							x = pos.x - obj->pos.x - texture.pos_r.x;
 							final.x = 0;
 						}
 						else
 						{
 							x = 0;
-							final.x = obj->pos.x + texture->pos_r.x - pos.x;
+							final.x = obj->pos.x + texture.pos_r.x - pos.x;
 						}
 
-						for (; x < texture->size.x && final.x < res.x; x++, final.x++)
+						for (; x < texture.size.x && final.x < res.x; x++, final.x++)
 						{
-							if (texture->value.c != ' ')
+							if (texture.value.c != ' ')
 							{
-								image[final.y][final.x].c = texture->value.c;
+								image[final.y][final.x].c = texture.value.c;
 								//                            8.           8 ->                          16 ->       8.
 								image[final.y][final.x].f.r = tempFRGB.r + image[final.y][final.x].f.r * tempAlpha / 255;
 								image[final.y][final.x].f.g = tempFRGB.g + image[final.y][final.x].f.g * tempAlpha / 255;
@@ -124,54 +131,55 @@ void KTech::Camera::Render(const std::vector<Layer*>& layers)
 				// Complex texture
 				else
 				{
+					long y, x;
 					// If the texture is before the camera, iterate with Y from point in which camera view starts, and iterate with final.y from 0.
-					if (obj->pos.y + texture->pos_r.y < pos.y)
+					if (obj->pos.y + texture.pos_r.y < pos.y)
 					{
-						y = pos.y - obj->pos.y - texture->pos_r.y;
+						y = pos.y - obj->pos.y - texture.pos_r.y;
 						final.y = 0;
 					}
 					// Otherwise, iterate with Y from 0, and iterate with final.y from point in which texture starts.
 					else
 					{
 						y = 0;
-						final.y = obj->pos.y + texture->pos_r.y - pos.y;
+						final.y = obj->pos.y + texture.pos_r.y - pos.y;
 					}
 
 					// Stop iterating through the texture until y reached the end of the texture, or final.y reached the end of the image.
-					for (; y < texture->t.size() && final.y < res.y; y++, final.y++)
+					for (; y < texture.t.size() && final.y < res.y; y++, final.y++)
 					{
 						// Same goes for X
-						if (obj->pos.x + texture->pos_r.x < pos.x)
+						if (obj->pos.x + texture.pos_r.x < pos.x)
 						{
-							x = pos.x - obj->pos.x - texture->pos_r.x;
+							x = pos.x - obj->pos.x - texture.pos_r.x;
 							final.x = 0;
 						}
 						else
 						{
 							x = 0;
-							final.x = obj->pos.x + texture->pos_r.x - pos.x;
+							final.x = obj->pos.x + texture.pos_r.x - pos.x;
 						}
 
-						for (; x < texture->t[y].size() && final.x < res.x; x++, final.x++)
+						for (; x < texture.t[y].size() && final.x < res.x; x++, final.x++)
 						{
-							if (texture->t[y][x].c != ' ')
+							if (texture.t[y][x].c != ' ')
 							{
-								image[final.y][final.x].c = texture->t[y][x].c; // Character
+								image[final.y][final.x].c = texture.t[y][x].c; // Character
 								// Precalculate foreground * layer alpha (8 bit depth)
 								//          8 ->                   16 ->          8.
-								tempAlpha = texture->t[y][x].f.a * layer->alpha / 255;
+								tempAlpha = texture.t[y][x].f.a * layer->alpha / 255;
 								//                            (8 ->                   16.         8 ->                           16.) 16 ->          8.
-								image[final.y][final.x].f.r = (texture->t[y][x].f.r * tempAlpha + image[final.y][final.x].f.r * (255 - tempAlpha)) / 255;
-								image[final.y][final.x].f.g = (texture->t[y][x].f.g * tempAlpha + image[final.y][final.x].f.g * (255 - tempAlpha)) / 255;
-								image[final.y][final.x].f.b = (texture->t[y][x].f.b * tempAlpha + image[final.y][final.x].f.b * (255 - tempAlpha)) / 255;
+								image[final.y][final.x].f.r = (texture.t[y][x].f.r * tempAlpha + image[final.y][final.x].f.r * (255 - tempAlpha)) / 255;
+								image[final.y][final.x].f.g = (texture.t[y][x].f.g * tempAlpha + image[final.y][final.x].f.g * (255 - tempAlpha)) / 255;
+								image[final.y][final.x].f.b = (texture.t[y][x].f.b * tempAlpha + image[final.y][final.x].f.b * (255 - tempAlpha)) / 255;
 							}
 							// Precalculate background * layer alpha (8 bit depth)
 							//          8 ->                    16 ->                 8.
-							tempAlpha = texture->t[y][x].b.a * layer->alpha / 255;
+							tempAlpha = texture.t[y][x].b.a * layer->alpha / 255;
 							//                            (8 ->                   16.         8 ->                           16.) 16 ->          8.
-							image[final.y][final.x].b.r = (texture->t[y][x].b.r * tempAlpha + image[final.y][final.x].b.r * (255 - tempAlpha)) / 255;
-							image[final.y][final.x].b.g = (texture->t[y][x].b.g * tempAlpha + image[final.y][final.x].b.g * (255 - tempAlpha)) / 255;
-							image[final.y][final.x].b.b = (texture->t[y][x].b.b * tempAlpha + image[final.y][final.x].b.b * (255 - tempAlpha)) / 255;
+							image[final.y][final.x].b.r = (texture.t[y][x].b.r * tempAlpha + image[final.y][final.x].b.r * (255 - tempAlpha)) / 255;
+							image[final.y][final.x].b.g = (texture.t[y][x].b.g * tempAlpha + image[final.y][final.x].b.g * (255 - tempAlpha)) / 255;
+							image[final.y][final.x].b.b = (texture.t[y][x].b.b * tempAlpha + image[final.y][final.x].b.b * (255 - tempAlpha)) / 255;
 						}
 					}
 				}

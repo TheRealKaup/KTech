@@ -22,7 +22,7 @@
 
 using namespace KTech;
 
-Collision::CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
+CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
 {
 	CR result = CR::O;
 	if (t1 >= 0 && t1 < colliderTypes.size())
@@ -93,54 +93,60 @@ bool Collision::AreComplexCollidersOverlapping(const std::vector<std::vector<boo
 	return false;
 }
 
-void Collision::ExpandMovementTree(Object* thisObj, Point dir,
+#define OBJECTS engine->memory.objects
+#define LAYERS engine->memory.layers
+
+void Collision::ExpandMovementTree(ID<Object>& thisObjID, Point dir,
 	std::vector<CollisionData>& pushData,
 	std::vector<CollisionData>& blockData,
 	std::vector<CollisionData>& overlapData,
 	std::vector<CollisionData>& exitOverlapData)
 {
-	static Object* otherObject;
-	static Collider* collider;
-	static Collider* otherCollider;
-	static bool currentOverlapState, futureOverlapState;
+	Object* thisObj = OBJECTS[thisObjID];
+	Layer* layer = LAYERS[thisObj->parentLayer];
 
-	for (size_t o = 0; o < thisObj->parentLayer->objects.size(); o++)
+	for (size_t o = 0; o < layer->objects.size(); o++) // Other objects
 	{
-		otherObject = thisObj->parentLayer->objects[o];
+		ID<Object>& otherObjID = (*layer)[o];
 
 		// Filter in only objects which aren't a part of the movement tree and objects from `blockingObjects`
+		bool alreadyMoving = false;
 		for (size_t i = 0; i < pushData.size(); i++) {
-			if (otherObject == pushData[i].activeObject || otherObject == pushData[i].passiveObject) {
-				otherObject = thisObj; // Stupid way to exit the other for-loop but whatever.
+			if (otherObjID == pushData[i].activeObject || otherObjID == pushData[i].passiveObject) {
+				alreadyMoving = true;
+				break;
 			}
 		}
-		if (otherObject == thisObj)
+		if (alreadyMoving || otherObjID == thisObjID)
 			continue;
 		
+		Object* otherObj = OBJECTS[otherObjID];
+
+		// *Needed in this scope!
 		CR cr = CR::O; // The collision result between this object and this other object. Default - overlap (nothing, ignored).
-		size_t c = 0; // Collider index (needed after for loops)
-		size_t oc = 0; // Other collider index (needed after for loops)
+		size_t c = 0; // Collider index 
+		size_t oc = 0; // Other collider index
 		size_t originallyBlockedColliderI = 0; // Used if not found a pushable collider
 		size_t originallyBlockingColliderI = 0; // ^
 
-		for (size_t c = 0; c < thisObj->colliders.size(); c++)
+		for (size_t c = 0; c < thisObj->colliders.size(); c++) // This object's colliders
 		{
 			// Set collider
-	 		collider = &thisObj->colliders[c];
+	 		const Collider& col = (thisObj->colliders[c]);
 			// Skip this one if it is invalid
-			if (!collider->active || collider->GetSize().x == 0 || collider->GetSize().y == 0)
+			if (!col.active || col.GetSize().x == 0 || col.GetSize().y == 0)
 				continue;
 
-			for (oc = 0; oc < otherObject->colliders.size(); oc++)
+			for (oc = 0; oc < otherObj->colliders.size(); oc++) // Other object's colliders
 			{
 				// Set other collider
-				otherCollider = &otherObject->colliders[oc];
+				const Collider& otherCol = otherObj->colliders[oc];
 				// Skip this one if it is invalid
-				if (!otherCollider->active || otherCollider->GetSize().x == 0 || otherCollider->GetSize().y == 0)
+				if (!otherCol.active || otherCol.GetSize().x == 0 || otherCol.GetSize().y == 0)
 					continue;
 
 				// Get the potential collision result in advance
-				CR potentialCollisionResult = GetPotentialCollisionResult(collider->type, otherCollider->type);
+				CR potentialCollisionResult = GetPotentialCollisionResult(col.type, otherCol.type);
 
 				// If the current known result is block (0) and the potential result of this other object is also block then there is no reason to proceed checking.
 				// If the current known result if push (1) and the potential result is also push then once again there is no reason to proceed checking.
@@ -150,59 +156,61 @@ void Collision::ExpandMovementTree(Object* thisObj, Point dir,
 				if (potentialCollisionResult == CR::O)
 				{
 					// Compare current and future overlapping according to the types of the colliders
-					if (collider->simple)
+					bool currentOverlapState, futureOverlapState;
+					if (col.simple)
 					{
-						if (otherCollider->simple)
+						if (otherCol.simple)
 						{
-							currentOverlapState = AreSimpleCollidersOverlapping(collider->size, Point(collider->pos_r.x + thisObj->pos.x, collider->pos_r.y + thisObj->pos.y), otherCollider->size, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
-							futureOverlapState = AreSimpleCollidersOverlapping(collider->size, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y), otherCollider->size, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
+							currentOverlapState = AreSimpleCollidersOverlapping(col.size, Point(col.pos_r.x + thisObj->pos.x, col.pos_r.y + thisObj->pos.y), otherCol.size, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
+							futureOverlapState = AreSimpleCollidersOverlapping(col.size, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y), otherCol.size, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
 						}
 						else
 						{
-							currentOverlapState = AreSimpleAndComplexCollidersOverlapping(collider->size, Point(collider->pos_r.x + thisObj->pos.x, collider->pos_r.y + thisObj->pos.y), otherCollider->c, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(collider->size, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y), otherCollider->c, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
+							currentOverlapState = AreSimpleAndComplexCollidersOverlapping(col.size, Point(col.pos_r.x + thisObj->pos.x, col.pos_r.y + thisObj->pos.y), otherCol.c, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
+							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(col.size, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y), otherCol.c, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
 						}
 					}
 					else
 					{
-						if (otherCollider->simple)
+						if (otherCol.simple)
 						{
-							currentOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCollider->size, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y), collider->c, Point(collider->pos_r.x + thisObj->pos.x, collider->pos_r.y + thisObj->pos.y));
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCollider->size, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y), collider->c, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y));
+							currentOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCol.size, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y), col.c, Point(col.pos_r.x + thisObj->pos.x, col.pos_r.y + thisObj->pos.y));
+							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCol.size, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y), col.c, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y));
 						}
 						else
 						{
-							currentOverlapState = AreComplexCollidersOverlapping(collider->c, Point(collider->pos_r.x + thisObj->pos.x, collider->pos_r.y + thisObj->pos.y), otherCollider->c, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
-							futureOverlapState = AreComplexCollidersOverlapping(collider->c, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y), otherCollider->c, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
+							currentOverlapState = AreComplexCollidersOverlapping(col.c, Point(col.pos_r.x + thisObj->pos.x, col.pos_r.y + thisObj->pos.y), otherCol.c, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
+							futureOverlapState = AreComplexCollidersOverlapping(col.c, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y), otherCol.c, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
 						}
 					}
 
 					if (!currentOverlapState && futureOverlapState)
-						overlapData.push_back({thisObj, otherObject, c, oc}); // Entered overlap!
+						overlapData.push_back({thisObjID, otherObjID, c, oc}); // Entered overlap!
 					else if (currentOverlapState && !futureOverlapState)
-						exitOverlapData.push_back({thisObj, otherObject, c, oc}); // Exited overlap!
+						exitOverlapData.push_back({thisObjID, otherObjID, c, oc}); // Exited overlap!
 				}
 				// Proceed to checking collision (repositioned overlap) only if the potential collision result is not already known.
 				// This means that if the currently known CR is a block and the potential CR is also a block, then there is no reason to check collision again since encountering another blocking collider doesn't matter.
 				// And, if the currently known CR is a push, then there is no reason to check for blocks or more ways to push, since the other object is going to get pushed either way.
 				// But, if the currently known CR is a push, the for loops should still keep going in order to check for more overlaps, which are always relevant.
-				// Basically, by detecting a block, this part of the code gets locked on a block, until a push is found, which causes this part of the code to get locked on a push and never check for more collisions again in the current `otherObject`'s iteration.
+				// Basically, by detecting a block, this part of the code gets locked on a block, until a push is found, which causes this part of the code to get locked on a push and never check for more collisions again in the current `otherObj`'s iteration.
 				else if (cr != potentialCollisionResult)
 				{
 					// Compare future overlapping according to the types of the colliders
-					if (collider->simple)
+					bool currentOverlapState, futureOverlapState;
+					if (col.simple)
 					{
-						if (otherCollider->simple)
-							futureOverlapState = AreSimpleCollidersOverlapping(collider->size, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y), otherCollider->size, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
+						if (otherCol.simple)
+							futureOverlapState = AreSimpleCollidersOverlapping(col.size, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y), otherCol.size, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
 						else
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(collider->size, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y), otherCollider->c, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
+							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(col.size, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y), otherCol.c, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
 					}
 					else
 					{
-						if (otherCollider->simple)
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCollider->size, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y), collider->c, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y));
+						if (otherCol.simple)
+							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCol.size, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y), col.c, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y));
 						else
-							futureOverlapState = AreComplexCollidersOverlapping(collider->c, Point(collider->pos_r.x + thisObj->pos.x + dir.x, collider->pos_r.y + thisObj->pos.y + dir.y), otherCollider->c, Point(otherCollider->pos_r.x + otherObject->pos.x, otherCollider->pos_r.y + otherObject->pos.y));
+							futureOverlapState = AreComplexCollidersOverlapping(col.c, Point(col.pos_r.x + thisObj->pos.x + dir.x, col.pos_r.y + thisObj->pos.y + dir.y), otherCol.c, Point(otherCol.pos_r.x + otherObj->pos.x, otherCol.pos_r.y + otherObj->pos.y));
 					}
 
 					if (futureOverlapState)
@@ -211,7 +219,7 @@ void Collision::ExpandMovementTree(Object* thisObj, Point dir,
 						cr = potentialCollisionResult;
 						if (cr == CR::B)
 						{
-							// There can only be one time (for each other object) where a block result can get to this point in the current `otherObject`'s iteration.
+							// There can only be one time (for each other object) where a block result can get to this point in the current `otherObj`'s iteration.
 							// That means that `c` and `oc` represent the original blocked and blocking colliders, which can be used for user-defined functions calling.
 							originallyBlockedColliderI = c;
 							originallyBlockingColliderI = oc;
@@ -219,22 +227,22 @@ void Collision::ExpandMovementTree(Object* thisObj, Point dir,
 					}
 				}
 			}
-	}
+		}
 
 		if (cr == CR::B)
-			blockData.push_back({thisObj, otherObject, originallyBlockedColliderI, originallyBlockingColliderI});
+			blockData.push_back({thisObjID, otherObjID, originallyBlockedColliderI, originallyBlockingColliderI});
 		else if (cr == CR::P)
-			pushData.push_back({thisObj, otherObject, oc, c});
+			pushData.push_back({thisObjID, otherObjID, oc, c});
 	}
 }
 
-bool Collision::MoveObject(Object* object, Point dir)
+bool Collision::MoveObject(ID<Object>& object, Point dir)
 {
 	std::vector<CollisionData> pushData;
 	std::vector<CollisionData> blockData;
 	std::vector<CollisionData> overlapData;
 	std::vector<CollisionData> exitOverlapData;
-	
+
 	// Start root of movement trees
 	ExpandMovementTree(object, dir, pushData, blockData, overlapData, exitOverlapData);
 	// Expand until no more objects in the area can be pushed
@@ -247,42 +255,38 @@ bool Collision::MoveObject(Object* object, Point dir)
 		// Change positions
 		for (size_t i = 0; i < pushData.size(); i++)
 		{
-			pushData[i].passiveObject->pos.x += dir.x;
-			pushData[i].passiveObject->pos.y += dir.y;
+			OBJECTS[pushData[i].passiveObject]->pos.x += dir.x;
+			OBJECTS[pushData[i].passiveObject]->pos.y += dir.y;
 		}
-		object->pos.x += dir.x;
-		object->pos.y += dir.y;
+		OBJECTS[object]->pos.x += dir.x;
+		OBJECTS[object]->pos.y += dir.y;
 		// Call push events
 		for (size_t i = 0; i < pushData.size(); i++)
 		{
-			pushData[i].activeObject->OnPush(dir, pushData[i].activeCollider, pushData[i].passiveObject, pushData[i].passiveCollider);
-			pushData[i].passiveObject->OnPushed(dir, pushData[i].passiveCollider, pushData[i].activeObject, pushData[i].activeCollider);
+			OBJECTS[pushData[i].activeObject]->OnPush(dir, pushData[i].activeCollider, pushData[i].passiveObject, pushData[i].passiveCollider);
+			OBJECTS[pushData[i].passiveObject]->OnPushed(dir, pushData[i].passiveCollider, pushData[i].activeObject, pushData[i].activeCollider);
 		}
 		// Call overlap events
 		for (size_t i = 0; i < overlapData.size(); i++)
 		{
-			overlapData[i].activeObject->OnOverlap(dir, overlapData[i].activeCollider, overlapData[i].passiveObject, overlapData[i].passiveCollider);
-			overlapData[i].passiveObject->OnOverlapped(dir, overlapData[i].passiveCollider, overlapData[i].activeObject, overlapData[i].activeCollider);
+			OBJECTS[overlapData[i].activeObject]->OnOverlap(dir, overlapData[i].activeCollider, overlapData[i].passiveObject, overlapData[i].passiveCollider);
+			OBJECTS[overlapData[i].passiveObject]->OnOverlapped(dir, overlapData[i].passiveCollider, overlapData[i].activeObject, overlapData[i].activeCollider);
 		}
 		// Call overlap exit events
 		for (size_t i = 0; i < exitOverlapData.size(); i++)
 		{
-			exitOverlapData[i].activeObject->OnOverlapExit(dir, exitOverlapData[i].activeCollider, exitOverlapData[i].passiveObject, exitOverlapData[i].passiveCollider);
-			exitOverlapData[i].passiveObject->OnOverlappedExit(dir, exitOverlapData[i].passiveCollider, exitOverlapData[i].activeObject, exitOverlapData[i].activeCollider);
+			OBJECTS[exitOverlapData[i].activeObject]->OnOverlapExit(dir, exitOverlapData[i].activeCollider, exitOverlapData[i].passiveObject, exitOverlapData[i].passiveCollider);
+			OBJECTS[exitOverlapData[i].passiveObject]->OnOverlappedExit(dir, exitOverlapData[i].passiveCollider, exitOverlapData[i].activeObject, exitOverlapData[i].activeCollider);
 		}
 		return true;
 	}
 	// Unable to move - there are blocking objects.
 	else
 	{
-		Object* theOtherObject = NULL;
-		Point lastPush = { 0, 0 };
-		int theColliderIndex = -1;
-		int theOtherColliderIndex = -1;
 		for (size_t i = 0; i < blockData.size(); i++)
 		{
-			blockData[i].activeObject->OnBlocked(dir, blockData[i].activeCollider, blockData[i].passiveObject, blockData[i].passiveCollider);
-			blockData[i].passiveObject->OnBlock(dir, blockData[i].passiveCollider, blockData[i].activeObject, blockData[i].activeCollider);
+			OBJECTS[blockData[i].activeObject]->OnBlocked(dir, blockData[i].activeCollider, blockData[i].passiveObject, blockData[i].passiveCollider);
+			OBJECTS[blockData[i].passiveObject]->OnBlock(dir, blockData[i].passiveCollider, blockData[i].activeObject, blockData[i].activeCollider);
 		}
 		return false; 
 	}

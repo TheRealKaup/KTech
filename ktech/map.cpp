@@ -20,7 +20,7 @@
 
 #include "ktech.hpp"
 
-int KTech::Map::AddCamera(Camera* camera, bool asActiveCamera)
+int KTech::Map::AddCamera(ID<Camera>& camera, bool asActiveCamera)
 {
 	cameras.push_back(camera);
 	if (asActiveCamera)
@@ -28,34 +28,59 @@ int KTech::Map::AddCamera(Camera* camera, bool asActiveCamera)
 	return cameras.size() - 1;
 }
 
-int KTech::Map::AddLayer(Layer* layer)
+int KTech::Map::AddLayer(ID<Layer>& layer)
 {
+	KTech::IO::Log("<Map::AddLayer()> Start of function...", RGBColors::mint);
+	engine.memory.layers[layer]->parentMap = id;
 	layers.push_back(layer);
-	layer->parentMap = this;
+	KTech::IO::Log("<Map::AddLayer()> End of function.", RGBColors::mint);
 	return layers.size() - 1;
 }
 
 bool KTech::Map::Render()
 {
-	if (activeCameraI >= 0 && activeCameraI < cameras.size() && cameras[activeCameraI] != nullptr)
+	if (activeCameraI >= 0 && activeCameraI < cameras.size())
 	{
-		cameras[activeCameraI]->Render(layers);
+		engine.memory.cameras[cameras[activeCameraI]]->Render(layers);
 		return true;
 	}
 	return false;
 }
 
-void KTech::Map::CallOnTicks()
+bool KTech::Map::RemoveLayer(ID<Layer>& layer)
 {
-	OnTick();
-
-	for (size_t l = 0; l < layers.size(); l++)
+	for (size_t i = 0; i < layers.size(); i++)
 	{
-		layers[l]->OnTick();
-
-		for (size_t o = 0; o < layers[l]->objects.size(); o++)
-			layers[l]->objects[o]->OnTick();
+		if (layers[i] == layer)
+		{
+			layers.erase(layers.begin() + i);
+			return true;
+		}
 	}
-	for (size_t c = 0; c < cameras.size(); c++)
-		cameras[c]->OnTick();
+	return false;
+}
+
+bool KTech::Map::RemoveCamera(ID<Camera>& camera)
+{
+	for (size_t i = 0; i < cameras.size(); i++)
+	{
+		if (cameras[i] == camera)
+		{
+			cameras.erase(cameras.begin() + i);
+			return true;
+		}
+	}
+	return false;
+}
+
+KTech::Map::Map(Engine& engine)
+	: engine(engine)
+{
+	engine.memory.maps.Add(this);
+};
+
+KTech::Map::~Map()
+{
+	IO::Log("<Map[" + name + "]::~Map()>", RGBColors::red);
+	engine.memory.maps.Remove(id);	
 }

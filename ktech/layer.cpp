@@ -20,10 +20,10 @@
 
 #include "ktech.hpp"
 
-int KTech::Layer::AddObject(Object* object)
+int KTech::Layer::AddObject(ID<Object>& object)
 {
+	engine.memory.objects[object]->parentLayer = id;
 	objects.push_back(object);
-	object->parentLayer = this;
 	return objects.size() - 1;
 }
 
@@ -31,9 +31,9 @@ bool KTech::Layer::RemoveObject(const std::string& name)
 {
 	for (int i = 0; i < objects.size(); i++)
 	{
-		if (objects[i]->name == name)
+		if (engine.memory.objects[objects[i]]->name == name)
 		{
-			objects[i]->parentLayer = nullptr;
+			// engine.memory.objects[objects[i]]->parentLayer = ID<Layer>(0, 0);
 			objects.erase(objects.begin() + i);
 			return true;
 		}
@@ -41,33 +41,33 @@ bool KTech::Layer::RemoveObject(const std::string& name)
 	return false;
 }
 
-bool KTech::Layer::RemoveObject(Object* object)
+bool KTech::Layer::RemoveObject(ID<Object>& object)
 {
-	bool removed = false;
-	for (size_t i = 0; i < objects.size();)
+	for (int i = 0; i < objects.size(); i++)
 	{
 		if (objects[i] == object)
 		{
-			objects[i]->parentLayer = nullptr;
+			// engine.memory.objects[objects[i]]->parentLayer = ID<Layer>(0, 0);
 			objects.erase(objects.begin() + i);
-			removed = true;
+			return true;
 		}
-		else
-			i++;
 	}
-	return removed;
+	return false;
 }
 
 // Currently layers must be forced to be added to maps ASAP, otherwise there would be seg faults, for example, whenever objects try to move (since they can't access engine.collision). 
-KTech::Layer::Layer(Map* map)
+KTech::Layer::Layer(Engine& engine, ID<Map>& map) : engine(engine)
 {
-	map->AddLayer(this);
+	engine.memory.layers.Add(this);
+	engine.memory.maps[map]->AddLayer(id);
 }
 
 KTech::Layer::~Layer()
 {
 	// Reset the `parentLayer` of the objects that have it set to this layer
-	for (Object*& obj : objects)
-		if (obj->parentLayer == this)
-			obj->parentLayer = nullptr;
+	IO::Log("<Layer[" + name + "]::~Layer()>", RGBColors::red);
+	for (ID<Object>& obj : objects)
+		if (engine.memory.objects.Exists(obj))
+			engine.memory.objects[obj]->parentLayer = ID<Layer>(0, 0);
+	engine.memory.maps[parentMap]->RemoveLayer(id);
 }

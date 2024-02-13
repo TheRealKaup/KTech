@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     ../../ktech/texture.cpp
     ../../ktech/time.cpp
     ../../ktech/timepoint.cpp
+    ../../ktech/memory.cpp
 )
 
 target_link_directories(game PUBLIC "/usr/lib")

@@ -229,11 +229,11 @@ void KTech::IO::Log(const std::string& text, RGB color)
 
 KTech::IO::IO(KTech::UPoint imageSize, Engine* engine) : engine(engine)
 {
-	// (AUDIO/OUTPUT) Redirect stderr to a file to supress ALSA's warnings spam in the terminal.
-	freopen("errfile.txt", "w", stderr);
-
 	// (OUTPUT) Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
 	std::cout << "\033[?25l\033[?1049h";
+	
+	// (AUDIO/OUTPUT) Redirect stderr to a file to supress ALSA's warnings spam in the terminal.
+	freopen("errfile.txt", "w", stderr);
 
 	// (INPUT) Set terminal attributes
 	tcgetattr(0, &oldTerminalAttributes);
@@ -263,12 +263,15 @@ KTech::IO::IO(KTech::UPoint imageSize, Engine* engine) : engine(engine)
 
 KTech::IO::~IO()
 {
+	Log("<IO::~IO> Returning terminal attributes, showing cursor, disabling alternative buffer, and detaching input loop thread.", RGBColors::green);
 	// Return to the old terminal attributes
 	tcsetattr(0, TCSANOW, &oldTerminalAttributes);
+	
 	// Show cursor, and disable alternative buffer (return to previous terminal)
 	std::cout << "\033[?25h\033[?1049l" << std::flush;
+	
 	// Officially destroy the thread..? Frankly I do not understand this.
 	// Without joining/detaching the thread, the program ends with a "core dumped" error,
 	// although the thread must be over if reached this point. 
-	t_inputLoop.detach();
+	t_inputLoop.join();
 }

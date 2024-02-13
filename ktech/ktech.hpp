@@ -29,15 +29,15 @@
 #pragma once
 
 // Standard libraries
-#include <iostream> // Printing, strings, et cetera
-#include <string> // to_string
-#include <vector> // Heavily based
-#include <functional> // Callback functions
-#include <thread> // For sleeping, time management.
-#include <chrono> // Time management
-#include <fstream> // Reading textures and audio files
-#include <cstring> // strcmp
-#include <stdint.h> // int32_t
+#include <iostream>
+#include <string>
+#include <vector>
+#include <functional>
+#include <thread>
+#include <chrono>
+#include <fstream>
+#include <cstring>
+#include <stdint.h>
 // Linux libraries
 #include <signal.h> // For getting signals (like on quit)
 #include <termios.h> // For changing terminal attributes
@@ -102,6 +102,14 @@ namespace KTech
 		constexpr inline CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0)) : c(character), f{foreground}, b(background) {}
 	};
 
+	// Collision Result
+	enum class CR : uint8_t
+	{
+		B,	// Block
+		P,	// Push
+		O	// Overlap
+	};
+
 	struct Texture
 	{
 		bool active = true;
@@ -149,9 +157,25 @@ namespace KTech
 		UPoint GetSize() const;
 	};
 
+	template<class T>
+	struct ID
+	{
+		inline static uint64_t GenerateUUID() { static uint64_t uuid = 0; return ++uuid; }
+		size_t i; // Index
+		inline ID() : i(0), uuid(GenerateUUID()) {}
+		constexpr inline ID(size_t i, size_t uuid) : i(i), uuid(uuid) {}
+		inline bool operator==(ID other) const { return other.uuid == uuid; }
+		inline uint64_t GetUUID() const { return uuid; }
+	private:
+		uint64_t uuid; // UUID
+	};
+
 	struct Object
 	{
-		Layer* parentLayer = nullptr;
+		Engine& engine;
+		ID<Object> id;
+
+		ID<Layer> parentLayer;
 
 		std::string name = "";
 		Point pos = Point(0, 0);
@@ -161,80 +185,92 @@ namespace KTech
 
 		bool Move(Point dir);
 		
-		void EnterLayer(Layer* layer);
+		void EnterLayer(ID<Layer>& layer);
 
 		virtual void OnTick() {} // Called by `Map::CallOnTicks()`.
-		virtual void OnPushed(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
-		virtual void OnPush(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
-		virtual void OnBlocked(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) blocked this object
-		virtual void OnBlock(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object blocked a different object (`otherObject`)
-		virtual void OnOverlap(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object entered an overlap with a different object (`otherObject`)
-		virtual void OnOverlapExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // This object exited an overlap with a different object (`otherObject`)
-		virtual void OnOverlapped(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
-		virtual void OnOverlappedExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
-
-		Object(Point position = Point(0, 0), Layer* layer = nullptr, const std::string& name = "");
-
+		virtual void OnPushed(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
+		virtual void OnPush(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
+		virtual void OnBlocked(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) blocked this object
+		virtual void OnBlock(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object blocked a different object (`otherObject`)
+		virtual void OnOverlap(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object entered an overlap with a different object (`otherObject`)
+		virtual void OnOverlapExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object exited an overlap with a different object (`otherObject`)
+		virtual void OnOverlapped(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
+		virtual void OnOverlappedExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
+		
+		Object(Engine& engine, Point position = Point(0, 0), const std::string& name = "");
 		~Object();
 	};
 
 	struct Layer
 	{
-		Map* parentMap = nullptr;
+		Engine& engine;
+		ID<Layer> id;
+		
+		ID<Map> parentMap;
 
-		std::vector<Object*> objects = {};
+		std::string name = "";
+		std::vector<ID<Object>> objects = {};
 		
 		bool visible = true;
 		uint8_t alpha = 255;
 		RGBA frgba = { 0, 0, 0, 0 };
 		RGBA brgba = { 0, 0, 0, 0 };
 
-		int AddObject(Object* object);
+		int AddObject(ID<Object>& object);
 		bool RemoveObject(const std::string& name);
-		bool RemoveObject(Object* object);
+		bool RemoveObject(ID<Object>& object);
 		
 		inline virtual void OnTick() {};
 
-		Layer(Map* map);
+		// WARNING: RETURNED REFERENCE IS NOT PERMANENT (VECTOR REALLOCATES)
+		ID<Object>& operator[](size_t i) { return objects[i]; }
 
+		Layer(Engine& engine, ID<Map>& map);
 		~Layer();
 	};
 
 	struct Camera
 	{
-		Map* parentMap = nullptr;
+		Engine& engine;
+		ID<Camera> id;
 
 		std::string name = "";
 		Point pos = Point(0, 0);
 		UPoint res = UPoint(10, 10);
 		std::vector<std::vector<Cell>> image = {};
 
-		void Render(const std::vector<Layer*>& layers);
+		void Render(const std::vector<ID<Layer>>& layers);
 		void Resize(UPoint res);
 
 		inline virtual void OnTick() {};
-		
-		Camera(Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+
+		Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+		~Camera();
 	};
 
 	struct Map
 	{
 	public:
-		Engine* parentEngine;
+		Engine& engine;
+		ID<Map> id;
 
-		std::vector<Camera*> cameras = {};
-		std::vector<Layer*> layers = {};
+		std::string name = "";
+		std::vector<ID<Camera>> cameras = {};
+		std::vector<ID<Layer>> layers = {};
 		size_t activeCameraI = -1;
 
-		int AddCamera(Camera* camera, bool asActiveCamera = false);
-		int AddLayer(Layer* layer);
+		int AddLayer(ID<Layer>& layer);
+		int AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
+
+		bool RemoveLayer(ID<Layer>& layer);
+		bool RemoveCamera(ID<Camera>& camera);
 
 		bool Render();
-		void CallOnTicks();
 
 		inline virtual void OnTick() {};
 		
-		Map(Engine* parentEngine) : parentEngine(parentEngine) {};
+		Map(Engine& engine);
+		~Map();
 	};
 
 	// Manager of all things that directly work with terminal I/O.
@@ -406,13 +442,7 @@ namespace KTech
 	class Collision
 	{
 	public:
-		// Collision Result
-		enum class CR : uint8_t
-		{
-			B,	// Block
-			P,	// Push
-			O	// Overlap
-		};
+		Engine* engine;
 
 		std::vector<std::vector<CR>> colliderTypes = {
 			{ CR::B, CR::P, CR::O }, // Heavy - 0
@@ -421,32 +451,34 @@ namespace KTech
 		};
 
 		struct CollisionData{
-			KTech::Object* activeObject;
-			KTech::Object* passiveObject;
+			ID<Object>& activeObject;
+			ID<Object>& passiveObject;
 			size_t activeCollider;
 			size_t passiveCollider;
 		};
 
 		CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2);
+	
+		bool MoveObject(ID<Object>& object, Point dir);
 
+		inline Collision(Engine* engine) : engine(engine) {};
+
+	private:
 		static bool AreSimpleCollidersOverlapping(UPoint simple1, Point pos1, UPoint simple2, Point pos2);
 		static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos);
 		static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2);
 	
-		void ExpandMovementTree(Object* thisObj, Point dir,
+		void ExpandMovementTree(ID<Object>& thisObj, Point dir,
 			std::vector<CollisionData>& pushData,
 			std::vector<CollisionData>& blockData,
 			std::vector<CollisionData>& overlapData,
 			std::vector<CollisionData>& exitOverlapData);
-	
-		bool MoveObject(Object* object, Point dir);
 	};
 
 	// Audio manager, creates its own audio stream using the PortAudio library, after making sure it is initialized.
 	class Audio
 	{
 	public:
-
 		class Source
 		{
 		public:
@@ -514,120 +546,57 @@ namespace KTech
 
 	class Memory
 	{
-	private:
-		struct ID
-		{
-			size_t i; // Index
-			uint64_t u; // UUID
-			constexpr inline ID(size_t i, size_t u) : i(i), u(u) {};
-		};
-
+	public:
 		template<typename T>
-		struct Storage
+		struct Container
 		{
-			// Contains a pointer to the structure instnace and the UUID of the instnace
-			struct Cell
-			{
-				T* p; // Pointer
-				size_t u; // UUID
-			};
-
-			// The structures are stored within cells, with their UUIDs
-			Cell* arr;
+			// The structures are stored as generic identifiables, which contain UUIDs.
+			T** arr;
 			// The size of the array
 			size_t size = 0;
 
-			// An RNG for multiplayer will be integrated later, but offline this works fine.
-			inline static uint64_t GenerateUUID()
-			{
-				static uint64_t uuid = 0;
-				return ++uuid;
-			}
-
-			inline ID Add(T* structure)
-			{
-				Cell* tmp = new Cell[size + 1]; // New array with one more cell
-				size_t i = 0; // Outside of for loop's scope for later use
-				for (; i < size; i++)
-					tmp[i] = arr[i]; // Move the cells to the new array
-				tmp[i] = {structure, GenerateUUID()}; // Create a new cell for the added structure
-				delete[] arr; // Delete the old array
-				arr = tmp; // Set the array as the new array
-				size++; // Increase the size by one
-				return ID(i, arr[i].u); // Return new ID of structure
- 			}
-
 			// Returns the valid index of the ID.
 			// If the UUID is missing, return the size of the array making the index invalid.
-			inline size_t IDToIndex(const ID& id)
-			{
-				for (size_t i = (id.i < size ? id.i : size - 1);; i--)
-				{
-					if (arr[i].u == id.u)
-						return i;
-					if (i == 0)
-						return size;
-				}
-			}
+			// Fixes the ID if outdated.
+			inline size_t IDToIndex(ID<T>& id);
+			// Returns the valid index of the ID.
+			// If the UUID is missing, return the size of the array making the index invalid.
+			inline size_t IDToIndex(const ID<T>& id);
 
-			// Remove a structure from storage.
+			// Returns true if the structure is found, false if missing.
+			// Fixes the ID if outdated.
+			bool Exists(ID<T>& id);
+			// Returns true if the structure is found, false if missing.
+			bool Exists(const ID<T>& id);
+
+			// Adds the pointer to the container, and manages the memory.
+			ID<T> Add(T* structure);
+
+			// Remove a structure from storage (doesn't delete it's memory).
 			// Returns true if the structure was found and removed.
 			// Returns false if the structre is missing.
-			inline bool Remove(const ID& id)
-			{
-				Cell* tmp = new Cell[size - 1]; // New array with one more cell
-				size_t toRemove = IDToIndex(id); // Convert the ID to a valid index
-				if (toRemove == size) // If the index is the size, then it's invalid
-					return false;
-				size_t i = 0;
-				for (; i < toRemove; i++, i++)
-					tmp[i] = arr[i]; // Move the cells to the new array
-				for (; i < size; i++)
-					tmp[i - 1] = arr[i]; // Move the cells to the new array
-				delete[] arr; // Delete the old array
-				arr = tmp; // Set the array as the new array
-				size--; // Increase the size by one
-				return true;
-			}
+			bool Remove(const ID<T>& id);
+
+			// Remove and delete a structure from storage.
+			// Returns true if the structure was found, removed and deleted.
+			// Returns false if the structre is missing.
+			bool Delete(const ID<T>& id);
 
 			// Takes an ID reference, returns the pointer to the structure.
 			// If the ID is outdated (made so by structures being removed) then update it.
 			// If the ID's UUID doesn't exist in the storage at all, this will reset the ID and will return `nullptr`.
-			T* operator[](ID& id) const
-			{
-				for (size_t i = (id.i < size ? id.i : size -1);; i--)
-				{
-					if (arr[i].u == id.u)
-					{
-						id.i = i;
-						return arr[i].p;
-					}
-					if (i == 0)
-						break;
-				}
-				id = ID(0, 0);
-				return nullptr;
-			}
-
+			T* operator[](ID<T>& id);
 			// Takes an ID reference, returns the pointer to the structure.
 			// Constant version of the previous operator, which will not update the given ID if it's outdated/missing.
-			T* operator[](const ID& id) const
-			{
-				for (size_t i = (id.i < size ? id.i : size -1);; i--)
-				{
-					if (arr[i].u == id.u)
-						return arr[i].p;
-					if (i == 0)
-						break;
-				}
-				return nullptr;
-			}
+			T* operator[](const ID<T>& id);
 		};
 
-		Storage<Object> objects;
-		Storage<Layer> layers;
-		Storage<Camera> cameras;
-		Storage<Map> maps;
+		Container<Object> objects;
+		Container<Layer> layers;
+		Container<Camera> cameras;
+		Container<Map> maps;
+
+		void CallOnTicks();
 	};
 
 	// Core class, the user should create one of these, and shouldn't have to construct themselves 
@@ -637,12 +606,14 @@ namespace KTech
 	public:
 		bool running = true;
 
-		IO io;
-		Time time;
+		Collision collision = Collision(this);
 		Audio audio;
-		Collision collision;
+		Time time;
+		IO io;
+		Memory memory;
 
 		inline Engine(UPoint imageSize, int16_t tps = 24) : io(IO(imageSize, this)), time(Time(tps, running)) {}
+		inline ~Engine() { IO::Log("<Engine::~Engine()>", RGB(255, 0, 0)); }
 	};
 
 	namespace RGBColors

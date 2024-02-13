@@ -20,22 +20,20 @@
 
 using namespace KTech;
 
-Engine engine(UPoint(50, 30), 24);
-
 struct Character : Object
 {
 	size_t jumpSFX = engine.audio.CreateSource("assets/jump.wav");
 	size_t groundHitSFX = engine.audio.CreateSource("assets/groundHit.wav");
 
-	KTech::Layer* voidLayer;
+	KTech::ID<Layer> voidLayer;
 
 	static constexpr int jumpStreng = 5;
 
-	KTech::Camera cam;
+	Camera cam;
 	bool onGround = false;
 	int yVelocity = 0;
 
-	KTech::Object* box = nullptr;
+	ID<Object> box;
 
 	void Jump()
 	{
@@ -86,34 +84,38 @@ struct Character : Object
 		IO::Log("<Character::OnTick> End of function.", RGBColors::pink);
 	}
 	
-	virtual void OnOverlap(Point dir, size_t collider, Object* otherObject, size_t otherCollider)
+	virtual void OnOverlap(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider)
 	{
-		if (otherObject->colliders[otherCollider].type == 2)
+		if (engine.memory.objects[otherObject]->colliders[otherCollider].type == 2)
 			box = otherObject;
 	}
 
-	virtual void OnOverlapExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider)
+	virtual void OnOverlapExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider)
 	{
 		if (otherObject == box)
-			box = nullptr;
+			box = ID<Object>(0, 0);
 	}
-	virtual void OnOverlappedExit(Point dir, size_t collider, Object* otherObject, size_t otherCollider)
+	virtual void OnOverlappedExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider)
 	{
 		if (otherObject == box)
-			box = nullptr;
+			box = ID<Object>(0, 0);
 	}
 
 	void PushBoxToDifferentLayer()
 	{
-		if (box != nullptr) // nullptr for seemingly no reason
+		engine.io.Log("<Character::PushBoxToDifferentLayer()> Start of function...", RGBColors::red);
+		if (engine.memory.objects.Exists(box))
 		{
-			box->EnterLayer(voidLayer);
-			box = nullptr;
+			engine.io.Log("<Character::PushBoxToDifferentLayer()> Moving object to voidLayer", RGBColors::red);
+			engine.memory.objects[box]->EnterLayer(voidLayer);
+			box = ID<Object>(0, 0);
 		}
 	}
 
-	Character(KTech::Layer* layer, KTech::Layer* voidLayer) : Object(Point(5, 2), layer, "character"), voidLayer(voidLayer)
+	Character(Engine& engine, ID<Layer>& layer, ID<Layer>& voidLayer)
+		: Object(engine, Point(5, 2), "character"), voidLayer(voidLayer), cam(engine, KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 ))
 	{
+		KTech::IO::Log("<Character::Character()> Start of function...", RGBColors::red);
 		textures.resize(1);
 		textures[0].Write(
 			{
@@ -126,23 +128,29 @@ struct Character : Object
 		colliders[0].ByTextureCharacter(textures[0], 100, 1);
 		colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
 
-		layer->parentMap->parentEngine->io.RegisterCallback("w", std::bind(&Character::Jump, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback("W", std::bind(&Character::Jump, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback(" ", std::bind(&Character::Jump, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this), true);
+		KTech::IO::Log("<Character::Character()> Registering callbacks", RGBColors::red);
+		engine.io.RegisterCallback("w", std::bind(&Character::Jump, this), true);
+		engine.io.RegisterCallback("W", std::bind(&Character::Jump, this), true);
+		engine.io.RegisterCallback(" ", std::bind(&Character::Jump, this), true);
+		engine.io.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this), true);
 
-		layer->parentMap->parentEngine->io.RegisterCallback("d", std::bind(&Character::Right, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback("D", std::bind(&Character::Right, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::right, std::bind(&Character::Right, this), true);
+		engine.io.RegisterCallback("d", std::bind(&Character::Right, this), true);
+		engine.io.RegisterCallback("D", std::bind(&Character::Right, this), true);
+		engine.io.RegisterCallback(KTech::Keys::right, std::bind(&Character::Right, this), true);
 
-		layer->parentMap->parentEngine->io.RegisterCallback("a", std::bind(&Character::Left, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback("A", std::bind(&Character::Left, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::left, std::bind(&Character::Left, this), true);
+		engine.io.RegisterCallback("a", std::bind(&Character::Left, this), true);
+		engine.io.RegisterCallback("A", std::bind(&Character::Left, this), true);
+		engine.io.RegisterCallback(KTech::Keys::left, std::bind(&Character::Left, this), true);
 
-		layer->parentMap->parentEngine->io.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this), true);
-		layer->parentMap->parentEngine->io.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this), true);
+		engine.io.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this), true);
+		engine.io.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this), true);
 
-		cam = KTech::Camera(KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 ));
+		KTech::IO::Log("<Character::Character()> Entering layer", RGBColors::red);
+		EnterLayer(layer);
+
+		cam.name = "character cam";
+
+		KTech::IO::Log("<Character::Character()> End of function.", RGBColors::red);
 	}
 };
 
@@ -159,7 +167,7 @@ struct GravityBox : Object
 			Move(Point(0, 1));
 	}
 
-	GravityBox(KTech::Layer* layer, KTech::Point pos, unsigned fallingSpeed = 1U) : Object(pos, layer), fallingSpeed(fallingSpeed)
+	GravityBox(Engine& engine, KTech::ID<Layer> layer, KTech::Point pos, unsigned fallingSpeed = 1U) : Object(engine, pos), fallingSpeed(fallingSpeed)
 	{
 		textures.resize(1);
 		textures[0].Write(
@@ -172,6 +180,8 @@ struct GravityBox : Object
 
 		colliders.resize(1);
 		colliders[0].Simple(KTech::UPoint(3, 3), 2, KTech::Point(0, 0));
+	
+		EnterLayer(layer);
 	}
 };
 
@@ -184,8 +194,9 @@ struct AutoUpdatingText : Object
 		textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
 	}
 
-	AutoUpdatingText(float* data, KTech::Point pos, KTech::Layer* layer) : Object(pos, layer), data(data)
+	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer) : Object(engine, pos), data(data)
 	{
+		EnterLayer(layer);
 		textures.resize(1);
 	}
 };
@@ -196,13 +207,16 @@ void TurnOnCharacterCamera() {
 	charCamOn = !charCamOn;
 }
 
+Engine engine(UPoint(50, 30), 24);
+
 int main()
 {
 	using namespace KTech;
 
 	// It would be preferable to have the startup notice drawn within the engine's image, but this is temporary.
-	engine.io.PrintStartupNotice("simpleplatform1, a platform game example based on KTech.", "2023", "Ethan Kaufman (AKA Kaup)", "simpleplatform1");
+	// engine.io.PrintStartupNotice("simpleplatform1, a platform game example based on KTech.", "2023", "Ethan Kaufman (AKA Kaup)", "simpleplatform1");
 
+	KTech::IO::Log("<main()> Creating collider types", RGBColors::blue);
 	engine.collision.colliderTypes = { // For "simpleplatform1" example
 		{ CR::B, CR::P, CR::P, CR::O }, // Heavy - 0
 		{ CR::B, CR::P, CR::P, CR::O }, // Normal - 1
@@ -210,28 +224,40 @@ int main()
 		{ CR::O, CR::O, CR::O, CR::O } // Overlappable - 3
 	};
 
-	KTech::Map map(&engine);
+	KTech::IO::Log("<main()> Creating map", RGBColors::blue);
+	KTech::Map map(engine);
+	map.name = "map";
 
-	KTech::Layer layer(&map);
-	KTech::Layer voidLayer(&map);
+	KTech::IO::Log("<main()> Creating layer", RGBColors::blue);
+	KTech::Layer layer(engine, map.id);
+	layer.name = "layer";
+	KTech::IO::Log("<main()> Creating voidLayer", RGBColors::blue);
+	KTech::Layer voidLayer(engine, map.id);
+	voidLayer.name = "voidLayer";
 
-	KTech::Camera camera({ 0, 0 }, { 50, 30 });
-	map.AddCamera(&camera, true);
+	KTech::IO::Log("<main()> Creating camera", RGBColors::blue);
+	KTech::Camera camera(engine, Point(0, 0), UPoint(50, 30));
+	camera.name = "camera";
+	KTech::IO::Log("<main()> Adding camera to map", RGBColors::blue);
+	// `Camera` to `ID<Camera>` cast overload
+	map.AddCamera(camera.id, true);
 
-	KTech::Object worldProps({ 1, 1 }, &layer, "worldProps");
+	KTech::Object worldProps(engine, Point(1, 1), "worldProps");
+	worldProps.name = "worldProps";
 	worldProps.textures.resize(3);
-	KTech::IO::Log("<Main> Loading assets/sky.ktecht", RGBColors::blue);
+	KTech::IO::Log("<main()> Loading assets/sky.ktecht", RGBColors::blue);
 	worldProps.textures[0].File("assets/sky.ktecht", { 0, 0 });
-	KTech::IO::Log("<Main> Loading assets/house.ktecht", RGBColors::blue);
+	KTech::IO::Log("<main()> Loading assets/house.ktecht", RGBColors::blue);
 	worldProps.textures[1].File("assets/house.ktecht", Point(18, 14));
-	KTech::IO::Log("<Main> Loading assets/land.ktecht", RGBColors::blue);
+	KTech::IO::Log("<main()> Loading assets/land.ktecht", RGBColors::blue);
 	worldProps.textures[2].File("assets/land.ktecht", { 0, 3 });
-	
 	worldProps.colliders.resize(1);
 	worldProps.colliders[0].ByTextureBackground(worldProps.textures[2], 100, 0);
-	uint8_t base = 29;
+	layer.AddObject(worldProps.id);
 
-	KTech::Object frame(KTech::Point(0, 0), &layer, "frame");
+	KTech::IO::Log("<main()> Creating frame", RGBColors::blue);
+	KTech::Object frame(engine, KTech::Point(0, 0), "frame");
+	frame.name = "frame";
 	frame.textures.resize(5);
 	frame.textures[0].Simple(KTech::UPoint(1, 30), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 0));
 	frame.textures[1].Simple(KTech::UPoint(1, 30), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(49, 0));
@@ -241,8 +267,8 @@ int main()
 		{
 			"'WASD'/'Arrow keys' to move.",
 			"'Space' to jump.",
-			"'f' to throw a gravity box off the layer.",
-			"'m' to turn on following camera."
+			"'F' to throw a gravity box off the layer.",
+			"'M' to turn on following camera."
 		}, RGBAColors::black, RGBAColors::transparent, Point(2, 2));
 	frame.textures[4].Resize(frame.textures[4].GetSize(), CellA());
 	frame.textures[4].SetBackground(RGBA(255, 255, 255, 100));
@@ -251,15 +277,25 @@ int main()
 	frame.colliders[1].Simple(KTech::UPoint(1, 30), 0, KTech::Point(0, 0));
 	frame.colliders[2].Simple(KTech::UPoint(50, 1), 0, KTech::Point(0, 29));
 	frame.colliders[3].Simple(KTech::UPoint(1, 30), 0, KTech::Point(49, 0));
+	layer.AddObject(frame.id);
 
-	Character character(&layer, &voidLayer);
-	map.AddCamera(&character.cam);
+	KTech::IO::Log("<main()> Creating character", RGBColors::blue);
+	Character character(engine, layer.id, voidLayer.id);
+	character.name = "character";
+	map.AddCamera(character.cam.id);
 
-	GravityBox gbA(&layer, {10, 5}, 1);
-	GravityBox gbB(&layer, {15, 5}, 2);
-	GravityBox gbC(&layer, {30, 5}, 3);
+	KTech::IO::Log("<main()> Creating GravityBoxes", RGBColors::blue);
+	GravityBox gbA(engine, layer.id, Point(10, 5), 1);
+	gbA.name = "gbA";
+	GravityBox gbB(engine, layer.id, Point(15, 5), 2);
+	gbB.name = "gbB";
+	GravityBox gbC(engine, layer.id, Point(30, 5), 3);
+	gbC.name = "gbC";
 
-	KTech::Object house({ 20, 32 }, &layer, "");
+	KTech::IO::Log("<main()> Creating house", RGBColors::blue);
+	KTech::Object house(engine, Point(20, 32));
+	house.name = "house";
+	layer.AddObject(house.id);
 
 	house.textures.resize(1);
 	house.textures[0].File("assets/house.ktecht", { 0, 0 });
@@ -267,34 +303,43 @@ int main()
 	engine.io.RegisterCallback("m", TurnOnCharacterCamera);
 	engine.io.RegisterCallback("M", TurnOnCharacterCamera);
 
-	KTech::Layer darkLayer(&map);
+	KTech::IO::Log("<main()> Creating darkLayer", RGBColors::blue);
+	KTech::Layer darkLayer(engine, map.id);
+	darkLayer.name = "darkLayer";
 	darkLayer.alpha = 127;
 	
-	AutoUpdatingText audioPerformance(&engine.time.tpsPotential, Point(2, 27), &layer);
+	KTech::IO::Log("<main()> Creating AutoUpdatingText", RGBColors::blue);
+	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.id);
+	tpsText.name = "tpsText";
 
-	engine.time.tpsLimit = 24;
-
+	KTech::IO::Log("<main()> Entering game loop", RGBColors::blue);
 	while (engine.running)
 	{
+		KTech::IO::Log("<main()> StartOfThisTick()", RGBColors::blue);
 		engine.time.StartThisTick();
+		KTech::IO::Log("<main()> io.Call()", RGBColors::blue);
 		engine.io.Call();
-		map.CallOnTicks();
+		KTech::IO::Log("<main()> CallOnTicks()", RGBColors::blue);
+		engine.memory.CallOnTicks();
 
+		KTech::IO::Log("<main()> Render and print", RGBColors::blue);
 		if (map.activeCameraI != -1 && map.activeCameraI < map.cameras.size())
 		{
-			// continue;
 			if (charCamOn) {
-				map.cameras[0]->Render({ &layer, &darkLayer });
-				engine.io.Draw(map.cameras[0]->image, Point(0, 0), 0, 0, 0, 0);
-				map.cameras[1]->Render(map.layers);
-				engine.io.Draw(map.cameras[1]->image, Point(18, 9), 0, 0, 0, 0);
+				camera.Render({ layer.id, voidLayer.id, darkLayer.id });
+				// darkLayer is the dark post processing effect
+				engine.io.Draw(camera.image, Point(0, 0), 0, 0, 0, 0);
+				character.cam.Render(map.layers);
+				engine.io.Draw(character.cam.image, Point(18, 9), 0, 0, 0, 0);
 			}
 			else {
-				map.cameras[0]->Render({ &layer });
-				engine.io.Draw(map.cameras[0]->image, Point(0, 0), 0, 0, 0, 0);
+				camera.Render(map.layers);
+				engine.io.Draw(camera.image, Point(0, 0), 0, 0, 0, 0);
 			}
 			engine.io.Print();
 		}
+		// KTech::IO::Log("<main()> WaitUntilNextTick()", RGBColors::blue);
 		engine.time.WaitUntilNextTick();
 	}
+	KTech::IO::Log("<main()> End of function.", RGBColors::blue);
 }
