@@ -569,18 +569,15 @@ namespace KTech
 			// Returns true if the structure is found, false if missing.
 			bool Exists(const ID<T>& id);
 
-			// Adds the pointer to the container, and manages the memory.
+			// Adds the pointer to the container.
+			// Automatically called by objects, layers, cameras and maps for themselves.
+			// You shouldn't call this manualy on a structure.
 			ID<T> Add(T* structure);
 
 			// Remove a structure from storage (doesn't delete it's memory).
 			// Returns true if the structure was found and removed.
 			// Returns false if the structre is missing.
 			bool Remove(const ID<T>& id);
-
-			// Remove and delete a structure from storage.
-			// Returns true if the structure was found, removed and deleted.
-			// Returns false if the structre is missing.
-			bool Delete(const ID<T>& id);
 
 			// Takes an ID reference, returns the pointer to the structure.
 			// If the ID is outdated (made so by structures being removed) then update it.

@@ -270,8 +270,7 @@ KTech::IO::~IO()
 	// Show cursor, and disable alternative buffer (return to previous terminal)
 	std::cout << "\033[?25h\033[?1049l" << std::flush;
 	
-	// Officially destroy the thread..? Frankly I do not understand this.
-	// Without joining/detaching the thread, the program ends with a "core dumped" error,
-	// although the thread must be over if reached this point. 
-	t_inputLoop.join();
+	// Detach so in the case that the game quit regardless of player input,
+	// the input loop thread would end.
+	t_inputLoop.detach();
 }

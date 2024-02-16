@@ -6,18 +6,52 @@ template<typename T>
 ID<T> Memory::Container<T>::Add(T* structure)
 {
 	KTech::IO::Log("<Container::Add()> Start of function...", RGBColors::lime);
-	T** tmp = new T*[size + 1]; // New array with one more cell
-	size_t i = 0; // Outside of for loop's scope for later use
-	for (; i < size; i++)
-		tmp[i] = arr[i]; // Move the cells to the new array
-	structure->id.i = i; // Update the index of the ID within the structure
-	tmp[i] = structure; // Create a new cell for the added structure
+	T** tmp = new T*[size + 1];
+	KTech::IO::Log("<Container::Add()> Created new extended array " + std::to_string((size_t)tmp), RGBColors::lime);
+	KTech::IO::Log("<Container::Add()> Move to new array", RGBColors::lime);
+	for (size_t i = 0; i < size; i++)
+		tmp[i] = arr[i];
+	KTech::IO::Log("<Container::Add()> Add given structure", RGBColors::lime);
+	structure->id.i = size;
+	tmp[size] = structure;
 	if (size > 0)
-		delete[] arr; // Delete the old array
-	arr = tmp; // Set the array as the new array
-	size++; // Increase the size by one
+	{
+		KTech::IO::Log("<Container::Add()> Delete old array " + std::to_string((size_t)arr), RGBColors::lime);
+		delete[] arr;
+	}
+	KTech::IO::Log("<Container::Add()> Update info", RGBColors::lime);
+	arr = tmp;
+	size++;
 	KTech::IO::Log("<Container::Add()> End of function, returning ID.", RGBColors::lime);
-	return arr[i]->id; // Return new ID of structure
+	return arr[size - 1]->id;
+}
+
+template<typename T>
+inline bool Memory::Container<T>::Remove(const ID<T>& id)
+{
+	KTech::IO::Log("<Container::Remove()> Start of function...", RGBColors::lime);
+	KTech::IO::Log("<Container::Remove()> Convert given ID to index", RGBColors::lime);
+	size_t toRemove = IDToIndex(id);
+	if (toRemove == size)
+	{
+		KTech::IO::Log("<Container::Remove()> End of function.", RGBColors::lime);
+		return false;
+	}
+	T** tmp = new T*[size - 1];
+	KTech::IO::Log("<Container::Remove()> Created new smaller array " + std::to_string((size_t)tmp), RGBColors::lime);
+	KTech::IO::Log("<Container::Remove()> Moving to new array", RGBColors::lime);
+	size_t i = 0;
+	for (; i < toRemove; i++)
+		tmp[i] = arr[i];
+	for (i++; i < size; i++)
+		tmp[i - 1] = arr[i];
+	KTech::IO::Log("<Container::Remove()> Delete old array " + std::to_string((size_t)arr), RGBColors::lime);
+	delete[] arr;
+	KTech::IO::Log("<Container::Remove()> Update info", RGBColors::lime);
+	size--;
+	arr = tmp;
+	KTech::IO::Log("<Container::Remove()> End of function.", RGBColors::lime);
+	return true;
 }
 
 template<typename T>
@@ -62,48 +96,6 @@ bool Memory::Container<T>::Exists(ID<T>& id)
 {
 	if (IDToIndex(id) == size)
 		return false;
-	return true;
-}
-
-template<typename T>
-inline bool Memory::Container<T>::Remove(const ID<T>& id)
-{
-	size_t toRemove = IDToIndex(id); // Convert the ID to a valid index
-	if (toRemove == size) // If the index is the size, then it's invalid (structure is missing)
-		return false;
-	T** tmp = new T*[size - 1]; // New array with one less cell
-	size_t i = 0;
-	for (; i < toRemove; i++)
-		tmp[i] = arr[i]; // Move the cells to the new array
-	// Skip one cell in the new array
-	for (; i < size; i++)
-		tmp[i - 1] = arr[i]; // Move the cells to the new array
-	delete[] arr; // Delete the old array
-	arr = tmp; // Set the array as the new array
-	size--; // Decrease the size by one
-	return true;
-}
-
-template<typename T>
-inline bool Memory::Container<T>::Delete(const ID<T>& id)
-{
-	size_t toRemove = IDToIndex(id); // Convert the ID to a valid index
-	if (toRemove == size) // If the index is the size, then it's invalid (structure is missing)
-		return false;
-	T** tmp = new T*[size - 1]; // New array with one less cell
-	size_t i = 0;
-	for (; i < toRemove; i++)
-		tmp[i] = arr[i]; // Move the cells to the new array
-	// Skip one cell in the new array
-	for (; i < size; i++)
-		tmp[i - 1] = arr[i]; // Move the cells to the new array
-	arr[toRemove]->id = ID<T>(0, 0); // Reset the ID
-	delete arr[toRemove]; // Delete the structure from memory
-	// ^ The ID was reset to prevent `Remove()` from overwritting this reallocation, since it was called by
-	// the destructure called by `delete`.
-	delete[] arr; // Delete the old array
-	arr = tmp; // Set the array as the new array
-	size--; // Decrease the size by one
 	return true;
 }
 

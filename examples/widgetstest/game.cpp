@@ -34,6 +34,8 @@ void Quit()
 struct UI
 {
 	Widget* widgets[4];
+	
+	ID<Layer> layer;
 
 	enum WidgetIndex
 	{
@@ -53,31 +55,31 @@ struct UI
 		if (countdown > 0)
 		{
 			countdown--;
-			widgets[0]->obj.textures[0].Write({"Exiting in " + std::to_string(countdown)}, widgets[0]->obj.textures[0].t[0][0].f, RGBAColors::transparent, Point(1, 1));
+			widgets[0]->textures[0].Write({"Exiting in " + std::to_string(countdown)}, widgets[0]->textures[0].t[0][0].f, RGBAColors::transparent, Point(1, 1));
 			countdownInvocation = engine.time.Invoke(std::bind(&UI::Countdown, this), 1, Time::Measurement::seconds);
 		}
 		else
 			Quit();
 	}
 
-	void CancelCountdown(Layer* layer)
+	void CancelCountdown()
 	{
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
-		widgets[0] = new Button(layer, std::bind(&UI::StartExitCountdown, this, layer), Keys::return_, Point(0, 0), "Exit", true);
+		widgets[0] = new Button(engine, layer, std::bind(&UI::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
 		engine.time.CancelInvocation(countdownInvocation);
 	}
 
-	void StartExitCountdown(Layer* layer)
+	void StartExitCountdown()
 	{
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
-		widgets[0] = new Button(layer, std::bind(&UI::CancelCountdown, this, layer), Keys::return_, Point(0, 0), "Exiting in 3", true);
+		widgets[0] = new Button(engine, layer, std::bind(&UI::CancelCountdown, this), Keys::return_, Point(0, 0), "Exiting in 3", true);
 		countdown = 3;
 		// Invoke countdown
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
@@ -90,30 +92,34 @@ struct UI
 	
 	void MoveUp()
 	{
+		engine.io.Log("(GAME) <UI::MoveUp()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
 		if (currentWidget == w_button)
 			currentWidget = w_switch;
 		else
 			currentWidget--;
 		widgets[currentWidget]->Select();
+		engine.io.Log("(GAME) <UI::MoveUp()> EOF", RGBColors::orange);
 	}
 
 	void MoveDown()
 	{
+		engine.io.Log("(GAME) <UI::MoveDown()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
 		if (currentWidget == w_switch)
 			currentWidget = w_button;
 		else
 			currentWidget++;
 		widgets[currentWidget]->Select();
+		engine.io.Log("(GAME) <UI::MoveDown()> EOF", RGBColors::orange);
 	}
 
-	UI(Layer* layer)
+	UI(ID<Layer> layer) : layer(layer)
 	{
-		widgets[0] = new Button(layer, std::bind(&UI::StartExitCountdown, this, layer), Keys::return_, Point(0, 0), "Exit", true);
-		widgets[1] = new IntField(layer, nullptr, 0, 1000, "123", Point(0, 4), "Int = ", true);
-		widgets[2] = new StringField(layer, nullptr, {keyrange_all}, Point(0, 8), "String = ", 4, "Test", true);
-		widgets[3] = new Switch(layer, nullptr, Keys::return_, Point(0, 12), "Switch", false, true);
+		widgets[0] = new Button(engine, layer, std::bind(&UI::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
+		widgets[1] = new IntField(engine, layer, nullptr, 0, 999, "123", Point(0, 4), "Int = ", true);
+		widgets[2] = new StringField(engine, layer, nullptr, {keyrange_all}, Point(0, 8), "String = ", 4, "Test", true);
+		widgets[3] = new Switch(engine, layer, nullptr, Keys::return_, Point(0, 12), "Switch", false, true);
 
 		widgets[currentWidget]->Select();
 
@@ -124,26 +130,29 @@ struct UI
 
 int main()
 {
-	Map map(&engine);
-	Layer layer(&map);
+	Map map(engine);
+	Layer layer(engine, map.id);
 
-	Camera camera({ 0, 0 }, { 20, 20 });
-	map.AddCamera(&camera, true);
+	Camera camera(engine, Point(0, 0), UPoint(20, 20));
+	map.AddCamera(camera.id, true);
 
-	UI ui(&layer);
+	UI ui(layer.id);
 
 	while (engine.running)
 	{
+		// Start
 		engine.io.Log("(GAME) <main()::GameLoop> StartThisTick", RGBColors::green);
 		engine.time.StartThisTick();
 
+		// Calls
 		engine.io.Log("(GAME) <main()::GameLoop> Call inputs", RGBColors::green);
 		engine.io.Call();
 		engine.io.Log("(GAME) <main()::GameLoop> Call invocations", RGBColors::green);
 		engine.time.CallInvocations();
 		engine.io.Log("(GAME) <main()::GameLoop> Call OnTicks", RGBColors::green);
-		map.CallOnTicks();
+		engine.memory.CallOnTicks();
 
+		// Render, draw and print
 		engine.io.Log("(GAME) <main()::GameLoop> Render", RGBColors::green);
 		map.Render();
 		engine.io.Log("(GAME) <main()::GameLoop> Draw", RGBColors::green);
@@ -151,6 +160,7 @@ int main()
 		engine.io.Log("(GAME) <main()::GameLoop> Print", RGBColors::green);
 		engine.io.Print();
 
+		// End
 		engine.io.Log("(GAME) <main()::GameLoop> WaitUntilNextTicks", RGBColors::green);
 		engine.time.WaitUntilNextTick();
 	}

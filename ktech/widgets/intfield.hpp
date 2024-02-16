@@ -38,7 +38,7 @@ private:
 	
 	void InternalInsert()
 	{
-		if (obj.parentLayer->parentMap->parentEngine->io.Is(KTech::Keys::backspace) || obj.parentLayer->parentMap->parentEngine->io.Is(KTech::Keys::delete_))
+		if (engine.io.Is(KTech::Keys::backspace) || engine.io.Is(KTech::Keys::delete_))
 		{
 			if (currentDigit == 0)
 				return;
@@ -46,17 +46,17 @@ private:
 			visibleNumber /= 10;
 
 			currentDigit--;
-			obj.textures[0].t[0][currentDigit].c = ' ';
+			textures[0].t[0][currentDigit].c = ' ';
 		}
-		else if (obj.parentLayer->parentMap->parentEngine->io.Between('0', '9'))
+		else if (engine.io.Between('0', '9'))
 		{
 			if (currentDigit == maxDigits)
 				return;
 
-			obj.textures[0].t[0][currentDigit].c = obj.parentLayer->parentMap->parentEngine->io.input.at(0);
+			textures[0].t[0][currentDigit].c = engine.io.input.at(0);
 			currentDigit++;
 
-			visibleNumber = visibleNumber * 10 + obj.parentLayer->parentMap->parentEngine->io.GetInt();
+			visibleNumber = visibleNumber * 10 + engine.io.GetInt();
 		}
 
 		number = visibleNumber;
@@ -72,8 +72,8 @@ private:
 public:
 	virtual void RenderSelected()
 	{
-		for (size_t i = 0; i < obj.textures.size(); i++)
-			obj.textures[i].SetForeground(selectedRGBA);
+		for (size_t i = 0; i < textures.size(); i++)
+			textures[i].SetForeground(selectedRGBA);
 	}
 
 	virtual void RenderUnselected()
@@ -87,7 +87,7 @@ public:
 
 			std::string newTexture = std::to_string(min);
 			newTexture.resize(maxDigits, ' ');
-			obj.textures[0].Write({ newTexture }, unselectedRGBA, KTech::RGBA(), obj.textures[0].pos_r);
+			textures[0].Write({ newTexture }, unselectedRGBA, KTech::RGBA(), textures[0].pos_r);
 		}
 		else if (visibleNumber > max)
 		{
@@ -97,19 +97,19 @@ public:
 
 			std::string newTexture = std::to_string(max);
 			newTexture.resize(maxDigits, ' ');
-			obj.textures[0].Write({ newTexture }, unselectedRGBA, KTech::RGBA(), obj.textures[0].pos_r);
+			textures[0].Write({ newTexture }, unselectedRGBA, KTech::RGBA(), textures[0].pos_r);
 		}
 		else if (visibleNumber >= min && visibleNumber <= max)
 			number = visibleNumber;
 
 		// Change color
-		for (size_t i = 0; i < obj.textures.size(); i++)
-			obj.textures[i].SetForeground(unselectedRGBA);
+		for (size_t i = 0; i < textures.size(); i++)
+			textures[i].SetForeground(unselectedRGBA);
 	}
 
 	void ChangeValue(std::string newNumber)
 	{
-		obj.textures[0].Simple(KTech::UPoint( maxDigits, 1 ), KTech::CellA(' ', unselectedRGBA, { 0, 0, 0, 0 }), KTech::Point(1 + (int)obj.textures[1].t[0].size(), 1));
+		textures[0].Simple(KTech::UPoint( maxDigits, 1 ), KTech::CellA(' ', unselectedRGBA, { 0, 0, 0, 0 }), KTech::Point(1 + (int)textures[1].t[0].size(), 1));
 		number = 0;
 		currentDigit = 0;
 		for (size_t x = 0; x < maxDigits && x < newNumber.length(); x++)
@@ -117,12 +117,13 @@ public:
 			currentDigit++;
 			number *= 10;
 			number += newNumber[x] - '0';
-			obj.textures[0].t[0][x] = KTech::CellA(newNumber[x], unselectedRGBA);
+			textures[0].t[0][x] = KTech::CellA(newNumber[x], unselectedRGBA);
 		}
 		visibleNumber = number;
 	}
 
-	IntField(KTech::Layer* layer,
+	IntField(KTech::Engine& engine,
+		KTech::ID<KTech::Layer> layer,
 		std::function<void()> OnInsert,
 		uint32_t min = 0,
 		uint32_t max = 255,
@@ -132,7 +133,7 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselectedRGBA = { 150, 150, 150, 255 },
 		KTech::RGBA selectedRGBA = { 255, 255, 255, 255 })
-		: Widget(layer, pos), OnInsert(OnInsert), min(min), max(max), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
+		: Widget(engine, layer, pos), OnInsert(OnInsert), min(min), max(max), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
 	{
 		for (size_t i = 1; true; i *= 10)
 		{
@@ -152,56 +153,56 @@ public:
 		// Texture
 		if (withFrame)
 		{
-			obj.textures.resize(10);
+			textures.resize(10);
 			// input
-			obj.textures[0].Rectangle(KTech::UPoint(maxDigits, 1), KTech::CellA(' ', unselectedRGBA),  KTech::Point(1 + text.length(), 1));
+			textures[0].Rectangle(KTech::UPoint(maxDigits, 1), KTech::CellA(' ', unselectedRGBA),  KTech::Point(1 + text.length(), 1));
 			for (size_t x = 0; x < maxDigits && x < defaultNum.length(); x++)
 			{
 				currentDigit++;
 				number *= 10;
 				number += defaultNum[x] - '0';
-				obj.textures[0].t[0][x] = KTech::CellA(defaultNum[x], unselectedRGBA);
+				textures[0].t[0][x] = KTech::CellA(defaultNum[x], unselectedRGBA);
 			}
 			visibleNumber = number;
 			// text
-			obj.textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+			textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 			// up-left corner
-			obj.textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 0));
+			textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 0));
 			// up-right corner
-			obj.textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxDigits, 0));
+			textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxDigits, 0));
 			// bottom-left corner
-			obj.textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 2));
+			textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 2));
 			// bottom-right corner
-			obj.textures[5].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxDigits, 2));
+			textures[5].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxDigits, 2));
 			// up frame
-			obj.textures[6].Simple(KTech::UPoint(text.length() + maxDigits, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 0));
+			textures[6].Simple(KTech::UPoint(text.length() + maxDigits, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 0));
 			// left frame
-			obj.textures[7].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(0, 1));
+			textures[7].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(0, 1));
 			// bottom frame
-			obj.textures[8].Simple(KTech::UPoint(text.length() + maxDigits, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 2));
+			textures[8].Simple(KTech::UPoint(text.length() + maxDigits, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 2));
 			// right frame
-			obj.textures[9].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(1 + text.length() + maxDigits, 1));
+			textures[9].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(1 + text.length() + maxDigits, 1));
 		}
 		else
 		{
-			obj.textures.resize(2);
+			textures.resize(2);
 			// input
-			obj.textures[0].Rectangle(KTech::UPoint(maxDigits, 1), KTech::CellA(' ', unselectedRGBA),  KTech::Point(1 + text.length(), 1));
+			textures[0].Rectangle(KTech::UPoint(maxDigits, 1), KTech::CellA(' ', unselectedRGBA),  KTech::Point(1 + text.length(), 1));
 			for (size_t x = 0; x < maxDigits && x < defaultNum.length(); x++)
 			{
 				currentDigit++;
 				number *= 10;
 				number += defaultNum[x] - '0';
-				obj.textures[0].t[0][x] = KTech::CellA(defaultNum[x], unselectedRGBA);
+				textures[0].t[0][x] = KTech::CellA(defaultNum[x], unselectedRGBA);
 			}
 			visibleNumber = number;
 			// text
-			obj.textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+			textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 		}
 
 		// Input handlers
-		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
-		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), false));
-		callbacksGroup->AddCallback(obj.parentLayer->parentMap->parentEngine->io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), false));
+		callbacksGroup->AddCallback(engine.io.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
+		callbacksGroup->AddCallback(engine.io.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), false));
+		callbacksGroup->AddCallback(engine.io.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), false));
 	}
 };

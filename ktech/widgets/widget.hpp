@@ -22,15 +22,14 @@
 
 #include "../ktech.hpp"
 
-struct Widget
+struct Widget : KTech::Object
 {
-	KTech::ID obj;
 	bool selected = false;
 	KTech::IO::CallbacksGroup* callbacksGroup;
 	inline virtual void RenderSelected () {}
 	inline virtual void RenderUnselected () {}
 	inline void Select() { selected = true; callbacksGroup->Enable(); RenderSelected(); }
 	inline void Deselect() { selected = false; callbacksGroup->Disable(); RenderUnselected(); }
-	inline Widget(KTech::Engine* engine, KTech::ID layer, KTech::Point pos) : obj(engine->memory.objects.Add(new KTech::Object(pos))), callbacksGroup(engine->io.CreateCallbacksGroup(false)) { }
+	inline Widget(KTech::Engine& engine, KTech::ID<KTech::Layer> layer, KTech::Point pos) : KTech::Object(engine, pos), callbacksGroup(engine.io.CreateCallbacksGroup(false)) { EnterLayer(layer); }
 	inline ~Widget() { callbacksGroup->DeleteCallbacks(); }
 };
