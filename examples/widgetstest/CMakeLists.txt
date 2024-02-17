@@ -1,24 +1,9 @@
-cmake_minimum_required(VERSION 3.26.4)
+set(EXECUTABLE_NAME widgetstest)
 
-project(game)
-
-add_executable(${PROJECT_NAME}
-    game.cpp
-    ../../ktech/audio.cpp
-    ../../ktech/camera.cpp
-    ../../ktech/collider.cpp
-    ../../ktech/collision.cpp
-    ../../ktech/input.cpp
-    ../../ktech/layer.cpp
-    ../../ktech/map.cpp
-    ../../ktech/object.cpp
-    ../../ktech/output.cpp
-    ../../ktech/texture.cpp
-    ../../ktech/time.cpp
-    ../../ktech/timepoint.cpp
-    ../../ktech/memory.cpp
+add_executable(${EXECUTABLE_NAME}
+	game.cpp
 )
 
-target_link_directories(game PUBLIC "/usr/lib")
+target_link_directories(${EXECUTABLE_NAME} PUBLIC "/usr/lib")
 
-target_link_libraries(game portaudio)
+target_link_libraries(${EXECUTABLE_NAME} portaudio ktech)
