@@ -55,7 +55,7 @@ As terminal software, the graphics are printed to the terminal, and user inputs 
 
 ## Documentation
 
-- [references.md](references.md) - direct information about each element of the library.
+- [reference.md](reference.md) - direct and concise information about each element of the library.
 - [tutorials.md](tutorials.md) - tutorials about getting KTech, using its different elements, creating a game with it and compiling.
 - [faq.md](faq.md) - answers for frequently asked questions.
 - [examples.md](examples.md) - analyses and explanations of the examples included in the "examples" directory in this repository.
