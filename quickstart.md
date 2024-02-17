@@ -8,27 +8,27 @@
 
 # Introduction to Quick Start Guide
 
-This is a short tutorial on using KTech. Note that it covers only a small portion of the library and minimally explains how to use it.
+This document is a short tutorial on using KTech. Note that it covers only a small portion of the library and minimally explains how to use it.
 
-If you are looking for a concise tutorial or for the library reference, refer to the [documentation section in the `readme.md` file](https://github.com/TheRealKaup/KTech/blob/master/readme.md#documentation) (both aren't available yet, and as for now this document is KTech's entire documentation).
+If you are looking for a concise tutorial, or the library reference, refer to the [documentation section in the `readme.md` file](https://github.com/TheRealKaup/KTech/blob/master/readme.md#documentation) (both aren't available yet, and as for now this tutorial is KTech's entire documentation).
 
 # Key Concepts
 
 ## The File System
 
-The entire library is declared and defined [within the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
+The entire library is in [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
 
-The core library is declared in the `ktech.hpp` header file in the `ktech` directory. This file is what you include in your game project (`include "ktech/ktech.hpp"`). This is the "core" library since it is the minimum required to include in your project to start creating a game.
+The core library is declared in the `ktech.hpp` header file of the `ktech` directory. This file is what you include in your game project. This is the "core" library since it is the minimum required to include in your project to start creating a game.
 
-Additionally, the contents of `ktech.hpp` are enclosed within a namespace called `KTech`.
+The contents of `ktech.hpp` are enclosed within a namespace called `KTech`.
 
-The source files (`.cpp`) in the `ktech` directory are the core library definitions.
+The source files (`.cpp`) in the `ktech` directory are the core library's definitions.
 
 The non-core parts of the library are currently only the widgets (UI objects) that are in the `ktech/widgets` directory. If you want to use any of the widgets there, you may selectively include the header files in there.
 
 ## Basic Structures
 
-KTech comes with a couple of fundamental structures. They are:
+KTech comes with a couple of fundamental structures that are available via the `KTech` namespace. They are:
 - `RGB` - Represents a single 24 bit depth color.
 - `RGBA` - Represents a single 24 bit depth color with an extra alpha channel.
 - `Point` - 2D vector comprising 2 32 bit signed integers (`x` and `y`).
@@ -38,22 +38,27 @@ KTech comes with a couple of fundamental structures. They are:
 
 ## World Hierarchy
 
+The library contains more complex structures that build up a world. These structures are `Map`, `Layer`, `Camera`, `Object`, `Texture` and `Collider`, which are available via the `KTech` namespace.
 
 ```
           Map
          /   \
       Layer  Camera
        /      
-    Objects  
-     /    \
-Textures  Colliders
+    Object  
+     /   \
+Texture  Collider
 ```
 
-### Map and Layer
+### Map
 
-Maps are completely disconnected from each other. They are a good way to divide your games to levels, for example. Maps contain list of their layers.
+Maps are completely disconnected from each other. They are a good way to divide your game to levels, for example. Maps contain a list of their layers.
 
-Layers are desigend to be loaded together. Layers contain a list of their objects. When you render a map, it will render all of the layers in that map in the order they are added to the map. Meaning, textures in the first layer will be rendered first, and textures in the second layer will be rendered on top of the textures in the first.
+### Layer
+
+Layers are desigend to be loaded together. Layers contain a list of their objects.
+
+When you render a map, it will render all of the layers in it, in the order they where added to the map. Meaning, textures in the first layer will be rendered first, and textures in the second layer will be rendered on top.
 
 Physics-wise, objects interact only with other objects in the same layer.
 
@@ -67,10 +72,62 @@ There are simple and complex textures, that both comprise of `CellA` values, bea
 
 ### Colliders
 
-There are simple and complex colliders, in a similar manner to textures. Colliders comprise `bool` values rather than `CellA`, and have a single `type` value, that is used to determine their collision result with other colliders.
+There are simple and complex colliders, in a similar manner to textures. Complex colliders are made of 2D array of `bool`s to represent where there is collider and where there isn't. Both complex and simple colliders have a `type` value, which is used to determine their collision result with other colliders.
 
 Collision between objects can result in a push, a block, or an overlap event.
 
+### Camera
+
+Cameras are able to render a `Cell` based image that can be printed to the terminal, given layers that contain objects with textures.
+
+## Engine
+
+The `Engine` class comprises components that make the game run. These components manage different aspects, and are:
+- `Collision` - Manages movement of objects and calculates collision events.
+- `Audio` - Manages audio sources and playing audio
+- `Time` - Manages invocations and provides game loop utilities
+- `IO` - Manages user input and printing graphics
+- `Memory` - Manages linking the world structure together
+
+### `Collision`
+
+Gets requests to move a certain object, calculates how its movement would look like, and based on that calls the relevant collision events on the relevant objects.
+
+If you would look inside `ktech.hpp` at `Object` you would see a lot of virtual functions. These are the callback functions that `Collision` could call when it determines collision events.
+
+You can create a class derived of `Object` and define new functionalities for these virtual functions to make them do things.
+
+`Collision` also stores `colliderTypes` which represents the types of colliders that is global for the `Engine` instance. You can look at `colliderTypes` this way:
+
+| What if (column) collides with (row) | Collider type 1 | Collider type 2 | Collider type 3 |
+|--------------------------------------|-----------------|-----------------|-----------------|
+| Collider type 1                      | Block           | Push            | Overlap         |
+| Collider type 2                      | Block           | Push            | Overlap         |
+| Collider type 3                      | Overlap         | Overlap         | Overlap         |
+
+Meaning, type 1 is an unpushable collider, type 2 is a pushable collider, and type 3 is a collider that overlaps with everything.
+
+### `Audio`
+
+Currently `Audio` has no connections to the other components of the engine, and pretty much works as a wrapper to the "PortAudio" library.
+
+`Audio` can load .wav files and create 1D audio sources, that can play, pause, resume and stop playing. It is pretty primitive.
+
+### `Time`
+
+`Time` provides utilities used to create a game loop (which will be discussed soon).
+
+It can also create invocations that call given callback functions.
+
+### `IO`
+
+`IO` manages both input and output, although they are quite separate.
+
+As for input, `IO` can be asked to attach a callback function when a certain key is pressed. It can also make groups of these attached callback functions, which make input handling easier, especially when it comes to UI.
+
+As for output, `IO` can receive images rendered by `Camera`s to draw a "final image" that can later be actually printed to the terminal. The reason there is an extra step of drawing between rendering and printing is to allow multiple cameras at the same time to be displayed which can be useful for whatever reason.
+
+### `Memory`
 
 ---
 ---
