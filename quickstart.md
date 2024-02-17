@@ -140,7 +140,7 @@ The containers receive pointers to structures and return an `ID` that can be use
 
 ## Game Loop
 
-The game loop in this context is a loop that attempts to run at a consistent iteration speed, which are called game ticks. Each tick usually does the same tasks, such as processing user input (which causes other events such as object movements), rendering, drawing and printing.
+The game loop in this context is a loop that attempts to run at a consistent speed. Iterations are called game ticks. Each tick usually does the same tasks, such as processing user input (which causes other events such as object movements), rendering, drawing and printing.
 
 The `Engine` class nor any other part of the library provides a premade game loop function. Instead, the user constructs one with the functions provided in the `Time` component of `Engine`.
 
