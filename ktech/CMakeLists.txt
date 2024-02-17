@@ -1,3 +1,5 @@
+set(LIBRARY_NAME ktech)
+
 set(LIBRARY_HEADERS
 	ktech.hpp
 	widgets/button.hpp
@@ -24,5 +26,8 @@ set(LIBRARY_SOURCES
 	timepoint.cpp
 )
 
-add_library(ktech STATIC ${LIBRARY_SOURCES})
-target_link_libraries(ktech portaudio)
+add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SOURCES})
+target_link_libraries(${LIBRARY_NAME} portaudio)
+target_include_directories(${LIBRARY_NAME} INTERFACE
+	${CMAKE_CURRENT_SOURCE_DIR}
+)

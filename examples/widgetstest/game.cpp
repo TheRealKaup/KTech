@@ -16,11 +16,11 @@
 	along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../../ktech/ktech.hpp"
-#include "../../ktech/widgets/button.hpp"
-#include "../../ktech/widgets/intfield.hpp"
-#include "../../ktech/widgets/stringfield.hpp"
-#include "../../ktech/widgets/switch.hpp"
+#include "ktech.hpp"
+#include "widgets/button.hpp"
+#include "widgets/intfield.hpp"
+#include "widgets/stringfield.hpp"
+#include "widgets/switch.hpp"
 
 using namespace KTech;
 

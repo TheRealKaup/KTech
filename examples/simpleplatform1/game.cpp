@@ -16,7 +16,7 @@
 	along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../../ktech/ktech.hpp"
+#include "ktech.hpp"
 
 using namespace KTech;
 
