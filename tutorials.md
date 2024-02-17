@@ -1,3 +1,7 @@
+## OUTDATED - this document is very old to the point it is irrelevant, wait until it's updated.
+
+---
+
 **Tutorials:**
  - [Intro: KTech's interface, how to start using it](#intro)
  - [Loop](#loop)
