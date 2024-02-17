@@ -5,7 +5,7 @@
 Table of contents:
 - [Introduction](#introduction) - general explanation of what KTech is.
 - [Capabilities](#capabilities) - key features included in the library. 
-- [Intereseting Details](#intereseting-details) - some specifics that could arouse your curiosity.
+- [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
 - [Documentation](#documentation) - links to the projects's documentation.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
@@ -43,7 +43,7 @@ As terminal software, the graphics are printed to the terminal, and user inputs 
 
 ---
 
-## Intereseting Details
+## Interesting Details
 
 - KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal-based textures. TextureCreator covers and improves one aspect of KTech game development, and in the future will be part of a full software development kit.
 - The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between game and engine different from popular game engines, this is the design I intentionally chose, because it gives the KTech user stronger control and understanding of what's happening.
