@@ -55,10 +55,6 @@ As terminal software, the graphics are printed to the terminal, and user inputs 
 
 ## Documentation
 
-KTech's entire documentation is stored within KTech's GitHub repostiroy (this very one).
-
-In front of you are listed all of the files that comprise KTech's documentation: 
-
 - [references.md](references.md) - direct information about each element of the library.
 - [tutorials.md](tutorials.md) - tutorials about getting KTech, using its different elements, creating a game with it and compiling.
 - [faq.md](faq.md) - answers for frequently asked questions.
