@@ -25,3 +25,4 @@ set(LIBRARY_SOURCES
 )
 
 add_library(ktech STATIC ${LIBRARY_SOURCES})
+target_link_libraries(ktech portaudio)
