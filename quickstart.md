@@ -1,6 +1,82 @@
-## OUTDATED - this document is very old to the point it is irrelevant, wait until it's updated.
+# Table of Contents:
+
+- Table of Contents
+- Introduction to Quick Start Guide
+- Key Concepts
+- Starting a Project
+- Building
+
+# Introduction to Quick Start Guide
+
+This is a short tutorial on using KTech. Note that it covers only a small portion of the library and minimally explains how to use it.
+
+If you are looking for a concise tutorial or for the library reference, refer to the [documentation section in the `readme.md` file](https://github.com/TheRealKaup/KTech/blob/master/readme.md#documentation) (both aren't available yet, and as for now this document is KTech's entire documentation).
+
+# Key Concepts
+
+## The File System
+
+The entire library is declared and defined [within the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
+
+The core library is declared in the `ktech.hpp` header file in the `ktech` directory. This file is what you include in your game project (`include "ktech/ktech.hpp"`). This is the "core" library since it is the minimum required to include in your project to start creating a game.
+
+Additionally, the contents of `ktech.hpp` are enclosed within a namespace called `KTech`.
+
+The source files (`.cpp`) in the `ktech` directory are the core library definitions.
+
+The non-core parts of the library are currently only the widgets (UI objects) that are in the `ktech/widgets` directory. If you want to use any of the widgets there, you may selectively include the header files in there.
+
+## Basic Structures
+
+KTech comes with a couple of fundamental structures. They are:
+- `RGB` - Represents a single 24 bit depth color.
+- `RGBA` - Represents a single 24 bit depth color with an extra alpha channel.
+- `Point` - 2D vector comprising 2 32 bit signed integers (`x` and `y`).
+- `UPoint` - 2D vector comprising 2 32 bit unsigned integers (`x` and `y`).
+- `Cell` - Represents a terminal cell comprising of a foreground `RGB`, background `RGB` and a `char`.
+- `CellA` - Represents a terminal cell with alpha channels comprising of a foreground `RGBA`, background `RGBA` and a `char`.
+
+## World Hierarchy
+
+
+```
+          Map
+         /   \
+      Layer  Camera
+       /      
+    Objects  
+     /    \
+Textures  Colliders
+```
+
+### Map and Layer
+
+Maps are completely disconnected from each other. They are a good way to divide your games to levels, for example. Maps contain list of their layers.
+
+Layers are desigend to be loaded together. Layers contain a list of their objects. When you render a map, it will render all of the layers in that map in the order they are added to the map. Meaning, textures in the first layer will be rendered first, and textures in the second layer will be rendered on top of the textures in the first.
+
+Physics-wise, objects interact only with other objects in the same layer.
+
+### Object
+
+Objects comprise textures and collider that behave relative to their parent object's position. Textures represent the object's appearance, and colliders represent the object's physical space.
+
+### Texture
+
+There are simple and complex textures, that both comprise of `CellA` values, beacuse textures are meant to be rendered for the terminal. Complex colliders are 2D arrays. Simple textures are instead rectangles, and thus are faster to render and have smaller memory usage, but they are of course less capable than complex colliders.
+
+### Colliders
+
+There are simple and complex colliders, in a similar manner to textures. Colliders comprise `bool` values rather than `CellA`, and have a single `type` value, that is used to determine their collision result with other colliders.
+
+Collision between objects can result in a push, a block, or an overlap event.
+
 
 ---
+---
+---
+
+# OUTDATED - this document is very old to the point it is irrelevant, wait until it's updated.
 
 **Tutorials:**
  - [Intro: KTech's interface, how to start using it](#intro)
