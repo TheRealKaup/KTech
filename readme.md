@@ -32,10 +32,6 @@ As terminal software, the graphics are printed to the terminal, and user inputs 
 
 ## Capabilities
 
-KTech covers all of the aspects that a basic 2D game engine library should.
-
-KTech's capabilities:
-
 - **Graphics** - Rendering terminal graphics with 24-bit color depth, opacity and layers.
 - **Physics** - Object movement with pushing, blocking and overlapping events, based on different collider types.
 - **Audio** - Loading, mixing and playing.
