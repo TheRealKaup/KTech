@@ -8,7 +8,7 @@
   - [Engine](#engine)
   - [Game Loop](#game-loop)
   - [Widgets](#widgets)
-- [Starting a Project](#starting-a-project)
+- [Game Example](#game-example)
 - [Building](#building)
   
 # Introduction to Quick Start Guide
@@ -21,7 +21,7 @@ If you are looking for a concise tutorial, or the library reference, refer to th
 
 ## The File System
 
-The entire library is in [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
+KTech is a static library. It's in [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
 
 The core library is declared in the `ktech.hpp` header file of the `ktech` directory. This file is what you include in your game project. This is the "core" library since it is the minimum required to include in your project to start creating a game.
 
@@ -158,4 +158,130 @@ The currently available widgets are:
 - String input field
 - Switch
 
-# Starting a Project
+# Creating a Game
+
+## Setting Up a Project
+
+- Create a source file for your game (such as `game.cpp`).
+- Create a copy of the KTech library, that is, [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech), in a place accessible to your game source file (e.g. in the same directory).
+- Include the `ktech.hpp` header file from the library in your game soruce file.
+
+## Game Example
+
+### Engine
+
+To start creating world structures you must first create an `Engine` instance:
+
+```c++
+#include "ktech/ktech.hpp"
+
+static KTech::Engine engine(KTech::UPoint(40, 20), 24);
+```
+
+Here we are creating a file `Engine` instance.
+
+The first `UPoint` argument is the size of the viewport, which is set manually rather than automatically with the size of the terminal itself.
+
+The integer argument is the ticks per second (tps) limit, that is, the speed of the game loop. Normally this will also be the graphical frames per second (fps) limit. That can change at any point while the game is running.
+
+### Creating a World
+
+To create world structures and connect them together, you can create them on the stack or on the heap, but you have to pass a reference to an `Engine` so the structures could communicate with each other in a memory safe and serializable way.
+
+For example, here we are creating a `Map` with a `Camera` and a `Layer` that has an `Object`:
+
+```c++
+int main()
+{
+	KTech::Map map(engine);
+
+	KTech::Camera camera(engine, KTech::Point(0, 0), KTech::UPoint(40, 20));
+	map.AddCamera(camera.id);
+
+	KTech::Layer layer(engine, map.id);
+
+	KTech::Object object(engine, KTech::Point(17, 7));
+	object.EnterLayer(layer.id);
+}
+```
+
+### Adding `Texture`s and `Collider`s to an `Object`
+
+The `Object` from the previous code is empty, that is, it has no textures and no colliders.
+
+`Object`s have 2 `std::vector`s, one with `Texture`s (`Object::textures`) and one with `Collider`s (`Object:colliders`). Normally, to add textures and colliders to an object you would resize those vectors to fit the amount of textures and colliders you want, and then use the functions within `Texture`s and `Collider`s to make something out of them.
+
+For example, here we are adding to the object from before some textures and colliders:
+
+```c++
+	object.textures.resize(2); // Add textures to the object
+	object.textures[0].Write(
+		{
+			" @@@ ",
+			"@@@@@",
+			"@@@@@",
+		}, KTech::RGBA(0, 100, 0), KTech::RGBAColors::transparent, KTech::Point(0, -1)
+	);
+	object.textures[1].Simple(KTech::UPoint(1, 2), KTech::CellA('|', KTech::RGBA(80, 40, 15)), KTech::Point(2, 2));
+	object.colliders.resize(2); // Add colliders to textures
+	object.colliders[0].ByTextureCharacter(object.textures[0], 1, 0);
+	object.colliders[1].Simple(KTech::UPoint(1, 2), 0, KTech::Point(2, 3));
+```
+
+And also add a background color to the layer so there's a sky:
+
+```c++
+	layer.brgba = KTech::RGBA(100, 200, 255, 255);
+```
+
+By the way, we are using the default `colliderTypes` of the `Collision` engine component.
+
+### Game Loop
+
+So far we have an engine and a world but nothing to run it. The solution is a game loop started after initializing the game:
+
+```c++
+	// Game loop
+	while (engine.running)
+	{
+		// Start
+		engine.time.StartThisTick();
+
+		// Calls
+		engine.io.Call();
+		engine.time.CallInvocations();
+		engine.memory.CallOnTicks();
+
+		// Render, draw and print
+		camera.Render(map.layers);
+		engine.io.Draw(camera.image);
+		engine.io.Print();
+
+		// End
+		engine.time.WaitUntilNextTick();
+	}
+```
+
+This is the recommended general form of a KTech game loop, but you can of course change the order of the operations however you would like, as this the entire point of having to construct the game loop yourself. This is what each operation does:
+- `engine.time.StartThisTick()` updates the engine component `Time`'s information about the time of which the tick started.
+- `engine.io.Call()` calls callback functions that are registered to input keys that were pressed since the last call of this function.
+- `engine.memory.CallOnTicks()` calls the `OnTick()` function present in the world structures contained in the memory containers.
+- `camera.Render(map.layers)` makes the camera render the given layers, which in this case is the single layer added to the map earlier.
+- `engine.io.Draw(camera.image)` takes the camera's rendered image and draws it to the engine's final image.
+- `engine.io.Print()` finally prints the image to the terminal.
+- `engine.time.WaitUntilNextTick()` will block the thread until the next tick should start.
+
+### Player Character
+
+You can inherit a class from `Object` and add functionality to it. This way you can create a user-controlled character.
+
+For example:
+
+```c++
+<to write>
+```
+
+
+# Building
+
+?
