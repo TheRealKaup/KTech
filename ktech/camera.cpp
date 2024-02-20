@@ -27,10 +27,25 @@ KTech::Camera::Camera(Engine& engine, Point position, UPoint resolution, const s
 	image.resize(res.y, std::vector<Cell>(res.x));
 }
 
+KTech::Camera::Camera(Engine& engine, ID<Map>& map, Point position, UPoint resolution, const std::string& name)
+	: engine(engine), pos(position), res(resolution)
+{
+	engine.memory.cameras.Add(this);
+	EnterMap(map);
+	image.resize(res.y, std::vector<Cell>(res.x));
+}
+
 KTech::Camera::~Camera()
 {
 	IO::Log("<Camera[" + name + "]::~Camera()>", RGBColors::red);
 	engine.memory.cameras.Remove(id);
+}
+
+void KTech::Camera::EnterMap(ID<Map>& map)
+{
+	if (engine.memory.maps.Exists(parentMap))
+		engine.memory.maps[parentMap]->RemoveCamera(id);
+	engine.memory.maps[map]->AddCamera(id);
 }
 
 void KTech::Camera::Render(const std::vector<ID<Layer>>& layers)
@@ -188,30 +203,40 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& layers)
 
 		if (layer->brgba.a != 0)
 		{
+			tempBRGB = RGB(layer->brgba.a * layer->brgba.r / 255, layer->brgba.a * layer->brgba.g / 255, layer->brgba.a * layer->brgba.b / 255);
+
 			for (size_t y = 0; y < res.y; y++)
 			{
 				for (size_t x = 0; x < res.x; x++)
 				{
-					image[y][x].b.r = layer->brgba.a * layer->brgba.r + (1.0f - layer->brgba.a) * image[y][x].b.r;
-					image[y][x].b.g = layer->brgba.a * layer->brgba.g + (1.0f - layer->brgba.a) * image[y][x].b.g;
-					image[y][x].b.b = layer->brgba.a * layer->brgba.b + (1.0f - layer->brgba.a) * image[y][x].b.b;
+					image[y][x].b.r = tempBRGB.r + (255 - layer->brgba.a) * image[y][x].b.r / 255;
+					image[y][x].b.g = tempBRGB.g + (255 - layer->brgba.a) * image[y][x].b.g / 255;
+					image[y][x].b.b = tempBRGB.b + (255 - layer->brgba.a) * image[y][x].b.b / 255;
 				}
 			}
 		}
 		
 		if (layer->frgba.a != 0)
 		{
+			tempFRGB = RGB(layer->frgba.a * layer->frgba.r / 255, layer->frgba.a * layer->frgba.g / 255, layer->frgba.a * layer->frgba.b / 255);
+
 			for (size_t y = 0; y < res.y; y++)
 			{
 				for (size_t x = 0; x < res.x; x++)
 				{
-					image[y][x].f.r = layer->frgba.a * layer->frgba.r + (1.0f - layer->frgba.a) * image[y][x].f.r;
-					image[y][x].f.g = layer->frgba.a * layer->frgba.g + (1.0f - layer->frgba.a) * image[y][x].f.g;
-					image[y][x].f.b = layer->frgba.a * layer->frgba.b + (1.0f - layer->frgba.a) * image[y][x].f.b;
+					image[y][x].f.r = tempFRGB.r + (255 - layer->frgba.a) * image[y][x].f.r / 255;
+					image[y][x].f.g = tempFRGB.g + (255 - layer->frgba.a) * image[y][x].f.g / 255;
+					image[y][x].f.b = tempFRGB.b + (255 - layer->frgba.a) * image[y][x].f.b / 255;
 				}
 			}
 		}
 	}
+}
+
+void KTech::Camera::Render()
+{
+	if (engine.memory.maps.Exists(parentMap))
+		Render(engine.memory.maps[parentMap]->layers);
 }
 
 void KTech::Camera::Resize(UPoint _res)

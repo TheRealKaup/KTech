@@ -25,15 +25,14 @@ int KTech::Map::AddCamera(ID<Camera>& camera, bool asActiveCamera)
 	cameras.push_back(camera);
 	if (asActiveCamera)
 		activeCameraI = cameras.size() - 1;
+	engine.memory.cameras[camera]->parentMap = id;
 	return cameras.size() - 1;
 }
 
 int KTech::Map::AddLayer(ID<Layer>& layer)
 {
-	KTech::IO::Log("<Map::AddLayer()> Start of function...", RGBColors::mint);
-	engine.memory.layers[layer]->parentMap = id;
 	layers.push_back(layer);
-	KTech::IO::Log("<Map::AddLayer()> End of function.", RGBColors::mint);
+	engine.memory.layers[layer]->parentMap = id;
 	return layers.size() - 1;
 }
 

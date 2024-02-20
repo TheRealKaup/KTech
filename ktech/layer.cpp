@@ -55,11 +55,25 @@ bool KTech::Layer::RemoveObject(ID<Object>& object)
 	return false;
 }
 
-// Currently layers must be forced to be added to maps ASAP, otherwise there would be seg faults, for example, whenever objects try to move (since they can't access engine.collision). 
-KTech::Layer::Layer(Engine& engine, ID<Map>& map) : engine(engine)
+void KTech::Layer::EnterMap(ID<Map>& map)
+{
+	if (engine.memory.maps.Exists(parentMap))
+		engine.memory.maps[parentMap]->RemoveLayer(id);
+	engine.memory.maps[map]->AddLayer(id);
+}
+
+KTech::Layer::Layer(Engine& engine)
+	: engine(engine)
 {
 	engine.memory.layers.Add(this);
-	engine.memory.maps[map]->AddLayer(id);
+}
+
+// Currently layers must be forced to be added to maps ASAP, otherwise there would be seg faults, for example, whenever objects try to move (since they can't access engine.collision). 
+KTech::Layer::Layer(Engine& engine, ID<Map>& map)
+	: engine(engine)
+{
+	engine.memory.layers.Add(this);
+	EnterMap(map);
 }
 
 KTech::Layer::~Layer()

@@ -39,6 +39,13 @@ KTech::Object::Object(Engine& engine, Point pos, const std::string& name)
 	engine.memory.objects.Add(this);
 }
 
+KTech::Object::Object(Engine& engine, ID<Layer>& layer, Point pos, const std::string& name)
+	: engine(engine), pos(pos), name(name)
+{
+	engine.memory.objects.Add(this);
+	EnterLayer(layer);
+}
+
 KTech::Object::~Object()
 {
 	IO::Log("<Object[" + name + ", " + std::to_string((size_t)this) + "]::~Object()> Start of function...", RGBColors::red);

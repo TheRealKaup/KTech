@@ -121,10 +121,10 @@ namespace KTech
 
 		std::vector<std::vector<CellA>> t = {}; 
 		
-		void Simple(UPoint size, CellA value, Point relative_position);
-		void Rectangle(UPoint size, CellA value, Point relative_position);// Load from a file.
-		UPoint File(const std::string& fileName, Point relative_position);
-		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point relative_position);
+		void Simple(UPoint size, CellA value, Point relative_position = Point(0, 0));
+		void Rectangle(UPoint size, CellA value, Point relative_position = Point(0, 0));// Load from a file.
+		UPoint File(const std::string& fileName, Point relative_position = Point(0, 0));
+		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point relative_position = Point(0, 0));
 
 		void Resize(UPoint newSize, CellA newValue);
 		void SetCell(CellA value);
@@ -148,9 +148,9 @@ namespace KTech
 		
 		std::vector<std::vector<bool>> c = {};
 
-		void Simple(UPoint size, uint8_t type, Point relative_position);
-		bool File(const std::string& fileName, uint8_t type, Point relative_position);
-		void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relative_position);
+		void Simple(UPoint size, uint8_t type, Point relative_position = Point(0, 0));
+		bool File(const std::string& fileName, uint8_t type, Point relative_position = Point(0, 0));
+		void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relative_position = Point(0, 0));
 		void ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 		void ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 
@@ -198,6 +198,7 @@ namespace KTech
 		virtual void OnOverlappedExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
 		
 		Object(Engine& engine, Point position = Point(0, 0), const std::string& name = "");
+		Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), const std::string& name = "");
 		~Object();
 	};
 
@@ -216,6 +217,8 @@ namespace KTech
 		RGBA frgba = { 0, 0, 0, 0 };
 		RGBA brgba = { 0, 0, 0, 0 };
 
+		void EnterMap(ID<Map>& map);
+
 		int AddObject(ID<Object>& object);
 		bool RemoveObject(const std::string& name);
 		bool RemoveObject(ID<Object>& object);
@@ -225,7 +228,9 @@ namespace KTech
 		// WARNING: RETURNED REFERENCE IS NOT PERMANENT (VECTOR REALLOCATES)
 		ID<Object>& operator[](size_t i) { return objects[i]; }
 
-		Layer(Engine& engine, ID<Map>& map);
+		Layer(Engine& engine);
+		Layer(Engine& engine, ID<Map>& parentMap);
+		
 		~Layer();
 	};
 
@@ -234,17 +239,23 @@ namespace KTech
 		Engine& engine;
 		ID<Camera> id;
 
+		ID<Map> parentMap;
+
 		std::string name = "";
 		Point pos = Point(0, 0);
 		UPoint res = UPoint(10, 10);
 		std::vector<std::vector<Cell>> image = {};
 
+		void EnterMap(ID<Map>& map);
+
+		void Render();
 		void Render(const std::vector<ID<Layer>>& layers);
 		void Resize(UPoint res);
 
 		inline virtual void OnTick() {};
 
 		Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+		Camera(Engine& engine, ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 		~Camera();
 	};
 
@@ -445,9 +456,9 @@ namespace KTech
 		Engine* engine;
 
 		std::vector<std::vector<CR>> colliderTypes = {
-			{ CR::B, CR::P, CR::O }, // Heavy - 0
-			{ CR::B, CR::P, CR::O }, // Normal - 1
-			{ CR::O, CR::O, CR::O } // Overlappable - 2
+			{ CR::B, CR::P, CR::O }, // Unpushable - 0
+			{ CR::B, CR::P, CR::O }, // Pushable - 1
+			{ CR::O, CR::O, CR::O } // overlapping - 2
 		};
 
 		struct CollisionData{
