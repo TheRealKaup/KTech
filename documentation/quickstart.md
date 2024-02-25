@@ -278,9 +278,54 @@ You can inherit a class from `Object` and add functionality to it. This way you 
 For example:
 
 ```c++
-<to write>
+struct Character : KTech::Object
+{
+	void Down()
+	{
+		Move(KTech::Point(0, 1));
+	}
+	
+	void Up()
+	{
+		Move(KTech::Point(0, -1));
+	}
+
+	void Right()
+	{
+		Move(KTech::Point(1, 0));
+	}
+
+	void Left()
+	{
+		Move(KTech::Point(-1, 0));
+	}
+
+	Character(KTech::Engine& engine, KTech::Point pos, KTech::ID<KTech::Layer>& layer)
+		: Object(engine, pos, "character")
+	{
+		textures.resize(1);
+		textures[0].Write(
+			{
+				" O ",
+				"/|\\",
+				"/ \\"
+			}, { 200, 0, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
+		);
+		colliders.resize(2);
+		colliders[0].ByTextureCharacter(textures[0], 100, 1);
+		colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
+
+		engine.io.RegisterCallback(KTech::Keys::down, std::bind(&Character::Down, this), true);
+		engine.io.RegisterCallback(KTech::Keys::up, std::bind(&Character::Up, this), true);
+		engine.io.RegisterCallback(KTech::Keys::right, std::bind(&Character::Right, this), true);
+		engine.io.RegisterCallback(KTech::Keys::left, std::bind(&Character::Left, this), true);
+
+		EnterLayer(layer);
+	}
+};
 ```
 
+This `Object`-inherited class, 
 
 # Building
 
