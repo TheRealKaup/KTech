@@ -26,6 +26,8 @@ Not to be confused, KTech is not a software development kit (SDK) like most know
 
 As terminal software, the graphics are printed to the terminal, and user inputs are received as escape codes and come in a sequence as if typed. This makes KTech games unique graphics-wise and input-wise, as they lead to unconventional solutions.
 
+Here's how a very simple KTech game can look like:
+
 ![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png)
 
 ---
