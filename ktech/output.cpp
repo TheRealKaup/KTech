@@ -232,9 +232,6 @@ KTech::IO::IO(KTech::UPoint imageSize, Engine* engine) : engine(engine)
 	// (OUTPUT) Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
 	std::cout << "\033[?25l\033[?1049h";
 	
-	// (AUDIO/OUTPUT) Redirect stderr to a file to supress ALSA's warnings spam in the terminal.
-	freopen("errfile.txt", "w", stderr);
-
 	// (INPUT) Set terminal attributes
 	tcgetattr(0, &oldTerminalAttributes);
 	termios terminalAttributes = oldTerminalAttributes;
