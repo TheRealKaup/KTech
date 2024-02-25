@@ -284,4 +284,53 @@ For example:
 
 # Building
 
-?
+KTech uses **Premake** to generate build files. CMake is not used because of the counterintuitive documentation and odd scripting language. Premake is used instead because of the [truly nice documentation](https://premake.github.io/docs/) and usage of the proper scripting language Lua, which is not even required dedicatedly learning to start writing Premake scripts. If you aren't familiar with Premake I recommend having a look at the "Getting Started" and "Writing Premake Scripts" sections of its documentation, they are short and well written. The following text assumes you've read those sections.
+
+The `ktech` directory contains a [`premake5.lua`](/ktech/premake5.lua) script. You should read the file, but in summary, it does 2 things:
+- Links portaudio for the workspace scope, making the following created projects in the workspace inherit that value and link portaudio. This is requried.
+- Create a Premake project named "KTechLibrary" for the KTech static library.
+
+To include the library in your game source files you will need to create a `premake5.lua` script that should do the following things:
+- Create a Premake workspace (the library Premake project does not depend on any workspace settings, such as location or configurations).
+- `include` the library's `premake5.lua` script (i.e. `include "<ktech_library_path>"`, e.g. `include "ktech"` from the repository's root).
+- Create a project for your game:
+  - Its `kind` should be set to `ConsoleApp`.
+  - Its `language` should be set to `C++`.
+  - It should link `KTechLibrary`.
+  - It should add your game files, and probably a `targetdir`, `objdir` and `targetname`.
+
+To generate the build files, you will need to call `premake5` from the directory with the script, with the following platform argument. If you are on Gnu/Linux, you would call `premake5 gmake2`, and then to build the library and your game, you will use `make`.
+
+## Example
+
+The `ktech/` directory is placed in the root of your game development directory ("`game_root/`"). It includes its `premake5.lua` script as it should.
+
+`game_root/` also contains the game files - `ui.hpp`, `ui.cpp` and `main.cpp`.
+
+Your `premake5.lua` script is located in `game_root/` and contains:
+
+```Lua
+-- Create a workspace that its projects will be built in `build/`
+workspace "KTech"
+	configurations { "Release" }
+	location "build"
+
+-- Include the KTech library
+include "ktech"
+
+-- Create a project/target for your game
+project "MyKTechGame"
+	kind "ConsoleApp"
+	language "C++"
+	targetdir "%{wks.location}/bin" -- The final executable binary file will be located in `game_root/build/bin/`.
+	objdir "%{wks.location}/obj/%{prj.name}" -- The object files will be located in `game_root/build/obj/MyKTechGame/`.
+	targetname "%{prj.name}" -- The final executable binary file will be named "MyKTechProject".
+
+	links { "KTechLibrary" }
+	
+	files { "*.cpp", "*.hpp"  } -- Include all the files in this diretory that include these patterns, which will include "ui.hpp", "ui.cpp" and "main.cpp". 
+```
+
+On Gnu/Linux you will run from `game_root/` the command `premake5 gmake2`, which will generate build files in `game_root/build/`, and you will run `make -C build/` to build the `MyKTechGame` project.
+
+The binary file will be outputted as `game_root/build/bin/MyKTechGame`, and can be run by calling `./build/bin/MyKTechGame` from `game_root/`.
