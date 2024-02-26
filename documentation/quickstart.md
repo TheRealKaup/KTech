@@ -61,7 +61,7 @@ Maps are completely disconnected from each other. They are a good way to divide 
 
 ### `Layer`
 
-Layers are desigend to be loaded together. Layers contain a list of their objects.
+Layers are designed to be loaded together. Layers contain a list of their objects.
 
 When you render a map, it will render all of the layers in it, in the order they where added to the map. Meaning, textures in the first layer will be rendered first, and textures in the second layer will be rendered on top.
 
@@ -73,7 +73,7 @@ Objects comprise textures and collider that behave relative to their parent obje
 
 ### `Texture`
 
-There are simple and complex textures, that both comprise of `CellA` values, beacuse textures are meant to be rendered for the terminal. Complex colliders are 2D arrays. Simple textures are instead rectangles, and thus are faster to render and have smaller memory usage, but they are of course less capable than complex colliders.
+There are simple and complex textures, that both comprise of `CellA` values, because textures are meant to be rendered for the terminal. Complex colliders are 2D arrays. Simple textures are instead rectangles, and thus are faster to render and have smaller memory usage, but they are of course less capable than complex colliders.
 
 ### `Colliders`
 
@@ -110,13 +110,13 @@ You can create a class derived of `Object` and define new functionalities for th
 | Collider type 2                      | Block           | Push            | Overlap         |
 | Collider type 3                      | Overlap         | Overlap         | Overlap         |
 
-Meaning, type 1 is an unpushable collider, type 2 is a pushable collider, and type 3 is a collider that overlaps with everything.
+Meaning, type 1 is a collider that can't be pushed, type 2 can be pushed, and type 3 overlaps with everything.
 
 ### `Audio`
 
 Currently `Audio` has no connections to the other components of the engine, and pretty much works as a wrapper to the "PortAudio" library.
 
-`Audio` can load .wav files and create 1D audio sources, that can play, pause, resume and stop playing. It is pretty primitive.
+`Audio` can load .wav files and play, pause, resume and stop single-dimension audio sources. It's quite primitive at the moment.
 
 ### `Time`
 
@@ -134,7 +134,7 @@ As for output, `IO` can receive images rendered by `Camera`s to draw a "final im
 
 ### `Memory`
 
-`Memory` is the serialization solution for the world hierarchy. It contains a `Container` for each of the storable structures - `Map`, `Layer`, `Camera` and `Object`.
+`Memory` is the serialization solution for the world hierarchy. It contains a `Container` for each of the structures the can be stored - `Map`, `Layer`, `Camera` and `Object`.
 
 The containers receive pointers to structures and return an `ID` that can be used to reach the structure again.
 
@@ -142,13 +142,13 @@ The containers receive pointers to structures and return an `ID` that can be use
 
 The game loop in this context is a loop that attempts to run at a consistent speed. Iterations are called game ticks. Each tick usually does the same tasks, such as processing user input (which causes other events such as object movements), rendering, drawing and printing.
 
-The `Engine` class nor any other part of the library provides a premade game loop function. Instead, the user constructs one with the functions provided in the `Time` component of `Engine`.
+The `Engine` class nor any other part of the library provides a prepared game loop function. Instead, the user constructs one with the functions provided in the `Time` component of `Engine`.
 
 ## `Widget`s
 
 Widgets are UI elements derived from the `Widget` class which is derived from the `Object` class.
 
-In the KTech ecosystem they are unrequired additions that you can include in your game as you wish.
+In the KTech ecosystem they are optional additions, and you can include them in your game as you wish.
 
 They collect user input automatically and can be enabled and disabled with their universal `Select()` and `Deselect()` functions.
 
@@ -164,7 +164,7 @@ The currently available widgets are:
 
 - Create a source file for your game (such as `game.cpp`).
 - Create a copy of the KTech library, that is, [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech), in a place accessible to your game source file (e.g. in the same directory).
-- Include the `ktech.hpp` header file from the library in your game soruce file.
+- Include the `ktech.hpp` header file from the library in your game source file.
 
 ## Game Example
 
@@ -182,7 +182,7 @@ Here we are creating a file `Engine` instance.
 
 The first `UPoint` argument is the size of the viewport, which is set manually rather than automatically with the size of the terminal itself.
 
-The integer argument is the ticks per second (tps) limit, that is, the speed of the game loop. Normally this will also be the graphical frames per second (fps) limit. That can change at any point while the game is running.
+The integer argument is the ticks per second (TPS) limit, that is, the speed of the game loop. Normally this will also be the graphical frames per second (FPS) limit. That can change at any point while the game is running.
 
 ### Creating a World
 
@@ -329,10 +329,10 @@ After passing the given arguments to `Object`'s constructor, the `Character` con
 
 `IO::RegisterCallback()` requires 3 arguments:
 - `const std::string& stringKey` - The trigger key, which should be the string that `IO` receives from the terminal when the key is pressed. Simple character keys like letters and numbers are recived as `"a"` or `"2"`, and other keys are received as escape codes which are listed in the `KTech::Keys` namespace. Note that capitalization matters, and `IO` does not automatically translate, for example, `a` to `A`, and vice versa. You would need to register a callback for each capitalization if you want to get calls for both.
-- `const std::function<void()>& callback` - Your callback function. To make it call a memeber function, `std::bind` is used to attach this character's pointer to it.
+- `const std::function<void()>& callback` - Your callback function. To make it call a member function, `std::bind` is used to attach this character's pointer to it.
 - `bool onTick` - If true, will memorize key presses until `IO::Call()` is called, which will finally call the callback function. If false, will immediately call your callback function when the key is received. Using the method of calling `IO::Call()` in your game loop each iteration, as done in the game loop example from earlier, is much more preferable when it comes to moving things, and could prevent physics glitches. On the other hand, not having you callback functions get called on tick is preferable when it comes to UI, as in, using widgets.
 
-The input callbacks registered are for moving down, up, right and left. They do so by using the `Object::Move()` function which receives a `Point()` representing the relative targeted position that `Collision` will atempt to move the object to.
+The input callbacks registered are for moving down, up, right and left. They do so by using the `Object::Move()` function which receives a `Point()` representing the relative targeted position that `Collision` will attempt to move the object to.
 
 As you might have noticed, the down direction is positive Y, up is negative Y, left is negative X, and right is positive X. This is because the axis origin is at the top left corner of the terminal, since this is the point printing is started at.
 
@@ -343,10 +343,10 @@ Character character(engine, layer.id, KTech::Point(2, 2));
 
 # Building
 
-KTech uses **Premake** to generate build files. CMake is not used because of the counterintuitive documentation and odd scripting language. Premake is used instead because of the [truly nice documentation](https://premake.github.io/docs/) and usage of the proper scripting language Lua, which is not even required dedicatedly learning to start writing Premake scripts. If you aren't familiar with Premake I recommend having a look at the "Getting Started" and "Writing Premake Scripts" sections of its documentation, they are short and well written. The following text assumes you've read those sections.
+KTech uses **Premake** to generate build files. CMake is not used because of the counterintuitive documentation and odd scripting language. Premake is used instead because of the [truly nice documentation](https://premake.github.io/docs/) and usage of the proper scripting language Lua, which is not even required to learn in a dedicated way to start writing Premake scripts. If you aren't familiar with Premake I recommend having a look at the "Getting Started" and "Writing Premake Scripts" sections of its documentation, they are short and well written. The following text assumes you've read those sections.
 
 The `ktech` directory contains a [`premake5.lua`](/ktech/premake5.lua) script. You should read the file, but in summary, it does 2 things:
-- Links portaudio for the workspace scope, making the following created projects in the workspace inherit that value and link portaudio. This is requried.
+- Links PortAudio for the workspace scope, making the following created projects in the workspace inherit that value and link PortAudio. This is required.
 - Create a Premake project named "KTechLibrary" for the KTech static library.
 
 To include the library in your game source files you will need to create a `premake5.lua` script that should do the following things:
