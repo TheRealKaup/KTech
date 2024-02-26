@@ -284,24 +284,21 @@ struct Character : KTech::Object
 	{
 		Move(KTech::Point(0, 1));
 	}
-	
 	void Up()
 	{
 		Move(KTech::Point(0, -1));
 	}
-
 	void Right()
 	{
 		Move(KTech::Point(1, 0));
 	}
-
 	void Left()
 	{
 		Move(KTech::Point(-1, 0));
 	}
 
-	Character(KTech::Engine& engine, KTech::Point pos, KTech::ID<KTech::Layer>& layer)
-		: Object(engine, pos, "character")
+	Character(KTech::Engine& engine, KTech::ID<KTech::Layer>& layer, KTech::Point pos)
+		: Object(engine, layer, pos, "character")
 	{
 		textures.resize(1);
 		textures[0].Write(
@@ -313,7 +310,6 @@ struct Character : KTech::Object
 		);
 		colliders.resize(2);
 		colliders[0].ByTextureCharacter(textures[0], 100, 1);
-		colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
 
 		engine.io.RegisterCallback(KTech::Keys::down, std::bind(&Character::Down, this), true);
 		engine.io.RegisterCallback(KTech::Keys::up, std::bind(&Character::Up, this), true);
@@ -325,7 +321,25 @@ struct Character : KTech::Object
 };
 ```
 
-This `Object`-inherited class, 
+This `Object`-inherited class initializes by inheriting `Object`'s constructor and then adding textures and colliders.
+
+I encourage you to see what `Object`'s constructor does for youself by reading its definition in `ktech/object.cpp`, but in summary, it memorizes the engine reference, sets a position and enters a layer. Normally you would use this constructor (or the other one which doesn't enter a layer) when inheriting from `Object` as shown in the example above.
+
+After passing the given arguments to `Object`'s constructor, the `Character` constructor adds to itself a texture and a collider, and then it registered input callbacks.
+
+`IO::RegisterCallback()` requires 3 arguments:
+- `const std::string& stringKey` - The trigger key, which should be the string that `IO` receives from the terminal when the key is pressed. Simple character keys like letters and numbers are recived as `"a"` or `"2"`, and other keys are received as escape codes which are listed in the `KTech::Keys` namespace. Note that capitalization matters, and `IO` does not automatically translate, for example, `a` to `A`, and vice versa. You would need to register a callback for each capitalization if you want to get calls for both.
+- `const std::function<void()>& callback` - Your callback function. To make it call a memeber function, `std::bind` is used to attach this character's pointer to it.
+- `bool onTick` - If true, will memorize key presses until `IO::Call()` is called, which will finally call the callback function. If false, will immediately call your callback function when the key is received. Using the method of calling `IO::Call()` in your game loop each iteration, as done in the game loop example from earlier, is much more preferable when it comes to moving things, and could prevent physics glitches. On the other hand, not having you callback functions get called on tick is preferable when it comes to UI, as in, using widgets.
+
+The input callbacks registered are for moving down, up, right and left. They do so by using the `Object::Move()` function which receives a `Point()` representing the relative targeted position that `Collision` will atempt to move the object to.
+
+As you might have noticed, the down direction is positive Y, up is negative Y, left is negative X, and right is positive X. This is because the axis origin is at the top left corner of the terminal, since this is the point printing is started at.
+
+To create a `Character` instance, you can, for example, add in your `main()` function before the game loop at the game initialization stage the following instantiation:
+```C++
+Character character(engine, layer.id, KTech::Point(2, 2));
+```
 
 # Building
 
