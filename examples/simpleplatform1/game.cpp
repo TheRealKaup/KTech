@@ -1,6 +1,6 @@
 /*
 	simpleplatform1, a platform game example based on KTech.
-	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
+	Copyright (C) 2023-2024 Ethan Kaufman (AKA Kaup)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

@@ -20,7 +20,7 @@
 
 #include "widget.hpp"
 
-class Switch : public Widget
+class AboutBox : public Widget
 {
 public:
 	bool down = false;
@@ -62,7 +62,7 @@ private:
 		for (size_t i = 1; i < textures.size(); i++)
 			textures[i].value.f = downRGBA;
 		
-		engine.time.Invoke(std::bind(&Switch::RemovePressColor, this), 100, KTech::Time::Measurement::milliseconds);
+		engine.time.Invoke(std::bind(&AboutBox::RemovePressColor, this), 100, KTech::Time::Measurement::milliseconds);
 
 		if (OnPress)
 			OnPress();
@@ -95,7 +95,7 @@ public:
 		RemovePressColor();
 	}
 
-	Switch(KTech::Engine& engine,
+	AboutBox(KTech::Engine& engine,
 		KTech::ID<KTech::Layer> layer,
 		std::function<void()> OnPress,
 		const std::string& key = KTech::Keys::return_,
@@ -175,6 +175,6 @@ public:
 		}
 
 		// Input handlers
-		callbacksGroup->AddCallback(engine.io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), false));
+		callbacksGroup->AddCallback(engine.io.RegisterCallback(key, std::bind(&AboutBox::InsideOnPress, this), false));
 	}
 };

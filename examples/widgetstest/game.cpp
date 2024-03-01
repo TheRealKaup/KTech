@@ -1,6 +1,6 @@
 /*
 	widgetstest, a user interface example based on KTech.
-	Copyright (C) 2023 Ethan Kaufman (AKA Kaup)
+	Copyright (C) 2023-2024 Ethan Kaufman (AKA Kaup)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -130,6 +130,8 @@ struct UI
 
 int main()
 {
+	engine.io.PrintStartupNotice("widgetstest, a user interface example based on KTech.", "2024", "Ethan Kaufman", "widgetstest");
+
 	Map map(engine);
 	Layer layer(engine, map.id);
 
