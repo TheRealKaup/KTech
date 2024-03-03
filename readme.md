@@ -7,6 +7,7 @@ Table of contents:
 - [Capabilities](#capabilities) - key features included in the library. 
 - [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
 - [Documentation](#documentation) - links to the projects's documentation.
+- [Contributing][#contributing] - How to contribute to the development of KTech.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
 
@@ -63,6 +64,14 @@ Here's how a very simple KTech game can look like:
 - [faq.md](documentation/faq.md) - (will exist in the future) answers for frequently asked questions.
 - [examples.md](documentation/examples.md) - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
 - [LICENSE](COPYING) - the license which covers KTech (GPLv3-or-later).
+
+---
+
+## Contributing
+
+\<to be written>
+
+Useful link - https://github.com/TheRealKaup/KTech/contribute
 
 ---
 
