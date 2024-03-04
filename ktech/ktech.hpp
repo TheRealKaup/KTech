@@ -99,7 +99,7 @@ namespace KTech
 		RGBA f;
 		RGBA b;
 		char c;
-		constexpr inline CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0)) : c(character), f{foreground}, b(background) {}
+		constexpr inline CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0)) : c(character), f(foreground), b(background) {}
 	};
 
 	// Collision Result
@@ -244,7 +244,8 @@ namespace KTech
 		std::string name = "";
 		Point pos = Point(0, 0);
 		UPoint res = UPoint(10, 10);
-		std::vector<std::vector<Cell>> image = {};
+		CellA background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
+		std::vector<std::vector<CellA>> image = {};
 
 		void EnterMap(ID<Map>& map);
 
@@ -306,7 +307,7 @@ namespace KTech
 		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
 
 		// Draw, usually the image of a camera, to the IO
-		void Draw(const std::vector<std::vector<Cell>>& image, Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0);
+		void Draw(const std::vector<std::vector<CellA>>& image, Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
 
 		void Print();
 

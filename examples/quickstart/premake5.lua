@@ -1,4 +1,4 @@
-project "widgetstest"
+project "quickstart"
 	kind "ConsoleApp"
 	language "C++"
 	targetdir "%{wks.location}/bin"
@@ -6,5 +6,5 @@ project "widgetstest"
 	targetname "%{prj.name}"
 
 	links { "KTechLibrary" }
-	
+
 	files { "*.cpp", "*.hpp"  }

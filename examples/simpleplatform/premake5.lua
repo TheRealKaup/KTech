@@ -1,4 +1,4 @@
-project "SimplePlatform1"
+project "simpleplatform"
 	kind "ConsoleApp"
 	language "C++"
 	targetdir "%{wks.location}/bin"

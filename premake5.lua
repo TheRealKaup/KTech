@@ -6,6 +6,7 @@ workspace "KTech"
 -- Include the KTech library
 include "ktech"
 
--- Build the examples, they are configured so object files will be in `build/obj/<project_name>` and binary files will be in `build/bin/` 
-include "examples/simpleplatform1"
-include "examples/widgetstest"
+-- Include all the examples in `examples/`, they are configured so object files will be in `build/obj/<project_name>` and binary files will be in `build/bin/` 
+for i,dir in ipairs(os.matchfiles("examples/*/premake5.lua")) do
+    include(dir)
+end

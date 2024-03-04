@@ -21,7 +21,7 @@
 #include "ktech.hpp"
 #include <cstring>
 
-void KTech::IO::Draw(const std::vector<std::vector<Cell>>& render, Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
+void KTech::IO::Draw(const std::vector<std::vector<CellA>>& render, Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t alpha)
 {
 	// Default the rectangle
 	if (bottom == 0)
@@ -32,10 +32,31 @@ void KTech::IO::Draw(const std::vector<std::vector<Cell>>& render, Point pos, ui
 	if (left >= right || top >= bottom)
 		return;
 
+	// To avoid repeating the same calculation
+	uint8_t tempAlpha;
+
 	// Draw
 	for (size_t yF = (pos.y < 0 ? 0 : pos.y), yR = top; yF < image.size() && yR < bottom; yF++, yR++)
+	{
 		for (size_t xF = (pos.x < 0 ? 0 : pos.x), xR = left; xF < image[yF].size() && xR < right; xF++, xR++)
-			image[yF][xF] = render[yR][xR];
+		{
+			if (render[yR][xR].c != ' ')
+			{
+				image[yF][xF].c = render[yR][xR].c;
+				tempAlpha = render[yR][xR].f.a * alpha / 255;
+				//                   8 ->                 16 ->     + 8 ->                16 ->                8.
+				image[yF][xF].f.r = (render[yR][xR].f.r * tempAlpha + image[yF][xF].f.r * (255 - tempAlpha)) / 255;
+				image[yF][xF].f.g = (render[yR][xR].f.g * tempAlpha + image[yF][xF].f.g * (255 - tempAlpha)) / 255;
+				image[yF][xF].f.b = (render[yR][xR].f.b * tempAlpha + image[yF][xF].f.b * (255 - tempAlpha)) / 255;
+			}
+			tempAlpha = render[yR][xR].b.a * alpha / 255;
+			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
+			image[yF][xF].b.r = (render[yR][xR].b.r * tempAlpha + image[yF][xF].b.r * (255 - tempAlpha)) / 255;
+			image[yF][xF].b.g = (render[yR][xR].b.g * tempAlpha + image[yF][xF].b.g * (255 - tempAlpha)) / 255;
+			image[yF][xF].b.b = (render[yR][xR].b.b * tempAlpha + image[yF][xF].b.b * (255 - tempAlpha)) / 255;
+		}
+	}
+
 }
 
 void KTech::IO::Print()
@@ -188,6 +209,10 @@ void KTech::IO::Print()
 		l += 3;
 	}
 	std::cout << "\033[H\033[3J\033[2J" << stringImage.substr(0, l) << std::flush;
+	
+	for (size_t y = 0; y < image.size(); y++)
+		for (size_t x = 0; x < image[y].size(); x++)
+			image[y][x] = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0));
 }
 
 void KTech::IO::PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string nameOfProject)
