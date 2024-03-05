@@ -6,7 +6,7 @@ Table of contents:
 - [Introduction](#introduction) - general explanation of what KTech is.
 - [Capabilities](#capabilities) - key features included in the library. 
 - [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
-- [Documentation](#documentation) - links to the projects's documentation.
+- [Documentation](#documentation) - links to the project's documentation.
 - [Contributing](#contributing) - How to contribute to the development of KTech.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
