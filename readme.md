@@ -7,7 +7,7 @@ Table of contents:
 - [Capabilities](#capabilities) - key features included in the library. 
 - [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
 - [Documentation](#documentation) - links to the project's documentation.
-- [Contributing](#contributing) - How to contribute to the development of KTech.
+- [Contributing](#contributing) - how to contribute to the development of KTech.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
 
