@@ -94,6 +94,6 @@ Here's a screenshot of the game, from 9.10.2023 (d/m/y):
 
 ### TextureCreator
 
-An application made with KTech for creating cell-based texture files for KTech games. This program is required because each terminal character cell has an RGB foreground color, an RGB background color and a characterst programming project I have ever had, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into making it.st programming project I have ever had, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into making it.. This kind of texture can't be created by a normal pixel-based image creator.
+An application made with KTech for creating cell-based texture files for KTech games. This program is required because each terminal character cell has an RGB foreground color, an RGB background color and a character. This kind of texture can't be created by a normal pixel-based image creator.
 
 ![TextureCreator Screenshot](https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png)
