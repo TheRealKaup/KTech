@@ -20,20 +20,20 @@
 
 #include "ktech.hpp"
 
-int KTech::Layer::AddObject(ID<Object>& object)
+void KTech::Layer::AddObject(ID<Object>& object)
 {
 	engine.memory.objects[object]->parentLayer = id;
 	objects.push_back(object);
-	return objects.size() - 1;
 }
 
 bool KTech::Layer::RemoveObject(const std::string& name)
 {
-	for (int i = 0; i < objects.size(); i++)
+	for (size_t i = 0; i < objects.size(); i++)
 	{
 		if (engine.memory.objects[objects[i]]->name == name)
 		{
-			// engine.memory.objects[objects[i]]->parentLayer = ID<Layer>(0, 0);
+			if (engine.memory.objects.Exists(objects[i]))
+				engine.memory.objects[objects[i]]->parentLayer = ID<Layer>(0, 0);
 			objects.erase(objects.begin() + i);
 			return true;
 		}
@@ -43,11 +43,12 @@ bool KTech::Layer::RemoveObject(const std::string& name)
 
 bool KTech::Layer::RemoveObject(ID<Object>& object)
 {
-	for (int i = 0; i < objects.size(); i++)
+	for (size_t i = 0; i < objects.size(); i++)
 	{
 		if (objects[i] == object)
 		{
-			// engine.memory.objects[objects[i]]->parentLayer = ID<Layer>(0, 0);
+			if (engine.memory.objects.Exists(objects[i]))
+				engine.memory.objects[objects[i]]->parentLayer = ID<Layer>(0, 0);
 			objects.erase(objects.begin() + i);
 			return true;
 		}
@@ -83,5 +84,6 @@ KTech::Layer::~Layer()
 	for (ID<Object>& obj : objects)
 		if (engine.memory.objects.Exists(obj))
 			engine.memory.objects[obj]->parentLayer = ID<Layer>(0, 0);
-	engine.memory.maps[parentMap]->RemoveLayer(id);
+	if (engine.memory.maps.Exists(parentMap))
+		engine.memory.maps[parentMap]->RemoveLayer(id);
 }

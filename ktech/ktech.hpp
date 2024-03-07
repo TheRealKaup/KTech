@@ -58,6 +58,8 @@ namespace KTech
 	struct Object;
 	struct Layer;
 	struct Camera;
+	struct Widget;
+	struct UI;
 	struct Map;
 	class Engine;
 
@@ -100,6 +102,118 @@ namespace KTech
 		RGBA b;
 		char c;
 		constexpr inline CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0)) : c(character), f(foreground), b(background) {}
+	};
+
+	// Manager of all things that directly work with terminal I/O.
+	class IO
+	{
+	public:
+		Engine* engine;
+
+		// Prepares terminal, creates input loop thread
+		IO(KTech::UPoint imageSize, Engine* engine);
+		// Resets terminal
+		~IO();
+
+		termios oldTerminalAttributes;
+		
+		winsize terminalSize;
+		std::vector<std::vector<Cell>> image;
+		std::string stringImage;
+
+		std::thread t_inputLoop;
+
+		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
+
+		// Draw, usually the image of a camera, to the IO
+		void Draw(const std::vector<std::vector<CellA>>& image, Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
+
+		void Print();
+
+		static void Log(const std::string& text, RGB color);
+
+		static char* Get();
+
+		struct Callback
+		{
+			bool enabled = true;
+			std::function<void()> ptr;
+			inline Callback(const std::function<void()>& callback) : ptr(callback) {}
+		};
+
+		struct BasicHandler
+		{
+			struct BasicCallback : Callback
+			{
+				BasicHandler* parentHandler;
+				bool onTick;
+				inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
+				~BasicCallback();
+			};
+			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
+			std::string input;
+			uint8_t timesPressed = 0;
+			void RemoveCallback(BasicCallback*);
+			inline BasicHandler(const std::string& input) : input(input) {};
+		};
+
+		struct RangedHandler
+		{
+			struct RangedCallback : Callback
+			{
+				RangedHandler* parentHandler;
+				inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
+				~RangedCallback();
+			};
+			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
+			char key1, key2;
+			void RemoveCallback(RangedCallback*);
+			inline RangedHandler(char key1, char key2) : key1(key1), key2(key2) {};
+		};
+
+		struct CallbacksGroup
+		{
+			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
+			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
+			enum class Status : uint8_t
+			{
+				disabled,
+				enabled,
+				removeDisabled, // Remove and then return status to disabled
+				removeEnabled, // Remove and then return status to enabled
+			};
+			Status status;
+			bool synced = true;
+			inline CallbacksGroup(bool enabled = true) : status(enabled ? Status::enabled : Status::disabled) { }
+			inline void AddCallback(BasicHandler::BasicCallback* callback) { basicCallbacks.push_back(callback); callback->enabled = false; }
+			inline void AddCallback(RangedHandler::RangedCallback* callback) { rangedCallbacks.push_back(callback); callback->enabled = false; }
+			inline void Enable() { status = Status::enabled; synced = false; }
+			inline void Disable() { status = Status::disabled; synced = false; }
+			// Remove
+			void DeleteCallbacks();
+		};
+
+		std::vector<BasicHandler*> basicHandlers; // Never deleted, no need to store in pointers; handleded by indices
+		std::vector<RangedHandler*> rangedHandlers; // Never deleted, no need to store in pointers; handleded by indices
+		std::vector<CallbacksGroup*> groups; // Usually experiences deletions; handleded by pointers
+
+		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
+		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
+		CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
+
+		std::string input = std::string(7, '\0');
+		std::string quitKey = "\x03";
+
+		void Call();
+
+		bool Is(const std::string& stringKey);
+		bool Is(char charKey);
+		bool Bigger(char charKey);
+		bool Smaller(char charKey);
+		bool Between(char charKey1, char charKey2);
+		uint8_t GetInt();
+
+		void Loop();
 	};
 
 	// Collision Result
@@ -219,7 +333,7 @@ namespace KTech
 
 		void EnterMap(ID<Map>& map);
 
-		int AddObject(ID<Object>& object);
+		void AddObject(ID<Object>& object);
 		bool RemoveObject(const std::string& name);
 		bool RemoveObject(ID<Object>& object);
 		
@@ -285,116 +399,62 @@ namespace KTech
 		~Map();
 	};
 
-	// Manager of all things that directly work with terminal I/O.
-	class IO
+	// Widget is now a non-optional KTech standard
+	struct Widget
 	{
-	public:
-		Engine* engine;
+		Engine& engine;
+		ID<Widget> id;
+		std::string name = "";
+		KTech::ID<KTech::UI> parentUI;
 
-		// Prepares terminal, creates input loop thread
-		IO(KTech::UPoint imageSize, Engine* engine);
-		// Resets terminal
-		~IO();
-
-		termios oldTerminalAttributes;
+		Point pos = Point(0, 0);
 		
-		winsize terminalSize;
-		std::vector<std::vector<Cell>> image;
-		std::string stringImage;
+		std::vector<Texture> textures = {};
+		IO::CallbacksGroup* callbacksGroup;
+		bool selected = false;
 
-		std::thread t_inputLoop;
+		inline virtual void RenderSelected () {}
+		inline virtual void RenderUnselected () {}
+		void Select();
+		void Deselect();
 
-		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
+		void EnterUI(ID<UI> ui);
 
-		// Draw, usually the image of a camera, to the IO
-		void Draw(const std::vector<std::vector<CellA>>& image, Point pos = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
+		inline virtual void OnTick() {};
 
-		void Print();
+		Widget(Engine& engine, ID<UI> parentUI, Point pos);
+		~Widget();
+	};
 
-		static void Log(const std::string& text, RGB color);
+	// Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.
+	struct UI
+	{
+		Engine& engine;
+		ID<UI> id;
+		std::string name = "";
 
-		static char* Get();
+		// Layer parts
+		std::vector<ID<Widget>> widgets = {};
+		bool visible = true;
+		uint8_t alpha = 255;
+		RGBA frgba = { 0, 0, 0, 0 };
+		RGBA brgba = { 0, 0, 0, 0 };
 
-		struct Callback
-		{
-			bool enabled = true;
-			std::function<void()> ptr;
-			inline Callback(const std::function<void()>& callback) : ptr(callback) {}
-		};
+		// Camera parts
+		UPoint res = UPoint(10, 10);
+		CellA background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
+		std::vector<std::vector<CellA>> image = {};
 
-		struct BasicHandler
-		{
-			struct BasicCallback : Callback
-			{
-				BasicHandler* parentHandler;
-				bool onTick;
-				inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick) : Callback(callback), parentHandler(parentHandler), onTick(onTick) {}
-				~BasicCallback();
-			};
-			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
-			std::string input;
-			uint8_t timesPressed = 0;
-			void RemoveCallback(BasicCallback*);
-			inline BasicHandler(const std::string& input) : input(input) {};
-		};
+		void AddWidget(ID<Widget> widget);
+		bool RemoveWidget(ID<Widget> widget);
 
-		struct RangedHandler
-		{
-			struct RangedCallback : Callback
-			{
-				RangedHandler* parentHandler;
-				inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler) : Callback(callback), parentHandler(parentHandler) {}
-				~RangedCallback();
-			};
-			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
-			char key1, key2;
-			void RemoveCallback(RangedCallback*);
-			inline RangedHandler(char key1, char key2) : key1(key1), key2(key2) {};
-		};
-
-		struct CallbacksGroup
-		{
-			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
-			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
-			enum class Status : uint8_t
-			{
-				disabled,
-				enabled,
-				removeDisabled, // Remove and then return status to disabled
-				removeEnabled, // Remove and then return status to enabled
-			};
-			Status status;
-			bool synced = true;
-			inline CallbacksGroup(bool enabled = true) : status(enabled ? Status::enabled : Status::disabled) { }
-			inline void AddCallback(BasicHandler::BasicCallback* callback) { basicCallbacks.push_back(callback); callback->enabled = false; }
-			inline void AddCallback(RangedHandler::RangedCallback* callback) { rangedCallbacks.push_back(callback); callback->enabled = false; }
-			inline void Enable() { status = Status::enabled; synced = false; }
-			inline void Disable() { status = Status::disabled; synced = false; }
-			// Remove
-			void DeleteCallbacks();
-		};
-
-		std::vector<BasicHandler*> basicHandlers; // Never deleted, no need to store in pointers; handleded by indices
-		std::vector<RangedHandler*> rangedHandlers; // Never deleted, no need to store in pointers; handleded by indices
-		std::vector<CallbacksGroup*> groups; // Usually experiences deletions; handleded by pointers
-
-		BasicHandler::BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
-		RangedHandler::RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
-		CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
-
-		std::string input = std::string(7, '\0');
-		std::string quitKey = "\x03";
-
-		void Call();
-
-		bool Is(const std::string& stringKey);
-		bool Is(char charKey);
-		bool Bigger(char charKey);
-		bool Smaller(char charKey);
-		bool Between(char charKey1, char charKey2);
-		uint8_t GetInt();
-
-		void Loop();
+		void Render();
+		void Resize(UPoint res);
+	
+		inline virtual void OnTick() {};
+		
+		UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
+		~UI();
 	};
 
 	// Time manager
@@ -604,6 +664,8 @@ namespace KTech
 		Container<Layer> layers;
 		Container<Camera> cameras;
 		Container<Map> maps;
+		Container<Widget> widgets;
+		Container<UI> uis;
 
 		void CallOnTicks();
 	};

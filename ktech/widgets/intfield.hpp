@@ -18,9 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "widget.hpp"
+#include "../ktech.hpp"
 
-class IntField : public Widget
+class IntField : public KTech::Widget
 {
 public:
 	uint32_t number = 0;
@@ -123,7 +123,7 @@ public:
 	}
 
 	IntField(KTech::Engine& engine,
-		KTech::ID<KTech::Layer> layer,
+		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnInsert,
 		uint32_t min = 0,
 		uint32_t max = 255,
@@ -133,7 +133,7 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselectedRGBA = { 150, 150, 150, 255 },
 		KTech::RGBA selectedRGBA = { 255, 255, 255, 255 })
-		: Widget(engine, layer, pos), OnInsert(OnInsert), min(min), max(max), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
+		: Widget(engine, ui, pos), OnInsert(OnInsert), min(min), max(max), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA)
 	{
 		for (size_t i = 1; true; i *= 10)
 		{

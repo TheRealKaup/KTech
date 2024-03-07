@@ -154,6 +154,8 @@ template class Memory::Container<Object>;
 template class Memory::Container<Layer>;
 template class Memory::Container<Camera>;
 template class Memory::Container<Map>;
+template class Memory::Container<Widget>;
+template class Memory::Container<UI>;
 
 void KTech::Memory::CallOnTicks()
 {

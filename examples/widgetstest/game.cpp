@@ -31,11 +31,11 @@ void Quit()
 	engine.running = false;
 }
 
-struct UI
+struct UITest
 {
 	Widget* widgets[4];
 	
-	ID<Layer> layer;
+	ID<UI> ui;
 
 	enum WidgetIndex
 	{
@@ -56,7 +56,7 @@ struct UI
 		{
 			countdown--;
 			widgets[0]->textures[0].Write({"Exiting in " + std::to_string(countdown)}, widgets[0]->textures[0].t[0][0].f, RGBAColors::transparent, Point(1, 1));
-			countdownInvocation = engine.time.Invoke(std::bind(&UI::Countdown, this), 1, Time::Measurement::seconds);
+			countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 		}
 		else
 			Quit();
@@ -67,7 +67,7 @@ struct UI
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
-		widgets[0] = new Button(engine, layer, std::bind(&UI::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
+		widgets[0] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
@@ -79,11 +79,11 @@ struct UI
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
-		widgets[0] = new Button(engine, layer, std::bind(&UI::CancelCountdown, this), Keys::return_, Point(0, 0), "Exiting in 3", true);
+		widgets[0] = new Button(engine, ui, std::bind(&UITest::CancelCountdown, this), Keys::return_, Point(0, 0), "Exiting in 3", true);
 		countdown = 3;
 		// Invoke countdown
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
-		countdownInvocation = engine.time.Invoke(std::bind(&UI::Countdown, this), 1, Time::Measurement::seconds);
+		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 		// As can be seen, the first `return_` press does not also call `Exit()`! Nice!
 		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
@@ -114,31 +114,29 @@ struct UI
 		engine.io.Log("(GAME) <UI::MoveDown()> EOF", RGBColors::orange);
 	}
 
-	UI(ID<Layer> layer) : layer(layer)
+	UITest(ID<UI> ui) : ui(ui)
 	{
-		widgets[0] = new Button(engine, layer, std::bind(&UI::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
-		widgets[1] = new IntField(engine, layer, nullptr, 0, 999, "123", Point(0, 4), "Int = ", true);
-		widgets[2] = new StringField(engine, layer, nullptr, {keyrange_all}, Point(0, 8), "String = ", 4, "Test", true);
-		widgets[3] = new Switch(engine, layer, nullptr, Keys::return_, Point(0, 12), "Switch", false, true);
+		widgets[0] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
+		widgets[1] = new IntField(engine, ui, nullptr, 0, 999, "123", Point(0, 4), "Int = ", true);
+		widgets[2] = new StringField(engine, ui, nullptr, {keyrange_all}, Point(0, 8), "String = ", 4, "Test", true);
+		widgets[3] = new Switch(engine, ui, nullptr, Keys::return_, Point(0, 12), "Switch", false, true);
 
 		widgets[currentWidget]->Select();
 
-		engine.io.RegisterCallback(Keys::Shift::tab, std::bind(&UI::MoveUp, this));
-		engine.io.RegisterCallback(Keys::tab, std::bind(&UI::MoveDown, this));
+		engine.io.RegisterCallback(Keys::Shift::tab, std::bind(&UITest::MoveUp, this));
+		engine.io.RegisterCallback(Keys::tab, std::bind(&UITest::MoveDown, this));
 	}
 };
 
 int main()
 {
-	engine.io.PrintStartupNotice("widgetstest, a user interface example based on KTech.", "2024", "Ethan Kaufman", "widgetstest");
+	// engine.io.PrintStartupNotice("widgetstest, a user interface example based on KTech.", "2024", "Ethan Kaufman", "widgetstest");
 
 	Map map(engine);
-	Layer layer(engine, map.id);
 
-	Camera camera(engine, Point(0, 0), UPoint(20, 20));
-	map.AddCamera(camera.id, true);
+	UI ui(engine, UPoint(20, 20));
 
-	UI ui(layer.id);
+	UITest uiTest(ui.id);
 
 	while (engine.running)
 	{
@@ -156,9 +154,9 @@ int main()
 
 		// Render, draw and print
 		engine.io.Log("(GAME) <main()::GameLoop> Render", RGBColors::green);
-		map.Render();
+		ui.Render();
 		engine.io.Log("(GAME) <main()::GameLoop> Draw", RGBColors::green);
-		engine.io.Draw(camera.image);
+		engine.io.Draw(ui.image);
 		engine.io.Log("(GAME) <main()::GameLoop> Print", RGBColors::green);
 		engine.io.Print();
 

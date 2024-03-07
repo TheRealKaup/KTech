@@ -18,7 +18,7 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "widget.hpp"
+#include "../ktech.hpp"
 
 struct KeyRange
 {
@@ -31,7 +31,7 @@ inline constexpr KeyRange keyrange_upper = KeyRange('A', 'Z');
 inline constexpr KeyRange keyrange_numbers = KeyRange('0', '9');
 inline constexpr KeyRange keyrange_all = KeyRange(' ', '~');
 
-class StringField : public Widget
+class StringField : public KTech::Widget
 {
 public:
 	std::string string = "";
@@ -98,7 +98,7 @@ public:
 	}
 
 	StringField(KTech::Engine& engine,
-		KTech::ID<KTech::Layer> layer,
+		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnInsert = 0,
 		std::vector<KeyRange> allowedCharacters = {keyrange_all},
 		KTech::Point pos = { 0, 0 },
@@ -108,7 +108,7 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselectedRGBA = KTech::RGBA(150, 150, 150, 255),
 		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
-		: Widget(engine, layer, pos), OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
+		: Widget(engine, ui, pos), OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
 	{
 		// Texture
 		if (withFrame)

@@ -18,9 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "widget.hpp"
+#include "../ktech.hpp"
 
-class AboutBox : public Widget
+class AboutBox : public KTech::Widget
 {
 public:
 	bool down = false;
@@ -96,7 +96,7 @@ public:
 	}
 
 	AboutBox(KTech::Engine& engine,
-		KTech::ID<KTech::Layer> layer,
+		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnPress,
 		const std::string& key = KTech::Keys::return_,
 		KTech::Point pos = { 0, 0 },
@@ -108,7 +108,7 @@ public:
 		KTech::RGBA unselectedOnRGBA = KTech::RGBA( 88, 150, 88, 255 ),
 		KTech::RGBA selectedOnRGBA = KTech::RGBA( 150, 255, 150, 255 ),
 		KTech::RGBA downRGBA = KTech::RGBA(150, 150, 255, 255))
-		: Widget(engine, layer, pos), OnPress(OnPress), on(on), unselectedOffRGBA(unselectedOffRGBA), selectedOffRGBA(selectedOffRGBA), unselectedOnRGBA(unselectedOnRGBA), selectedOnRGBA(selectedOnRGBA), downRGBA(downRGBA)
+		: Widget(engine, ui, pos), OnPress(OnPress), on(on), unselectedOffRGBA(unselectedOffRGBA), selectedOffRGBA(selectedOffRGBA), unselectedOnRGBA(unselectedOnRGBA), selectedOnRGBA(selectedOnRGBA), downRGBA(downRGBA)
 	{
 		// Texture
 		if (withFrame)

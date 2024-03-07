@@ -18,9 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "widget.hpp"
+#include "../ktech.hpp"
 
-class Button : public Widget
+class Button : public KTech::Widget
 {
 public:
 	std::function<void()> OnPress;
@@ -63,7 +63,7 @@ public:
 	}
 
 	Button(KTech::Engine& engine,
-		KTech::ID<KTech::Layer> layer,
+		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnPress,
 		std::string key = KTech::Keys::return_,
 		KTech::Point pos = { 0, 0 },
@@ -72,7 +72,7 @@ public:
 		KTech::RGBA unselectedRGBA = KTech::RGBA( 150, 150, 150, 255 ),
 		KTech::RGBA selectedRGBA = KTech::RGBA( 255, 255, 255, 255 ),
 		KTech::RGBA downRGBA = KTech::RGBA(150, 150, 255, 255))
-		: Widget(engine, layer, pos), OnPress(OnPress), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), downRGBA(downRGBA)
+		: Widget(engine, ui, pos), OnPress(OnPress), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), downRGBA(downRGBA)
 	{
 		// Texture
 		if (withFrame)

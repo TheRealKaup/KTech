@@ -81,5 +81,11 @@ KTech::Map::Map(Engine& engine)
 KTech::Map::~Map()
 {
 	IO::Log("<Map[" + name + "]::~Map()>", RGBColors::red);
-	engine.memory.maps.Remove(id);	
+	for (ID<Layer>& layer : layers)
+		if (engine.memory.layers.Exists(layer))
+			engine.memory.layers[layer]->parentMap = ID<Map>(0, 0);
+	for (ID<Camera>& camera : cameras)
+		if (engine.memory.cameras.Exists(camera))
+			engine.memory.cameras[camera]->parentMap = ID<Map>(0, 0);
+	engine.memory.maps.Remove(id);
 }

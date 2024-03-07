@@ -249,6 +249,7 @@ void KTech::IO::Log(const std::string& text, RGB color)
 {
 	static uint32_t logIndex = 0;
 	std::cout << "\033[38;2;" << std::to_string(color.r) << ';' << std::to_string(color.g) << ';' << std::to_string(color.b) << 'm' << logIndex << "] " << text << "\033[m" << std::endl << std::flush;
+	// std::cout << logIndex << "] " << text << std::endl << std::flush;
 	logIndex++;
 }
 

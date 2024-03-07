@@ -266,8 +266,9 @@ bool KTech::IO::Between(char charKey1, char charKey2)
 
 KTech::IO::CallbacksGroup* KTech::IO::CreateCallbacksGroup(bool enabled)
 {
-	Log("<IO::CreateCallbacksGroup()> Creating and pushing new CallbacksGroup.", RGBColors::hotPink);
+	Log("<IO::CreateCallbacksGroup()> Creating and pushing new CallbacksGroup...", RGBColors::hotPink);
 	groups.push_back(new CallbacksGroup(enabled));
+	Log("<IO::CreateCallbacksGroup()> EOF.", RGBColors::hotPink);
 	return groups[groups.size() - 1];
 }
 

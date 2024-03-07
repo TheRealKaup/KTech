@@ -38,6 +38,8 @@ KTech::Camera::Camera(Engine& engine, ID<Map>& map, Point position, UPoint resol
 KTech::Camera::~Camera()
 {
 	IO::Log("<Camera[" + name + "]::~Camera()>", RGBColors::red);
+	if (engine.memory.maps.Exists(parentMap))
+		engine.memory.maps[parentMap]->RemoveCamera(id);
 	engine.memory.cameras.Remove(id);
 }
 
@@ -63,16 +65,10 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& layers)
 
 	for (size_t l = 0; l < layers.size(); l++)
 	{
-		if (!engine.memory.layers.Exists(layers[l]) && !engine.memory.layers[layers[l]]->visible)
-			continue;
-
 		KTech::Layer* layer = engine.memory.layers[layers[l]];
 
 		for (size_t o = 0; o < layer->objects.size(); o++)
 		{
-			if (!engine.memory.objects.Exists(layer->objects[o]))
-				continue;
-
 			KTech::Object* obj = engine.memory.objects[layer->objects[o]];
 			
 			for (size_t t = 0; t < obj->textures.size(); t++)
@@ -244,17 +240,11 @@ void KTech::Camera::Render()
 		Render(engine.memory.maps[parentMap]->layers);
 }
 
-void KTech::Camera::Resize(UPoint _res)
+void KTech::Camera::Resize(UPoint newRes)
 {
 	static size_t y;
-	res = _res;
-	image.resize(_res.y);
-	// fAlphaMap.resize(_res.y);
-	// bAlphaMap.resize(_res.y);
-	for (y = 0; y < _res.y; y++)
-	{
-		image[y].resize(_res.x);
-		// fAlphaMap[y].resize(_res.x);
-		// bAlphaMap[y].resize(_res.x);
-	}	
+	res = newRes;
+	image.resize(newRes.y);
+	for (y = 0; y < newRes.y; y++)
+		image[y].resize(newRes.x);
 }
