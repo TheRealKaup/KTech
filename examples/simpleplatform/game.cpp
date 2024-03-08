@@ -175,7 +175,7 @@ struct GravityBox : Object
 				"#-#",
 				"|G|",
 				"#-#"
-			}, { 100, 0, 200, 255 }, { 200, 200, 200, 200 }, { 0, 0 }
+			}, { 80, 55, 50, 255 }, { 190, 140, 115, 255 }, { 0, 0 }
 		);
 
 		colliders.resize(1);
@@ -191,13 +191,14 @@ struct AutoUpdatingText : Object
 
 	void OnTick()
 	{
-		textures[0].Write({std::to_string(*data)}, {255, 255, 255, 255}, {0, 0, 0, 127}, {0, 0});
+		textures[1].Write({std::to_string(*data)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(textures[0].GetSize().x, 0));
 	}
 
-	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer) : Object(engine, pos), data(data)
+	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text) : Object(engine, pos), data(data)
 	{
 		EnterLayer(layer);
-		textures.resize(1);
+		textures.resize(2);
+		textures[0].Write({ text },  RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(0, 0));
 	}
 };
 
@@ -309,7 +310,7 @@ int main()
 	darkLayer.alpha = 127;
 	
 	KTech::IO::Log("<main()> Creating AutoUpdatingText", RGBColors::blue);
-	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.id);
+	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.id, "FPS: ");
 	tpsText.name = "tpsText";
 
 	KTech::IO::Log("<main()> Entering game loop", RGBColors::blue);
