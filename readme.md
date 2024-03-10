@@ -69,9 +69,9 @@ Here's how a very simple KTech game can look like:
 
 ## Contributing
 
-\<to be written>
-
-Useful link - https://github.com/TheRealKaup/KTech/contribute
+- GitHub issues recommended for new contributers are listed at https://github.com/TheRealKaup/KTech/contribute.
+- Please report bugs and suggestions. You can do so in the form of a detailed issue, there's no specific format to comply with.
+- You are very welcome to contribute code via a pull request.
 
 ---
 
@@ -79,6 +79,7 @@ Useful link - https://github.com/TheRealKaup/KTech/contribute
 
 Kaup (Ethan Kaufman):
 - Email: ethan.kauf736@gmail.com
+- Instagram: https://www.instagram.com/kaufboi/
 
 ---
 
