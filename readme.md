@@ -55,12 +55,12 @@ Here's how a very simple KTech game can look like:
 
 ## Documentation
 
-- [quickstart.md](documentation/quickstart.md) - quick start guide if you want to experiment with KTech right away.
-- [reference.md](documentation/reference.md) - (will exist in the future) direct and concise information about each element of the library.
-- [tutorials.md](documentation/tutorials.md) - (will exist in the future) tutorials about getting KTech, using its different elements, creating a game with it and compiling.
-- [faq.md](documentation/faq.md) - (will exist in the future) answers for frequently asked questions.
-- [examples.md](documentation/examples.md) - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
-- [LICENSE](COPYING) - the license which covers KTech (GPLv3-or-later).
+- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away.
+- **[reference.md](documentation/reference.md)** - (will exist in the future) direct and concise information about each element of the library.
+- **[tutorials.md](documentation/tutorials.md)** - (will exist in the future) tutorials about getting KTech, using its different elements, creating a game with it and compiling.
+- **[faq.md](documentation/faq.md)** - (will exist in the future) answers for frequently asked questions.
+- **[examples.md](documentation/examples.md)** - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
+- **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
 
 ---
 
