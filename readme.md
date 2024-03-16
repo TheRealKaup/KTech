@@ -1,9 +1,9 @@
 # *KTech*, Kaup's C++ Terminal Game Engine Library
 
 - [Introduction](#introduction) - general explanation of what KTech is.
+- [Documentation](#documentation) - links to the project's documentation.
 - [Capabilities](#capabilities) - key features included in the library. 
 - [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
-- [Documentation](#documentation) - links to the project's documentation.
 - [Contributing](#contributing) - how to contribute to the development of KTech.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
@@ -30,6 +30,17 @@ Here's how a very simple KTech game can look like:
 
 ---
 
+## Documentation
+
+- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away.
+- **[reference.md](documentation/reference.md)** - (will exist in the future) direct and concise information about each element of the library.
+- **[tutorials.md](documentation/tutorials.md)** - (will exist in the future) tutorials about getting KTech, using its different elements, creating a game with it and compiling.
+- **[faq.md](documentation/faq.md)** - (will exist in the future) answers for frequently asked questions.
+- **[examples.md](documentation/examples.md)** - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
+- **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
+
+---
+
 ## Capabilities
 
 - **Graphics** - Rendering terminal graphics with 24-bit color depth, opacity and layers.
@@ -50,17 +61,6 @@ Here's how a very simple KTech game can look like:
 - The engine relies only on the CPU for its processing (audio, graphics, collision...) and achieves more than playable performance.
 - Making a game with KTech can be entirely done from a terminal by using a terminal text editor (like Vim) for writing code, the TextureCreator application for creating textures, a C++ compiler accessible from a terminal, and by simply running the game to play it in the terminal.
 - I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this is the biggest programming project I have ever worked on, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into it.
-
----
-
-## Documentation
-
-- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away.
-- **[reference.md](documentation/reference.md)** - (will exist in the future) direct and concise information about each element of the library.
-- **[tutorials.md](documentation/tutorials.md)** - (will exist in the future) tutorials about getting KTech, using its different elements, creating a game with it and compiling.
-- **[faq.md](documentation/faq.md)** - (will exist in the future) answers for frequently asked questions.
-- **[examples.md](documentation/examples.md)** - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
-- **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
 
 ---
 
