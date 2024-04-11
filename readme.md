@@ -1,12 +1,9 @@
-# KTech
+# *KTech*, Kaup's C++ Terminal Game Engine Library
 
-***KTech*** is Kaup's C++ terminal game engine library.
-
-Table of contents:
 - [Introduction](#introduction) - general explanation of what KTech is.
+- [Documentation](#documentation) - links to the project's documentation.
 - [Capabilities](#capabilities) - key features included in the library. 
 - [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
-- [Documentation](#documentation) - links to the project's documentation.
 - [Contributing](#contributing) - how to contribute to the development of KTech.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
@@ -33,6 +30,17 @@ Here's how a very simple KTech game can look like:
 
 ---
 
+## Documentation
+
+- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away.
+- **[reference.md](documentation/reference.md)** - (will exist in the future) direct and concise information about each element of the library.
+- **[tutorials.md](documentation/tutorials.md)** - (will exist in the future) tutorials about getting KTech, using its different elements, creating a game with it and compiling.
+- **[faq.md](documentation/faq.md)** - (will exist in the future) answers for frequently asked questions.
+- **[examples.md](documentation/examples.md)** - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
+- **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
+
+---
+
 ## Capabilities
 
 - **Graphics** - Rendering terminal graphics with 24-bit color depth, opacity and layers.
@@ -56,22 +64,11 @@ Here's how a very simple KTech game can look like:
 
 ---
 
-## Documentation
-
-- [quickstart.md](documentation/quickstart.md) - quick start guide if you want to experiment with KTech right away.
-- [reference.md](documentation/reference.md) - (will exist in the future) direct and concise information about each element of the library.
-- [tutorials.md](documentation/tutorials.md) - (will exist in the future) tutorials about getting KTech, using its different elements, creating a game with it and compiling.
-- [faq.md](documentation/faq.md) - (will exist in the future) answers for frequently asked questions.
-- [examples.md](documentation/examples.md) - (will exist in the future) analyses and explanations of the examples included in the "examples" directory in this repository.
-- [LICENSE](COPYING) - the license which covers KTech (GPLv3-or-later).
-
----
-
 ## Contributing
 
-\<to be written>
-
-Useful link - https://github.com/TheRealKaup/KTech/contribute
+- GitHub issues recommended for new contributers are listed at https://github.com/TheRealKaup/KTech/contribute.
+- Please report bugs and suggestions. You can do so in the form of a detailed issue, there's no specific format to comply with.
+- You are very welcome to contribute code via a pull request.
 
 ---
 
@@ -79,6 +76,7 @@ Useful link - https://github.com/TheRealKaup/KTech/contribute
 
 Kaup (Ethan Kaufman):
 - Email: ethan.kauf736@gmail.com
+- Instagram: https://www.instagram.com/kaufboi/
 
 ---
 
