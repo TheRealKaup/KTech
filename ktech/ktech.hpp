@@ -105,15 +105,9 @@ namespace KTech
 	};
 
 	// Manager of all things that directly work with terminal I/O.
-	class IO
+	struct IO
 	{
-	public:
 		Engine* engine;
-
-		// Prepares terminal, creates input loop thread
-		IO(KTech::UPoint imageSize, Engine* engine);
-		// Resets terminal
-		~IO();
 
 		termios oldTerminalAttributes;
 		
@@ -122,6 +116,11 @@ namespace KTech
 		std::string stringImage;
 
 		std::thread t_inputLoop;
+
+		// Prepares terminal, creates input loop thread
+		IO(KTech::UPoint imageSize, Engine* engine);
+		// Resets terminal
+		~IO();
 
 		void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
 
@@ -153,8 +152,8 @@ namespace KTech
 			std::vector<BasicCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			std::string input;
 			uint8_t timesPressed = 0;
-			void RemoveCallback(BasicCallback*);
 			inline BasicHandler(const std::string& input) : input(input) {};
+			void RemoveCallback(BasicCallback*);
 		};
 
 		struct RangedHandler
@@ -167,14 +166,12 @@ namespace KTech
 			};
 			std::vector<RangedCallback*> callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
 			char key1, key2;
-			void RemoveCallback(RangedCallback*);
 			inline RangedHandler(char key1, char key2) : key1(key1), key2(key2) {};
+			void RemoveCallback(RangedCallback*);
 		};
 
 		struct CallbacksGroup
 		{
-			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
-			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
 			enum class Status : uint8_t
 			{
 				disabled,
@@ -182,6 +179,8 @@ namespace KTech
 				removeDisabled, // Remove and then return status to disabled
 				removeEnabled, // Remove and then return status to enabled
 			};
+			std::vector<BasicHandler::BasicCallback*> basicCallbacks;
+			std::vector<RangedHandler::RangedCallback*> rangedCallbacks;
 			Status status;
 			bool synced = true;
 			inline CallbacksGroup(bool enabled = true) : status(enabled ? Status::enabled : Status::disabled) { }
@@ -240,11 +239,13 @@ namespace KTech
 		UPoint File(const std::string& fileName, Point relative_position = Point(0, 0));
 		void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point relative_position = Point(0, 0));
 
-		void Resize(UPoint newSize, CellA newValue);
+		void Resize(UPoint newSize, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
 		void SetCell(CellA value);
 		void SetForeground(RGBA value);
 		void SetBackground(RGBA value);
 		void SetCharacter(char value);
+		void SetForegroundAlpha(uint8_t value);
+		void SetBackgroundAlpha(uint8_t value);
 		void SetAlpha(uint8_t value);
 		
 		UPoint GetSize() const;
@@ -412,6 +413,10 @@ namespace KTech
 		std::vector<Texture> textures = {};
 		IO::CallbacksGroup* callbacksGroup;
 		bool selected = false;
+		bool shown = true;
+
+		Widget(Engine& engine, ID<UI> parentUI, Point pos);
+		~Widget();
 
 		inline virtual void RenderSelected () {}
 		inline virtual void RenderUnselected () {}
@@ -421,9 +426,6 @@ namespace KTech
 		void EnterUI(ID<UI> ui);
 
 		inline virtual void OnTick() {};
-
-		Widget(Engine& engine, ID<UI> parentUI, Point pos);
-		~Widget();
 	};
 
 	// Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.

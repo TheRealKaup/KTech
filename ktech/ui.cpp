@@ -77,7 +77,9 @@ void KTech::UI::Render()
 	for (size_t w = 0; w < widgets.size(); w++)
 	{
 		KTech::Widget* widget = engine.memory.widgets[widgets[w]];
-		
+		if (!widget->shown)
+			continue;
+
 		for (size_t t = 0; t < widget->textures.size(); t++)
 		{
 			KTech::Texture& texture = widget->textures[t];
@@ -128,15 +130,13 @@ void KTech::UI::Render()
 					for (size_t x = start.x; x < end.x; x++)
 					{
 						if (texture.value.c != ' ')
-						{
 							image[y][x].c = texture.value.c;
-							//                            8.            8 ->                          16 ->                 8.
-							image[y][x].f.r = tempFRGBA.r + image[y][x].f.r * (255 - tempFRGBA.a) / 255;
-							image[y][x].f.g = tempFRGBA.g + image[y][x].f.g * (255 - tempFRGBA.a) / 255;
-							image[y][x].f.b = tempFRGBA.b + image[y][x].f.b * (255 - tempFRGBA.a) / 255;
-							image[y][x].f.a += tempFRGBA.a * (255 - image[y][x].f.a) / 255;
-						}
-						//                            8.            8 ->                          16 ->                 8.
+						//                8.            8 ->              16 ->                 8.
+						image[y][x].f.r = tempFRGBA.r + image[y][x].f.r * (255 - tempFRGBA.a) / 255;
+						image[y][x].f.g = tempFRGBA.g + image[y][x].f.g * (255 - tempFRGBA.a) / 255;
+						image[y][x].f.b = tempFRGBA.b + image[y][x].f.b * (255 - tempFRGBA.a) / 255;
+						image[y][x].f.a += tempFRGBA.a * (255 - image[y][x].f.a) / 255;
+						//                8.            8 ->              16 ->                 8.
 						image[y][x].b.r = tempBRGBA.r + image[y][x].b.r * (255 - tempBRGBA.a) / 255;
 						image[y][x].b.g = tempBRGBA.g + image[y][x].b.g * (255 - tempBRGBA.a) / 255;
 						image[y][x].b.b = tempBRGBA.b + image[y][x].b.b * (255 - tempBRGBA.a) / 255;
@@ -179,17 +179,15 @@ void KTech::UI::Render()
 					for (; x < texture.t[y].size() && start.x < res.x; x++, start.x++)
 					{
 						if (texture.t[y][x].c != ' ')
-						{
 							image[start.y][start.x].c = texture.t[y][x].c; // Character
-							// Precalculate foreground * layer alpha (8 bit depth)
-							//          8 ->                   16 ->          8.
-							tempAlpha = texture.t[y][x].f.a * alpha / 255;
-							//                            (8 ->                   16.         8 ->                           16.) 16 ->          8.
-							image[start.y][start.x].f.r = (texture.t[y][x].f.r * tempAlpha + image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
-							image[start.y][start.x].f.g = (texture.t[y][x].f.g * tempAlpha + image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
-							image[start.y][start.x].f.b = (texture.t[y][x].f.b * tempAlpha + image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
-							image[start.y][start.x].f.a += tempAlpha * (255 - image[start.y][start.x].f.a) / 255;
-						}
+						// Precalculate foreground * layer alpha (8 bit depth)
+						//          8 ->                   16 ->          8.
+						tempAlpha = texture.t[y][x].f.a * alpha / 255;
+						//                            (8 ->                   16.         8 ->                           16.) 16 ->          8.
+						image[start.y][start.x].f.r = (texture.t[y][x].f.r * tempAlpha + image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
+						image[start.y][start.x].f.g = (texture.t[y][x].f.g * tempAlpha + image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
+						image[start.y][start.x].f.b = (texture.t[y][x].f.b * tempAlpha + image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
+						image[start.y][start.x].f.a += tempAlpha * (255 - image[start.y][start.x].f.a) / 255;
 						// Precalculate background * layer alpha (8 bit depth)
 						//          8 ->                    16 ->                 8.
 						tempAlpha = texture.t[y][x].b.a * alpha / 255;

@@ -69,7 +69,7 @@ private:
 	}
 
 public:
-	virtual void RenderSelected()
+	virtual void RenderSelected() override
 	{
 		if (on)
 			for (size_t i = 0; i < textures.size(); i++)
@@ -79,7 +79,7 @@ public:
 				textures[i].SetForeground(selectedOffRGBA);
 	}  
 
-	virtual void RenderUnselected()
+	virtual void RenderUnselected() override
 	{
 		if (on)
 			for (size_t i = 0; i < textures.size(); i++)

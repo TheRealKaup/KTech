@@ -122,15 +122,13 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& layers)
     					for (size_t x = start.x; x < end.x; x++)
 						{
 							if (texture.value.c != ' ')
-							{
 								image[y][x].c = texture.value.c;
-								//                            8.            8 ->                          16 ->                 8.
-								image[y][x].f.r = tempFRGBA.r + image[y][x].f.r * (255 - tempFRGBA.a) / 255;
-								image[y][x].f.g = tempFRGBA.g + image[y][x].f.g * (255 - tempFRGBA.a) / 255;
-								image[y][x].f.b = tempFRGBA.b + image[y][x].f.b * (255 - tempFRGBA.a) / 255;
-								image[y][x].f.a += tempFRGBA.a * (255 - image[y][x].f.a) / 255;
-							}
-							//                            8.            8 ->                          16 ->                 8.
+							//                8.            8 ->              16 ->                 8.
+							image[y][x].f.r = tempFRGBA.r + image[y][x].f.r * (255 - tempFRGBA.a) / 255;
+							image[y][x].f.g = tempFRGBA.g + image[y][x].f.g * (255 - tempFRGBA.a) / 255;
+							image[y][x].f.b = tempFRGBA.b + image[y][x].f.b * (255 - tempFRGBA.a) / 255;
+							image[y][x].f.a += tempFRGBA.a * (255 - image[y][x].f.a) / 255;
+							//                8.            8 ->              16 ->                 8.
 							image[y][x].b.r = tempBRGBA.r + image[y][x].b.r * (255 - tempBRGBA.a) / 255;
 							image[y][x].b.g = tempBRGBA.g + image[y][x].b.g * (255 - tempBRGBA.a) / 255;
 							image[y][x].b.b = tempBRGBA.b + image[y][x].b.b * (255 - tempBRGBA.a) / 255;
@@ -173,21 +171,19 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& layers)
 						for (; x < texture.t[y].size() && start.x < res.x; x++, start.x++)
 						{
 							if (texture.t[y][x].c != ' ')
-							{
 								image[start.y][start.x].c = texture.t[y][x].c; // Character
-								// Precalculate foreground * layer alpha (8 bit depth)
-								//          8 ->                   16 ->          8.
-								tempAlpha = texture.t[y][x].f.a * layer->alpha / 255;
-								//                            (8 ->                   16.         8 ->                           16.) 16 ->         8.
-								image[start.y][start.x].f.r = (texture.t[y][x].f.r * tempAlpha + image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
-								image[start.y][start.x].f.g = (texture.t[y][x].f.g * tempAlpha + image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
-								image[start.y][start.x].f.b = (texture.t[y][x].f.b * tempAlpha + image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
-								image[start.y][start.x].f.a += tempAlpha * (255 - image[start.y][start.x].f.a) / 255;
-							}
+							// Precalculate foreground * layer alpha (8 bit depth)
+							//          8 ->                  16 ->          8.
+							tempAlpha = texture.t[y][x].f.a * layer->alpha / 255;
+							//                            (8 ->                  16.         8 ->                          16.) ->              8.
+							image[start.y][start.x].f.r = (texture.t[y][x].f.r * tempAlpha + image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
+							image[start.y][start.x].f.g = (texture.t[y][x].f.g * tempAlpha + image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
+							image[start.y][start.x].f.b = (texture.t[y][x].f.b * tempAlpha + image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
+							image[start.y][start.x].f.a += tempAlpha * (255 - image[start.y][start.x].f.a) / 255;
 							// Precalculate background * layer alpha (8 bit depth)
 							//          8 ->                    16 ->                 8.
 							tempAlpha = texture.t[y][x].b.a * layer->alpha / 255;
-							//                            (8 ->                   16.         8 ->                           16.) 16 ->         8.
+							//                            (8 ->                  16.         8 ->                          16.) ->              8.
 							image[start.y][start.x].b.r = (texture.t[y][x].b.r * tempAlpha + image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
 							image[start.y][start.x].b.g = (texture.t[y][x].b.g * tempAlpha + image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
 							image[start.y][start.x].b.b = (texture.t[y][x].b.b * tempAlpha + image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;

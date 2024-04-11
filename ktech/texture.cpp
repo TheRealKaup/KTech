@@ -46,6 +46,11 @@ KTech::UPoint KTech::Texture::File(const std::string& fileName, Point _pos)
 	if (!file.is_open())
 	{
 		IO::Log("<KTech::Texture::File()> Error! Failed to open file " + fileName + ".", RGB(255, 0, 0));
+		t.resize(2, std::vector<CellA>(2));
+		t[0][0].b = RGBA(255, 0, 220, 255);
+		t[1][1].b = RGBA(255, 0, 220, 255);
+		t[0][1].b = RGBA(0, 0, 0, 255);
+		t[1][0].b = RGBA(0, 0, 0, 255);
 		return UPoint(0, 0);
 	}
 
@@ -109,7 +114,7 @@ void KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA fr
 	{
 		t[y].resize(stringVector[y].length());
 		for (size_t x = 0; x < stringVector[y].length(); x++)
-			t[y][x] = CellA(stringVector[y][x], frgba, brgba);
+			t[y][x] = CellA(stringVector[y][x], (stringVector[y][x] == ' ' ? RGBA(RGBAColors::transparent) : frgba) , brgba);
 	}	
 }
 
@@ -166,6 +171,26 @@ void KTech::Texture::SetCharacter(char _value)
 		for (size_t y = 0; y < t.size(); y++)
 			for (size_t x = 0; x < t[y].size(); x++)
 				t[y][x].c = _value;
+}
+
+void KTech::Texture::SetForegroundAlpha(uint8_t _value)
+{
+	if (simple)
+		value.f.a = _value;
+	else
+		for (size_t y = 0; y < t.size(); y++)
+			for (size_t x = 0; x < t[y].size(); x++)
+				t[y][x].f.a = _value;
+}
+
+void KTech::Texture::SetBackgroundAlpha(uint8_t _value)
+{
+	if (simple)
+		value.b.a = _value;
+	else
+		for (size_t y = 0; y < t.size(); y++)
+			for (size_t x = 0; x < t[y].size(); x++)
+				t[y][x].b.a = _value;
 }
 
 void KTech::Texture::SetAlpha(uint8_t _value)
