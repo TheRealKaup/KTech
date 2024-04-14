@@ -26,6 +26,8 @@
 	In order to contact me (Kaup), refer to the "readme.md" file.
 */
 
+#pragma once
+
 #include <cstdint>
 
 namespace KTech
@@ -67,9 +69,10 @@ namespace KTech
 	namespace Keys {}
 }
 
+// Avoids errors caused by files building order by not including the following inclusions in the other header files.
+// For example `audio.hpp` might be processed first by the compiler, which will include `engine.hpp` via here, thus causing
+// an incomplete type error, as it contains an `Audio` member, meanwhile, the `Audio` class hasn't been defined yet. 
 #ifndef KTECH_DEFINITION
-#ifndef KTECH_H
-#define KTECH_H
 #include "basic_structs/point.hpp"
 #include "basic_structs/upoint.hpp"
 #include "basic_structs/rgb.hpp"
@@ -99,5 +102,4 @@ namespace KTech
 #include "engine/memory.hpp"
 #include "engine/time.hpp"
 #include "engine/engine.hpp"
-#endif
 #endif
