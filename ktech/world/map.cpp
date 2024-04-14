@@ -18,7 +18,11 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "map.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "layer.hpp"
+#include "camera.hpp"
+#include "../engine/engine.hpp"
 
 int KTech::Map::AddCamera(ID<Camera>& camera, bool asActiveCamera)
 {

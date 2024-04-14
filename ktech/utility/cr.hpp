@@ -18,14 +18,16 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#pragma once
 
-KTech::Time::TimePoint::TimePoint()
-{
-	chronoTimePoint = std::chrono::high_resolution_clock::now();
-}
+#define KTECH_DEFINITION
+#include "../ktech.hpp"
+#undef KTECH_DEFINITION
 
-void KTech::Time::TimePoint::SetToNow()
+// Collision Result
+enum class KTech::CR : uint8_t
 {
-	chronoTimePoint = std::chrono::high_resolution_clock::now();
-}
+	B,	// Block
+	P,	// Push
+	O	// Overlap
+};

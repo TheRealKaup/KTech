@@ -18,22 +18,16 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#pragma once
 
-using namespace KTech;
+#define KTECH_DEFINITION
+#include "../ktech.hpp"
+#undef KTECH_DEFINITION
 
-void KTech::Memory::CallOnTicks()
+struct KTech::Point
 {
-	for (size_t i = 0; i < uis.size; i++)
-		uis.arr[i]->OnTick();
-	for (size_t i = 0; i < widgets.size; i++)
-		widgets.arr[i]->OnTick();
-	for (size_t i = 0; i < maps.size; i++)
-		maps.arr[i]->OnTick();
-	for (size_t i = 0; i < cameras.size; i++)
-		cameras.arr[i]->OnTick();
-	for (size_t i = 0; i < layers.size; i++)
-		layers.arr[i]->OnTick();
-	for (size_t i = 0; i < objects.size; i++)
-		objects.arr[i]->OnTick();
-}
+	int32_t x, y;
+
+	constexpr inline Point(int32_t x = 0, int32_t y = 0)
+		: x(x), y(y) {}
+};

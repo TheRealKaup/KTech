@@ -18,7 +18,11 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "layer.hpp"
+#include "../world/object.hpp"
+#include "../world/map.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../engine/engine.hpp"
 
 void KTech::Layer::AddObject(ID<Object>& object)
 {

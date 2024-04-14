@@ -18,8 +18,15 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
-#include <cstring>
+#include "io.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../utility/keys.hpp"
+#include "../basic/upoint.hpp"
+#include "../basic/cell.hpp"
+#include "../basic/cella.hpp"
+#include "../engine/engine.hpp"
+
+#include <iostream>
 
 void KTech::IO::Draw(const std::vector<std::vector<CellA>>& render, Point pos, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t alpha)
 {

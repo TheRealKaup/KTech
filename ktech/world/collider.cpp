@@ -18,7 +18,10 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "collider.hpp"
+#include "texture.hpp"
+
+#include <fstream>
 
 void KTech::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
 {

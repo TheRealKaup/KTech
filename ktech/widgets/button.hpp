@@ -18,6 +18,8 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 #include "../ktech.hpp"
 
 class Button : public KTech::Widget

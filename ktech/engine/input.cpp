@@ -18,7 +18,12 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "io.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../engine/engine.hpp"
+
+#include <cstring>
+#include <unistd.h>
 
 #define maxInputLength 7
 

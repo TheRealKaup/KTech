@@ -18,7 +18,13 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "texture.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../utility/rgbacolors.hpp"
+#include "../engine/engine.hpp"
+
+#include <iostream>
+#include <fstream>
 
 void KTech::Texture::Simple(UPoint _size, CellA _value, Point _pos) {
 	simple = true;

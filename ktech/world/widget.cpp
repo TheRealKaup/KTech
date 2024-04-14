@@ -18,7 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "widget.hpp"
+#include "ui.hpp"
+#include "../engine/engine.hpp"
 
 KTech::Widget::Widget(KTech::Engine& engine, KTech::ID<KTech::UI> ui, KTech::Point pos)
 	: engine(engine), pos(pos), callbacksGroup(engine.io.CreateCallbacksGroup(false))

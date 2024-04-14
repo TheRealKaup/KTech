@@ -18,7 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "time.hpp"
+
+#include <thread>
 
 long KTech::Time::GetDelta(const TimePoint& a, const TimePoint& b, Measurement timeMeasurement)
 {

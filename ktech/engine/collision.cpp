@@ -18,11 +18,14 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "collision.hpp"
+#include "../basic/point.hpp"
+#include "../basic/upoint.hpp"
+#include "../world/object.hpp"
+#include "../world/layer.hpp"
+#include "../engine/engine.hpp"
 
-using namespace KTech;
-
-CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
+KTech::CR KTech::Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
 {
 	CR result = CR::O;
 	if (t1 >= 0 && t1 < colliderTypes.size())
@@ -33,14 +36,14 @@ CR Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)
 
 // `s` - simple (rectangle)
 // `p` - global position
-bool Collision::AreSimpleCollidersOverlapping(UPoint s1, Point p1, UPoint s2, Point p2)
+bool KTech::Collision::AreSimpleCollidersOverlapping(UPoint s1, Point p1, UPoint s2, Point p2)
 {
  	return (p1.x < p2.x + s2.x && p1.x + s1.x > p2.x && p1.y < p2.y + s2.y && p1.y + s1.y > p2.y);
 }
 // `s` - simple (rectangle)
 // `c` - complex (2d vector)
 // `p` - global position
-bool Collision::AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos)
+bool KTech::Collision::AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos)
 {
 	// Start Y from 0 if the simple is before the complex, or at the same position.
 	// Otherwise, add some to Y so the scanning will start from the point in which the simple collider starts.
@@ -62,7 +65,7 @@ bool Collision::AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point sim
 
 // `c` - complex (2d vector)
 // `p` - global position
-bool Collision::AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2)
+bool KTech::Collision::AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2)
 {
 	size_t y1 = 0;
 	size_t y2 = 0;
@@ -96,7 +99,7 @@ bool Collision::AreComplexCollidersOverlapping(const std::vector<std::vector<boo
 #define OBJECTS engine->memory.objects
 #define LAYERS engine->memory.layers
 
-void Collision::ExpandMovementTree(ID<Object>& thisObjID, Point dir,
+void KTech::Collision::ExpandMovementTree(ID<Object>& thisObjID, Point dir,
 	std::vector<CollisionData>& pushData,
 	std::vector<CollisionData>& blockData,
 	std::vector<CollisionData>& overlapData,
@@ -236,7 +239,7 @@ void Collision::ExpandMovementTree(ID<Object>& thisObjID, Point dir,
 	}
 }
 
-bool Collision::MoveObject(ID<Object>& object, Point dir)
+bool KTech::Collision::MoveObject(ID<Object>& object, Point dir)
 {
 	std::vector<CollisionData> pushData;
 	std::vector<CollisionData> blockData;

@@ -18,12 +18,18 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
-
-using namespace KTech;
+#include "container.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../world/ui.hpp"
+#include "../world/widget.hpp"
+#include "../world/map.hpp"
+#include "../world/camera.hpp"
+#include "../world/layer.hpp"
+#include "../world/object.hpp"
+#include "../engine/io.hpp"
 
 template<typename T>
-ID<T> Memory::Container<T>::Add(T* structure)
+KTech::ID<T> KTech::Container<T>::Add(T* structure)
 {
 	KTech::IO::Log("<Container::Add()> Start of function...", RGBColors::lime);
 	T** tmp = new T*[size + 1];
@@ -47,7 +53,7 @@ ID<T> Memory::Container<T>::Add(T* structure)
 }
 
 template<typename T>
-inline bool Memory::Container<T>::Remove(const ID<T>& id)
+inline bool KTech::Container<T>::Remove(const ID<T>& id)
 {
 	KTech::IO::Log("<Container::Remove()> Start of function...", RGBColors::lime);
 	KTech::IO::Log("<Container::Remove()> Convert given ID to index", RGBColors::lime);
@@ -75,7 +81,7 @@ inline bool Memory::Container<T>::Remove(const ID<T>& id)
 }
 
 template<typename T>
-inline size_t Memory::Container<T>::IDToIndex(const ID<T>& id)
+inline size_t KTech::Container<T>::IDToIndex(const ID<T>& id)
 {
 	for (size_t i = (id.i < size ? id.i : size - 1);; i--)
 	{
@@ -87,7 +93,7 @@ inline size_t Memory::Container<T>::IDToIndex(const ID<T>& id)
 }
 
 template<typename T>
-inline size_t Memory::Container<T>::IDToIndex(ID<T>& id)
+inline size_t KTech::Container<T>::IDToIndex(ID<T>& id)
 {
 	for (size_t i = (id.i < size ? id.i : size - 1);; i--)
 	{
@@ -104,7 +110,7 @@ inline size_t Memory::Container<T>::IDToIndex(ID<T>& id)
 }
 
 template<typename T>
-bool Memory::Container<T>::Exists(const ID<T>& id)
+bool KTech::Container<T>::Exists(const ID<T>& id)
 {
 	if (IDToIndex(id) == size)
 		return false;
@@ -112,7 +118,7 @@ bool Memory::Container<T>::Exists(const ID<T>& id)
 }
 
 template<typename T>
-bool Memory::Container<T>::Exists(ID<T>& id)
+bool KTech::Container<T>::Exists(ID<T>& id)
 {
 	if (IDToIndex(id) == size)
 		return false;
@@ -120,7 +126,7 @@ bool Memory::Container<T>::Exists(ID<T>& id)
 }
 
 template<typename T>
-T* Memory::Container<T>::operator[](ID<T>& id)
+T* KTech::Container<T>::operator[](ID<T>& id)
 {
 	for (size_t i = (id.i < size ? id.i : size -1);; i--)
 	{
@@ -137,7 +143,7 @@ T* Memory::Container<T>::operator[](ID<T>& id)
 }
 
 template<typename T>
-T* Memory::Container<T>::operator[](const ID<T>& id)
+T* KTech::Container<T>::operator[](const ID<T>& id)
 {
 	for (size_t i = (id.i < size ? id.i : size -1);; i--)
 	{
@@ -150,9 +156,9 @@ T* Memory::Container<T>::operator[](const ID<T>& id)
 }
 
 // Explicit instantiation
-template class Memory::Container<Object>;
-template class Memory::Container<Layer>;
-template class Memory::Container<Camera>;
-template class Memory::Container<Map>;
-template class Memory::Container<Widget>;
-template class Memory::Container<UI>;
+template class KTech::Container<KTech::Object>;
+template class KTech::Container<KTech::Layer>;
+template class KTech::Container<KTech::Camera>;
+template class KTech::Container<KTech::Map>;
+template class KTech::Container<KTech::Widget>;
+template class KTech::Container<KTech::UI>;

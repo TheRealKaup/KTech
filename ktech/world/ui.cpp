@@ -18,7 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "ui.hpp"
+#include "widget.hpp"
+#include "../engine/engine.hpp"
 
 KTech::UI::UI(Engine& engine, UPoint resolution, const std::string& name)
 	: engine(engine), res(resolution), name(name)
