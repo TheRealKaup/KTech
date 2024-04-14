@@ -19,11 +19,11 @@
 */
 
 #include "io.hpp"
-#include "../misc/rgbcolors.hpp"
-#include "../misc/keys.hpp"
-#include "../basic_structs/upoint.hpp"
-#include "../basic_structs/cell.hpp"
-#include "../basic_structs/cella.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../utility/keys.hpp"
+#include "../basic/upoint.hpp"
+#include "../basic/cell.hpp"
+#include "../basic/cella.hpp"
 #include "../engine/engine.hpp"
 
 #include <iostream>

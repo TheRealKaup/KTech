@@ -19,13 +19,13 @@
 */
 
 #include "container.hpp"
-#include "../misc/rgbcolors.hpp"
-#include "../world_structs/ui.hpp"
-#include "../world_structs/widget.hpp"
-#include "../world_structs/map.hpp"
-#include "../world_structs/camera.hpp"
-#include "../world_structs/layer.hpp"
-#include "../world_structs/object.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../world/ui.hpp"
+#include "../world/widget.hpp"
+#include "../world/map.hpp"
+#include "../world/camera.hpp"
+#include "../world/layer.hpp"
+#include "../world/object.hpp"
 #include "../engine/io.hpp"
 
 template<typename T>

@@ -19,10 +19,10 @@
 */
 
 #include "collision.hpp"
-#include "../basic_structs/point.hpp"
-#include "../basic_structs/upoint.hpp"
-#include "../world_structs/object.hpp"
-#include "../world_structs/layer.hpp"
+#include "../basic/point.hpp"
+#include "../basic/upoint.hpp"
+#include "../world/object.hpp"
+#include "../world/layer.hpp"
 #include "../engine/engine.hpp"
 
 KTech::CR KTech::Collision::GetPotentialCollisionResult(uint8_t t1, uint8_t t2)

@@ -23,8 +23,8 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../misc/id.hpp"
-#include "../basic_structs/rgba.hpp"
+#include "../utility/id.hpp"
+#include "../basic/rgba.hpp"
 
 #include <string>
 #include <vector>

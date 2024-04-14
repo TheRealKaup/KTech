@@ -19,8 +19,8 @@
 */
 
 #include "texture.hpp"
-#include "../misc/rgbcolors.hpp"
-#include "../misc/rgbacolors.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../utility/rgbacolors.hpp"
 #include "../engine/engine.hpp"
 
 #include <iostream>

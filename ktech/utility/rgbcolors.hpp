@@ -23,28 +23,23 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../basic_structs/point.hpp"
-#include "../basic_structs/upoint.hpp"
+#include "../basic/rgb.hpp"
 
-#include <string>
-#include <vector>
-
-struct KTech::Collider
+namespace KTech::RGBColors
 {
-	bool active = true;
-	Point pos_r = { 0, 0 };
-	bool simple = true;
-	uint8_t type = 0;
-
-	UPoint size = { 0, 0 };
-	
-	std::vector<std::vector<bool>> c = {};
-
-	void Simple(UPoint size, uint8_t type, Point relative_position = Point(0, 0));
-	bool File(const std::string& fileName, uint8_t type, Point relative_position = Point(0, 0));
-	void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relative_position = Point(0, 0));
-	void ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
-	void ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
-
-	UPoint GetSize() const;
-};
+	constexpr RGB red = RGB(255, 0, 0);
+	constexpr RGB orange = RGB(255, 128, 0);
+	constexpr RGB yellow = RGB(255, 255, 0);
+	constexpr RGB lime = RGB(128, 255, 0);
+	constexpr RGB green = RGB(0, 255, 0);
+	constexpr RGB mint = RGB(0, 255, 128);
+	constexpr RGB cyan = RGB(0, 255, 255);
+	constexpr RGB blue = RGB(0, 128, 255);
+	constexpr RGB primaryBlue = RGB(0, 0, 255);
+	constexpr RGB purple = RGB(128, 0, 255);
+	constexpr RGB pink = RGB(255, 0, 255);
+	constexpr RGB hotPink = RGB(255, 0, 128);
+	constexpr RGB white = RGB(255, 255, 255);
+	constexpr RGB gray = RGB(160, 160, 160);
+	constexpr RGB black = RGB(0, 0, 0);
+}

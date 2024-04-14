@@ -19,9 +19,9 @@
 */
 
 #include "layer.hpp"
-#include "../world_structs/object.hpp"
-#include "../world_structs/map.hpp"
-#include "../misc/rgbcolors.hpp"
+#include "../world/object.hpp"
+#include "../world/map.hpp"
+#include "../utility/rgbcolors.hpp"
 #include "../engine/engine.hpp"
 
 void KTech::Layer::AddObject(ID<Object>& object)

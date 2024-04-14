@@ -23,10 +23,10 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../misc/id.hpp"
-#include "../basic_structs/point.hpp"
-#include "../world_structs/texture.hpp"
-#include "../world_structs/collider.hpp"
+#include "../utility/id.hpp"
+#include "../basic/point.hpp"
+#include "../world/texture.hpp"
+#include "../world/collider.hpp"
 
 struct KTech::Object
 {

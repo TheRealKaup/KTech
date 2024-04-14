@@ -23,7 +23,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../misc/id.hpp"
+#include "../utility/id.hpp"
 
 #include <string>
 #include <vector>

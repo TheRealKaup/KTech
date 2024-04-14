@@ -23,36 +23,35 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../misc/id.hpp"
-#include "../basic_structs/point.hpp"
-#include "../basic_structs/upoint.hpp"
-#include "../basic_structs/cella.hpp"
+#include "../utility/id.hpp"
+#include "../basic/point.hpp"
+#include "../world/texture.hpp"
+#include "../engine/io.hpp"
 
-#include <string>
-#include <vector>
-
-struct KTech::Camera
+// Widget is now a non-optional KTech standard
+struct KTech::Widget
 {
 	Engine& engine;
-	ID<Camera> id;
-
-	ID<Map> parentMap;
-
+	ID<Widget> id;
 	std::string name = "";
+	KTech::ID<KTech::UI> parentUI;
+
 	Point pos = Point(0, 0);
-	UPoint res = UPoint(10, 10);
-	CellA background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
-	std::vector<std::vector<CellA>> image = {};
+	
+	std::vector<Texture> textures = {};
+	IO::CallbacksGroup* callbacksGroup;
+	bool selected = false;
+	bool shown = true;
 
-	void EnterMap(ID<Map>& map);
+	Widget(Engine& engine, ID<UI> parentUI, Point pos);
+	~Widget();
 
-	void Render();
-	void Render(const std::vector<ID<Layer>>& layers);
-	void Resize(UPoint res);
+	inline virtual void RenderSelected () {}
+	inline virtual void RenderUnselected () {}
+	void Select();
+	void Deselect();
+
+	void EnterUI(ID<UI> ui);
 
 	inline virtual void OnTick() {};
-
-	Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
-	Camera(Engine& engine, ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
-	~Camera();
 };

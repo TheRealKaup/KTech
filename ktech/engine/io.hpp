@@ -23,7 +23,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../basic_structs/point.hpp"
+#include "../basic/point.hpp"
 
 #include <termio.h>
 #include <vector>

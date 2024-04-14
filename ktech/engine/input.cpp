@@ -19,7 +19,7 @@
 */
 
 #include "io.hpp"
-#include "../misc/rgbcolors.hpp"
+#include "../utility/rgbcolors.hpp"
 #include "../engine/engine.hpp"
 
 #include <cstring>

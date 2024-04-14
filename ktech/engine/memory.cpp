@@ -19,13 +19,13 @@
 */
 
 #include "memory.hpp"
-#include "../world_structs/ui.hpp"
-#include "../world_structs/widget.hpp"
-#include "../world_structs/map.hpp"
-#include "../world_structs/camera.hpp"
-#include "../world_structs/layer.hpp"
-#include "../world_structs/object.hpp"
-#include "../misc/container.hpp"
+#include "../world/ui.hpp"
+#include "../world/widget.hpp"
+#include "../world/map.hpp"
+#include "../world/camera.hpp"
+#include "../world/layer.hpp"
+#include "../world/object.hpp"
+#include "../utility/container.hpp"
 
 void KTech::Memory::CallOnTicks()
 {

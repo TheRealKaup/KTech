@@ -23,41 +23,36 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../misc/id.hpp"
-#include "../basic_structs/upoint.hpp"
-#include "../basic_structs/rgba.hpp"
-#include "../basic_structs/cella.hpp"
+#include "../utility/id.hpp"
+#include "../basic/point.hpp"
+#include "../basic/upoint.hpp"
+#include "../basic/cella.hpp"
 
 #include <string>
 #include <vector>
 
-// Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.
-struct KTech::UI
+struct KTech::Camera
 {
 	Engine& engine;
-	ID<UI> id;
+	ID<Camera> id;
+
+	ID<Map> parentMap;
+
 	std::string name = "";
-
-	// Layer parts
-	std::vector<ID<Widget>> widgets = {};
-	bool visible = true;
-	uint8_t alpha = 255;
-	RGBA frgba = { 0, 0, 0, 0 };
-	RGBA brgba = { 0, 0, 0, 0 };
-
-	// Camera parts
+	Point pos = Point(0, 0);
 	UPoint res = UPoint(10, 10);
 	CellA background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
 	std::vector<std::vector<CellA>> image = {};
 
-	void AddWidget(ID<Widget> widget);
-	bool RemoveWidget(ID<Widget> widget);
+	void EnterMap(ID<Map>& map);
 
 	void Render();
+	void Render(const std::vector<ID<Layer>>& layers);
 	void Resize(UPoint res);
 
 	inline virtual void OnTick() {};
-	
-	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
-	~UI();
+
+	Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	Camera(Engine& engine, ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	~Camera();
 };

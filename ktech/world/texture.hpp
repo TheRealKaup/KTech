@@ -23,10 +23,10 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../basic_structs/point.hpp"
-#include "../basic_structs/upoint.hpp"
-#include "../basic_structs/rgba.hpp"
-#include "../basic_structs/cella.hpp"
+#include "../basic/point.hpp"
+#include "../basic/upoint.hpp"
+#include "../basic/rgba.hpp"
+#include "../basic/cella.hpp"
 
 #include <string>
 #include <vector>

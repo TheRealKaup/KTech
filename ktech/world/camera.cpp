@@ -23,7 +23,7 @@
 #include "object.hpp"
 #include "layer.hpp"
 #include "map.hpp"
-#include "../misc/rgbcolors.hpp"
+#include "../utility/rgbcolors.hpp"
 #include "../engine/engine.hpp"
 
 KTech::Camera::Camera(Engine& engine, Point position, UPoint resolution, const std::string& name)

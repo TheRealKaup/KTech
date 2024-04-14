@@ -41,7 +41,7 @@ namespace KTech
 	struct Cell;
 	struct CellA;
 	// World structures.
-	// Definitions in `world_structs/`
+	// Definitions in `world/`
 	struct Texture;
 	struct Collider;
 	struct Object;
@@ -58,7 +58,7 @@ namespace KTech
 	class Memory;
 	class Time;
 	class Engine;
-	// Defined in `misc/`
+	// Defined in `utility/`
 	enum class CR : uint8_t;	
 	template<class T>
 	struct ID;
@@ -73,28 +73,28 @@ namespace KTech
 // For example `audio.hpp` might be processed first by the compiler, which will include `engine.hpp` via here, thus causing
 // an incomplete type error, as it contains an `Audio` member, meanwhile, the `Audio` class hasn't been defined yet. 
 #ifndef KTECH_DEFINITION
-#include "basic_structs/point.hpp"
-#include "basic_structs/upoint.hpp"
-#include "basic_structs/rgb.hpp"
-#include "basic_structs/rgba.hpp"
-#include "basic_structs/cell.hpp"
-#include "basic_structs/cella.hpp"
+#include "basic/point.hpp"
+#include "basic/upoint.hpp"
+#include "basic/rgb.hpp"
+#include "basic/rgba.hpp"
+#include "basic/cell.hpp"
+#include "basic/cella.hpp"
 
-#include "world_structs/collider.hpp"
-#include "world_structs/texture.hpp"
-#include "world_structs/object.hpp"
-#include "world_structs/layer.hpp"
-#include "world_structs/camera.hpp"
-#include "world_structs/map.hpp"
-#include "world_structs/widget.hpp"
-#include "world_structs/ui.hpp"
+#include "world/collider.hpp"
+#include "world/texture.hpp"
+#include "world/object.hpp"
+#include "world/layer.hpp"
+#include "world/camera.hpp"
+#include "world/map.hpp"
+#include "world/widget.hpp"
+#include "world/ui.hpp"
 
-#include "misc/container.hpp"
-#include "misc/cr.hpp"
-#include "misc/id.hpp"
-#include "misc/keys.hpp"
-#include "misc/rgbcolors.hpp"
-#include "misc/rgbacolors.hpp"
+#include "utility/container.hpp"
+#include "utility/cr.hpp"
+#include "utility/id.hpp"
+#include "utility/keys.hpp"
+#include "utility/rgbcolors.hpp"
+#include "utility/rgbacolors.hpp"
 
 #include "engine/audio.hpp"
 #include "engine/collision.hpp"

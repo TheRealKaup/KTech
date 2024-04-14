@@ -19,7 +19,7 @@
 */
 
 #include "map.hpp"
-#include "../misc/rgbcolors.hpp"
+#include "../utility/rgbcolors.hpp"
 #include "layer.hpp"
 #include "camera.hpp"
 #include "../engine/engine.hpp"

@@ -23,35 +23,41 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../misc/id.hpp"
-#include "../basic_structs/point.hpp"
-#include "../world_structs/texture.hpp"
-#include "../engine/io.hpp"
+#include "../utility/id.hpp"
+#include "../basic/upoint.hpp"
+#include "../basic/rgba.hpp"
+#include "../basic/cella.hpp"
 
-// Widget is now a non-optional KTech standard
-struct KTech::Widget
+#include <string>
+#include <vector>
+
+// Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.
+struct KTech::UI
 {
 	Engine& engine;
-	ID<Widget> id;
+	ID<UI> id;
 	std::string name = "";
-	KTech::ID<KTech::UI> parentUI;
 
-	Point pos = Point(0, 0);
-	
-	std::vector<Texture> textures = {};
-	IO::CallbacksGroup* callbacksGroup;
-	bool selected = false;
-	bool shown = true;
+	// Layer parts
+	std::vector<ID<Widget>> widgets = {};
+	bool visible = true;
+	uint8_t alpha = 255;
+	RGBA frgba = { 0, 0, 0, 0 };
+	RGBA brgba = { 0, 0, 0, 0 };
 
-	Widget(Engine& engine, ID<UI> parentUI, Point pos);
-	~Widget();
+	// Camera parts
+	UPoint res = UPoint(10, 10);
+	CellA background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
+	std::vector<std::vector<CellA>> image = {};
 
-	inline virtual void RenderSelected () {}
-	inline virtual void RenderUnselected () {}
-	void Select();
-	void Deselect();
+	void AddWidget(ID<Widget> widget);
+	bool RemoveWidget(ID<Widget> widget);
 
-	void EnterUI(ID<UI> ui);
+	void Render();
+	void Resize(UPoint res);
 
 	inline virtual void OnTick() {};
+	
+	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	~UI();
 };

@@ -28,8 +28,8 @@
 #include "io.hpp"
 #include "memory.hpp"
 #include "time.hpp"
-#include "../basic_structs/rgb.hpp"
-#include "../basic_structs/upoint.hpp"
+#include "../basic/rgb.hpp"
+#include "../basic/upoint.hpp"
 
 // Core class, the user should create one of these, and shouldn't have to construct themselves 
 // a system using the other namespaces themselves

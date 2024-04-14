@@ -20,7 +20,7 @@
 
 #include "object.hpp"
 #include "layer.hpp"
-#include "../misc/rgbcolors.hpp"
+#include "../utility/rgbcolors.hpp"
 #include "../engine/engine.hpp"
 
 void KTech::Object::EnterLayer(ID<Layer>& layer)

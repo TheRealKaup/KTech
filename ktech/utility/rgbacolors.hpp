@@ -23,7 +23,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../basic_structs/rgba.hpp"
+#include "../basic/rgba.hpp"
 
 namespace KTech::RGBAColors
 {
