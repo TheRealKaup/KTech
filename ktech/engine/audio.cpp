@@ -18,7 +18,11 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "audio.hpp"
+
+#include <iostream>
+#include <cstring>
+#include <fstream>
 
 // Audio values: 16 bit depth, 2 channels, default (probably 44100) sample rate
 

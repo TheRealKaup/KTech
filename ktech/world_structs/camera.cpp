@@ -18,7 +18,13 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ktech.hpp"
+#include "camera.hpp"
+#include "texture.hpp"
+#include "object.hpp"
+#include "layer.hpp"
+#include "map.hpp"
+#include "../misc/rgbcolors.hpp"
+#include "../engine/engine.hpp"
 
 KTech::Camera::Camera(Engine& engine, Point position, UPoint resolution, const std::string& name)
 	: engine(engine), pos(position), res(resolution)
