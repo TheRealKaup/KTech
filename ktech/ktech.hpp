@@ -30,16 +30,16 @@
 
 namespace KTech
 {
-		// Basic structures.
-		// Definitions in `basic_structs/`.
+	// Basic structures.
+	// Definitions in `basic_structs/`.
 	struct RGB;
 	struct RGBA;
 	struct Point;
 	struct UPoint;
 	struct Cell;
 	struct CellA;
-		// World structures.
-		// Definitions in `world_structs/`
+	// World structures.
+	// Definitions in `world_structs/`
 	struct Texture;
 	struct Collider;
 	struct Object;
@@ -48,15 +48,15 @@ namespace KTech
 	struct Map;
 	struct Widget;
 	struct UI;
-		// Engine and its components.
-		// Definitions in `engine/`
+	// Engine and its components.
+	// Definitions in `engine/`
 	struct IO;
 	class Audio;
 	class Collision;
 	class Memory;
 	class Time;
 	class Engine;
-		// Defined in `misc/`
+	// Defined in `misc/`
 	enum class CR : uint8_t;	
 	template<class T>
 	struct ID;
