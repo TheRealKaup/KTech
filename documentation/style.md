@@ -8,6 +8,8 @@ Table of Contents:
 - [Classes](#classes)
     - [Order of class members](#order-of-class-members)
     - [Class constructors](#class-constructors)
+- [Source and header files](#source-and-header-files)
+	- [Inclusion](#inclusion)
 
 # Naming
 
@@ -41,7 +43,7 @@ Within each section, the order of class members should be as listed:
 - Enums
 - Classes
 - Variables:
-    - Engine data
+    - Engine data:
         - `Engine` reference or pointer
         - Personal `ID`
         - String name
@@ -53,7 +55,7 @@ Within each section, the order of class members should be as listed:
 - Constructors (including fake constructors like those in `Texture` and `Collider`)
 - Destructor
 - Operator overrides
-- Normal functions
+- Normal functions:
     - Virtual functions
     - Adders (e.g. `Layer::AddObject()`)
     - Removers (e.g. `Map::RemoveCamera()`)
@@ -79,4 +81,60 @@ struct KTech::Cell
 	inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
 		: c(character), f{foreground}, b(background) {}
 };
+```
+
+# Source and header files
+
+## Inclusion
+
+In a header file that defines a class, this is the following format for inclusion:
+- `#pragma once`
+- New line
+- `#define KTECH_DEFINITION`
+- `#include "path_to/ktech.hpp"` (normally `"../ktech.hpp"`)
+- `#include` KTech dependencies by the following directory order, then by alphabetical order:
+	- From `utility/` directory
+	- From `basic/` directory
+	- From `world/` directory
+	- From `engine/` directory
+	- From `widgets/` directory
+- New line
+- `#include` external dependencies in alphabetical order
+
+For example:
+
+```c++
+#pragma once
+
+#define KTECH_DEFINITION
+#include "../ktech.hpp"
+#undef KTECH_DEFINITION
+#include "../utility/cr.hpp"
+
+#include <vector>
+```
+
+In a source file that defines class members, this is the following format for inclusion:
+- `#include` the class members' declarations (meaning, the class definition)
+- `#include` KTech dependencies by the following directory order, then by alphabetical order:
+	- From `utility/` directory
+ 	- From `basic/` directory
+  	- From `world/` directory
+  	- From `engine/` directory
+  	- From `widgets/` directory
+- New line
+- `#include` external dependencies in alphabetical order
+
+For example:
+
+```c++
+#include "io.hpp"
+#include "../utility/keys.hpp"
+#include "../utility/rgbcolors.hpp"
+#include "../basic/cell.hpp"
+#include "../basic/cella.hpp"
+#include "../basic/upoint.hpp"
+#include "../engine/engine.hpp"
+
+#include <iostream>
 ```
