@@ -127,6 +127,7 @@ For example:
 
 In a source file that defines class members, this is the following format for inclusion:
 - `#include` the class members' declarations (meaning, the class definition)
+- New line
 - `#include` KTech dependencies by the following directory order, then by alphabetical order:
     - From `utility/` directory
     - From `basic/` directory
