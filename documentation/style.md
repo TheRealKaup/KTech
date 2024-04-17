@@ -96,6 +96,7 @@ In a header file that defines a class, this is the following format for inclusio
 - New line
 - `#define KTECH_DEFINITION`
 - `#include "path_to/ktech.hpp"` (normally `"../ktech.hpp"`)
+- `#undef KTECH_DEFINITION`
 - `#include` KTech dependencies by the following directory order, then by alphabetical order:
     - From `utility/` directory
     - From `basic/` directory
