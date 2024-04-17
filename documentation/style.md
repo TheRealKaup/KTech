@@ -21,7 +21,7 @@ Table of Contents:
 - Add "m_" prefix (the following letter's capitalization shouldn't be affected), and,
 - Avoid additional underscores.
 - Except when either:
-    - The variable is a member of a class that has no normal function members, (meaning, the class's members are inherently accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
+    - The variable is a member of a class that has no static normal function members, (meaning, the class's members are inherently accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
     - The variable is public and created once per `Engine` instance (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
     - The variable is a reference or a pointer to `Engine`, or to a variable that is created once per `Engine` instance (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
 
@@ -56,6 +56,7 @@ Within each section, the order of class members should be as listed:
 - Destructor
 - Operator overrides
 - Normal functions:
+    - Static functions
     - Virtual functions
     - Adders (e.g. `Layer::AddObject()`)
     - Removers (e.g. `Map::RemoveCamera()`)
