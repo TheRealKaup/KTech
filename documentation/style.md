@@ -51,8 +51,8 @@ Within each section, the order of class members should be as listed:
         - Parent's `ID`
         - Children's `ID`s
         - Active status
-    - External data (which are variables that are mostly used and managed by other classes, such as those that represent appearance and physical space)
-    - Internal data (anything that isn't external data as described above)
+    - External data (which are variables that are mostly processed by other classes, such as those that represent appearance and physical space)
+    - Internal data (which are variables that are mostly processed by the class itself, usually anything that isn't external data)
 - Constructors (including fake constructors like those in `Texture` and `Collider`)
 - Destructor
 - Operator overrides
