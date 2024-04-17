@@ -72,6 +72,8 @@ The members' definitions should be in the same order they were declared in the c
 
 The order of parameters in constructors of "simple classes" should be the same order that the corresponding member variables are declared in.
 
+If all constructors of a class initialize a member variable, don't set a defualt value for that member variable where it is declared.
+
 For example:
 
 ```c++
