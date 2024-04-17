@@ -28,7 +28,7 @@ Table of Contents:
 
 **Parameters**:
 - If it's in the declaration of the function:
-    - Make the rest of the name generally clear and avoid abbreviations.
+    - Avoid abbreviations.
 - If it's in the separate definition of the function:
     - Add "p_" prefix (the following letter's capitalization shouldn't be affected), and,
     - Make the rest of the name correspond with the member variable the parameter initializes (if it exists), and,
