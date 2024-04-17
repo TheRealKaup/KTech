@@ -73,13 +73,13 @@ The order of parameters in constructors of "simple classes" should be the same o
 ```c++
 struct KTech::Cell
 {
-	char c;
-	RGB f;
-	RGB b;
+    char c;
+    RGB f;
+    RGB b;
 
     // First `c`, then `f`, then `b`.
-	inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
-		: c(character), f{foreground}, b(background) {}
+    inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
+        : c(character), f{foreground}, b(background) {}
 };
 ```
 
@@ -93,11 +93,11 @@ In a header file that defines a class, this is the following format for inclusio
 - `#define KTECH_DEFINITION`
 - `#include "path_to/ktech.hpp"` (normally `"../ktech.hpp"`)
 - `#include` KTech dependencies by the following directory order, then by alphabetical order:
-	- From `utility/` directory
-	- From `basic/` directory
-	- From `world/` directory
-	- From `engine/` directory
-	- From `widgets/` directory
+    - From `utility/` directory
+    - From `basic/` directory
+    - From `world/` directory
+    - From `engine/` directory
+    - From `widgets/` directory
 - New line
 - `#include` external dependencies in alphabetical order
 
@@ -117,11 +117,11 @@ For example:
 In a source file that defines class members, this is the following format for inclusion:
 - `#include` the class members' declarations (meaning, the class definition)
 - `#include` KTech dependencies by the following directory order, then by alphabetical order:
-	- From `utility/` directory
- 	- From `basic/` directory
-  	- From `world/` directory
-  	- From `engine/` directory
-  	- From `widgets/` directory
+    - From `utility/` directory
+    - From `basic/` directory
+    - From `world/` directory
+    - From `engine/` directory
+    - From `widgets/` directory
 - New line
 - `#include` external dependencies in alphabetical order
 
