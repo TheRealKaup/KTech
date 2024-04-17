@@ -44,6 +44,7 @@ Within each section, the order of class members should be as listed:
 - Enums
 - Classes
 - Variables:
+    - Static variables
     - Engine data:
         - `Engine` reference or pointer
         - Personal `ID`
