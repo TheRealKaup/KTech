@@ -70,7 +70,7 @@ The members' definitions should be in the same order they were declared in the c
 
 ## Class constructors
 
-The order of parameters in constructors of "simple classes" (todo: replace this vague term) should be the same order that the corresponding member variables are declared in.
+The order of parameters in constructors of "simple classes" (to do: replace this vague term) should be the same order that the corresponding member variables are declared in.
 
 If all constructors of a class initialize a member variable, or that memeber variable has a default constructor that is used in a constructor that makes said member variable irrelevant, don't set a defualt value for that member variable where it is declared.
 
