@@ -5,8 +5,9 @@ This document contains specifications for KTech's coding style.
 Table of Contents:
 - [Preamble](#preamble)
 - [Naming](#naming)
-- [Class members](#class-members)
+- [Classes](#classes)
     - [Order of class members](#order-of-class-members)
+    - [Class constructors](#class-constructors)
 
 # Naming
 
@@ -18,7 +19,7 @@ Table of Contents:
 - Add "m_" prefix (the following letter's capitalization shouldn't be affected), and,
 - Avoid additional underscores.
 - Except when either:
-    - The variable is a member of a structure that has no normal function members, (meaning, the structure's members are inherently accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
+    - The variable is a member of a class that has no normal function members, (meaning, the class's members are inherently accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
     - The variable is public and created once per `Engine` instance (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
     - The variable is a reference or a pointer to `Engine`, or to a variable that is created once per `Engine` instance (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
 
@@ -30,7 +31,7 @@ Table of Contents:
     - Make the rest of the name correspond with the member variable the parameter initializes (if it exists), and,
     - Avoid additional underscores.
 
-# Class members
+# Classes
 
 ## Order of class members
 
@@ -62,3 +63,20 @@ Within each section, the order of class members should be as listed:
     - Anything else
 
 The members' definitions should be in the same order they were declared in the class definition.
+
+## Class constructors
+
+The order of parameters in constructors of "simple classes" should be the same order that the corresponding member variables are declared in. For example:
+
+```c++
+struct KTech::Cell
+{
+	char c;
+	RGB f;
+	RGB b;
+
+    // First `c`, then `f`, then `b`.
+	inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
+		: c(character), f{foreground}, b(background) {}
+};
+```
