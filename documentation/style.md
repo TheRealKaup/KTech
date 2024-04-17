@@ -72,8 +72,6 @@ The members' definitions should be in the same order they were declared in the c
 
 The order of parameters in constructors of "simple classes" should be the same order that the corresponding member variables are declared in.
 
-If at least one constructor provides a default parameter for a member variable, that member variable shouldn't have a default value where it is declared.
-
 For example:
 
 ```c++
