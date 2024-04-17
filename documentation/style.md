@@ -5,17 +5,60 @@ This document contains specifications for KTech's coding style.
 Table of Contents:
 - [Preamble](#preamble)
 - [Naming](#naming)
+- [Class members](#class-members)
+    - [Order of class members](#order-of-class-members)
 
 # Naming
 
 **Variables** and **enum values** - in camelCase.
 
-**Functions**, **classes** and **namespaces** - the first letter of each word, including the first word, should be in uppercase.
+**Functions**, **classes**, **namespaces** and **enums** - the first letter of each word, including the first word, should be in uppercase.
 
-**Variable members**:
+**Member variables**:
 - Add "m_" prefix (the following letter's capitalization shouldn't be affected), and,
 - Avoid additional underscores.
 - Except when either:
-    - The variable is a member of a structure that has no normal function members, (meaning, the structure's members are inherently accessed from outside, thus the "m_" prefix is unnecessary). For example, variable members of `Point` and variable members of `Collision::CollisionData`.
-    - The variable is public and created once per `Engine` instance (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, variable members of `Engine` itself and the variable `IO::input`.
+    - The variable is a member of a structure that has no normal function members, (meaning, the structure's members are inherently accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
+    - The variable is public and created once per `Engine` instance (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
     - The variable is a reference or a pointer to `Engine`, or to a variable that is created once per `Engine` instance (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
+
+**Parameters**:
+- If it's in the declaration of the function:
+    - Make the rest of the name generally clear and avoid abbreviations.
+- If it's in the definition of the function:
+    - Add "p_" prefix (the following letter's capitalization shouldn't be affected), and,
+    - Make the rest of the name correspond with the member variable the parameter initializes (if it exists), and,
+    - Avoid additional underscores.
+
+# Class members
+
+## Order of class members
+
+In the class definition, the public section should come first, then the protected section, then the private sections.
+
+Within each section, the order of class members should be as listed:
+- Enums
+- Classes
+- Variables:
+    - Engine data
+        - `Engine` reference or pointer
+        - Personal `ID`
+        - String name
+        - Parent's `ID`
+        - Children's `ID`s
+        - Active status
+    - External data (which are variables that are mostly used and managed by other classes, such as those that represent appearance and physical space)
+    - Internal data (anything that isn't external data as described above)
+- Constructors (including fake constructors like those in `Texture` and `Collider`)
+- Destructor
+- Operator overrides
+- Normal functions
+    - Virtual functions
+    - Adders (e.g. `Layer::AddObject()`)
+    - Removers (e.g. `Map::RemoveCamera()`)
+    - Enterers (e.g. `Layer::EnterMap()`)
+    - Getters (e.g. `Texture::GetSize()`)
+    - Setters (e.g. `Camera::Resize()`)
+    - Anything else
+
+The members' definitions should be in the same order they were declared in the class definition.
