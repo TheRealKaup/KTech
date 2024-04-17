@@ -91,7 +91,7 @@ struct KTech::Cell
 
 ## Other conventions about classes
 
-Use the `struct` declaration for a class that has no protected or private members. Otherwise, use the `class` declaration.
+Use the `struct` keyword for a class that has no protected or private members. Otherwise, use the `class` keyword.
 
 # Source and header files
 
