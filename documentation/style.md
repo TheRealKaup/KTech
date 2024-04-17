@@ -83,7 +83,7 @@ struct KTech::Cell
     RGB f;
     RGB b;
 
-    // First `c`, then `f`, then `b`.
+    // First `c`, then `f`, then `b`, as this is a simple class.
     inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
         : c(character), f{foreground}, b(background) {}
 };
