@@ -8,6 +8,7 @@ Table of Contents:
 - [Classes](#classes)
     - [Order of class members](#order-of-class-members)
     - [Class constructors](#class-constructors)
+    - [Other conventions about classes](#other-conventions-about-classes)
 - [Source and header files](#source-and-header-files)
 	- [Inclusion](#inclusion)
 
@@ -87,6 +88,10 @@ struct KTech::Cell
         : c(character), f{foreground}, b(background) {}
 };
 ```
+
+## Other conventions about classes
+
+Use the `struct` declaration for a class that has no protected or private members. Otherwise, use the `class` declaration.
 
 # Source and header files
 
