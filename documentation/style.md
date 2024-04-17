@@ -95,6 +95,8 @@ struct KTech::Cell
 
 Make member variables of engine components public only if they should be normally used by the user.
 
+If an engine component becomes too big to be easily readable within 2 singular header and source files, split them within a new directory, similar to how `Input` has its own `engine/input/` directory.
+
 ## Other conventions about classes
 
 Use the `struct` keyword for a class that has no protected or private members. Otherwise, use the `class` keyword.
