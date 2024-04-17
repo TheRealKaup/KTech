@@ -8,6 +8,7 @@ Table of Contents:
 - [Classes](#classes)
     - [Order of class members](#order-of-class-members)
     - [Class constructors](#class-constructors)
+    - [Engine components](#engine-components)
     - [Other conventions about classes](#other-conventions-about-classes)
 - [Source and header files](#source-and-header-files)
 	- [Inclusion](#inclusion)
@@ -89,6 +90,10 @@ struct KTech::Cell
         : c(character), f{foreground}, b(background) {}
 };
 ```
+
+## Engine components
+
+Make member variables of engine components public only if they should be normally used by the user.
 
 ## Other conventions about classes
 
