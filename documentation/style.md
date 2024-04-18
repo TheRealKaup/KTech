@@ -92,7 +92,7 @@ struct KTech::Cell
 };
 ```
 
-If a class constructor accepts an `Engine` reference or pointer, that parameter should be the first one.
+If a constructor accepts an `Engine` reference or pointer, that parameter should be the first one.
 
 ## Engine components
 
