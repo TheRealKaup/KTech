@@ -24,8 +24,8 @@ Table of Contents:
 - avoid additional underscores.
 - Except when either:
     - The variable is a member of a class that doesn't have normal function members, (meaning, the class's members are mostly accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
-    - The variable is public and created once per `Engine` instance (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
-    - The variable is a reference or a pointer to `Engine`, or to a variable that is created once per `Engine` instance (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
+    - The variable is a public member of an engine component (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
+    - The variable is a reference or a pointer to `Engine`, or to a member variable of an engine component (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
 
 **Parameters**:
 - If it's in the declaration of the function:
