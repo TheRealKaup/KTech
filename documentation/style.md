@@ -92,6 +92,8 @@ struct KTech::Cell
 };
 ```
 
+If a class constructor accepts an `Engine` reference or pointer, that parameter should be the first one.
+
 ## Engine components
 
 Make member variables of engine components public only if they should be normally used by the user.
