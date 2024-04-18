@@ -64,6 +64,7 @@ Within each section, the order of class members should be as listed:
     - Adders (e.g. `Layer::AddObject()`)
     - Removers (e.g. `Map::RemoveCamera()`)
     - Enterers (e.g. `Layer::EnterMap()`)
+    - Checkers (e.g. `Input::Is()`)
     - Getters (e.g. `Texture::GetSize()`)
     - Setters (e.g. `Camera::Resize()`)
     - Anything else
