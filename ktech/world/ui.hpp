@@ -24,9 +24,9 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../utility/id.hpp"
-#include "../basic/upoint.hpp"
-#include "../basic/rgba.hpp"
 #include "../basic/cella.hpp"
+#include "../basic/rgba.hpp"
+#include "../basic/upoint.hpp"
 
 #include <string>
 #include <vector>
@@ -35,29 +35,27 @@
 struct KTech::UI
 {
 	Engine& engine;
-	ID<UI> id;
-	std::string name = "";
+	ID<UI> m_id;
+	std::string m_name;
+	std::vector<ID<Widget>> m_widgets;
 
-	// Layer parts
-	std::vector<ID<Widget>> widgets = {};
-	bool visible = true;
-	uint8_t alpha = 255;
-	RGBA frgba = { 0, 0, 0, 0 };
-	RGBA brgba = { 0, 0, 0, 0 };
+	UPoint m_res;
+	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
+	RGBA m_frgba = RGBA(0, 0, 0, 0);
+	RGBA m_brgba = RGBA(0, 0, 0, 0);
+	uint8_t m_alpha = 255;
+	std::vector<std::vector<CellA>> m_image;
 
-	// Camera parts
-	UPoint res = UPoint(10, 10);
-	CellA background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
-	std::vector<std::vector<CellA>> image = {};
-
-	void AddWidget(ID<Widget> widget);
-	bool RemoveWidget(ID<Widget> widget);
-
-	void Render();
-	void Resize(UPoint res);
+	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	~UI();
 
 	inline virtual void OnTick() {};
 	
-	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
-	~UI();
+	void AddWidget(ID<Widget> widget);
+
+	bool RemoveWidget(ID<Widget> widget);
+
+	void Resize(UPoint resolution);
+
+	void Render();
 };

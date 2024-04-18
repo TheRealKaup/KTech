@@ -32,44 +32,38 @@
 class KTech::Audio
 {
 public:
-	class Source
+	struct Source
 	{
-	public:
-		bool loaded = false;
-		bool playing = false;
+		bool m_loaded = false;
+		bool m_playing = false;
+		
+		int16_t* m_data = nullptr;
 
-		uint32_t cur = 0UL;
-		uint32_t frames = 0UL;
-		uint32_t endpointToPlay = 0UL;
-		uint32_t startPoint = 0UL;
-		float volume = 1.0f;
+		uint32_t m_cur = 0UL;
+		uint32_t m_frames = 0UL;
+		uint32_t m_endpointToPlay = 0UL;
+		uint32_t m_startPoint = 0UL;
+		float m_volume = 1.0f;
 
-		uint8_t channels = 0U;
-		uint32_t dataSize = 0UL;
+		uint8_t m_channels = 0U;
+		uint32_t m_dataSize = 0UL;
 
-		int16_t* data = nullptr;
-
-		std::function<void()> OnEnd;
+		std::function<void()> m_OnEnd;
 
 		// For the play chain
-		size_t nextSource;
+		size_t m_nextSource;
+
+		Source(const std::string& fileName, std::function<void()> OnEnd = nullptr);
+		~Source();
 
 		// Set the settings of the source to play.
 		// This does not actually play the source. For that you need an AudioManager.
 		void SetSettingsToPlay(uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
-
-		Source(const std::string& fileName, std::function<void()> OnEnd = nullptr);
-		~Source();
 	};
 
-	// Instances - not pointers!
-	std::vector<Source> sources;
+	Audio(uint16_t bufferSize = 256);
+	~Audio();
 
-	// Chain of the playing sources. Made to replace iterating through all of the sources in the callback.
-	size_t playChain;
-	size_t chainLength = 0;
-
-	// Creates a source, stores it in `sources`, returns index (not UUID yet, that will be in the future)
 	size_t CreateSource(const std::string& fileName, std::function<void()> OnEnd = nullptr);
 
 	bool PlaySource(size_t index, uint32_t start = 0, uint32_t length = 0, float volume = 1.0f);
@@ -77,22 +71,38 @@ public:
 	bool ResumeSource(size_t index);
 	void StopSource(size_t index);
 
-	const uint16_t bufferSize;
-	int32_t* unlimitedOutput;
-
-	Audio(uint16_t bufferSize = 256);
-	
-	~Audio();
-
 private:
-	inline static bool paInitialized = false;
-	PaStream* stream = nullptr;
-	PaStreamParameters outputParameters;
-	int32_t tempAudioLimiter = 0;
+	std::vector<Source> m_sources;
+	size_t m_playChain;
+	size_t m_chainLength = 0;
+	const uint16_t m_bufferSize;
+	int32_t* m_unlimitedOutput;
+
+	int Callback(void* output);
+
+	static int Callback(
+		const void *input,
+		void *output,
+		unsigned long framesPerBuffer,
+		const PaStreamCallbackTimeInfo *timeInfo,
+		PaStreamCallbackFlags statusFlags,
+		void *userData
+	);
+
+	inline static bool m_paInitialized = false;
+	PaStream* m_stream = nullptr;
+	PaStreamParameters m_outputParameters;
 
 	// This class and its static instance will automatically terminate PortAudio.
 	// Its only way to know whether PortAudio was initialized is usign the static boolean `paInitialized` which, if `AudioStream`s were created, should be true.
 	// Terminating isn't done in `AudioManager::~AudioManager()`, because there could be multiple `AudioManager`s, that are created and destoryed in different times.
-	class PortAudioAutomaticTerminator { inline ~PortAudioAutomaticTerminator() { if (paInitialized) Pa_Terminate(); } };
-	static PortAudioAutomaticTerminator portAudioAutomaticTerminator;
+	class PortAudioAutomaticTerminator
+	{
+		inline ~PortAudioAutomaticTerminator()
+		{
+			if (m_paInitialized)
+				Pa_Terminate();
+		}
+	};
+	static PortAudioAutomaticTerminator m_portAudioAutomaticTerminator;
 };

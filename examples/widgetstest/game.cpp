@@ -55,7 +55,7 @@ struct UITest
 		if (countdown > 0)
 		{
 			countdown--;
-			widgets[0]->textures[0].Write({"Exiting in " + std::to_string(countdown)}, widgets[0]->textures[0].t[0][0].f, RGBAColors::transparent, Point(1, 1));
+			widgets[0]->m_textures[0].Write({"Exiting in " + std::to_string(countdown)}, widgets[0]->m_textures[0].m_t[0][0].f, RGBAColors::transparent, Point(1, 1));
 			countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 		}
 		else
@@ -64,54 +64,54 @@ struct UITest
 
 	void CancelCountdown()
 	{
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
 		widgets[0] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
 		engine.time.CancelInvocation(countdownInvocation);
 	}
 
 	void StartExitCountdown()
 	{
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
 		delete widgets[0];
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
 		widgets[0] = new Button(engine, ui, std::bind(&UITest::CancelCountdown, this), Keys::return_, Point(0, 0), "Exiting in 3", true);
 		countdown = 3;
 		// Invoke countdown
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
 		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 		// As can be seen, the first `return_` press does not also call `Exit()`! Nice!
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
 		widgets[0]->Select();
-		engine.io.Log("(GAME) <UI::StartExitCountdown()> EOF", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::StartExitCountdown()> EOF", RGBColors::orange);
 	}
 	
 	void MoveUp()
 	{
-		engine.io.Log("(GAME) <UI::MoveUp()> SOF", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::MoveUp()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
 		if (currentWidget == w_button)
 			currentWidget = w_switch;
 		else
 			currentWidget--;
 		widgets[currentWidget]->Select();
-		engine.io.Log("(GAME) <UI::MoveUp()> EOF", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::MoveUp()> EOF", RGBColors::orange);
 	}
 
 	void MoveDown()
 	{
-		engine.io.Log("(GAME) <UI::MoveDown()> SOF", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::MoveDown()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
 		if (currentWidget == w_switch)
 			currentWidget = w_button;
 		else
 			currentWidget++;
 		widgets[currentWidget]->Select();
-		engine.io.Log("(GAME) <UI::MoveDown()> EOF", RGBColors::orange);
+		engine.output.Log("(GAME) <UI::MoveDown()> EOF", RGBColors::orange);
 	}
 
 	UITest(ID<UI> ui) : ui(ui)
@@ -123,45 +123,40 @@ struct UITest
 
 		widgets[currentWidget]->Select();
 
-		engine.io.RegisterCallback(Keys::Shift::tab, std::bind(&UITest::MoveUp, this));
-		engine.io.RegisterCallback(Keys::tab, std::bind(&UITest::MoveDown, this));
+		engine.input.RegisterCallback(Keys::Shift::tab, std::bind(&UITest::MoveUp, this));
+		engine.input.RegisterCallback(Keys::tab, std::bind(&UITest::MoveDown, this));
 	}
 };
 
 int main()
 {
-	// engine.io.PrintStartupNotice("widgetstest, a user interface example based on KTech.", "2024", "Ethan Kaufman", "widgetstest");
+	// engine.output.PrintStartupNotice("widgetstest, a user interface example based on KTech.", "2024", "Ethan Kaufman", "widgetstest");
 
 	Map map(engine);
 
 	UI ui(engine, UPoint(20, 20));
 
-	UITest uiTest(ui.id);
+	UITest uiTest(ui.m_id);
 
 	while (engine.running)
 	{
-		// Start
-		engine.io.Log("(GAME) <main()::GameLoop> StartThisTick", RGBColors::green);
-		engine.time.StartThisTick();
-
 		// Calls
-		engine.io.Log("(GAME) <main()::GameLoop> Call inputs", RGBColors::green);
-		engine.io.Call();
-		engine.io.Log("(GAME) <main()::GameLoop> Call invocations", RGBColors::green);
+		engine.output.Log("(GAME) <main()::GameLoop> Call inputs", RGBColors::green);
+		engine.input.CallHandlers();
+		engine.output.Log("(GAME) <main()::GameLoop> Call invocations", RGBColors::green);
 		engine.time.CallInvocations();
-		engine.io.Log("(GAME) <main()::GameLoop> Call OnTicks", RGBColors::green);
+		engine.output.Log("(GAME) <main()::GameLoop> Call OnTicks", RGBColors::green);
 		engine.memory.CallOnTicks();
 
 		// Render, draw and print
-		engine.io.Log("(GAME) <main()::GameLoop> Render", RGBColors::green);
+		engine.output.Log("(GAME) <main()::GameLoop> Render", RGBColors::green);
 		ui.Render();
-		engine.io.Log("(GAME) <main()::GameLoop> Draw", RGBColors::green);
-		engine.io.Draw(ui.image);
-		engine.io.Log("(GAME) <main()::GameLoop> Print", RGBColors::green);
-		engine.io.Print();
+		engine.output.Log("(GAME) <main()::GameLoop> Draw", RGBColors::green);
+		engine.output.Draw(ui.m_image);
+		engine.output.Log("(GAME) <main()::GameLoop> Print", RGBColors::green);
+		engine.output.Print();
 
-		// End
-		engine.io.Log("(GAME) <main()::GameLoop> WaitUntilNextTicks", RGBColors::green);
+		engine.output.Log("(GAME) <main()::GameLoop> WaitUntilNextTicks", RGBColors::green);
 		engine.time.WaitUntilNextTick();
 	}
 }

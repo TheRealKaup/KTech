@@ -18,14 +18,37 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "time.hpp"
+#pragma once
 
-KTech::Time::TimePoint::TimePoint()
-{
-	chronoTimePoint = std::chrono::high_resolution_clock::now();
-}
+#include "input.hpp"
 
-void KTech::Time::TimePoint::SetToNow()
+class KTech::Input::CallbacksGroup
 {
-	chronoTimePoint = std::chrono::high_resolution_clock::now();
-}
+public:
+	enum class Status : uint8_t
+	{
+		disabled,
+		enabled,
+		removeDisabled, // Remove and then return status to disabled
+		removeEnabled, // Remove and then return status to enabled
+	};
+
+	CallbacksGroup(bool enabled = true)
+		: m_status(enabled ? Status::enabled : Status::disabled) {}
+		
+	void AddCallback(BasicCallback* basicCallback);
+	void AddCallback(RangedCallback* rangedCallback);
+	
+	void DeleteCallbacks();
+	
+	void Enable();
+	void Disable();
+
+	void Update();
+
+private:
+	std::vector<BasicCallback*> m_basicCallbacks;
+	std::vector<RangedCallback*> m_rangedCallbacks;
+	Status m_status;
+	bool m_synced = true;
+};

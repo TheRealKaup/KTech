@@ -19,26 +19,27 @@
 */
 
 #include "memory.hpp"
-#include "../world/ui.hpp"
-#include "../world/widget.hpp"
-#include "../world/map.hpp"
+
+#include "../utility/container.hpp" 
 #include "../world/camera.hpp"
 #include "../world/layer.hpp"
+#include "../world/map.hpp"
 #include "../world/object.hpp"
-#include "../utility/container.hpp"
+#include "../world/ui.hpp"
+#include "../world/widget.hpp"
 
 void KTech::Memory::CallOnTicks()
 {
-	for (size_t i = 0; i < uis.size; i++)
-		uis.arr[i]->OnTick();
-	for (size_t i = 0; i < widgets.size; i++)
-		widgets.arr[i]->OnTick();
-	for (size_t i = 0; i < maps.size; i++)
-		maps.arr[i]->OnTick();
-	for (size_t i = 0; i < cameras.size; i++)
-		cameras.arr[i]->OnTick();
-	for (size_t i = 0; i < layers.size; i++)
-		layers.arr[i]->OnTick();
-	for (size_t i = 0; i < objects.size; i++)
-		objects.arr[i]->OnTick();
+	for (size_t i = 0; i < uis.m_size; i++)
+		uis.m_arr[i]->OnTick();
+	for (size_t i = 0; i < widgets.m_size; i++)
+		widgets.m_arr[i]->OnTick();
+	for (size_t i = 0; i < maps.m_size; i++)
+		maps.m_arr[i]->OnTick();
+	for (size_t i = 0; i < cameras.m_size; i++)
+		cameras.m_arr[i]->OnTick();
+	for (size_t i = 0; i < layers.m_size; i++)
+		layers.m_arr[i]->OnTick();
+	for (size_t i = 0; i < objects.m_size; i++)
+		objects.m_arr[i]->OnTick();
 }

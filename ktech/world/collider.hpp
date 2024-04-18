@@ -31,18 +31,17 @@
 
 struct KTech::Collider
 {
-	bool active = true;
-	Point pos_r = { 0, 0 };
-	bool simple = true;
-	uint8_t type = 0;
+	bool m_active = true;
 
-	UPoint size = { 0, 0 };
-	
-	std::vector<std::vector<bool>> c = {};
+	Point m_rPos;
+	bool m_simple = true;
+	UPoint m_size;
+	std::vector<std::vector<bool>> m_c;
+	uint8_t m_type;
 
-	void Simple(UPoint size, uint8_t type, Point relative_position = Point(0, 0));
-	bool File(const std::string& fileName, uint8_t type, Point relative_position = Point(0, 0));
-	void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relative_position = Point(0, 0));
+	void Simple(UPoint size, uint8_t type, Point relativePosition = Point(0, 0));
+	bool File(const std::string& fileName, uint8_t type, Point relativePosition = Point(0, 0));
+	void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relativePosition = Point(0, 0));
 	void ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 	void ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 

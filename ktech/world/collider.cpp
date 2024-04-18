@@ -19,25 +19,26 @@
 */
 
 #include "collider.hpp"
+
 #include "texture.hpp"
 
 #include <fstream>
 
-void KTech::Collider::Simple(UPoint _size, uint8_t _type, Point _pos)
+void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_pos)
 {
-    simple = true;
-    type = _type;
-    pos_r = _pos;
-    size = _size;
+    m_simple = true;
+    m_type = p_type;
+    m_rPos = p_pos;
+    m_size = p_size;
 }
 
-bool KTech::Collider::File(const std::string& fileName, uint8_t _type, Point _pos)
+bool KTech::Collider::File(const std::string& p_fileName, uint8_t p_type, Point p_pos)
 {
-    simple = false;
-    type = _type;
-    pos_r = _pos;
+    m_simple = false;
+    m_type = p_type;
+    m_rPos = p_pos;
 
-	std::ifstream file(fileName);
+	std::ifstream file(p_fileName);
 	if (!file.is_open())
 		return false;
 	std::string line;
@@ -45,72 +46,72 @@ bool KTech::Collider::File(const std::string& fileName, uint8_t _type, Point _po
 	for (size_t y = 0; std::getline(file, line); y++)
 	{
 		// potentially broken if one of the values = 10 ('\n')
-		c.resize(c.size() + 1);
-		c[y].resize(line.length());
+		m_c.resize(m_c.size() + 1);
+		m_c[y].resize(line.length());
 		for (size_t x = 0; x < line.length(); x++)
-			c[y][x] = line[x];
+			m_c[y][x] = line[x];
 	}
 	
 	return true;
 }
 
-void KTech::Collider::Write(const std::vector<std::string>& stringVector, uint8_t _type, Point _pos)
+void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint8_t p_type, Point p_pos)
 {
-    simple = false;
-    type = _type;
-    pos_r = _pos;
+    m_simple = false;
+    m_type = p_type;
+    m_rPos = p_pos;
 
-	c.resize(stringVector.size());
-	for (size_t y = 0; y < stringVector.size(); y++)
+	m_c.resize(p_stringVector.size());
+	for (size_t y = 0; y < p_stringVector.size(); y++)
 	{
 		// potentially broken if one of the values = 10 ('\n')
-		c[y].resize(stringVector[y].length());
-		for (size_t x = 0; x < c[y].size(); x++)
-			c[y][x] = stringVector[y][x] == ' ' ? false : true;
+		m_c[y].resize(p_stringVector[y].length());
+		for (size_t x = 0; x < m_c[y].size(); x++)
+			m_c[y][x] = p_stringVector[y][x] == ' ' ? false : true;
 	}
 }
 
-void KTech::Collider::ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
+void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_alphaThreshold, uint8_t p_type)
 {
-    simple = false;
-    type = _type;
-    pos_r = texture.pos_r;
+    m_simple = false;
+    m_type = p_type;
+    m_rPos = p_texture.m_rPos;
 
-	c.resize(texture.t.size());
-	for (size_t y = 0; y < texture.t.size(); y++)
+	m_c.resize(p_texture.m_t.size());
+	for (size_t y = 0; y < p_texture.m_t.size(); y++)
 	{
 		// potentially broken if one of the values = 10 ('\n')
-		c[y].resize(texture.t[y].size());
-		for (size_t x = 0; x < c[y].size(); x++)
-			c[y][x] = ((texture.t[y][x].c != ' ' && texture.t[y][x].f.a >= alphaThreshold) ? true : false);
+		m_c[y].resize(p_texture.m_t[y].size());
+		for (size_t x = 0; x < m_c[y].size(); x++)
+			m_c[y][x] = ((p_texture.m_t[y][x].c != ' ' && p_texture.m_t[y][x].f.a >= p_alphaThreshold) ? true : false);
 	}
 }
 
-void KTech::Collider::ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t _type)
+void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_alphaThreshold, uint8_t p_type)
 {
-    simple = false;
-    type = _type;
-    pos_r = texture.pos_r;
+    m_simple = false;
+    m_type = p_type;
+    m_rPos = p_texture.m_rPos;
 
-	c.resize(texture.t.size());
-	for (size_t y = 0; y < texture.t.size(); y++)
+	m_c.resize(p_texture.m_t.size());
+	for (size_t y = 0; y < p_texture.m_t.size(); y++)
 	{
 		// potentially broken if one of the values = 10 ('\n')
-		c[y].resize(texture.t[y].size());
-		for (size_t x = 0; x < c[y].size(); x++)
-			c[y][x] = (texture.t[y][x].b.a >= alphaThreshold ? true : false);
+		m_c[y].resize(p_texture.m_t[y].size());
+		for (size_t x = 0; x < m_c[y].size(); x++)
+			m_c[y][x] = (p_texture.m_t[y][x].b.a >= p_alphaThreshold ? true : false);
 	}
 }
 
 // [Simple/Complex] Get the size of the texture.
 KTech::UPoint KTech::Collider::GetSize() const
 {
-	if (simple)
-		return size;
+	if (m_simple)
+		return m_size;
 	else
 	{
-		UPoint result(0, c.size());
-		for (const std::vector<bool>& row : c)
+		UPoint result(0, m_c.size());
+		for (const std::vector<bool>& row : m_c)
 			if (row.size() > result.x)
 				result.x = row.size();
 		return result;

@@ -52,10 +52,11 @@ namespace KTech
 	struct UI;
 	// Engine and its components.
 	// Definitions in `engine/`
-	struct IO;
 	class Audio;
 	class Collision;
+	class Input;
 	class Memory;
+	class Output;
 	class Time;
 	class Engine;
 	// Defined in `utility/`
@@ -98,7 +99,8 @@ namespace KTech
 
 #include "engine/audio.hpp"
 #include "engine/collision.hpp"
-#include "engine/io.hpp"
+#include "engine/input/input.hpp"
+#include "engine/input/callbacksgroup.hpp"
 #include "engine/memory.hpp"
 #include "engine/time.hpp"
 #include "engine/engine.hpp"

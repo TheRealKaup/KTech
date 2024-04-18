@@ -36,67 +36,67 @@ inline constexpr KeyRange keyrange_all = KeyRange(' ', '~');
 class StringField : public KTech::Widget
 {
 public:
-	std::string string = "";
+	std::string m_string = "";
 
-	std::function<void()> OnInsert;
+	std::function<void()> m_OnInsert;
 
-	KTech::RGBA unselectedRGBA, selectedRGBA;
+	KTech::RGBA m_unselectedRGBA, m_selectedRGBA;
 
 private:
-	uint16_t currentChar = 0;
-	uint16_t maxChars;
+	uint16_t m_currentChar = 0;
+	uint16_t m_maxChars;
 
 	void InternalInsert()
 	{
-		if (engine.io.Is(KTech::Keys::backspace) || engine.io.Is(KTech::Keys::delete_))
+		if (engine.input.Is(KTech::Keys::backspace) || engine.input.Is(KTech::Keys::delete_))
 		{
-			if (currentChar == 0)
+			if (m_currentChar == 0)
 				return;
 
-			currentChar--;
-			string.pop_back();
+			m_currentChar--;
+			m_string.pop_back();
 
-			textures[0].t[0][currentChar].c = ' ';
+			m_textures[0].m_t[0][m_currentChar].c = ' ';
 		}
-		else if (currentChar == maxChars)
+		else if (m_currentChar == m_maxChars)
 			return;
 		else
 		{
-			textures[0].t[0][currentChar].c = engine.io.input.at(0);
-			string.push_back(engine.io.input.at(0));
-			currentChar++;
+			m_textures[0].m_t[0][m_currentChar].c = engine.input.input.at(0);
+			m_string.push_back(engine.input.input.at(0));
+			m_currentChar++;
 		}
-		if (OnInsert)
-			OnInsert();
+		if (m_OnInsert)
+			m_OnInsert();
 	}
 
 public:
 	virtual void RenderSelected() override
 	{
-		for (size_t i = 0; i < textures.size(); i++)
-			textures[i].SetForeground(selectedRGBA);
+		for (size_t i = 0; i < m_textures.size(); i++)
+			m_textures[i].SetForeground(m_selectedRGBA);
 	}
 
 	virtual void RenderUnselected() override
 	{
-		for (size_t i = 0; i < textures.size(); i++)
-			textures[i].SetForeground(unselectedRGBA);
+		for (size_t i = 0; i < m_textures.size(); i++)
+			m_textures[i].SetForeground(m_unselectedRGBA);
 	}
 
 	void ChangeValue(std::string newString)
 	{
-		string.resize(newString.length() > maxChars ? maxChars : newString.length());
-		for (size_t x = 0; x < maxChars; x++)
+		m_string.resize(newString.length() > m_maxChars ? m_maxChars : newString.length());
+		for (size_t x = 0; x < m_maxChars; x++)
 		{
-			if (x < string.length())
+			if (x < m_string.length())
 			{
-				string[x] = newString[x];
-				textures[0].t[0][x].c = newString[x];
+				m_string[x] = newString[x];
+				m_textures[0].m_t[0][x].c = newString[x];
 			}
 			else
-				textures[0].t[0][x].c = ' ';
+				m_textures[0].m_t[0][x].c = ' ';
 		}
-		currentChar = string.length();
+		m_currentChar = m_string.length();
 	}
 
 	StringField(KTech::Engine& engine,
@@ -110,56 +110,56 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselectedRGBA = KTech::RGBA(150, 150, 150, 255),
 		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
-		: Widget(engine, ui, pos), OnInsert(OnInsert), maxChars(maxChars), unselectedRGBA(unselectedRGBA), selectedRGBA(selectedRGBA), string(defaultString)
+		: Widget(engine, ui, pos), m_OnInsert(OnInsert), m_maxChars(maxChars), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA), m_string(defaultString)
 	{
 		// Texture
 		if (withFrame)
 		{
-			textures.resize(10);
+			m_textures.resize(10);
 			// input
-			textures[0].Rectangle(KTech::UPoint(maxChars, 1), KTech::CellA(' ', unselectedRGBA), KTech::Point(1 + text.length(), 1));
-			for (size_t i = 0; i < string.length() && i < textures[0].t[0].size(); i++)
+			m_textures[0].Rectangle(KTech::UPoint(maxChars, 1), KTech::CellA(' ', unselectedRGBA), KTech::Point(1 + text.length(), 1));
+			for (size_t i = 0; i < m_string.length() && i < m_textures[0].m_t[0].size(); i++)
 			{
-				textures[0].t[0][i].c = string[i];
-				currentChar++;
+				m_textures[0].m_t[0][i].c = m_string[i];
+				m_currentChar++;
 			}
 			// text
-			textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+			m_textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 			// up-left corner
-			textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 0));
+			m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 0));
 			// up-right corner
-			textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxChars, 0));
+			m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxChars, 0));
 			// bottom-left corner
-			textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 2));
+			m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(0, 2));
 			// bottom-right corner
-			textures[5].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxChars, 2));
+			m_textures[5].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedRGBA), KTech::Point(1 + text.length() + maxChars, 2));
 			// up frame
-			textures[6].Simple(KTech::UPoint(text.length() + maxChars, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 0));
+			m_textures[6].Simple(KTech::UPoint(text.length() + maxChars, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 0));
 			// left frame
-			textures[7].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(0, 1));
+			m_textures[7].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(0, 1));
 			// bottom frame
-			textures[8].Simple(KTech::UPoint(text.length() + maxChars, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 2));
+			m_textures[8].Simple(KTech::UPoint(text.length() + maxChars, 1), KTech::CellA('-', unselectedRGBA), KTech::Point(1, 2));
 			// right frame
-			textures[9].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(1 + text.length() + maxChars, 1));
+			m_textures[9].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedRGBA), KTech::Point(1 + text.length() + maxChars, 1));
 		}
 		else
 		{
-			textures.resize(2);
+			m_textures.resize(2);
 			// input
-			textures[0].Rectangle(KTech::UPoint(maxChars, 1), KTech::CellA(' ', unselectedRGBA), KTech::Point(1 + text.length(), 1));
-			for (size_t i = 0; i < string.length() && i < textures[0].t[0].size(); i++)
+			m_textures[0].Rectangle(KTech::UPoint(maxChars, 1), KTech::CellA(' ', unselectedRGBA), KTech::Point(1 + text.length(), 1));
+			for (size_t i = 0; i < m_string.length() && i < m_textures[0].m_t[0].size(); i++)
 			{
-				textures[0].t[0][i].c = string[i];
-				currentChar++;
+				m_textures[0].m_t[0][i].c = m_string[i];
+				m_currentChar++;
 			}
 			// text
-			textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+			m_textures[1].Write({text}, unselectedRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 		}
 		
 		// Input handlers
 		for (KeyRange& keyRange : allowedCharacters)
-			callbacksGroup->AddCallback(engine.io.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
-		callbacksGroup->AddCallback(engine.io.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), false));
-		callbacksGroup->AddCallback(engine.io.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), false));
+			m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::InternalInsert, this)));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::InternalInsert, this), false));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::InternalInsert, this), false));
 	}
 };

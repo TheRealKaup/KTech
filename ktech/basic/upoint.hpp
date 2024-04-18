@@ -28,6 +28,6 @@ struct KTech::UPoint
 {
 	uint32_t x, y;
 
-	constexpr inline UPoint(uint32_t x = 0, uint32_t y = 0)
+	inline constexpr UPoint(uint32_t x = 0, uint32_t y = 0)
 		: x(x), y(y) {}
 };

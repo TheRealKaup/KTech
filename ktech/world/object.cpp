@@ -19,45 +19,47 @@
 */
 
 #include "object.hpp"
-#include "layer.hpp"
+
 #include "../utility/rgbcolors.hpp"
+#include "layer.hpp"
+#include "../engine/output.hpp"
 #include "../engine/engine.hpp"
 
-void KTech::Object::EnterLayer(ID<Layer>& layer)
-{
-	if (engine.memory.layers.Exists(parentLayer))
-		engine.memory.layers[parentLayer]->RemoveObject(id);
-	engine.memory.layers[layer]->AddObject(id);
-}
-
-bool KTech::Object::Move(Point dir)
-{
-	// Request the collision manager of the engine to move this object.
-	return engine.collision.MoveObject(id, dir);
-}
-
-KTech::Object::Object(Engine& engine, Point pos, const std::string& name)
-	: engine(engine), pos(pos), name(name)
+KTech::Object::Object(Engine& p_engine, Point p_pos, const std::string& p_name)
+	: engine(p_engine), m_pos(p_pos), m_name(p_name)
 {
 	engine.memory.objects.Add(this);
 }
 
-KTech::Object::Object(Engine& engine, ID<Layer>& layer, Point pos, const std::string& name)
-	: engine(engine), pos(pos), name(name)
+KTech::Object::Object(Engine& p_engine, ID<Layer>& p_layer, Point p_pos, const std::string& p_name)
+	: engine(p_engine), m_pos(p_pos), m_name(p_name)
 {
 	engine.memory.objects.Add(this);
-	EnterLayer(layer);
+	EnterLayer(p_layer);
 }
 
 KTech::Object::~Object()
 {
-	IO::Log("<Object[" + name + ", " + std::to_string((size_t)this) + "]::~Object()> Start of function...", RGBColors::red);
-	if (engine.memory.layers.Exists(parentLayer))
+	Output::Log("<Object[" + m_name + ", " + std::to_string((size_t)this) + "]::~Object()> Start of function...", RGBColors::red);
+	if (engine.memory.layers.Exists(m_parentLayer))
 	{
-		IO::Log("<Object[" + name + "]::~Object()> Parent layer stil exists, remove this object from it", RGBColors::red);
-			engine.memory.layers[parentLayer]->RemoveObject(id);
+		Output::Log("<Object[" + m_name + "]::~Object()> Parent layer stil exists, remove this object from it", RGBColors::red);
+			engine.memory.layers[m_parentLayer]->RemoveObject(m_id);
 	}
-	IO::Log("<Object[" + name + "]::~Object()> Remove this object from memory", RGBColors::red);
-	engine.memory.objects.Remove(id);
-	IO::Log("<Object[" + name + "]::~Object()> End of function.", RGBColors::red);
+	Output::Log("<Object[" + m_name + "]::~Object()> Remove this object from memory", RGBColors::red);
+	engine.memory.objects.Remove(m_id);
+	Output::Log("<Object[" + m_name + "]::~Object()> End of function.", RGBColors::red);
+}
+
+void KTech::Object::EnterLayer(ID<Layer>& p_layer)
+{
+	if (engine.memory.layers.Exists(m_parentLayer))
+		engine.memory.layers[m_parentLayer]->RemoveObject(m_id);
+	engine.memory.layers[p_layer]->AddObject(m_id);
+}
+
+bool KTech::Object::Move(Point p_dir)
+{
+	// Request the collision manager of the engine to move this object.
+	return engine.collision.MoveObject(m_id, p_dir);
 }

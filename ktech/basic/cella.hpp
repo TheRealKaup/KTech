@@ -27,10 +27,10 @@
 
 struct KTech::CellA
 {
+	char c;
 	RGBA f;
 	RGBA b;
-	char c;
 
-	constexpr inline CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0))
+	inline constexpr CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0))
 		: c(character), f(foreground), b(background) {}
 };

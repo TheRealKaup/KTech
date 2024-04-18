@@ -32,31 +32,28 @@
 struct KTech::Layer
 {
 	Engine& engine;
-	ID<Layer> id;
-	
-	ID<Map> parentMap;
+	ID<Layer> m_id;
+	std::string m_name;
+	ID<Map> m_parentMap;
+	std::vector<ID<Object>> m_objects;
+	bool m_visible = true;
 
-	std::string name = "";
-	std::vector<ID<Object>> objects = {};
-	
-	bool visible = true;
-	uint8_t alpha = 255;
-	RGBA frgba = { 0, 0, 0, 0 };
-	RGBA brgba = { 0, 0, 0, 0 };
+	uint8_t m_alpha = 255;
+	RGBA m_frgba = RGBA(0, 0, 0, 0);
+	RGBA m_brgba = RGBA(0, 0, 0, 0);
 
-	void EnterMap(ID<Map>& map);
+	Layer(Engine& engine, const std::string& name = "");
+	Layer(Engine& engine, ID<Map>& parentMap, const std::string& name = "");
+	~Layer();
 
-	void AddObject(ID<Object>& object);
-	bool RemoveObject(const std::string& name);
-	bool RemoveObject(ID<Object>& object);
+	ID<Object> operator[](size_t index);
 	
 	inline virtual void OnTick() {};
 
-	// WARNING: RETURNED REFERENCE IS NOT PERMANENT (VECTOR REALLOCATES)
-	ID<Object>& operator[](size_t i) { return objects[i]; }
-
-	Layer(Engine& engine);
-	Layer(Engine& engine, ID<Map>& parentMap);
+	void AddObject(ID<Object>& object);
 	
-	~Layer();
+	bool RemoveObject(const std::string& name);
+	bool RemoveObject(ID<Object>& object);
+
+	void EnterMap(ID<Map>& map);
 };

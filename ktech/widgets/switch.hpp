@@ -25,75 +25,75 @@
 class Switch : public KTech::Widget
 {
 public:
-	bool down = false;
-	bool on = false;
+	bool m_down = false;
+	bool m_on = false;
 
-	std::function<void()> OnPress;
+	std::function<void()> m_OnPress;
 	
-	KTech::RGBA unselectedOffRGBA, selectedOffRGBA, unselectedOnRGBA, selectedOnRGBA, downRGBA;
+	KTech::RGBA m_unselectedOffRGBA, m_selectedOffRGBA, m_unselectedOnRGBA, m_selectedOnRGBA, m_downRGBA;
 
 private:
 	void RemovePressColor()
 	{
-		if (selected)
+		if (m_selected)
 		{
-			if (on)
-				for (size_t i = 0; i < textures.size(); i++)
-					textures[i].SetForeground(selectedOnRGBA);
-			if (!on)
-				for (size_t i = 0; i < textures.size(); i++)
-					textures[i].SetForeground(selectedOffRGBA);
+			if (m_on)
+				for (size_t i = 0; i < m_textures.size(); i++)
+					m_textures[i].SetForeground(m_selectedOnRGBA);
+			if (!m_on)
+				for (size_t i = 0; i < m_textures.size(); i++)
+					m_textures[i].SetForeground(m_selectedOffRGBA);
 		}
 		else
 		{
-			if (on)
-				for (size_t i = 0; i < textures.size(); i++)
-					textures[i].SetForeground(unselectedOnRGBA);
-			if (!on)
-				for (size_t i = 0; i < textures.size(); i++)
-					textures[i].SetForeground(unselectedOffRGBA);
+			if (m_on)
+				for (size_t i = 0; i < m_textures.size(); i++)
+					m_textures[i].SetForeground(m_unselectedOnRGBA);
+			if (!m_on)
+				for (size_t i = 0; i < m_textures.size(); i++)
+					m_textures[i].SetForeground(m_unselectedOffRGBA);
 		}
 	}
 
 	void InsideOnPress()
 	{
-		on = !on;
+		m_on = !m_on;
 
-		for (size_t x = 0; x < textures[0].t[0].size(); x++)
-			textures[0].t[0][x].f = downRGBA;
-		for (size_t i = 1; i < textures.size(); i++)
-			textures[i].value.f = downRGBA;
+		for (size_t x = 0; x < m_textures[0].m_t[0].size(); x++)
+			m_textures[0].m_t[0][x].f = m_downRGBA;
+		for (size_t i = 1; i < m_textures.size(); i++)
+			m_textures[i].m_value.f = m_downRGBA;
 		
 		engine.time.Invoke(std::bind(&Switch::RemovePressColor, this), 100, KTech::Time::Measurement::milliseconds);
 
-		if (OnPress)
-			OnPress();
+		if (m_OnPress)
+			m_OnPress();
 	}
 
 public:
 	virtual void RenderSelected() override
 	{
-		if (on)
-			for (size_t i = 0; i < textures.size(); i++)
-				textures[i].SetForeground(selectedOnRGBA);
-		if (!on)
-			for (size_t i = 0; i < textures.size(); i++)
-				textures[i].SetForeground(selectedOffRGBA);
+		if (m_on)
+			for (size_t i = 0; i < m_textures.size(); i++)
+				m_textures[i].SetForeground(m_selectedOnRGBA);
+		if (!m_on)
+			for (size_t i = 0; i < m_textures.size(); i++)
+				m_textures[i].SetForeground(m_selectedOffRGBA);
 	}  
 
 	virtual void RenderUnselected() override
 	{
-		if (on)
-			for (size_t i = 0; i < textures.size(); i++)
-				textures[i].SetForeground(unselectedOnRGBA);
-		if (!on)
-			for (size_t i = 0; i < textures.size(); i++)
-				textures[i].SetForeground(unselectedOffRGBA);
+		if (m_on)
+			for (size_t i = 0; i < m_textures.size(); i++)
+				m_textures[i].SetForeground(m_unselectedOnRGBA);
+		if (!m_on)
+			for (size_t i = 0; i < m_textures.size(); i++)
+				m_textures[i].SetForeground(m_unselectedOffRGBA);
 	}
 
 	void ChangeValue(bool _on)
 	{
-		on = _on;
+		m_on = _on;
 		RemovePressColor();
 	}
 
@@ -110,73 +110,73 @@ public:
 		KTech::RGBA unselectedOnRGBA = KTech::RGBA( 88, 150, 88, 255 ),
 		KTech::RGBA selectedOnRGBA = KTech::RGBA( 150, 255, 150, 255 ),
 		KTech::RGBA downRGBA = KTech::RGBA(150, 150, 255, 255))
-		: Widget(engine, ui, pos), OnPress(OnPress), on(on), unselectedOffRGBA(unselectedOffRGBA), selectedOffRGBA(selectedOffRGBA), unselectedOnRGBA(unselectedOnRGBA), selectedOnRGBA(selectedOnRGBA), downRGBA(downRGBA)
+		: Widget(engine, ui, pos), m_OnPress(OnPress), m_on(on), m_unselectedOffRGBA(unselectedOffRGBA), m_selectedOffRGBA(selectedOffRGBA), m_unselectedOnRGBA(unselectedOnRGBA), m_selectedOnRGBA(selectedOnRGBA), m_downRGBA(downRGBA)
 	{
 		// Texture
 		if (withFrame)
 		{
 			if (on)
 			{
-				textures.resize(9);
+				m_textures.resize(9);
 				// text
-				textures[0].Write({text}, unselectedOnRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+				m_textures[0].Write({text}, unselectedOnRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 				// up-left corner
-				textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(0, 0));
+				m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(0, 0));
 				// up-right corner
-				textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(1 + text.length(), 0));
+				m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(1 + text.length(), 0));
 				// bottom-left corner
-				textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(0, 2));
+				m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(0, 2));
 				// bottom-right corner
-				textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(1 + text.length(), 2));
+				m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOnRGBA), KTech::Point(1 + text.length(), 2));
 				// up frame
-				textures[5].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOnRGBA), KTech::Point(1, 0));
+				m_textures[5].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOnRGBA), KTech::Point(1, 0));
 				// left frame
-				textures[6].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOnRGBA), KTech::Point(0, 1));
+				m_textures[6].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOnRGBA), KTech::Point(0, 1));
 				// bottom frame
-				textures[7].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOnRGBA), KTech::Point(1, 2));
+				m_textures[7].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOnRGBA), KTech::Point(1, 2));
 				// right frame
-				textures[8].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOnRGBA), KTech::Point(1 + text.length(), 1));
+				m_textures[8].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOnRGBA), KTech::Point(1 + text.length(), 1));
 			}
 			else
 			{
-				textures.resize(9);
+				m_textures.resize(9);
 				// text
-				textures[0].Write({text}, unselectedOffRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+				m_textures[0].Write({text}, unselectedOffRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 				// up-left corner
-				textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(0, 0));
+				m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(0, 0));
 				// up-right corner
-				textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(1 + text.length(), 0));
+				m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(1 + text.length(), 0));
 				// bottom-left corner
-				textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(0, 2));
+				m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(0, 2));
 				// bottom-right corner
-				textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(1 + text.length(), 2));
+				m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', unselectedOffRGBA), KTech::Point(1 + text.length(), 2));
 				// up frame
-				textures[5].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOffRGBA), KTech::Point(1, 0));
+				m_textures[5].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOffRGBA), KTech::Point(1, 0));
 				// left frame
-				textures[6].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOffRGBA), KTech::Point(0, 1));
+				m_textures[6].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOffRGBA), KTech::Point(0, 1));
 				// bottom frame
-				textures[7].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOffRGBA), KTech::Point(1, 2));
+				m_textures[7].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', unselectedOffRGBA), KTech::Point(1, 2));
 				// right frame
-				textures[8].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOffRGBA), KTech::Point(1 + text.length(), 1));
+				m_textures[8].Simple(KTech::UPoint(1, 1), KTech::CellA('|', unselectedOffRGBA), KTech::Point(1 + text.length(), 1));
 			}
 		}
 		else
 		{
 			if (on)
 			{
-				textures.resize(1);
+				m_textures.resize(1);
 				// text
-				textures[0].Write({text}, unselectedOnRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+				m_textures[0].Write({text}, unselectedOnRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 			}
 			else
 			{
-				textures.resize(1);
+				m_textures.resize(1);
 				// text
-				textures[0].Write({text}, unselectedOffRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+				m_textures[0].Write({text}, unselectedOffRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 			}
 		}
 
 		// Input handlers
-		callbacksGroup->AddCallback(engine.io.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), false));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(key, std::bind(&Switch::InsideOnPress, this), false));
 	}
 };

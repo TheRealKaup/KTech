@@ -29,12 +29,31 @@
 template<class T>
 struct KTech::ID
 {
-	inline static uint64_t GenerateUUID() { static uint64_t uuid = 0; return ++uuid; }
-	std::size_t i; // Index
-	inline ID() : i(0), uuid(GenerateUUID()) {}
-	constexpr inline ID(size_t i, size_t uuid) : i(i), uuid(uuid) {}
-	inline bool operator==(ID other) const { return other.uuid == uuid; }
-	inline uint64_t GetUUID() const { return uuid; }
+	std::size_t m_i; // Index
+
+	inline ID()
+		: m_i(0), m_uuid(GenerateUUID()) {}
+
+	constexpr inline ID(size_t i, size_t uuid)
+		: m_i(i), m_uuid(uuid) {}
+	
+	inline bool operator==(ID other) const
+	{
+		return other.m_uuid == m_uuid;
+	}
+	
+	inline static uint64_t GenerateUUID()
+	{
+		static uint64_t uuid = 0;
+		uuid++;
+		return uuid;
+	}
+
+	inline uint64_t GetUUID() const
+	{
+		return m_uuid;
+	}
+
 private:
-	uint64_t uuid; // UUID
+	uint64_t m_uuid; // UUID
 };

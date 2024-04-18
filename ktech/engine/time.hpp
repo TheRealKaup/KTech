@@ -27,12 +27,9 @@
 #include <chrono>
 #include <functional>
 
-// Time manager
 class KTech::Time
 {
 public:
-	const bool& running;
-	
 	enum class Measurement : uint8_t
 	{
 		ticks,
@@ -44,38 +41,40 @@ public:
 	struct TimePoint
 	{
 		std::chrono::high_resolution_clock::time_point chronoTimePoint;
-		void SetToNow();
-		TimePoint();
+		TimePoint()
+			: chronoTimePoint(std::chrono::high_resolution_clock::now()) {}
 	};
 
-	// Get the amount of time that has passed since `TimePoint a` until `TimePoint b`.
-	long GetDelta(const TimePoint& a, const TimePoint& b, Measurement timeMeasurement);
-	// Get the amount of time that has passed since the creation of `Time` and `TimePoint tp`.
-	long GetInt(const TimePoint& tp, Measurement timeMeasurement);
+	struct Invocation
+	{
+		std::function<void()> callback;
+		size_t ticksLeft; // Current ticks left in this instance
+		inline Invocation(const std::function<void()>& callback, size_t ticks)
+			: callback(callback), ticksLeft(ticks) {}
+	};
 
-	const TimePoint startTP;
-	TimePoint thisTickStartTP;
-
-	int16_t tpsLimit = 24;
+	int16_t tpsLimit;
 	float tps = 0.0f;
 	float tpsPotential = 0.0f;
 	int32_t deltaTime = 0;
 	int32_t ticksCounter = 0;
 
-	inline void StartThisTick() { thisTickStartTP.SetToNow(); }
-	void WaitUntilNextTick();
-	
-	struct Invocation
-	{
-		inline static std::vector<Invocation*> invocations;
-		std::function<void()> callback;
-		uint32_t ticksLeft; // Current ticks left in this instance
-		inline Invocation(const std::function<void()>& callback, uint32_t ticks)
-			: callback(callback), ticksLeft(ticks) {}
-	};
+	inline Time(Engine* const engine, int16_t ticksPerSecondLimit = 24)
+		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
+
 	Invocation* Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement);
 	bool CancelInvocation(Invocation* invocation);
 	void CallInvocations();
 
-	inline Time(int16_t tps, const bool& running) : tps(tps), running(running) {}
+	size_t GetDelta(const TimePoint& timePointA, const TimePoint& timePointB, Measurement timeMeasurement);
+	size_t GetInt(const TimePoint& tp, Measurement timeMeasurement);
+
+	void WaitUntilNextTick();
+
+private:
+	Engine* const engine;
+
+	const TimePoint m_startTP;
+	TimePoint m_thisTickStartTP;
+	std::vector<Invocation*> m_invocations;
 };

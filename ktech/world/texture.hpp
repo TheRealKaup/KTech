@@ -33,21 +33,23 @@
 
 struct KTech::Texture
 {
-	bool active = true;
-	Point pos_r = {0, 0};
-	bool simple = true;
+	bool m_active = true;
 
-	UPoint size = { 0, 0 };
-	CellA value = CellA('#', RGBA());
-
-	std::vector<std::vector<CellA>> t = {}; 
+	Point m_rPos;
+	bool m_simple;
+	UPoint m_size;
+	CellA m_value;
+	std::vector<std::vector<CellA>> m_t;
 	
-	void Simple(UPoint size, CellA value, Point relative_position = Point(0, 0));
-	void Rectangle(UPoint size, CellA value, Point relative_position = Point(0, 0));// Load from a file.
-	UPoint File(const std::string& fileName, Point relative_position = Point(0, 0));
-	void Write(const std::vector<std::string>& stringVector, RGBA frgba, RGBA brgba, Point relative_position = Point(0, 0));
+	void Simple(UPoint size, CellA value, Point relateivePosition = Point(0, 0));
+	void Rectangle(UPoint size, CellA value, Point relateivePosition = Point(0, 0));// Load from a file.
+	UPoint File(const std::string& fileName, Point relateivePosition = Point(0, 0));
+	void Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition = Point(0, 0));
 
-	void Resize(UPoint newSize, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
+	UPoint GetSize() const;
+
+	// `newValue` - only fills the new cells.
+	void Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
 	void SetCell(CellA value);
 	void SetForeground(RGBA value);
 	void SetBackground(RGBA value);
@@ -56,6 +58,5 @@ struct KTech::Texture
 	void SetBackgroundAlpha(uint8_t value);
 	void SetAlpha(uint8_t value);
 	
-	UPoint GetSize() const;
 	void ExportToFile(const std::string& fileName) const;
 };

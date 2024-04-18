@@ -32,12 +32,17 @@ struct KTech::Map
 {
 public:
 	Engine& engine;
-	ID<Map> id;
+	ID<Map> m_id;
+	std::string m_name;
+	std::vector<ID<Camera>> m_cameras = {};
+	std::vector<ID<Layer>> m_layers = {};
 
-	std::string name = "";
-	std::vector<ID<Camera>> cameras = {};
-	std::vector<ID<Layer>> layers = {};
-	size_t activeCameraI = -1;
+	size_t m_activeCameraI = -1;
+
+	Map(Engine& engine, const std::string& name = "");
+	~Map();
+
+	inline virtual void OnTick() {};
 
 	int AddLayer(ID<Layer>& layer);
 	int AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
@@ -46,9 +51,4 @@ public:
 	bool RemoveCamera(ID<Camera>& camera);
 
 	bool Render();
-
-	inline virtual void OnTick() {};
-	
-	Map(Engine& engine);
-	~Map();
 };

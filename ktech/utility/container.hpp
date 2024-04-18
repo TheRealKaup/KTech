@@ -30,33 +30,9 @@ template<typename T>
 struct KTech::Container
 {
 	// The structures are stored as generic identifiables, which contain UUIDs.
-	T** arr;
+	T** m_arr = nullptr;
 	// The size of the array
-	size_t size = 0;
-
-	// Returns the valid index of the ID.
-	// If the UUID is missing, return the size of the array making the index invalid.
-	// Fixes the ID if outdated.
-	inline size_t IDToIndex(ID<T>& id);
-	// Returns the valid index of the ID.
-	// If the UUID is missing, return the size of the array making the index invalid.
-	inline size_t IDToIndex(const ID<T>& id);
-
-	// Returns true if the structure is found, false if missing.
-	// Fixes the ID if outdated.
-	bool Exists(ID<T>& id);
-	// Returns true if the structure is found, false if missing.
-	bool Exists(const ID<T>& id);
-
-	// Adds the pointer to the container.
-	// Automatically called by objects, layers, cameras and maps for themselves.
-	// You shouldn't call this manualy on a structure.
-	ID<T> Add(T* structure);
-
-	// Remove a structure from storage (doesn't delete it's memory).
-	// Returns true if the structure was found and removed.
-	// Returns false if the structre is missing.
-	bool Remove(const ID<T>& id);
+	size_t m_size = 0;
 
 	// Takes an ID reference, returns the pointer to the structure.
 	// If the ID is outdated (made so by structures being removed) then update it.
@@ -65,4 +41,26 @@ struct KTech::Container
 	// Takes an ID reference, returns the pointer to the structure.
 	// Constant version of the previous operator, which will not update the given ID if it's outdated/missing.
 	T* operator[](const ID<T>& id);
+
+	// Adds the pointer to the container.
+	// Automatically called by objects, layers, cameras and maps for themselves.
+	// You shouldn't call this manualy on a structure.
+	ID<T> Add(T* structure);
+	// Remove a structure from storage (doesn't delete it's memory).
+	// Returns true if the structure was found and removed.
+	// Returns false if the structre is missing.
+	bool Remove(const ID<T>& id);
+
+	// Returns true if the structure is found, false if missing.
+	// Fixes the ID if outdated.
+	bool Exists(ID<T>& id);
+	// Returns true if the structure is found, false if missing.
+	bool Exists(const ID<T>& id);
+	// Returns the valid index of the ID.
+	// If the UUID is missing, return the size of the array making the index invalid.
+	// Fixes the ID if outdated.
+	size_t IDToIndex(ID<T>& id);
+	// Returns the valid index of the ID.
+	// If the UUID is missing, return the size of the array making the index invalid.
+	size_t IDToIndex(const ID<T>& id);
 };

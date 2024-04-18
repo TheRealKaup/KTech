@@ -23,26 +23,28 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../basic/upoint.hpp"
-#include "audio.hpp"
-#include "collision.hpp"
-#include "input/input.hpp"
-#include "memory.hpp"
-#include "output.hpp"
-#include "time.hpp"
+#include "../basic/point.hpp"
 
-class KTech::Engine
+#include <string>
+#include <termio.h>
+#include <vector>
+
+class KTech::Output
 {
 public:
-	bool running = true;
+	Output(Engine* const engine, KTech::UPoint imageSize);
+	~Output();
 
-	Audio audio;
-	Collision collision;
-	Input input;
-	Memory memory;
-	Output output;
-	Time time;
+	static void Log(const std::string& text, RGB color);
 
-	Engine(UPoint imageSize, int16_t ticksPerSecondLimit = 24)
-		: collision(this), input(this), output(this, imageSize), time(this, ticksPerSecondLimit) {}
+	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
+	void Draw(const std::vector<std::vector<CellA>>& image, Point position = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
+	void Print();
+
+private:
+	Engine* const engine;
+
+	winsize m_terminalSize;
+	std::vector<std::vector<Cell>> m_image;
+	std::string m_stringImage;
 };

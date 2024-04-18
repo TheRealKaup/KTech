@@ -22,94 +22,44 @@
 
 #include <thread>
 
-long KTech::Time::GetDelta(const TimePoint& a, const TimePoint& b, Measurement timeMeasurement)
+KTech::Time::Invocation* KTech::Time::Invoke(const std::function<void()>& p_callback, uint32_t p_time, Measurement p_measurement)
 {
-	switch (timeMeasurement)
+	switch (p_measurement)
 	{
 		case Measurement::ticks:
 		{
-			return std::chrono::duration_cast<std::chrono::seconds>(b.chronoTimePoint - a.chronoTimePoint).count() * tps;
-		}
-		case Measurement::seconds:
-		{
-			return std::chrono::duration_cast<std::chrono::seconds>(b.chronoTimePoint - a.chronoTimePoint).count();
-		}
-		case Measurement::milliseconds:
-		{
-			return std::chrono::duration_cast<std::chrono::milliseconds>(b.chronoTimePoint - a.chronoTimePoint).count();
-		}
-		case Measurement::microseconds:
-		{
-			return std::chrono::duration_cast<std::chrono::microseconds>(b.chronoTimePoint - a.chronoTimePoint).count();
-		}
-		default:
-			return 0;
-	}
-}
-
-long KTech::Time::GetInt(const TimePoint& tp, Measurement timeMeasurement)
-{
-	switch (timeMeasurement)
-	{
-		case Measurement::ticks:
-		{
-			return std::chrono::duration_cast<std::chrono::seconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count() * tps;
-		}
-		case Measurement::seconds:
-		{
-			return std::chrono::duration_cast<std::chrono::seconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count();
-		}
-		case Measurement::milliseconds:
-		{
-			return std::chrono::duration_cast<std::chrono::milliseconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count();
-		}
-		case Measurement::microseconds:
-		{
-			return std::chrono::duration_cast<std::chrono::microseconds>(tp.chronoTimePoint - startTP.chronoTimePoint).count();
-		}
-		default:
-			return 0;
-	}
-}
-
-KTech::Time::Invocation* KTech::Time::Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement)
-{
-	switch (timeMeasurement)
-	{
-		case Measurement::ticks:
-		{
-			Invocation::invocations.push_back(new Invocation(callback, time));
+			m_invocations.push_back(new Invocation(p_callback, p_time));
 			break;
 		}
 		case Measurement::seconds:
 		{
-			Invocation::invocations.push_back(new Invocation(callback, time * tpsLimit));
+			m_invocations.push_back(new Invocation(p_callback, p_time * tpsLimit));
 			break;
 		}
 		case Measurement::milliseconds:
 		{
-			Invocation::invocations.push_back(new Invocation(callback, time * tpsLimit / 1000));
+			m_invocations.push_back(new Invocation(p_callback, p_time * tpsLimit / 1000));
 			break;
 		}
 		case Measurement::microseconds:
 		{
-			Invocation::invocations.push_back(new Invocation(callback, time * tpsLimit / 1000000));
+			m_invocations.push_back(new Invocation(p_callback, p_time * tpsLimit / 1000000));
 			break;
 		}
 		default:
 			return nullptr;
 	}
-	return Invocation::invocations[Invocation::invocations.size() - 1];
+	return m_invocations[m_invocations.size() - 1];
 }
 
-bool KTech::Time::CancelInvocation(Invocation* invocation)
+bool KTech::Time::CancelInvocation(Invocation* p_invocation)
 {
-	for (size_t i = 0; i < Invocation::invocations.size(); i++)
+	for (size_t i = 0; i < m_invocations.size(); i++)
 	{
-		if (invocation == Invocation::invocations[i])
+		if (p_invocation == m_invocations[i])
 		{
-			Invocation::invocations.erase(Invocation::invocations.begin() + i);
-			delete invocation;
+			m_invocations.erase(m_invocations.begin() + i);
+			delete p_invocation;
 			return true;
 		}
 	}
@@ -119,34 +69,84 @@ bool KTech::Time::CancelInvocation(Invocation* invocation)
 
 void KTech::Time::CallInvocations()
 {
-	for (size_t i = 0; i < Invocation::invocations.size(); i++)
+	for (size_t i = 0; i < m_invocations.size(); i++)
 	{
-		if (Invocation::invocations[i]->ticksLeft > 0)
-			Invocation::invocations[i]->ticksLeft--;
+		if (m_invocations[i]->ticksLeft > 0)
+			m_invocations[i]->ticksLeft--;
 		else
 		{
 			// Call
-			if (Invocation::invocations[i]->callback)
-				Invocation::invocations[i]->callback();
+			if (m_invocations[i]->callback)
+				m_invocations[i]->callback();
 			// Remove invocation
-			delete Invocation::invocations[i];
-			Invocation::invocations.erase(Invocation::invocations.begin() + i);
+			delete m_invocations[i];
+			m_invocations.erase(m_invocations.begin() + i);
 			i--;
 			continue;
 		}
 	}
 }
 
+size_t KTech::Time::GetDelta(const TimePoint& p_a, const TimePoint& p_b, Measurement p_timeMeasurement)
+{
+	switch (p_timeMeasurement)
+	{
+		case Measurement::ticks:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(p_b.chronoTimePoint - p_a.chronoTimePoint).count() * tpsLimit;
+		}
+		case Measurement::seconds:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(p_b.chronoTimePoint - p_a.chronoTimePoint).count();
+		}
+		case Measurement::milliseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::milliseconds>(p_b.chronoTimePoint - p_a.chronoTimePoint).count();
+		}
+		case Measurement::microseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::microseconds>(p_b.chronoTimePoint - p_a.chronoTimePoint).count();
+		}
+		default:
+			return 0;
+	}
+}
+
+size_t KTech::Time::GetInt(const TimePoint& p_tp, Measurement p_measurement)
+{
+	switch (p_measurement)
+	{
+		case Measurement::ticks:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(p_tp.chronoTimePoint - m_startTP.chronoTimePoint).count() * tps;
+		}
+		case Measurement::seconds:
+		{
+			return std::chrono::duration_cast<std::chrono::seconds>(p_tp.chronoTimePoint - m_startTP.chronoTimePoint).count();
+		}
+		case Measurement::milliseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::milliseconds>(p_tp.chronoTimePoint - m_startTP.chronoTimePoint).count();
+		}
+		case Measurement::microseconds:
+		{
+			return std::chrono::duration_cast<std::chrono::microseconds>(p_tp.chronoTimePoint - m_startTP.chronoTimePoint).count();
+		}
+		default:
+			return 0;
+	}
+}
+
 void KTech::Time::WaitUntilNextTick()
 {
 	// Calcualte `tpsPotential`
-	deltaTime = GetDelta(thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
+	deltaTime = GetDelta(m_thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
 	tpsPotential = 1000000.0f / deltaTime;
 	// Sleep according to `tpsLimit`
 	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / tpsLimit - deltaTime));
 	// Calculate (actual) `tps`
-	deltaTime = GetDelta(thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
+	deltaTime = GetDelta(m_thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
 	tps = 1000000.0f / deltaTime;
-	thisTickStartTP.SetToNow();
+	m_thisTickStartTP = TimePoint();
 	ticksCounter++;
 }

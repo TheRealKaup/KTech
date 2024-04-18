@@ -19,41 +19,43 @@
 */
 
 #include "widget.hpp"
+
 #include "ui.hpp"
+#include "../engine/input/callbacksgroup.hpp"
 #include "../engine/engine.hpp"
 
-KTech::Widget::Widget(KTech::Engine& engine, KTech::ID<KTech::UI> ui, KTech::Point pos)
-	: engine(engine), pos(pos), callbacksGroup(engine.io.CreateCallbacksGroup(false))
+KTech::Widget::Widget(KTech::Engine& p_engine, KTech::ID<KTech::UI> p_ui, KTech::Point p_pos, const std::string& p_name)
+	: engine(p_engine), m_pos(p_pos), m_name(p_name), m_callbacksGroup(p_engine.input.CreateCallbacksGroup(false))
 {
 	engine.memory.widgets.Add(this);
-	EnterUI(ui);
+	EnterUI(p_ui);
 }
 
 KTech::Widget::~Widget()
 {
-	callbacksGroup->DeleteCallbacks();
-	if (engine.memory.uis.Exists(parentUI))
-		engine.memory.uis[parentUI]->RemoveWidget(id);
-	engine.memory.widgets.Remove(id);
+	m_callbacksGroup->DeleteCallbacks();
+	if (engine.memory.uis.Exists(m_parentUI))
+		engine.memory.uis[m_parentUI]->RemoveWidget(m_id);
+	engine.memory.widgets.Remove(m_id);
 }
 
-void KTech::Widget::EnterUI(ID<UI> ui)
+void KTech::Widget::EnterUI(ID<UI> p_ui)
 {
-	if (engine.memory.uis.Exists(parentUI))
-		engine.memory.uis[parentUI]->RemoveWidget(id);
-	engine.memory.uis[ui]->AddWidget(id);
+	if (engine.memory.uis.Exists(m_parentUI))
+		engine.memory.uis[m_parentUI]->RemoveWidget(m_id);
+	engine.memory.uis[p_ui]->AddWidget(m_id);
 }
 
 void KTech::Widget::Select()
 {
-	selected = true;
-	callbacksGroup->Enable();
+	m_selected = true;
+	m_callbacksGroup->Enable();
 	RenderSelected();
 };
 
 void KTech::Widget::Deselect()
 {
-	selected = false;
-	callbacksGroup->Disable();
+	m_selected = false;
+	m_callbacksGroup->Disable();
 	RenderUnselected();
 }

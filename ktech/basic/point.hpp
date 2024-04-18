@@ -28,6 +28,6 @@ struct KTech::Point
 {
 	int32_t x, y;
 
-	constexpr inline Point(int32_t x = 0, int32_t y = 0)
+	inline constexpr Point(int32_t x = 0, int32_t y = 0)
 		: x(x), y(y) {}
 };

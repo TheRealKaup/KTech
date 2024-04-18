@@ -26,32 +26,32 @@
 #include "../utility/id.hpp"
 #include "../basic/point.hpp"
 #include "../world/texture.hpp"
-#include "../engine/io.hpp"
+#include "../engine/input/input.hpp"
 
 // Widget is now a non-optional KTech standard
 struct KTech::Widget
 {
 	Engine& engine;
-	ID<Widget> id;
-	std::string name = "";
-	KTech::ID<KTech::UI> parentUI;
+	ID<Widget> m_id;
+	std::string m_name;
+	KTech::ID<KTech::UI> m_parentUI;
+	bool m_selected = false;
+	bool m_shown = true;
 
-	Point pos = Point(0, 0);
-	
-	std::vector<Texture> textures = {};
-	IO::CallbacksGroup* callbacksGroup;
-	bool selected = false;
-	bool shown = true;
+	Point m_pos;
+	std::vector<Texture> m_textures = {};
+	Input::CallbacksGroup* m_callbacksGroup;
 
-	Widget(Engine& engine, ID<UI> parentUI, Point pos);
+	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), const std::string& name = "");
 	~Widget();
+
+	inline virtual void OnTick() {};
 
 	inline virtual void RenderSelected () {}
 	inline virtual void RenderUnselected () {}
-	void Select();
-	void Deselect();
 
 	void EnterUI(ID<UI> ui);
-
-	inline virtual void OnTick() {};
+	
+	void Select();
+	void Deselect();
 };

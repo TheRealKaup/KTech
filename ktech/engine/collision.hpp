@@ -27,11 +27,10 @@
 
 #include <vector>
 
-// Exists to store `colliderTypes`.
 class KTech::Collision
 {
 public:
-	Engine* engine;
+	Engine* const engine;
 
 	std::vector<std::vector<CR>> colliderTypes = {
 		{ CR::B, CR::P, CR::O }, // Unpushable - 0
@@ -39,6 +38,12 @@ public:
 		{ CR::O, CR::O, CR::O } // overlapping - 2
 	};
 
+	inline Collision(Engine* engine)
+		: engine(engine) {};
+
+	bool MoveObject(ID<Object>& object, Point direction);
+
+private:
 	struct CollisionData{
 		ID<Object>& activeObject;
 		ID<Object>& passiveObject;
@@ -48,16 +53,11 @@ public:
 
 	CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2);
 
-	bool MoveObject(ID<Object>& object, Point dir);
+	static bool AreSimpleCollidersOverlapping(UPoint simple1, Point position1, UPoint simple2, Point position2);
+	static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePosition, const std::vector<std::vector<bool>>& complex, Point complexPosition);
+	static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& collider1, Point position1, const std::vector<std::vector<bool>>& collider2, Point position2);
 
-	inline Collision(Engine* engine) : engine(engine) {};
-
-private:
-	static bool AreSimpleCollidersOverlapping(UPoint simple1, Point pos1, UPoint simple2, Point pos2);
-	static bool AreSimpleAndComplexCollidersOverlapping(UPoint simple, Point simplePos, const std::vector<std::vector<bool>>& complex, Point complexPos);
-	static bool AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& c1, Point p1, const std::vector<std::vector<bool>>& c2, Point p2);
-
-	void ExpandMovementTree(ID<Object>& thisObj, Point dir,
+	void ExpandMovementTree(ID<Object>& thisObject,Point direction,
 		std::vector<CollisionData>& pushData,
 		std::vector<CollisionData>& blockData,
 		std::vector<CollisionData>& overlapData,
