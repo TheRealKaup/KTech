@@ -106,7 +106,7 @@ Use the `struct` keyword for a class that has no protected or private members. O
 
 ## Inclusion
 
-In a header file that defines a class, this is the following format for inclusion:
+In a header file that defines a KTech class, this is the following format for inclusion:
 - `#pragma once`
 - New line
 - `#define KTECH_DEFINITION`
