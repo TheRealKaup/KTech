@@ -8,3 +8,6 @@ project "widgetstest"
 	links { "KTechLibrary" }
 	
 	files { "*.cpp", "*.hpp"  }
+
+	filter "configurations:Debug"
+		symbols "On"

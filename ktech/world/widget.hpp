@@ -31,10 +31,18 @@
 // Widget is now a non-optional KTech standard
 struct KTech::Widget
 {
+	// struct WidgetState
+	// {
+	// 	ID<Widget> widget;
+	// 	bool m_selected;
+	// 	bool m_shown;
+	// };
+
 	Engine& engine;
 	ID<Widget> m_id;
 	std::string m_name;
-	KTech::ID<KTech::UI> m_parentUI;
+	ID<UI> m_parentUI;
+	// std::vector<WidgetState> m_childWidgets;
 	bool m_selected = false;
 	bool m_shown = true;
 
@@ -50,8 +58,13 @@ struct KTech::Widget
 	inline virtual void RenderSelected () {}
 	inline virtual void RenderUnselected () {}
 
+	void AddWidget(ID<Widget> widget);
+	void RemoveWidget(ID<Widget> widget);
+
 	void EnterUI(ID<UI> ui);
 	
 	void Select();
 	void Deselect();
+	// void Show();
+	// void Hide();
 };

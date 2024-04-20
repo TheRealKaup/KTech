@@ -24,6 +24,7 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../utility/cr.hpp"
+#include "../world/object.hpp"
 
 #include <vector>
 
@@ -45,8 +46,8 @@ public:
 
 private:
 	struct CollisionData{
-		ID<Object>& activeObject;
-		ID<Object>& passiveObject;
+		ID<Object> activeObject;
+		ID<Object> passiveObject;
 		size_t activeCollider;
 		size_t passiveCollider;
 	};

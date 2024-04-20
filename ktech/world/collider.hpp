@@ -34,7 +34,7 @@ struct KTech::Collider
 	bool m_active = true;
 
 	Point m_rPos;
-	bool m_simple = true;
+	bool m_simple;
 	UPoint m_size;
 	std::vector<std::vector<bool>> m_c;
 	uint8_t m_type;

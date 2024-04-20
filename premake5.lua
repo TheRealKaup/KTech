@@ -1,6 +1,6 @@
 -- Create a workspace that its projects will be built in `build/`
 workspace "KTech"
-	configurations { "Release" }
+	configurations { "Debug", "Release" }
 	location "build"
 
 -- Include the KTech library

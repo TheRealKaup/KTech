@@ -12,5 +12,8 @@ project "KTechLibrary"
 	targetdir "%{wks.location}/bin"
 	objdir "%{wks.location}/obj/%{prj.name}"
 	targetname "%{prj.name}"
-	
+
 	files { "**cpp", "**hpp" }
+
+	filter "configurations:Debug"
+		symbols "On"

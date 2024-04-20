@@ -8,3 +8,6 @@ project "quickstart"
 	links { "KTechLibrary" }
 
 	files { "*.cpp", "*.hpp"  }
+	
+	filter "configurations:Debug"
+		symbols "On"

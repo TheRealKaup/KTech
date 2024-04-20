@@ -88,7 +88,19 @@ KTech::UPoint KTech::Texture::File(const std::string& p_fileName, Point p_pos)
 	{
 		for (size_t x = 0; x < m_t[y].size(); x++)
 		{
-			if (file.read((char*)&m_t[y][x], 9).eof())
+			// Backwards compatability
+			char data[9];
+			file.read(data, 9);
+			m_t[y][x].f.r = data[0];
+			m_t[y][x].f.g = data[1];
+			m_t[y][x].f.b = data[2];
+			m_t[y][x].f.a = data[3];
+			m_t[y][x].b.r = data[4];
+			m_t[y][x].b.g = data[5];
+			m_t[y][x].b.b = data[6];
+			m_t[y][x].b.a = data[7];
+			m_t[y][x].c = data[8];
+			if (file.eof())
 			{
 				y = m_t.size();
 				break;

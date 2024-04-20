@@ -84,21 +84,21 @@ struct Character : Object
 		Output::Log("<Character::OnTick> End of function.", RGBColors::pink);
 	}
 	
-	virtual void OnOverlap(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider)
+	virtual void OnOverlap(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 	{
-		if (engine.memory.objects[otherObject]->m_colliders[otherCollider].m_type == 2)
-			box = otherObject;
+		if (engine.memory.objects[p_otherObject]->m_colliders[p_otherCollider].m_type == 2)
+			box = p_otherObject;
 	}
 
-	virtual void OnOverlapExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider)
+	virtual void OnOverlapExit(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 	{
-		if (otherObject == box)
-			box = ID<Object>(0, 0);
+		if (p_otherObject == box)
+			box = nullID<Object>;
 	}
-	virtual void OnOverlappedExit(Point dir, size_t collider, ID<Object> otherObject, size_t otherCollider)
+	virtual void OnOverlappedExit(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 	{
-		if (otherObject == box)
-			box = ID<Object>(0, 0);
+		if (p_otherObject == box)
+			box = nullID<Object>;
 	}
 
 	void PushBoxToDifferentLayer()
@@ -194,7 +194,8 @@ struct AutoUpdatingText : Object
 		m_textures[1].Write({std::to_string(*data)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(m_textures[0].GetSize().x, 0));
 	}
 
-	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text) : Object(engine, pos), data(data)
+	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text)
+		: Object(engine, pos), data(data)
 	{
 		EnterLayer(layer);
 		m_textures.resize(2);
@@ -222,7 +223,7 @@ int main()
 		{ CR::B, CR::P, CR::P, CR::O }, // Heavy - 0
 		{ CR::B, CR::P, CR::P, CR::O }, // Normal - 1
 		{ CR::B, CR::B, CR::P, CR::O }, // Light - 2
-		{ CR::O, CR::O, CR::O, CR::O } // Overlappable - 3
+		{ CR::O, CR::O, CR::O, CR::O }  // Overlappable - 3
 	};
 
 	KTech::Output::Log("<main()> Creating map", RGBColors::blue);
@@ -247,11 +248,11 @@ int main()
 	worldProps.m_name = "worldProps";
 	worldProps.m_textures.resize(3);
 	KTech::Output::Log("<main()> Loading assets/sky.ktecht", RGBColors::blue);
-	worldProps.m_textures[0].File("assets/sky.ktecht", { 0, 0 });
+	worldProps.m_textures[0].File("assets/sky.ktecht", Point(0, 0));
 	KTech::Output::Log("<main()> Loading assets/house.ktecht", RGBColors::blue);
 	worldProps.m_textures[1].File("assets/house.ktecht", Point(18, 14));
 	KTech::Output::Log("<main()> Loading assets/land.ktecht", RGBColors::blue);
-	worldProps.m_textures[2].File("assets/land.ktecht", { 0, 3 });
+	worldProps.m_textures[2].File("assets/land.ktecht", Point(0, 3));
 	worldProps.m_colliders.resize(1);
 	worldProps.m_colliders[0].ByTextureBackground(worldProps.m_textures[2], 100, 0);
 	layer.AddObject(worldProps.m_id);
@@ -312,7 +313,7 @@ int main()
 	KTech::Output::Log("<main()> Creating AutoUpdatingText", RGBColors::blue);
 	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.m_id, "FPS: ");
 	tpsText.m_name = "tpsText";
-
+	
 	KTech::Output::Log("<main()> Entering game loop", RGBColors::blue);
 	while (engine.running)
 	{

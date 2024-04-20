@@ -51,12 +51,12 @@ KTech::Layer::~Layer()
 		engine.memory.maps[m_parentMap]->RemoveLayer(m_id);
 }
 
-KTech::ID<KTech::Object> KTech::Layer::operator[](size_t p_i)
+KTech::ID<KTech::Object>& KTech::Layer::operator[](size_t p_i)
 {
 	if (p_i < m_objects.size())
 		return m_objects[p_i];
 	else
-		return ID<Object>(0, 0);
+		return nullID<Object>;
 }
 
 void KTech::Layer::AddObject(ID<Object>& p_object)

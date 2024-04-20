@@ -88,34 +88,34 @@ bool KTech::Collision::MoveObject(ID<Object>& p_obj, Point p_dir)
 KTech::CR KTech::Collision::GetPotentialCollisionResult(uint8_t p_t1, uint8_t p_t2)
 {
 	CR result = CR::O;
-	if (p_t1 >= 0 && p_t1 < colliderTypes.size())
+	if (p_t1 < colliderTypes.size())
 		if (p_t2 >= 0 && p_t2 < colliderTypes[p_t1].size())
 			result = colliderTypes[p_t1][p_t2];
 	return result;
 }
 
-// `s` - m_simple (rectangle)
+// `s` - simple (rectangle)
 // `p` - global position
 bool KTech::Collision::AreSimpleCollidersOverlapping(UPoint p_s1, Point p_p1, UPoint p_s2, Point p_p2)
 {
  	return (p_p1.x < p_p2.x + p_s2.x && p_p1.x + p_s1.x > p_p2.x && p_p1.y < p_p2.y + p_s2.y && p_p1.y + p_s1.y > p_p2.y);
 }
 
-// `s` - m_simple (rectangle)
+// `s` - simple (rectangle)
 // `c` - complex (2d vector)
 // `p` - global position
 bool KTech::Collision::AreSimpleAndComplexCollidersOverlapping(UPoint p_simple, Point p_simplePos, const std::vector<std::vector<bool>>& p_complex, Point p_complexPos)
 {
-	// Start Y from 0 if the m_simple is before the complex, or at the same position.
-	// Otherwise, add some to Y so the scanning will start from the point in which the m_simple collider starts.
+	// Start Y from 0 if the simple is before the complex, or at the same position.
+	// Otherwise, add some to Y so the scanning will start from the point in which the simple collider starts.
 	size_t y = (p_complexPos.y < p_simplePos.y ? p_simplePos.y - p_complexPos.y : 0);
-	// Iterate with Y until it reaches the end of the complex, or the end of the m_simple.
+	// Iterate with Y until it reaches the end of the complex, or the end of the simple.
 	for (; y < p_complex.size() && p_complexPos.y + y < p_simplePos.y + p_simple.y; y++)
 	{
-		// Start X from 0 if the m_simple is before the complex, or at the same position.
-		// Otherwise, add some to X so the scanning will start from the point in which the m_simple collider starts.
+		// Start X from 0 if the simple is before the complex, or at the same position.
+		// Otherwise, add some to X so the scanning will start from the point in which the simple collider starts.
 		size_t x = (p_complexPos.x < p_simplePos.x ? p_simplePos.x - p_complexPos.x : 0);
-		// Iterate with X until it reaches the end of the complex, or the end of the m_simple.
+		// Iterate with X until it reaches the end of the complex, or the end of the simple.
 		for (; x < p_complex[y].size() && p_complexPos.x + x < p_simplePos.x + p_simple.x; x++)
 			if (p_complex[y][x])
 				if (p_simplePos.x <= p_complexPos.x + x && p_complexPos.x + x <= p_simplePos.x + p_simple.x && p_simplePos.y <= p_complexPos.y + y && p_complexPos.y + y <= p_simplePos.y + p_simple.y)
@@ -168,7 +168,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 
 	for (size_t o = 0; o < layer->m_objects.size(); o++) // Other objects
 	{
-		ID<Object> otherObjID = (*layer)[o];
+		ID<Object>& otherObjID = (*layer)[o];
 
 		// Filter in only objects which aren't a part of the movement tree and objects from `blockingObjects`
 		bool alreadyMoving = false;

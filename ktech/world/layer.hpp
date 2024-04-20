@@ -46,7 +46,8 @@ struct KTech::Layer
 	Layer(Engine& engine, ID<Map>& parentMap, const std::string& name = "");
 	~Layer();
 
-	ID<Object> operator[](size_t index);
+	// Use this refereance temporarily - do not move this reference, it can become stale.
+	ID<Object>& operator[](size_t index);
 	
 	inline virtual void OnTick() {};
 
