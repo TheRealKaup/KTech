@@ -24,7 +24,6 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../basic/upoint.hpp"
-#include "audio.hpp"
 #include "collision.hpp"
 #include "input/input.hpp"
 #include "memory.hpp"
@@ -36,7 +35,6 @@ class KTech::Engine
 public:
 	bool running = true;
 
-	Audio audio;
 	Collision collision;
 	Input input;
 	Memory memory;

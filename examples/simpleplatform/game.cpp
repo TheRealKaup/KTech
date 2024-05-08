@@ -22,9 +22,6 @@ using namespace KTech;
 
 struct Character : Object
 {
-	size_t jumpSFX = engine.audio.CreateSource("assets/jump.wav");
-	size_t groundHitSFX = engine.audio.CreateSource("assets/groundHit.wav");
-
 	KTech::ID<Layer> voidLayer;
 
 	static constexpr int jumpStreng = 5;
@@ -39,7 +36,6 @@ struct Character : Object
 	{
 		if (onGround) {
 			yVelocity = jumpStreng;
-			engine.audio.PlaySource(jumpSFX);
 			onGround = false;
 		}
 	}
@@ -78,9 +74,6 @@ struct Character : Object
 
 		cam.m_pos = { m_pos.x - 6, m_pos.y - 6 };
 	
-		if (!priorOnGround && onGround)
-		 	engine.audio.PlaySource(groundHitSFX, 0, 0, 0.5f);
-
 		Output::Log("<Character::OnTick> End of function.", RGBColors::pink);
 	}
 	
