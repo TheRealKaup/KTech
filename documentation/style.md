@@ -104,6 +104,8 @@ If an engine component becomes too big to be easily readable within 2 singular h
 
 Use the `struct` keyword for a class that has no protected or private members. Otherwise, use the `class` keyword.
 
+Virtualize the destructors of world structures and of any class that is expected to be derived from, in order to avoid memory leaks.
+
 # Source and header files
 
 ## Inclusion
