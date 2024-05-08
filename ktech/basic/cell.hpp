@@ -33,4 +33,14 @@ struct KTech::Cell
 
 	inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
 		: c(character), f{foreground}, b(background) {}
+
+	inline constexpr bool operator==(const Cell& cell) const
+	{
+		return (c == cell.c) && (f == cell.f) && (b == cell.b);
+	}
+
+	inline constexpr bool operator!=(const Cell& cell) const
+	{
+		return !(*this == cell);
+	}
 };

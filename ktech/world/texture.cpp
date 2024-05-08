@@ -139,6 +139,16 @@ void KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 	}	
 }
 
+std::vector<KTech::CellA>& KTech::Texture::operator[](size_t y)
+{
+	return m_t[y];
+}
+
+const std::vector<KTech::CellA>& KTech::Texture::operator[](size_t y) const
+{
+	return m_t[y];
+}
+
 KTech::UPoint KTech::Texture::GetSize() const
 {
 	// If the texture is simple, then `size` already represents the texture's size.

@@ -103,6 +103,16 @@ void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_al
 	}
 }
 
+std::vector<bool>& KTech::Collider::operator[](size_t y)
+{
+	return m_c[y];
+}
+
+const std::vector<bool>& KTech::Collider::operator[](size_t y) const
+{
+	return m_c[y];
+}
+
 // [Simple/Complex] Get the size of the texture.
 KTech::UPoint KTech::Collider::GetSize() const
 {

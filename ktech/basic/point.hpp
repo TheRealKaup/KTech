@@ -23,6 +23,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
+#include "upoint.hpp"
 
 struct KTech::Point
 {
@@ -30,4 +31,41 @@ struct KTech::Point
 
 	inline constexpr Point(int32_t x = 0, int32_t y = 0)
 		: x(x), y(y) {}
+
+	inline constexpr Point(const UPoint& uPoint)
+		: x(uPoint.x), y(uPoint.y) {}
+
+	inline constexpr bool operator==(const Point& point) const
+	{
+		return (x == point.x) && (y == point.y);
+	}
+
+	inline constexpr bool operator!=(const Point& point) const
+	{
+		return !(*this == point);
+	}
+
+	inline constexpr Point operator+(const Point& point) const
+	{
+		return Point(x + point.x, y + point.y);
+	}
+
+	inline constexpr Point operator-(const Point& point) const
+	{
+		return Point(x - point.x, y - point.y);
+	}
+
+	inline constexpr Point& operator+=(const Point& point)
+	{
+		x += point.x;
+		y += point.x;
+		return *this;
+	}
+
+	inline constexpr Point& operator-=(const Point& point)
+	{
+		x -= point.x;
+		y -= point.x;
+		return *this;
+	}
 };

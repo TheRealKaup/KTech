@@ -34,4 +34,14 @@ struct KTech::RGBA
 	
 	inline constexpr RGBA(RGB rgb, uint8_t alpha = 255)
 		: r(rgb.r), g(rgb.g), b(rgb.b), a(alpha) {}
+
+	inline constexpr bool operator==(const RGBA& rgba) const
+	{
+		return (r == rgba.r) && (g == rgba.g) && (b == rgba.b) && (a == rgba.a);
+	}
+
+	inline constexpr bool operator!=(const RGBA& rgba) const
+	{
+		return !(*this == rgba);
+	}
 };

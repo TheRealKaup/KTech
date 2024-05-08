@@ -46,6 +46,9 @@ struct KTech::Texture
 	UPoint File(const std::string& fileName, Point relateivePosition = Point(0, 0));
 	void Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition = Point(0, 0));
 
+	std::vector<CellA>& operator[](size_t y);
+	const std::vector<CellA>& operator[](size_t y) const;
+
 	UPoint GetSize() const;
 
 	// `newValue` - only fills the new cells.

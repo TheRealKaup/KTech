@@ -30,4 +30,38 @@ struct KTech::UPoint
 
 	inline constexpr UPoint(uint32_t x = 0, uint32_t y = 0)
 		: x(x), y(y) {}
+
+	inline constexpr bool operator==(const UPoint& point) const
+	{
+		return (x == point.x) && (y == point.y);
+	}
+
+	inline constexpr bool operator!=(const UPoint& point) const
+	{
+		return !(*this == point);
+	}
+
+	inline constexpr UPoint operator+(const UPoint& point) const
+	{
+		return UPoint(x + point.x, y + point.y);
+	}
+
+	inline constexpr UPoint operator-(const UPoint& point) const
+	{
+		return UPoint(x - point.x, y - point.y);
+	}
+
+	inline constexpr UPoint& operator+=(const UPoint& point)
+	{
+		x += point.x;
+		y += point.x;
+		return *this;
+	}
+
+	inline constexpr UPoint& operator-=(const UPoint& point)
+	{
+		x -= point.x;
+		y -= point.x;
+		return *this;
+	}
 };

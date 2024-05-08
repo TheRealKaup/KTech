@@ -45,5 +45,8 @@ struct KTech::Collider
 	void ByTextureCharacter(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 	void ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 
+	std::vector<bool>& operator[](size_t y);
+	const std::vector<bool>& operator[](size_t y) const;
+
 	UPoint GetSize() const;
 };
