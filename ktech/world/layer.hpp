@@ -49,7 +49,7 @@ struct KTech::Layer
 	// Use this refereance temporarily - do not move this reference, it can become stale.
 	ID<Object>& operator[](size_t index);
 	
-	inline virtual void OnTick() {};
+	inline virtual bool OnTick() { return false; };
 
 	void AddObject(ID<Object>& object);
 	

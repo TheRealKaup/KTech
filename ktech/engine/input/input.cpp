@@ -192,6 +192,7 @@ void KTech::Input::Loop()
 		TempLog("<Input::Loop()> Start of iteratin, getting input", RGBColors::hotPink);
 		// Get input and update `std::string Input::input`
 		input.assign(Get());
+		inputThisTick = true;
 		// Quit
 		if (input == quitKey)
 		{

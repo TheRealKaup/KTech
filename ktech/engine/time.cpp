@@ -77,7 +77,10 @@ void KTech::Time::CallInvocations()
 		{
 			// Call
 			if (m_invocations[i]->callback)
+			{
 				m_invocations[i]->callback();
+				invokedThisTick = true;
+			}
 			// Remove invocation
 			delete m_invocations[i];
 			m_invocations.erase(m_invocations.begin() + i);

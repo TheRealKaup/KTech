@@ -20,6 +20,8 @@
 
 using namespace KTech;
 
+Engine engine(UPoint(50, 30), 24);
+
 struct Character : Object
 {
 	KTech::ID<Layer> voidLayer;
@@ -50,45 +52,49 @@ struct Character : Object
 		Move({ -1 });
 	}
 
-	virtual void OnTick()
+	virtual bool OnTick() override
 	{
-		Output::Log("<Character::OnTick> Start of function...", RGBColors::pink);
+		bool changed = false;
 
 		bool left = false;
 		bool right = false;
 		
 		bool priorOnGround = onGround;
 
-		Output::Log("<Character::OnTick> Moving", RGBColors::pink);
-
 		if (yVelocity > 0)
 		{
 			for (size_t i = 0; i < yVelocity; i++)
-				Move(Point(0, -1));
+				changed = Move(Point(0, -1));
 			yVelocity--;
 		}
 		else
+		{
 			onGround = !Move(Point(0, 1));
+			if (!onGround)
+				changed = true;
+		}
 
-		Output::Log("<Character::OnTick> Moving camera", RGBColors::pink);
-
-		cam.m_pos = { m_pos.x - 6, m_pos.y - 6 };
+		if (cam.m_pos != m_pos - Point(6, 6))
+		{
+			cam.m_pos = m_pos - Point(6, 6);
+			changed = true;
+		}
 	
-		Output::Log("<Character::OnTick> End of function.", RGBColors::pink);
+		return changed;
 	}
 	
-	virtual void OnOverlap(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
+	virtual void OnOverlap(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider) override
 	{
 		if (engine.memory.objects[p_otherObject]->m_colliders[p_otherCollider].m_type == 2)
 			box = p_otherObject;
 	}
 
-	virtual void OnOverlapExit(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
+	virtual void OnOverlapExit(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider) override
 	{
 		if (p_otherObject == box)
 			box = nullID<Object>;
 	}
-	virtual void OnOverlappedExit(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
+	virtual void OnOverlappedExit(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider) override
 	{
 		if (p_otherObject == box)
 			box = nullID<Object>;
@@ -151,16 +157,19 @@ struct GravityBox : Object
 {
 	bool onGround = false;
 
-	unsigned fallingSpeed;
+	size_t fallingSpeed;
 
-	void OnTick()
+	virtual bool OnTick() override
 	{
 		// If catched, do not fall.
+		bool moved = false;
 		for (size_t i = 0; i < fallingSpeed; i++)
-			Move(Point(0, 1));
+			if (Move(Point(0, 1)))
+				moved = true;
+		return moved;
 	}
 
-	GravityBox(Engine& engine, KTech::ID<Layer> layer, KTech::Point pos, unsigned fallingSpeed = 1U) : Object(engine, pos), fallingSpeed(fallingSpeed)
+	GravityBox(Engine& engine, KTech::ID<Layer> layer, KTech::Point pos, size_t fallingSpeed = 1) : Object(engine, pos), fallingSpeed(fallingSpeed)
 	{
 		m_textures.resize(1);
 		m_textures[0].Write(
@@ -182,9 +191,10 @@ struct AutoUpdatingText : Object
 {
 	float* data;
 
-	void OnTick()
+	virtual bool OnTick() override
 	{
 		m_textures[1].Write({std::to_string(*data)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(m_textures[0].GetSize().x, 0));
+		return false;
 	}
 
 	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text)
@@ -198,11 +208,11 @@ struct AutoUpdatingText : Object
 
 bool charCamOn = false;
 
-void TurnOnCharacterCamera() {
+void TurnOnCharacterCamera()
+{
 	charCamOn = !charCamOn;
+	engine.output.Clear();
 }
-
-Engine engine(UPoint(50, 30), 24);
 
 int main()
 {
@@ -310,27 +320,28 @@ int main()
 	KTech::Output::Log("<main()> Entering game loop", RGBColors::blue);
 	while (engine.running)
 	{
-		KTech::Output::Log("<main()> output.Call()", RGBColors::blue);
 		engine.input.CallHandlers();
-		KTech::Output::Log("<main()> CallOnTicks()", RGBColors::blue);
 		engine.memory.CallOnTicks();
 
-		KTech::Output::Log("<main()> Render and print", RGBColors::blue);
-		if (map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size())
+		if (map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size() && engine.output.ShouldRenderThisTick())
 		{
-			if (charCamOn) {
+			if (charCamOn) 
+			{
 				camera.Render({ layer.m_id, voidLayer.m_id, darkLayer.m_id });
 				// darkLayer is the dark post processing effect
 				engine.output.Draw(camera.m_image, Point(0, 0), 0, 0, 0, 0);
 				character.cam.Render(map.m_layers);
 				engine.output.Draw(character.cam.m_image, Point(18, 9), 0, 0, 0, 0);
 			}
-			else {
+			else
+			{
 				camera.Render(map.m_layers);
 				engine.output.Draw(camera.m_image, Point(0, 0), 0, 0, 0, 0);
 			}
 			engine.output.Print();
 		}
+		else if (engine.output.ShouldPrintThisTick())
+			engine.output.Print();
 		// KTech::Output::Log("<main()> WaitUntilNextTick()", RGBColors::blue);
 		engine.time.WaitUntilNextTick();
 	}

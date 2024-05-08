@@ -38,8 +38,16 @@ public:
 	static void Log(const std::string& text, RGB color);
 
 	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName);
+	// Clears the in-engine image, not the terminal.
+	void Clear();
 	void Draw(const std::vector<std::vector<CellA>>& image, Point position = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
 	void Print();
+
+	// If game loop is designed to render-on-demand, use this function to determine whether there is demand, that is, should the game loop
+	// render, draw and print.
+	bool ShouldRenderThisTick();
+	// Returns true if the terminal resized this tick, which means the game loop should print even if it didn't render.
+	bool ShouldPrintThisTick();
 
 private:
 	Engine* const engine;

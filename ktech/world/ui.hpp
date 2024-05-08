@@ -49,7 +49,7 @@ struct KTech::UI
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~UI();
 
-	inline virtual void OnTick() {};
+	inline virtual bool OnTick() { return false; };
 	
 	void AddWidget(ID<Widget> widget);
 

@@ -93,6 +93,13 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 		exit(0); // exit the thread completely
 }
 
+void KTech::Output::Clear()
+{
+	for (size_t y = 0; y < m_image.size(); y++)
+		for (size_t x = 0; x < m_image[y].size(); x++)
+			m_image[y][x] = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0));
+}
+
 void KTech::Output::Draw(const std::vector<std::vector<CellA>>& p_render, Point p_pos, uint16_t p_left, uint16_t p_top, uint16_t p_right, uint16_t p_bottom, uint8_t p_alpha)
 {
 	// Default the rectangle
@@ -112,15 +119,12 @@ void KTech::Output::Draw(const std::vector<std::vector<CellA>>& p_render, Point 
 	{
 		for (size_t xF = (p_pos.x < 0 ? 0 : p_pos.x), xR = p_left; xF < m_image[yF].size() && xR < p_right; xF++, xR++)
 		{
-			if (p_render[yR][xR].c != ' ')
-			{
-				m_image[yF][xF].c = p_render[yR][xR].c;
-				tempAlpha = p_render[yR][xR].f.a * p_alpha / 255;
-				//                   8 ->                 16 ->     + 8 ->                16 ->                8.
-				m_image[yF][xF].f.r = (p_render[yR][xR].f.r * tempAlpha + m_image[yF][xF].f.r * (255 - tempAlpha)) / 255;
-				m_image[yF][xF].f.g = (p_render[yR][xR].f.g * tempAlpha + m_image[yF][xF].f.g * (255 - tempAlpha)) / 255;
-				m_image[yF][xF].f.b = (p_render[yR][xR].f.b * tempAlpha + m_image[yF][xF].f.b * (255 - tempAlpha)) / 255;
-			}
+			m_image[yF][xF].c = p_render[yR][xR].c;
+			tempAlpha = p_render[yR][xR].f.a * p_alpha / 255;
+			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
+			m_image[yF][xF].f.r = (p_render[yR][xR].f.r * tempAlpha + m_image[yF][xF].f.r * (255 - tempAlpha)) / 255;
+			m_image[yF][xF].f.g = (p_render[yR][xR].f.g * tempAlpha + m_image[yF][xF].f.g * (255 - tempAlpha)) / 255;
+			m_image[yF][xF].f.b = (p_render[yR][xR].f.b * tempAlpha + m_image[yF][xF].f.b * (255 - tempAlpha)) / 255;
 			tempAlpha = p_render[yR][xR].b.a * p_alpha / 255;
 			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
 			m_image[yF][xF].b.r = (p_render[yR][xR].b.r * tempAlpha + m_image[yF][xF].b.r * (255 - tempAlpha)) / 255;
@@ -128,7 +132,6 @@ void KTech::Output::Draw(const std::vector<std::vector<CellA>>& p_render, Point 
 			m_image[yF][xF].b.b = (p_render[yR][xR].b.b * tempAlpha + m_image[yF][xF].b.b * (255 - tempAlpha)) / 255;
 		}
 	}
-
 }
 
 void KTech::Output::Print()
@@ -281,8 +284,25 @@ void KTech::Output::Print()
 		l += 3;
 	}
 	std::cout << "\033[H\033[3J\033[2J" << m_stringImage.substr(0, l) << std::flush;
-	
-	for (size_t y = 0; y < m_image.size(); y++)
-		for (size_t x = 0; x < m_image[y].size(); x++)
-			m_image[y][x] = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0));
+}
+
+bool KTech::Output::ShouldRenderThisTick()
+{
+	if (engine->input.inputThisTick || engine->time.invokedThisTick || engine->memory.callChangedThisTick)
+	{
+		engine->input.inputThisTick = false;
+		engine->time.invokedThisTick = false;
+		engine->memory.callChangedThisTick = false;
+		return true;
+	}
+	return false;
+}
+
+bool KTech::Output::ShouldPrintThisTick()
+{
+	winsize tempTerminalSize;
+	ioctl(fileno(stdout), TIOCGWINSZ, &tempTerminalSize);
+	if (tempTerminalSize.ws_row != m_terminalSize.ws_row || tempTerminalSize.ws_col != m_terminalSize.ws_col)
+		return true;
+	return false;
 }

@@ -141,22 +141,20 @@ int main()
 	while (engine.running)
 	{
 		// Calls
-		engine.output.Log("(GAME) <main()::GameLoop> Call inputs", RGBColors::green);
 		engine.input.CallHandlers();
-		engine.output.Log("(GAME) <main()::GameLoop> Call invocations", RGBColors::green);
 		engine.time.CallInvocations();
-		engine.output.Log("(GAME) <main()::GameLoop> Call OnTicks", RGBColors::green);
 		engine.memory.CallOnTicks();
 
-		// Render, draw and print
-		engine.output.Log("(GAME) <main()::GameLoop> Render", RGBColors::green);
-		ui.Render();
-		engine.output.Log("(GAME) <main()::GameLoop> Draw", RGBColors::green);
-		engine.output.Draw(ui.m_image);
-		engine.output.Log("(GAME) <main()::GameLoop> Print", RGBColors::green);
-		engine.output.Print();
+		if (engine.output.ShouldRenderThisTick())
+		{
+			// Render, draw and print
+			ui.Render();
+			engine.output.Draw(ui.m_image);
+			engine.output.Print();
+		}
+		else if (engine.output.ShouldPrintThisTick())
+			engine.output.Print();
 
-		engine.output.Log("(GAME) <main()::GameLoop> WaitUntilNextTicks", RGBColors::green);
 		engine.time.WaitUntilNextTick();
 	}
 }

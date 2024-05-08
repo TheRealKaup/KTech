@@ -55,7 +55,7 @@ struct KTech::Widget
 	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), const std::string& name = "");
 	virtual ~Widget();
 
-	inline virtual void OnTick() {};
+	inline virtual bool OnTick() { return false; };
 
 	inline virtual void RenderSelected () {}
 	inline virtual void RenderUnselected () {}

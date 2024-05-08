@@ -42,7 +42,7 @@ public:
 	Map(Engine& engine, const std::string& name = "");
 	virtual ~Map();
 
-	inline virtual void OnTick() {};
+	inline virtual bool OnTick() { return false; };
 
 	int AddLayer(ID<Layer>& layer);
 	int AddCamera(ID<Camera>& camera, bool asActiveCamera = false);

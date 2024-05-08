@@ -43,6 +43,9 @@ public:
 
 	std::string input;
 	std::string quitKey = "\x03";
+	
+	// Render-on-demand
+	bool inputThisTick = false;
 
 	// Prepares terminal, creates input loop thread
 	Input(Engine* const engine);

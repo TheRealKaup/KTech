@@ -74,12 +74,11 @@ void KTech::Camera::Render()
 
 void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 {
-	// Point final - the relative position between the camera and the texture (image index).
-	static KTech::Point start;
-	static KTech::Point end;
-	static RGBA tempFRGBA;
-	static RGBA tempBRGBA;
-	static uint8_t tempAlpha;
+	KTech::Point start;
+	KTech::Point end;
+	RGBA tempFRGBA;
+	RGBA tempBRGBA;
+	uint8_t tempAlpha;
 
 	// Reset the image to background.
 	for (size_t y = 0; y < m_res.y; y++)

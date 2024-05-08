@@ -82,7 +82,8 @@ int main()
 		engine.memory.CallOnTicks();
 
 		// Render, draw and print
-		camera.Render(map.m_layers);
+		if (engine.output.ShouldRenderThisTick())
+			camera.Render(map.m_layers);
 		engine.output.Draw(camera.m_image, KTech::Point(0, 0), 0, 0, 0, 0, engine.time.ticksCounter % 256);
 		engine.output.Print();
 

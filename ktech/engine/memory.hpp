@@ -35,5 +35,8 @@ public:
 	Container<Widget> widgets;
 	Container<UI> uis;
 
+	// Render-on-demand
+	bool callChangedThisTick;
+
 	void CallOnTicks();
 };
