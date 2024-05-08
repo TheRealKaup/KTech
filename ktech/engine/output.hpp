@@ -37,7 +37,7 @@ public:
 
 	static void Log(const std::string& text, RGB color);
 
-	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string author, const std::string programName);
+	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName);
 	void Draw(const std::vector<std::vector<CellA>>& image, Point position = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
 	void Print();
 

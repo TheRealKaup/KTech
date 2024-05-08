@@ -17,3 +17,4 @@ project "KTechLibrary"
 
 	filter "configurations:Debug"
 		symbols "On"
+		defines { "DEBUG" }

@@ -31,10 +31,13 @@
 KTech::Output::Output(Engine* p_engine, KTech::UPoint p_imageSize)
 	: engine(p_engine)
 {
-	// (OUTPUT) Hide cursor and enable alternative buffer (the "save screen" and "restore screen" options aren't preferable, alternative buffer makes more sense).
-	std::cout << "\033[?25l\033[?1049h";
-
-	// (OUTPUT) Size the image
+#ifndef DEBUG
+	// Hide cursor
+	std::cout << "\033[?25l";
+#endif
+	// Switch to alternative buffer
+	std::cout << "\033[?1049h";
+	// Size the image
 	m_image.resize(p_imageSize.y);
 	for (size_t y = 0; y < m_image.size(); y++)
 		m_image[y].resize(p_imageSize.x);
@@ -57,11 +60,10 @@ void KTech::Output::Log(const std::string& p_text, RGB p_color)
 {
 	static uint32_t logIndex = 0;
 	std::cout << "\033[38;2;" << std::to_string(p_color.r) << ';' << std::to_string(p_color.g) << ';' << std::to_string(p_color.b) << 'm' << logIndex << "] " << p_text << "\033[m" << std::endl << std::flush;
-	// std::cout << logIndex << "] " << text << std::endl << std::flush;
 	logIndex++;
 }
 
-void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::string& p_years, const std::string p_author, const std::string p_projectName)
+void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::string& p_years, const std::string& p_author, const std::string& p_projectName)
 {
 	// Clear the terminal
 	std::cout << "\033[H\033[3J\033[2J";
