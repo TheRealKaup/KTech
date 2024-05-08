@@ -52,7 +52,6 @@ namespace KTech
 	struct UI;
 	// Engine and its components.
 	// Definitions in `engine/`
-	class Audio;
 	class Collision;
 	class Input;
 	class Memory;
