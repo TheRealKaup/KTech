@@ -41,7 +41,7 @@ struct KTech::Object
 
 	Object(Engine& engine, Point position = Point(0, 0), const std::string& name = "");
 	Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), const std::string& name = "");
-	~Object();
+	virtual ~Object();
 
 	inline virtual void OnTick() {} // Called by `Map::CallOnTicks()`.
 	inline virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.

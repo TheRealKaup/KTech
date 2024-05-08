@@ -44,7 +44,7 @@ struct KTech::Layer
 
 	Layer(Engine& engine, const std::string& name = "");
 	Layer(Engine& engine, ID<Map>& parentMap, const std::string& name = "");
-	~Layer();
+	virtual ~Layer();
 
 	// Use this refereance temporarily - do not move this reference, it can become stale.
 	ID<Object>& operator[](size_t index);

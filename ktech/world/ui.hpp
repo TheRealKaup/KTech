@@ -47,7 +47,7 @@ struct KTech::UI
 	std::vector<std::vector<CellA>> m_image;
 
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
-	~UI();
+	virtual ~UI();
 
 	inline virtual void OnTick() {};
 	

@@ -40,7 +40,7 @@ public:
 	size_t m_activeCameraI = -1;
 
 	Map(Engine& engine, const std::string& name = "");
-	~Map();
+	virtual ~Map();
 
 	inline virtual void OnTick() {};
 

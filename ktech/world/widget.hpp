@@ -53,7 +53,7 @@ struct KTech::Widget
 	Input::CallbacksGroup* m_callbacksGroup;
 
 	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), const std::string& name = "");
-	~Widget();
+	virtual ~Widget();
 
 	inline virtual void OnTick() {};
 
