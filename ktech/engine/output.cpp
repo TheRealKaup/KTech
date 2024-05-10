@@ -22,7 +22,6 @@
 
 #include "../utility/keys.hpp"
 #include "../basic/cell.hpp"
-#include "../basic/cella.hpp"
 #include "../basic/upoint.hpp"
 #include "../engine/engine.hpp"
 
@@ -100,7 +99,7 @@ void KTech::Output::Clear()
 			m_image[y][x] = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0));
 }
 
-void KTech::Output::Draw(const std::vector<std::vector<CellA>>& p_render, Point p_pos, uint16_t p_left, uint16_t p_top, uint16_t p_right, uint16_t p_bottom, uint8_t p_alpha)
+void KTech::Output::Draw(const std::vector<std::vector<Cell>>& p_render, Point p_pos, uint16_t p_left, uint16_t p_top, uint16_t p_right, uint16_t p_bottom, uint8_t p_alpha)
 {
 	// Default the rectangle
 	if (p_bottom == 0)
@@ -111,25 +110,19 @@ void KTech::Output::Draw(const std::vector<std::vector<CellA>>& p_render, Point 
 	if (p_left >= p_right || p_top >= p_bottom)
 		return;
 
-	// To avoid repeating the same calculation
-	uint8_t tempAlpha;
-
 	// Draw
 	for (size_t yF = (p_pos.y < 0 ? 0 : p_pos.y), yR = p_top; yF < m_image.size() && yR < p_bottom; yF++, yR++)
 	{
 		for (size_t xF = (p_pos.x < 0 ? 0 : p_pos.x), xR = p_left; xF < m_image[yF].size() && xR < p_right; xF++, xR++)
 		{
 			m_image[yF][xF].c = p_render[yR][xR].c;
-			tempAlpha = p_render[yR][xR].f.a * p_alpha / 255;
 			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
-			m_image[yF][xF].f.r = (p_render[yR][xR].f.r * tempAlpha + m_image[yF][xF].f.r * (255 - tempAlpha)) / 255;
-			m_image[yF][xF].f.g = (p_render[yR][xR].f.g * tempAlpha + m_image[yF][xF].f.g * (255 - tempAlpha)) / 255;
-			m_image[yF][xF].f.b = (p_render[yR][xR].f.b * tempAlpha + m_image[yF][xF].f.b * (255 - tempAlpha)) / 255;
-			tempAlpha = p_render[yR][xR].b.a * p_alpha / 255;
-			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
-			m_image[yF][xF].b.r = (p_render[yR][xR].b.r * tempAlpha + m_image[yF][xF].b.r * (255 - tempAlpha)) / 255;
-			m_image[yF][xF].b.g = (p_render[yR][xR].b.g * tempAlpha + m_image[yF][xF].b.g * (255 - tempAlpha)) / 255;
-			m_image[yF][xF].b.b = (p_render[yR][xR].b.b * tempAlpha + m_image[yF][xF].b.b * (255 - tempAlpha)) / 255;
+			m_image[yF][xF].f.r = (p_render[yR][xR].f.r * p_alpha + m_image[yF][xF].f.r * (255 - p_alpha)) / 255;
+			m_image[yF][xF].f.g = (p_render[yR][xR].f.g * p_alpha + m_image[yF][xF].f.g * (255 - p_alpha)) / 255;
+			m_image[yF][xF].f.b = (p_render[yR][xR].f.b * p_alpha + m_image[yF][xF].f.b * (255 - p_alpha)) / 255;
+			m_image[yF][xF].b.r = (p_render[yR][xR].b.r * p_alpha + m_image[yF][xF].b.r * (255 - p_alpha)) / 255;
+			m_image[yF][xF].b.g = (p_render[yR][xR].b.g * p_alpha + m_image[yF][xF].b.g * (255 - p_alpha)) / 255;
+			m_image[yF][xF].b.b = (p_render[yR][xR].b.b * p_alpha + m_image[yF][xF].b.b * (255 - p_alpha)) / 255;
 		}
 	}
 }
@@ -288,7 +281,7 @@ void KTech::Output::Print()
 
 bool KTech::Output::ShouldRenderThisTick()
 {
-	if (engine->input.inputThisTick || engine->time.invokedThisTick || engine->memory.callChangedThisTick)
+	if (engine->input.inputThisTick || engine->time.invokedThisTick || engine->memory.callChangedThisTick || engine->time.ticksCounter == 0)
 	{
 		engine->input.inputThisTick = false;
 		engine->time.invokedThisTick = false;

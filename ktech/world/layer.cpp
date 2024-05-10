@@ -32,23 +32,18 @@ KTech::Layer::Layer(Engine& p_engine, const std::string& p_name)
 	engine.memory.layers.Add(this);
 }
 
-// Currently layers must be forced to be added to maps ASAP, otherwise there would be seg faults, for example, whenever objects try to move (since they can't access engine.collision). 
 KTech::Layer::Layer(Engine& p_engine, ID<Map>& p_map, const std::string& p_name)
-	: engine(p_engine), m_name(p_name)
+	: Layer(p_engine, p_name)
 {
-	engine.memory.layers.Add(this);
 	EnterMap(p_map);
 }
 
 KTech::Layer::~Layer()
 {
-	// Reset the `parentLayer` of the objects that have it set to this layer
 	Output::Log("<Layer[" + m_name + "]::~Layer()>", RGBColors::red);
-	for (ID<Object>& obj : m_objects)
-		if (engine.memory.objects.Exists(obj))
-			engine.memory.objects[obj]->m_parentLayer = ID<Layer>(0, 0);
-	if (engine.memory.maps.Exists(m_parentMap))
-		engine.memory.maps[m_parentMap]->RemoveLayer(m_id);
+	RemoveAllObjects();
+	LeaveMap();	
+	engine.memory.layers.Remove(m_id);
 }
 
 KTech::ID<KTech::Object>& KTech::Layer::operator[](size_t p_i)
@@ -59,25 +54,16 @@ KTech::ID<KTech::Object>& KTech::Layer::operator[](size_t p_i)
 		return nullID<Object>;
 }
 
-void KTech::Layer::AddObject(ID<Object>& p_object)
+bool KTech::Layer::AddObject(ID<Object>& p_object)
 {
+	if (!engine.memory.objects.Exists(p_object))
+		return false;
+	for (ID<Object>& object : m_objects)
+		if (object == p_object)
+			return false;
 	engine.memory.objects[p_object]->m_parentLayer = m_id;
 	m_objects.push_back(p_object);
-}
-
-bool KTech::Layer::RemoveObject(const std::string& p_name)
-{
-	for (size_t i = 0; i < m_objects.size(); i++)
-	{
-		if (engine.memory.objects[m_objects[i]]->m_name == p_name)
-		{
-			if (engine.memory.objects.Exists(m_objects[i]))
-				engine.memory.objects[m_objects[i]]->m_parentLayer = ID<Layer>(0, 0);
-			m_objects.erase(m_objects.begin() + i);
-			return true;
-		}
-	}
-	return false;
+	return true;
 }
 
 bool KTech::Layer::RemoveObject(ID<Object>& p_object)
@@ -87,7 +73,7 @@ bool KTech::Layer::RemoveObject(ID<Object>& p_object)
 		if (m_objects[i] == p_object)
 		{
 			if (engine.memory.objects.Exists(m_objects[i]))
-				engine.memory.objects[m_objects[i]]->m_parentLayer = ID<Layer>(0, 0);
+				engine.memory.objects[m_objects[i]]->m_parentLayer = nullID<Layer>;
 			m_objects.erase(m_objects.begin() + i);
 			return true;
 		}
@@ -95,9 +81,28 @@ bool KTech::Layer::RemoveObject(ID<Object>& p_object)
 	return false;
 }
 
-void KTech::Layer::EnterMap(ID<Map>& p_map)
+bool KTech::Layer::RemoveAllObjects()
+{
+	if (m_objects.size() == 0)
+		return false;
+	for (size_t i = 0; i < m_objects.size(); i++)
+		if (engine.memory.objects.Exists(m_objects[i]))
+			engine.memory.objects[m_objects[i]]->m_parentLayer = nullID<Layer>;
+	m_objects.clear();
+	return true;
+}
+
+bool KTech::Layer::EnterMap(ID<Map>& p_map)
+{
+	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
+		return false;
+	return engine.memory.maps[p_map]->AddLayer(m_id);
+}
+
+bool KTech::Layer::LeaveMap()
 {
 	if (engine.memory.maps.Exists(m_parentMap))
-		engine.memory.maps[m_parentMap]->RemoveLayer(m_id);
-	engine.memory.maps[p_map]->AddLayer(m_id);
+		return engine.memory.maps[m_parentMap]->RemoveLayer(m_id);
+	m_parentMap = nullID<Map>;
+	return true;
 }

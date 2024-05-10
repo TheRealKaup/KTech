@@ -51,7 +51,7 @@ int main()
 	KTech::Map map(engine);
 
 	KTech::Camera camera(engine, KTech::Point(0, 0), KTech::UPoint(40, 20));
-	camera.m_background = KTech::CellA(' ', KTech::RGBA(0, 0, 0, 0), KTech::RGBA(180, 230, 240, 255));
+	camera.m_background = KTech::Cell(' ', KTech::RGB(0, 0, 0), KTech::RGB(180, 230, 240));
 	map.AddCamera(camera.m_id);
 
 	KTech::Layer layer(engine, map.m_id);
@@ -84,6 +84,7 @@ int main()
 		// Render, draw and print
 		if (engine.output.ShouldRenderThisTick())
 			camera.Render(map.m_layers);
+		engine.output.Clear();
 		engine.output.Draw(camera.m_image, KTech::Point(0, 0), 0, 0, 0, 0, engine.time.ticksCounter % 256);
 		engine.output.Print();
 

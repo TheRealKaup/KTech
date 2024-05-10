@@ -32,15 +32,13 @@ KTech::Camera::Camera(Engine& p_engine, Point p_pos, UPoint p_res, const std::st
 	: engine(p_engine), m_pos(p_pos), m_res(p_res)
 {
 	engine.memory.cameras.Add(this);
-	m_image.resize(m_res.y, std::vector<CellA>(m_res.x));
+	m_image.resize(m_res.y, std::vector<Cell>(m_res.x));
 }
 
 KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_map, Point p_pos, UPoint p_res, const std::string& p_name)
-	: engine(p_engine), m_pos(p_pos), m_res(p_res)
+	: Camera(p_engine, p_pos, p_res)
 {
-	engine.memory.cameras.Add(this);
 	EnterMap(p_map);
-	m_image.resize(m_res.y, std::vector<CellA>(m_res.x));
 }
 
 KTech::Camera::~Camera()
@@ -51,11 +49,19 @@ KTech::Camera::~Camera()
 	engine.memory.cameras.Remove(m_id);
 }
 
-void KTech::Camera::EnterMap(ID<Map>& p_map)
+bool KTech::Camera::EnterMap(ID<Map>& p_map)
+{
+	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
+		return false;
+	return engine.memory.maps[p_map]->AddCamera(m_id);
+}
+
+bool KTech::Camera::LeaveMap()
 {
 	if (engine.memory.maps.Exists(m_parentMap))
-		engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
-	engine.memory.maps[p_map]->AddCamera(m_id);
+		return engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
+	m_parentMap = nullID<Map>;
+	return true;
 }
 
 void KTech::Camera::Resize(UPoint p_res)
@@ -148,12 +154,10 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 							m_image[y][x].f.r = tempFRGBA.r + m_image[y][x].f.r * (255 - tempFRGBA.a) / 255;
 							m_image[y][x].f.g = tempFRGBA.g + m_image[y][x].f.g * (255 - tempFRGBA.a) / 255;
 							m_image[y][x].f.b = tempFRGBA.b + m_image[y][x].f.b * (255 - tempFRGBA.a) / 255;
-							m_image[y][x].f.a += tempFRGBA.a * (255 - m_image[y][x].f.a) / 255;
 							//                8.            8 ->              16 ->                 8.
 							m_image[y][x].b.r = tempBRGBA.r + m_image[y][x].b.r * (255 - tempBRGBA.a) / 255;
 							m_image[y][x].b.g = tempBRGBA.g + m_image[y][x].b.g * (255 - tempBRGBA.a) / 255;
 							m_image[y][x].b.b = tempBRGBA.b + m_image[y][x].b.b * (255 - tempBRGBA.a) / 255;
-							m_image[y][x].b.a += tempBRGBA.a * (255 - m_image[y][x].b.a) / 255;
 						}
 					}
 				}
@@ -200,7 +204,6 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 							m_image[start.y][start.x].f.r = (texture.m_t[y][x].f.r * tempAlpha + m_image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
 							m_image[start.y][start.x].f.g = (texture.m_t[y][x].f.g * tempAlpha + m_image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
 							m_image[start.y][start.x].f.b = (texture.m_t[y][x].f.b * tempAlpha + m_image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
-							m_image[start.y][start.x].f.a += tempAlpha * (255 - m_image[start.y][start.x].f.a) / 255;
 							// Precalculate background * layer alpha (8 bit depth)
 							//          8 ->                    16 ->                 8.
 							tempAlpha = texture.m_t[y][x].b.a * layer->m_alpha / 255;
@@ -208,7 +211,6 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 							m_image[start.y][start.x].b.r = (texture.m_t[y][x].b.r * tempAlpha + m_image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
 							m_image[start.y][start.x].b.g = (texture.m_t[y][x].b.g * tempAlpha + m_image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
 							m_image[start.y][start.x].b.b = (texture.m_t[y][x].b.b * tempAlpha + m_image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;
-							m_image[start.y][start.x].b.a += tempAlpha * (255 - m_image[start.y][start.x].b.a) / 255;
 						}
 					}
 				}
@@ -224,7 +226,6 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 					m_image[y][x].f.r = tempFRGBA.r + (255 - layer->m_frgba.a) * m_image[y][x].f.r / 255;
 					m_image[y][x].f.g = tempFRGBA.g + (255 - layer->m_frgba.a) * m_image[y][x].f.g / 255;
 					m_image[y][x].f.b = tempFRGBA.b + (255 - layer->m_frgba.a) * m_image[y][x].f.b / 255;
-					m_image[y][x].f.a += tempFRGBA.a * (255 - m_image[y][x].f.a) / 255;
 				}
 			}
 		}
@@ -238,7 +239,6 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 					m_image[y][x].b.r = tempBRGBA.r + (255 - layer->m_brgba.a) * m_image[y][x].b.r / 255;
 					m_image[y][x].b.g = tempBRGBA.g + (255 - layer->m_brgba.a) * m_image[y][x].b.g / 255;
 					m_image[y][x].b.b = tempBRGBA.b + (255 - layer->m_brgba.a) * m_image[y][x].b.b / 255;
-					m_image[y][x].b.a += tempBRGBA.a * (255 - m_image[y][x].b.a) / 255;
 				}
 			}
 		}

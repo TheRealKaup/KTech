@@ -44,11 +44,13 @@ public:
 
 	inline virtual bool OnTick() { return false; };
 
-	int AddLayer(ID<Layer>& layer);
-	int AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
+	bool AddLayer(ID<Layer>& layer);
+	bool AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
 
 	bool RemoveLayer(ID<Layer>& layer);
 	bool RemoveCamera(ID<Camera>& camera);
+	bool RemoveAllLayers();
+	bool RemoveAllCameras();
 
 	bool Render();
 };

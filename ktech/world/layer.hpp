@@ -51,10 +51,10 @@ struct KTech::Layer
 	
 	inline virtual bool OnTick() { return false; };
 
-	void AddObject(ID<Object>& object);
-	
-	bool RemoveObject(const std::string& name);
+	bool AddObject(ID<Object>& object);
 	bool RemoveObject(ID<Object>& object);
+	bool RemoveAllObjects();
 
-	void EnterMap(ID<Map>& map);
+	bool EnterMap(ID<Map>& map);
+	bool LeaveMap();
 };

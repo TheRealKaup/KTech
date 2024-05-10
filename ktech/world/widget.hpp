@@ -44,6 +44,7 @@ struct KTech::Widget
 	ID<Widget> m_id;
 	std::string m_name;
 	ID<UI> m_parentUI;
+	ID<Widget> m_parentWidget = nullID<Widget>;
 	std::vector<ChildWidget> m_childWidgets;
 	bool m_selected = false;
 	bool m_shown = true;
@@ -52,6 +53,7 @@ struct KTech::Widget
 	std::vector<Texture> m_textures = {};
 	Input::CallbacksGroup* m_callbacksGroup;
 
+	Widget(Engine& engine, Point position = Point(0, 0), const std::string& name = "");
 	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), const std::string& name = "");
 	virtual ~Widget();
 
@@ -60,11 +62,15 @@ struct KTech::Widget
 	inline virtual void RenderSelected () {}
 	inline virtual void RenderUnselected () {}
 
-	void AddWidget(ID<Widget> widget);
+	bool AddWidget(ID<Widget> widget);
 	bool RemoveWidget(ID<Widget> widget);
+	bool RemoveAllWidgets();
 
-	void EnterUI(ID<UI> ui);
-	
+	bool EnterWidget(ID<Widget> widget);
+	bool EnterUI(ID<UI> ui);
+	bool LeaveWidget();
+	bool LeaveUI();
+
 	void Select();
 	void Deselect();
 	void Show();

@@ -40,20 +40,20 @@ struct KTech::UI
 	std::vector<ID<Widget>> m_widgets;
 
 	UPoint m_res;
-	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
+	Cell m_background = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)); // The background to render upon.
 	RGBA m_frgba = RGBA(0, 0, 0, 0);
 	RGBA m_brgba = RGBA(0, 0, 0, 0);
 	uint8_t m_alpha = 255;
-	std::vector<std::vector<CellA>> m_image;
+	std::vector<std::vector<Cell>> m_image;
 
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~UI();
 
 	inline virtual bool OnTick() { return false; };
 	
-	void AddWidget(ID<Widget> widget);
-
+	bool AddWidget(ID<Widget> widget);
 	bool RemoveWidget(ID<Widget> widget);
+	bool RemoveAllWidgets();
 
 	void Resize(UPoint resolution);
 

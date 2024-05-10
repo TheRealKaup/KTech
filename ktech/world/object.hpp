@@ -53,7 +53,9 @@ struct KTech::Object
 	inline virtual void OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
 	inline virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
 	
-	void EnterLayer(ID<Layer>& layer);
-	
+	bool EnterLayer(ID<Layer>& layer);
+	bool LeaveLayer();
+
+
 	bool Move(Point direction);
 };
