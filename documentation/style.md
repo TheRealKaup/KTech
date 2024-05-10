@@ -133,7 +133,7 @@ The "given structure" is provided as an ID.
     - If the child structure exists in `Engine::Memory`:
         - Set the parent ID of the child structure to `KTech::nullID`.
 - Clear child structures vector.
-- Return false.
+- Return true.
 
 ### Enter
 
