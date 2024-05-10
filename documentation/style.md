@@ -156,10 +156,12 @@ The "given structure" is provided as an ID.
 
 When constructed, world structures are responsible for adding themselves to `Engine::Memory`, and for entering other world structors.
 
-If the constructor accepts a parent map to enter:
+If the constructor accepts a parent structure to enter:
 - Add this structure to `Engine::Memory` (i.e. `engine.memory.container.Add(this);`).
 
-If the constructor doesn't accept a parent map to enter, call the constructor that doesn't, and enter the given parent.
+If the constructor doesn't accept a parent structure to enter;
+- Call the constructor that doesn't accept a parent.
+- Enter the given parent.
 
 ### Destructor
 
