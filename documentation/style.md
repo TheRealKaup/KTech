@@ -104,7 +104,7 @@ Since enterers and leavers (of child structure) simply call adders and removers 
 
 The "given structure" is provided as an ID.
 
-### Adder
+### Add
 
 - If the given structure does not exist in `Engine::Memory`:
     - Return false.
@@ -112,36 +112,61 @@ The "given structure" is provided as an ID.
     - Return false.
 - Call the leaver function of the given structure.
 - Set the parent ID of the given structure to this structure's ID.
-- Add the given structure to this structure's corresponding vector.
+- Add the given structure to this child structures vector.
 - Return true.
 
-### Remover
+### Remove
 
-- Is the given structure within this structure?
-    - True:
-        - Does the given structure exist in `Engine::Memory`?
-            - True: set the parent ID of the given structure to `KTech::nullID`.
-            - False: continue.
-        - Erase the given structure from this structure's corresponding vector.
-        - Return true.
-    - False: return false.
+- If the given structure is not within this structure:
+    - Return false.
+- If the given structure exists in `Engine::Memory`:
+    - Set the parent ID of the given structure to `KTech::nullID`.
+- Erase the given structure from this child structures vector.
+- Return true.
 
-### Enterer
+### RemoveAll
 
-- Is the given structure not already the current parent, and, does the given structure exist in `Engine::Memory`?
-    - True:
-        - Call this structure's leaver function.
-        - 
+- If there are no child structures:
+    - Return false.
+- For all child structures:
+    - If the child structure exists in `Engine::Memory`:
+        - Set the parent ID of the child structure to `KTech::nullID`.
+- Clear child structures vector.
+- Return false.
 
-### Leaver
+### Enter
 
-- Does the current parent exit in `Engine::Memory`?
-    - True:
-        - Call the remove function of the given structure, with the ID of this structure's.
-        - Return true.
-    - False:
-        - Set the parent ID of this structure to `KTech::nullID`.
-        - Return false.
+- If the given structure is already the current parent:
+    - Return false.
+- If the given structure does not exist in `Engine::Memory`:
+    - Return false:
+- Call this structure's leaver function, and return its returned value.
+
+### Leave
+
+- If the current parent exits in `Engine::Memory`:
+    - Call the remove function of current parent, and return its returned value.
+- Set the parent ID to `KTech::nullID`.
+- Return true.
+
+## Expected behavior of constructors and destructors of world structures
+
+### Constructor
+
+When constructed, world structures are responsible for adding themselves to `Engine::Memory`, and for entering other world structors.
+
+If the constructor accepts a parent map to enter:
+- Add this structure to `Engine::Memory` (i.e. `engine.memory.container.Add(this);`).
+
+If the constructor doesn't accept a parent map to enter, call the constructor that doesn't, and enter the given parent.
+
+### Destructor
+
+When destructed, world structures are responsible for removing themselves to `Engine::Memory`, for leaving their parents, and for removing child structures.
+
+- Call this `RemoveAll` function.
+- Call this leaver function.
+- Remove this from `Engine::Memory` (i.e. `engine.memory.container.Remove(m_id);`).
 
 ## Engine components
 
