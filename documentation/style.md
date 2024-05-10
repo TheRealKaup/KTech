@@ -8,7 +8,7 @@ Table of Contents:
 - [Classes](#classes)
     - [Order of class members](#order-of-class-members)
     - [Class constructors](#class-constructors)
-    - [Expected behavior of adder, remover, enterer and leaver functions](#expected-behavior-of-adder,-remover,-enterer-and-leaver-functions)
+    - [Expected behavior of adder, remover, enterer and leaver functions](#expected-behavior-of-adder-remover-enterer-and-leaver-functions)
     - [Expected behavior of constructors and destructors of world structures](#expected-behavior-of-constructors-and-destructors-of-world-structures)
     - [Engine components](#engine-components)
     - [Other conventions about classes](#other-conventions-about-classes)
