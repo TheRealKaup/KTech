@@ -1,6 +1,6 @@
 # Preamble
 
-This document contains specifications for KTech's coding style.
+This document contains specifications for KTech's code.
 
 Table of Contents:
 - [Preamble](#preamble)
