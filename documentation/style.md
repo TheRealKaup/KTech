@@ -109,6 +109,8 @@ The "given structure" is provided as an ID.
 
 - If the given structure does not exist in `Engine::Memory`:
     - Return false.
+- If the given structure is this structure itself:
+     - Return false.
 - If the given structure is already within this structure:
     - Return false.
 - Call the leaver function of the given structure.
@@ -137,10 +139,12 @@ The "given structure" is provided as an ID.
 
 ### Enter
 
-- If the given structure is already the current parent:
-    - Return false.
 - If the given structure does not exist in `Engine::Memory`:
     - Return false:
+- If the given structure is this structure itself:
+     - Return false.
+- If the given structure is already the current parent:
+    - Return false.
 - Call this structure's leaver function, and return its returned value.
 
 ### Leave
