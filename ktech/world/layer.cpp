@@ -48,10 +48,7 @@ KTech::Layer::~Layer()
 
 KTech::ID<KTech::Object>& KTech::Layer::operator[](size_t p_i)
 {
-	if (p_i < m_objects.size())
-		return m_objects[p_i];
-	else
-		return nullID<Object>;
+	return m_objects[p_i];
 }
 
 bool KTech::Layer::AddObject(ID<Object>& p_object)

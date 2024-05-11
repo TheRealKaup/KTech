@@ -41,15 +41,18 @@ struct KTech::Container
 	// If the ID's UUID doesn't exist in the storage at all, this will reset the ID and will return `nullptr`.
 	T* operator[](ID<T>& p_id)
 	{
-		for (size_t i = (p_id.m_i < m_size ? p_id.m_i : m_size -1);; i--)
+		if (m_size > 0)
 		{
-			if (m_arr[i]->m_id == p_id)
+			for (size_t i = (p_id.m_i < m_size ? p_id.m_i : m_size - 1);; i--)
 			{
-				p_id.m_i = i;
-				return m_arr[i];
+				if (m_arr[i]->m_id == p_id)
+				{
+					p_id.m_i = i;
+					return m_arr[i];
+				}
+				if (i == 0)
+					break;
 			}
-			if (i == 0)
-				break;
 		}
 		p_id.m_i = 0;
 		return nullptr;
@@ -58,12 +61,15 @@ struct KTech::Container
 	// Constant version of the previous operator, which will not update the given ID if it's outdated/missing.
 	T* operator[](const ID<T>& p_id)
 	{
-		for (size_t i = (p_id.m_i < m_size ? p_id.m_i : m_size -1);; i--)
+		if (m_size > 0)
 		{
-			if (m_arr[i]->m_id == p_id)
-				return m_arr[i];
-			if (i == 0)
-				break;
+			for (size_t i = (p_id.m_i < m_size ? p_id.m_i : m_size -1);; i--)
+			{
+				if (m_arr[i]->m_id == p_id)
+					return m_arr[i];
+				if (i == 0)
+					break;
+			}
 		}
 		return nullptr;
 	}
@@ -144,15 +150,18 @@ struct KTech::Container
 	// Fixes the ID if outdated.
 	size_t IDToIndex(ID<T>& id)
 	{
-		for (size_t i = (id.m_i < m_size ? id.m_i : m_size - 1);; i--)
+		if (m_size > 0)
 		{
-			if (m_arr[i]->m_id == id)
-			{	
-				id.m_i = i;
-				return i;
+			for (size_t i = (id.m_i < m_size ? id.m_i : m_size - 1);; i--)
+			{
+				if (m_arr[i]->m_id == id)
+				{	
+					id.m_i = i;
+					return i;
+				}
+				if (i == 0)
+					break;
 			}
-			if (i == 0)
-				break;
 		}
 		id.m_i = 0;
 		return m_size;
@@ -161,12 +170,16 @@ struct KTech::Container
 	// If the UUID is missing, return the size of the array making the index invalid.
 	size_t IDToIndex(const ID<T>& id)
 	{
-		for (size_t i = (id.m_i < m_size ? id.m_i : m_size - 1);; i--)
+		if (m_size > 0)
 		{
-			if (m_arr[i]->m_id == id)
-				return i;
-			if (i == 0)
-				return m_size;
+			for (size_t i = (id.m_i < m_size ? id.m_i : m_size - 1);; i--)
+			{
+				if (m_arr[i]->m_id == id)
+					return i;
+				if (i == 0)
+					break;
+			}
 		}
+		return m_size;
 	}
 };
