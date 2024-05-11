@@ -111,7 +111,7 @@ public:
 
 	void ChangeValue(std::string newNumber)
 	{
-		m_textures[0].Simple(KTech::UPoint( m_maxDigits, 1 ), KTech::CellA(' ', m_unselectedRGBA, { 0, 0, 0, 0 }), KTech::Point(1 + (int)m_textures[1].m_t[0].size(), 1));
+		m_textures[0].Rectangle(KTech::UPoint( m_maxDigits, 1 ), KTech::CellA(' ', m_unselectedRGBA, { 0, 0, 0, 0 }), KTech::Point(1 + (int)m_textures[1].m_t[0].size(), 1));
 		m_number = 0;
 		m_currentDigit = 0;
 		for (size_t x = 0; x < m_maxDigits && x < newNumber.length(); x++)
