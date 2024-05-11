@@ -54,11 +54,13 @@ KTech::UPoint KTech::Texture::File(const std::string& p_fileName, Point p_pos)
 	{
 		Output::Log("<KTech::Texture::File()> Error! Failed to open file " + p_fileName + ".", RGB(255, 0, 0));
 		m_t.resize(2, std::vector<CellA>(2));
+		m_t[0].resize(2);
+		m_t[1].resize(2);
 		m_t[0][0].b = RGBA(255, 0, 220, 255);
 		m_t[1][1].b = RGBA(255, 0, 220, 255);
 		m_t[0][1].b = RGBA(0, 0, 0, 255);
 		m_t[1][0].b = RGBA(0, 0, 0, 255);
-		return UPoint(0, 0);
+		return GetSize();
 	}
 
 	Output::Log("<KTech::Texture::File()> Reading size of texture.", RGB(128, 128, 255));
@@ -274,7 +276,19 @@ void KTech::Texture::ExportToFile(const std::string& p_fileName) const
 		for (size_t x = 0; x < maxTextureSize.x; x++)
 		{
 			if (x < m_t[y].size())
-				file.write((char*)&m_t[y][x], 9);
+			{
+				char data[9];
+				data[0] = m_t[y][x].f.r;
+				data[1] = m_t[y][x].f.g;
+				data[2] = m_t[y][x].f.b;
+				data[3] = m_t[y][x].f.a;
+				data[4] = m_t[y][x].b.r;
+				data[5] = m_t[y][x].b.g;
+				data[6] = m_t[y][x].b.b;
+				data[7] = m_t[y][x].b.a;
+				data[8] = m_t[y][x].c;
+				file.write(data, 9);
+			}
 			else
 				file.write("\0\0\0\0\0\0\0\0\0", 9);
 		}
