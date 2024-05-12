@@ -20,7 +20,9 @@
 
 using namespace KTech;
 
-Engine engine(UPoint(50, 30), 24);
+static constexpr UPoint viewport = UPoint(50, 30);
+
+Engine engine(viewport, 24);
 
 struct Character : Object
 {
@@ -259,7 +261,7 @@ int main()
 	voidLayer.m_name = "voidLayer";
 
 	KTech::Output::Log("<main()> Creating camera", RGBColors::blue);
-	KTech::Camera camera(engine, Point(0, 0), UPoint(50, 30));
+	KTech::Camera camera(engine, Point(0, 0), viewport);
 	camera.m_name = "camera";
 	KTech::Output::Log("<main()> Adding camera to map", RGBColors::blue);
 	// `Camera` to `ID<Camera>` cast overload
@@ -282,10 +284,10 @@ int main()
 	KTech::Object frame(engine, KTech::Point(0, 0), "frame");
 	frame.m_name = "frame";
 	frame.m_textures.resize(5);
-	frame.m_textures[0].Simple(KTech::UPoint(1, 30), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 0));
-	frame.m_textures[1].Simple(KTech::UPoint(1, 30), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(49, 0));
-	frame.m_textures[2].Simple(KTech::UPoint(50, 1), KTech::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 0));
-	frame.m_textures[3].Simple(KTech::UPoint(50, 1), KTech::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 29));
+	frame.m_textures[0].Simple(KTech::UPoint(1, viewport.y), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 0));
+	frame.m_textures[1].Simple(KTech::UPoint(1, viewport.y), KTech::CellA('|', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(viewport.x - 1, 0));
+	frame.m_textures[2].Simple(KTech::UPoint(viewport.x, 1), KTech::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, 0));
+	frame.m_textures[3].Simple(KTech::UPoint(viewport.x, 1), KTech::CellA('-', { 0, 0, 0, 255 }, { 255, 255, 255, 255 }), KTech::Point(0, viewport.y - 1));
 	frame.m_textures[4].Write(
 		{
 			"'WASD'/'Arrow keys' to move.",
@@ -296,10 +298,10 @@ int main()
 	frame.m_textures[4].Resize(frame.m_textures[4].GetSize(), CellA());
 	frame.m_textures[4].SetBackground(RGBA(255, 255, 255, 100));
 	frame.m_colliders.resize(4);
-	frame.m_colliders[0].Simple(KTech::UPoint(50, 1), 0, KTech::Point(0, 0));
-	frame.m_colliders[1].Simple(KTech::UPoint(1, 30), 0, KTech::Point(0, 0));
-	frame.m_colliders[2].Simple(KTech::UPoint(50, 1), 0, KTech::Point(0, 29));
-	frame.m_colliders[3].Simple(KTech::UPoint(1, 30), 0, KTech::Point(49, 0));
+	frame.m_colliders[0].Simple(KTech::UPoint(viewport.x, 1), 0, KTech::Point(0, 0));
+	frame.m_colliders[1].Simple(KTech::UPoint(1, viewport.y), 0, KTech::Point(0, 0));
+	frame.m_colliders[2].Simple(KTech::UPoint(viewport.x, 1), 0, KTech::Point(0, viewport.y - 1));
+	frame.m_colliders[3].Simple(KTech::UPoint(1, viewport.y), 0, KTech::Point(viewport.x - 1, 0));
 	layer.AddObject(frame.m_id);
 
 	KTech::Output::Log("<main()> Creating character", RGBColors::blue);
@@ -345,11 +347,20 @@ int main()
 		{
 			if (charCamOn) 
 			{
+				engine.output.Clear(); // Allows to make foreground darker
 				camera.Render({ layer.m_id, voidLayer.m_id, darkLayer.m_id });
-				// darkLayer is the dark post processing effect
-				engine.output.Draw(camera.m_image, Point(0, 0), 0, 0, 0, 0);
+				engine.output.Draw(camera.m_image, Point(0, 0), 0, 0, 0, 0, 127);
 				character.cam.Render(map.m_layers);
-				engine.output.Draw(character.cam.m_image, Point(18, 9), 0, 0, 0, 0);
+				engine.output.Draw(
+					character.cam.m_image,
+					Point(
+						18 - (character.cam.m_pos.x <= 0 ? character.cam.m_pos.x - 1 : 0),
+						9 - (character.cam.m_pos.y <= 0 ? character.cam.m_pos.y - 1 : 0)),
+					character.cam.m_pos.x <= 0 ? -character.cam.m_pos.x + 1 : 0,
+					character.cam.m_pos.y <= 0 ? -character.cam.m_pos.y + 1 : 0,
+					character.cam.m_pos.x + character.cam.m_res.x >= viewport.x ? viewport.x - character.cam.m_pos.x - 1 : 0,
+					character.cam.m_pos.y + character.cam.m_res.y >= viewport.y ? viewport.y - character.cam.m_pos.y - 1 : 0
+				);
 			}
 			else
 			{
