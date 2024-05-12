@@ -133,35 +133,53 @@ void KTech::UI::Render()
 					start.y = 0;
 				if (start.x < 0)
 					start.x = 0;
-				// Pre-calculate added color (can only store 8-bit depth)
-				tempFRGBA = RGBA(
-				//  8 ->                16 ->               24 ->          8.
-					texture.m_value.f.r * texture.m_value.f.a * m_alpha / 65025,
-					texture.m_value.f.g * texture.m_value.f.a * m_alpha / 65025,
-					texture.m_value.f.b * texture.m_value.f.a * m_alpha / 65025,
-				//  8 ->                16 ->          8.
-					texture.m_value.f.a * m_alpha / 255
-				);
-				tempBRGBA = RGBA(
-					texture.m_value.b.r * texture.m_value.b.a * m_alpha / 65025,
-					texture.m_value.b.g * texture.m_value.b.a * m_alpha / 65025,
-					texture.m_value.b.b * texture.m_value.b.a * m_alpha / 65025,
-					texture.m_value.b.a * m_alpha / 255
-				);
-				// Render
-				for (size_t y = start.y; y < end.y; y++)
-				{
-					for (size_t x = start.x; x < end.x; x++)
-					{
-						if (texture.m_value.c != ' ')
+				// Render character
+				if (texture.m_value.c != ' ')
+					for (size_t y = start.y; y < end.y; y++)
+						for (size_t x = start.x; x < end.x; x++)
 							m_image[y][x].c = texture.m_value.c;
-						//                  8.            8 ->                16 ->                 8.
-						m_image[y][x].f.r = tempFRGBA.r + m_image[y][x].f.r * (255 - tempFRGBA.a) / 255;
-						m_image[y][x].f.g = tempFRGBA.g + m_image[y][x].f.g * (255 - tempFRGBA.a) / 255;
-						m_image[y][x].f.b = tempFRGBA.b + m_image[y][x].f.b * (255 - tempFRGBA.a) / 255;
-						m_image[y][x].b.r = tempBRGBA.r + m_image[y][x].b.r * (255 - tempBRGBA.a) / 255;
-						m_image[y][x].b.g = tempBRGBA.g + m_image[y][x].b.g * (255 - tempBRGBA.a) / 255;
-						m_image[y][x].b.b = tempBRGBA.b + m_image[y][x].b.b * (255 - tempBRGBA.a) / 255;
+				// Render foreground
+				tempAlpha = texture.m_value.f.a * m_alpha / 255;
+				if (tempAlpha > 0)
+				{
+					// Pre-calculate added color (can only store 8-bit depth)
+					tempFRGBA = RGBA(
+						texture.m_value.f.r * texture.m_value.f.a * m_alpha / 65025,
+						texture.m_value.f.g * texture.m_value.f.a * m_alpha / 65025,
+						texture.m_value.f.b * texture.m_value.f.a * m_alpha / 65025,
+						tempAlpha
+					);
+
+					for (size_t y = start.y; y < end.y; y++)
+					{
+						for (size_t x = start.x; x < end.x; x++)
+						{
+							m_image[y][x].f.r = tempFRGBA.r + m_image[y][x].f.r * (255 - tempFRGBA.a) / 255;
+							m_image[y][x].f.g = tempFRGBA.g + m_image[y][x].f.g * (255 - tempFRGBA.a) / 255;
+							m_image[y][x].f.b = tempFRGBA.b + m_image[y][x].f.b * (255 - tempFRGBA.a) / 255;
+						}
+					}
+				}
+				// Render background
+				tempAlpha = texture.m_value.b.a * m_alpha / 255;
+				if (tempAlpha > 0)
+				{
+					// Pre-calculate added color (can only store 8-bit depth)
+					tempBRGBA = RGBA(
+						texture.m_value.b.r * texture.m_value.b.a * m_alpha / 65025,
+						texture.m_value.b.g * texture.m_value.b.a * m_alpha / 65025,
+						texture.m_value.b.b * texture.m_value.b.a * m_alpha / 65025,
+						tempAlpha
+					);
+
+					for (size_t y = start.y; y < end.y; y++)
+					{
+						for (size_t x = start.x; x < end.x; x++)
+						{
+							m_image[y][x].b.r = tempBRGBA.r + m_image[y][x].b.r * (255 - tempBRGBA.a) / 255;
+							m_image[y][x].b.g = tempBRGBA.g + m_image[y][x].b.g * (255 - tempBRGBA.a) / 255;
+							m_image[y][x].b.b = tempBRGBA.b + m_image[y][x].b.b * (255 - tempBRGBA.a) / 255;
+						}
 					}
 				}
 			}
@@ -202,19 +220,21 @@ void KTech::UI::Render()
 						if (texture.m_t[y][x].c != ' ')
 							m_image[start.y][start.x].c = texture.m_t[y][x].c; // Character
 						// Precalculate foreground * layer alpha (8 bit depth)
-						//          8 ->                    16 ->     8.
 						tempAlpha = texture.m_t[y][x].f.a * m_alpha / 255;
-						//                              (8 ->                    16.         8 ->                             16.             )   8.
-						m_image[start.y][start.x].f.r = (texture.m_t[y][x].f.r * tempAlpha + m_image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
-						m_image[start.y][start.x].f.g = (texture.m_t[y][x].f.g * tempAlpha + m_image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
-						m_image[start.y][start.x].f.b = (texture.m_t[y][x].f.b * tempAlpha + m_image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
+						if (tempAlpha > 0)
+						{
+							m_image[start.y][start.x].f.r = (texture.m_t[y][x].f.r * tempAlpha + m_image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
+							m_image[start.y][start.x].f.g = (texture.m_t[y][x].f.g * tempAlpha + m_image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
+							m_image[start.y][start.x].f.b = (texture.m_t[y][x].f.b * tempAlpha + m_image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
+						}
 						// Precalculate background * layer alpha (8 bit depth)
-						//          8 ->                    16 ->     8.
 						tempAlpha = texture.m_t[y][x].b.a * m_alpha / 255;
-						//                              (8 ->                    16.         8 ->                             16.             )   8.
-						m_image[start.y][start.x].b.r = (texture.m_t[y][x].b.r * tempAlpha + m_image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
-						m_image[start.y][start.x].b.g = (texture.m_t[y][x].b.g * tempAlpha + m_image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
-						m_image[start.y][start.x].b.b = (texture.m_t[y][x].b.b * tempAlpha + m_image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;
+						if (tempAlpha > 0)
+						{
+							m_image[start.y][start.x].b.r = (texture.m_t[y][x].b.r * tempAlpha + m_image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
+							m_image[start.y][start.x].b.g = (texture.m_t[y][x].b.g * tempAlpha + m_image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
+							m_image[start.y][start.x].b.b = (texture.m_t[y][x].b.b * tempAlpha + m_image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;
+						}
 					}
 				}
 			}

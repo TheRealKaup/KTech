@@ -189,16 +189,34 @@ struct GravityBox : Object
 
 struct AutoUpdatingText : Object
 {
-	float* data;
+	float* m_data;
+	static constexpr size_t historyLength = 10;
+	float m_dataHistory[historyLength];
+	size_t m_historyRotation = 0;
 
 	virtual bool OnTick() override
 	{
-		m_textures[1].Write({std::to_string(*data)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(m_textures[0].GetSize().x, 0));
-		return false;
+		m_dataHistory[m_historyRotation] = *m_data;
+		float averageData = 0;
+		size_t i;
+		for (i = m_historyRotation; i < historyLength && m_dataHistory[i] != 0; i++)
+			averageData += m_dataHistory[i];
+		averageData /= (i - m_historyRotation);
+		if (m_historyRotation >= historyLength - 1)
+		{
+			m_historyRotation = 0;
+			m_textures[1].Write({std::to_string(averageData)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(m_textures[0].GetSize().x, 0));
+			return true;
+		}
+		else
+		{
+			m_historyRotation++;
+			return false;
+		}
 	}
 
 	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text)
-		: Object(engine, pos), data(data)
+		: Object(engine, pos), m_data(data)
 	{
 		EnterLayer(layer);
 		m_textures.resize(2);
@@ -314,7 +332,7 @@ int main()
 	darkLayer.m_alpha = 127;
 	
 	KTech::Output::Log("<main()> Creating AutoUpdatingText", RGBColors::blue);
-	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.m_id, "FPS: ");
+	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.m_id, "TPS: ");
 	tpsText.m_name = "tpsText";
 	
 	KTech::Output::Log("<main()> Entering game loop", RGBColors::blue);

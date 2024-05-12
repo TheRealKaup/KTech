@@ -1,10 +1,7 @@
 --[[
 Create your own Premake workspace and include this file to add
-the library as a statically linkable Premake project and globally
-link portaudio in your workspace.
+the library as a statically linkable Premake project.
 ]]--
-
-links { "portaudio" }
 
 project "KTechLibrary"
 	kind "StaticLib"
