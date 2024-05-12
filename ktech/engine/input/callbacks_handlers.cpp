@@ -20,41 +20,26 @@
 
 #include "callbacks_handlers.hpp"
 
-#include "../../utility/rgbcolors.hpp"
-#include "callbacksgroup.hpp"
-
 KTech::Input::BasicCallback::~BasicCallback()
 {
-	TempLog("<Input::BasicCallback::~BasicCallback()> Requesting parent handler to remove this callback.", RGBColors::hotPink);
 	parentHandler->RemoveCallback(this);
 }
 
 KTech::Input::RangedCallback::~RangedCallback()
 {
-	TempLog("<Input::RangedCallback::~RangedCallback()> Requesting parent handler to remove this callback.", RGBColors::hotPink);
 	parentHandler->RemoveCallback(this);
 }
 
 void KTech::Input::BasicHandler::RemoveCallback(BasicCallback* p_callback)
 {
 	for (size_t i = 0; i < m_callbacks.size(); i++)
-	{
 		if (m_callbacks[i] == p_callback)
-		{
-			TempLog("<Input::BasicCallback::~BasicCallback()> Clearing found pointer", RGBColors::hotPink);
 			m_callbacks.erase(m_callbacks.begin() + i);
-		}
-	}
 }
 
 void KTech::Input::RangedHandler::RemoveCallback(RangedCallback* p_callback)
 {
 	for (size_t i = 0; i < m_callbacks.size(); i++)
-	{
 		if (m_callbacks[i] == p_callback)
-		{
-			TempLog("<Input::RangedCallback::~RangedCallback()> Clearing found pointer", RGBColors::hotPink);
 			m_callbacks.erase(m_callbacks.begin() + i);
-		}
-	}
 }

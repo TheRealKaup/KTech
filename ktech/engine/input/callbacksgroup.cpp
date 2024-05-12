@@ -20,7 +20,6 @@
 
 #include "callbacksgroup.hpp"
 
-#include "../../utility/rgbcolors.hpp"
 #include "callbacks_handlers.hpp"
 
 void KTech::Input::CallbacksGroup::AddCallback(BasicCallback* callback)
@@ -50,7 +49,6 @@ void KTech::Input::CallbacksGroup::Disable()
 void KTech::Input::CallbacksGroup::DeleteCallbacks()
 {
 	// Disable as soon as possible the callbacks (since the actual callbacks are probably deleted right after)
-	TempLog("<Input::CallbacksGroup::DeleteCallbacks()> Start of function...", RGBColors::hotPink);
 	for (BasicCallback* basicCallback : m_basicCallbacks)
 		basicCallback->enabled = false;
 	for (RangedCallback* rangedCallback : m_rangedCallbacks)
@@ -59,20 +57,16 @@ void KTech::Input::CallbacksGroup::DeleteCallbacks()
 	// (removeDisabled will set the group to be disabled later, removeEnabled will set to enabled)
 	m_status = (m_status == Status::disabled ? Status::removeDisabled : Status::removeEnabled);
 	m_synced = false;
-	TempLog("<Input::CallbacksGroup::DeleteCallbacks()> Set callbacks to be deleted in the next iteration of `Input::Call()`", RGBColors::hotPink);
-	TempLog("<Input::CallbacksGroup::DeleteCallbacks()> End of function.", RGBColors::hotPink);
 }
 
 void KTech::Input::CallbacksGroup::Update()
 {
 	if (!m_synced)
 	{
-		TempLog("<Input::Call()> Found an unsynced group", RGBColors::hotPink);
 		switch (m_status)
 		{
 			case Status::disabled:
 			{
-				TempLog("<Input::Call()> Disabling group", RGBColors::hotPink);
 				// Disalbe the callbacks
 				for (BasicCallback* basicCallback : m_basicCallbacks)
 					basicCallback->enabled = false;
@@ -82,7 +76,6 @@ void KTech::Input::CallbacksGroup::Update()
 			}
 			case Status::enabled:
 			{
-				TempLog("<Input::Call()> Enabling group", RGBColors::hotPink);
 				// Enable the callbacks
 				for (BasicCallback* basicCallback : m_basicCallbacks)
 					basicCallback->enabled = true;
@@ -92,13 +85,10 @@ void KTech::Input::CallbacksGroup::Update()
 			}
 			case Status::removeDisabled:
 			{
-				TempLog("<Input::Call()> Deleting group's callbacks then disabling", RGBColors::hotPink);
 				// Delete the callbacks from memory (which will automatically delete the callbacks from
 				// their parent handlers' callback vector)
 				for (BasicCallback*& basicCallback : m_basicCallbacks)
 				{
-					TempLog("<Input::Call()> Deleting basic callback " + std::to_string((size_t)basicCallback), RGBColors::hotPink);
-					TempLog("<Input::Call()> Callback's parent handler is " + std::to_string((size_t)(basicCallback->parentHandler)), RGBColors::hotPink);
 					delete basicCallback;
 				}
 				for (RangedCallback*& rangedCallback : m_rangedCallbacks)
@@ -112,12 +102,9 @@ void KTech::Input::CallbacksGroup::Update()
 			}
 			case Status::removeEnabled:
 			{
-				TempLog("<Input::Call()> Deleting group's callbacks then enabling", RGBColors::hotPink);
 				// The same as ^ but enable the group afterwards
 				for (BasicCallback* basicCallback : m_basicCallbacks)
 				{
-					TempLog("<Input::Call()> Deleting basic callback " + std::to_string((size_t)basicCallback), RGBColors::hotPink);
-					TempLog("<Input::Call()> Callback's parent handler is " + std::to_string((size_t)(basicCallback->parentHandler)), RGBColors::hotPink);
 					delete basicCallback;
 				}
 				for (RangedCallback* rangedCallback : m_rangedCallbacks)

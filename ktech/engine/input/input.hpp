@@ -23,14 +23,11 @@
 #define KTECH_DEFINITION
 #include "../../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../../basic/rgb.hpp"
 
 #include <functional>
 #include <string>
 #include <termio.h>
 #include <thread>
-
-static void TempLog(const std::string&, KTech::RGB color) {}
 
 class KTech::Input
 {
