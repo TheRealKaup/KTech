@@ -124,7 +124,7 @@ void KTech::Widget::Select()
 		if (childWidget.oldSelected)
 			engine.memory.widgets[childWidget.widget]->Select();
 	}
-	RenderSelected();
+	OnSelect();
 };
 
 void KTech::Widget::Deselect()
@@ -136,7 +136,7 @@ void KTech::Widget::Deselect()
 		childWidget.oldSelected = engine.memory.widgets[childWidget.widget]->m_selected;
 		engine.memory.widgets[childWidget.widget]->Deselect();
 	}
-	RenderUnselected();
+	OnDeselect();
 }
 
 void KTech::Widget::Show()
@@ -147,6 +147,7 @@ void KTech::Widget::Show()
 		if (childWidget.oldShown)
 			engine.memory.widgets[childWidget.widget]->Show();
 	}
+	void OnShow();
 }
 
 void KTech::Widget::Hide()
@@ -157,4 +158,5 @@ void KTech::Widget::Hide()
 		childWidget.oldShown = engine.memory.widgets[childWidget.widget]->m_shown;
 		engine.memory.widgets[childWidget.widget]->Hide();
 	}
+	void OnHide();
 }

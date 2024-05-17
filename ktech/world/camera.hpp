@@ -24,7 +24,7 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../utility/id.hpp"
-#include "../basic/cella.hpp"
+#include "../basic/cell.hpp"
 #include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
 

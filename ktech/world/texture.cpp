@@ -26,25 +26,40 @@
 #include <fstream>
 #include <iostream>
 
-void KTech::Texture::Simple(UPoint p_size, CellA p_value, Point p_pos) {
+void KTech::Texture::Simple(UPoint p_size, CellA p_value)
+{
 	m_simple = true;
-	m_rPos = p_pos;
 	m_size = p_size;
 	m_value = p_value;
 }
 
-void KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_pos)
+void KTech::Texture::Simple(UPoint p_size, CellA p_value, Point p_pos)
 {
-	m_simple = false;
 	m_rPos = p_pos;
-	m_t.clear();
-	m_t.resize(p_size.y, std::vector<CellA>(p_size.x, p_value));
+	Simple(p_size, p_value);
 }
 
-KTech::UPoint KTech::Texture::File(const std::string& p_fileName, Point p_pos)
+void KTech::Texture::Rectangle(UPoint p_size, CellA p_value)
 {
 	m_simple = false;
+	m_t.resize(p_size.y);
+	for (std::vector<CellA>& y : m_t)
+	{
+		y.resize(p_size.x);
+		for (CellA& x : y)
+			x = p_value;
+	}
+}
+
+void KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_pos)
+{
 	m_rPos = p_pos;
+	Rectangle(p_size, p_value);
+}
+
+KTech::UPoint KTech::Texture::File(const std::string& p_fileName)
+{
+	m_simple = false;
 	m_size = UPoint(0, 0);
 
 	Output::Log("<KTech::Texture::File()> Opening file " + p_fileName + "." , RGB(128, 128, 255));
@@ -110,26 +125,21 @@ KTech::UPoint KTech::Texture::File(const std::string& p_fileName, Point p_pos)
 		}
 	}
 
-	// Print old texture file
 	Output::Log("<KTech::Texture::File()> Printing texture:", RGB(128, 128, 255));
-	for (std::vector<CellA>& row : m_t)
-	{
-		for (CellA& cell : row)
-		{
-			std::cout << "\033[38;2;" << std::to_string(cell.f.r * cell.f.a / 255) << ';' << std::to_string(cell.f.g * cell.f.a / 255) << ';'<< std::to_string(cell.f.b * cell.f.a / 255) << 'm'
-				<< "\033[48;2;" << std::to_string(cell.b.r * cell.b.a / 255) << ';' << std::to_string(cell.b.g * cell.b.a / 255) << ';'<< std::to_string(cell.b.b * cell.b.a / 255) << 'm' << cell.c;
-		}
-		std::cout << "\033[m" << std::endl;
-	}
-	std::cout << std::flush;
+	Print();
 
 	Output::Log("<KTech::Texture::File()> Returning.", RGB(128, 128, 255));
     return maxTextureSize;
 }
 
-void KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba, Point p_pos) {
-	m_simple = false;
+KTech::UPoint KTech::Texture::File(const std::string& p_fileName, Point p_pos)
+{
 	m_rPos = p_pos;
+	return File(p_fileName);
+}
+
+KTech::UPoint KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba) {
+	m_simple = false;
 	m_t.resize(p_stringVector.size());
 	m_size = UPoint(0, 0);
 
@@ -138,7 +148,15 @@ void KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 		m_t[y].resize(p_stringVector[y].length());
 		for (size_t x = 0; x < p_stringVector[y].length(); x++)
 			m_t[y][x] = CellA(p_stringVector[y][x], (p_stringVector[y][x] == ' ' ? RGBA(RGBAColors::transparent) : p_frgba) , p_brgba);
-	}	
+	}
+
+	return GetSize();
+}
+
+KTech::UPoint KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba, Point p_pos)
+{
+	m_rPos = p_pos;
+	return Write(p_stringVector, p_frgba, p_brgba);
 }
 
 std::vector<KTech::CellA>& KTech::Texture::operator[](size_t y)
@@ -158,9 +176,9 @@ KTech::UPoint KTech::Texture::GetSize() const
 		return m_size;
 	// Otherwise, go over the entire texture to get the maximum X size, and use that to tell the size.
 	UPoint size(0, m_t.size());
-	for (size_t y = 0; y < m_t.size(); y++)
-		if (m_t[y].size() > size.x)
-			size.x = m_t[y].size();
+	for (const std::vector<CellA>& row : m_t)
+		if (row.size() > size.x)
+			size.x = row.size();
 	return size;
 }
 
@@ -259,6 +277,22 @@ void KTech::Texture::SetAlpha(uint8_t p_value)
 	}
 }
 
+void KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
+{
+	if (m_simple)
+	{
+		if (m_value.c == oldValue)
+			m_value.c = newValue;
+	}
+	else
+	{
+		for (size_t y = 0; y < m_t.size(); y++)
+			for (size_t x = 0; x < m_t[y].size(); x++)
+				if (m_t[y][x].c == oldValue)
+					m_t[y][x].c = newValue;
+	}
+}
+
 void KTech::Texture::ExportToFile(const std::string& p_fileName) const
 {
 	// Create/open file
@@ -292,5 +326,18 @@ void KTech::Texture::ExportToFile(const std::string& p_fileName) const
 			else
 				file.write("\0\0\0\0\0\0\0\0\0", 9);
 		}
+	}
+}
+
+void KTech::Texture::Print()
+{
+	for (std::vector<CellA>& row : m_t)
+	{
+		for (CellA& cell : row)
+		{
+			std::cout << "\033[38;2;" << std::to_string(cell.f.r * cell.f.a / 255) << ';' << std::to_string(cell.f.g * cell.f.a / 255) << ';'<< std::to_string(cell.f.b * cell.f.a / 255) << 'm'
+				<< "\033[48;2;" << std::to_string(cell.b.r * cell.b.a / 255) << ';' << std::to_string(cell.b.g * cell.b.a / 255) << ';'<< std::to_string(cell.b.b * cell.b.a / 255) << 'm' << (' ' <= cell.c && cell.c <= '~' ? cell.c : ' ');
+		}
+		std::cout << "\033[m" << std::endl;
 	}
 }

@@ -53,6 +53,8 @@ KTech::Output::~Output()
 {
 	// Show cursor, and disable alternative buffer (return to previous terminal)
 	std::cout << "\033[?25h\033[?1049l" << std::flush;
+	for (std::string& out : outputAfterQuit)
+		std::cout << out;
 }
 
 void KTech::Output::Log(const std::string& p_text, RGB p_color)

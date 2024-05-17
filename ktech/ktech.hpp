@@ -48,7 +48,7 @@ namespace KTech
 	struct Layer;
 	struct Camera;
 	struct Map;
-	struct Widget;
+	class Widget;
 	struct UI;
 	// Engine and its components.
 	// Definitions in `engine/`

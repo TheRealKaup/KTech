@@ -16,15 +16,23 @@
 	along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
+/*
+	WARNING:
+	The way this program is written is not advised, as it misses some new, preferable, alternative features of KTech.
+	A rewrite is warranted.
+*/
+
 #include "../../ktech/ktech.hpp"
 #include "../../ktech/widgets/button.hpp"
+#include "../../ktech/widgets/frame.hpp"
 #include "../../ktech/widgets/intfield.hpp"
 #include "../../ktech/widgets/stringfield.hpp"
 #include "../../ktech/widgets/switch.hpp"
+#include "../../ktech/widgets/aboutbox.hpp"
 
 using namespace KTech;
 
-Engine engine(UPoint(20, 20), 24);
+Engine engine(UPoint(19, 19), 24);
 
 void Quit()
 {
@@ -33,18 +41,22 @@ void Quit()
 
 struct UITest
 {
-	Widget* widgets[4];
-	
-	ID<UI> ui;
-
 	enum WidgetIndex
 	{
+		w_frame,
+		w_showNotice,
 		w_button,
 		w_intfield,
 		w_stringfield,
 		w_switch,
+		w_notice,
+		WIDGETS_SIZE
 	};
+	
+	Widget* widgets[WIDGETS_SIZE];
 	size_t currentWidget = w_intfield;
+
+	ID<UI> ui;
 	
 	Time::Invocation* countdownInvocation;
 
@@ -55,7 +67,7 @@ struct UITest
 		if (countdown > 0)
 		{
 			countdown--;
-			widgets[0]->m_textures[0].Write({"Exiting in " + std::to_string(countdown)}, widgets[0]->m_textures[0].m_t[0][0].f, RGBAColors::transparent, Point(1, 1));
+			((Button*)widgets[w_button])->SetText("Exiting in " + std::to_string(countdown), true);
 			countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 		}
 		else
@@ -65,28 +77,32 @@ struct UITest
 	void CancelCountdown()
 	{
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
-		delete widgets[0];
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
-		widgets[0] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
+		((Button*)widgets[w_button])->SetText("Exit", true);
+		((Button*)widgets[w_button])->m_OnPress = std::bind(&UITest::StartExitCountdown, this);
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
-		widgets[0]->Select();
+		widgets[w_button]->Select();
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
 		engine.time.CancelInvocation(countdownInvocation);
+
+		((IntField*)widgets[w_intfield])->SetValue("789");
+		((StringField*)widgets[w_stringfield])->SetValue("abcd");
+		((Switch*)widgets[w_switch])->SetValue(true);
 	}
 
 	void StartExitCountdown()
 	{
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
-		delete widgets[0];
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
-		widgets[0] = new Button(engine, ui, std::bind(&UITest::CancelCountdown, this), Keys::return_, Point(0, 0), "Exiting in 3", true);
+		((Button*)widgets[w_button])->SetText("Exiting in 3", true);
+		((Button*)widgets[w_button])->m_OnPress = std::bind(&UITest::CancelCountdown, this);
 		countdown = 3;
 		// Invoke countdown
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
 		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 		// As can be seen, the first `return_` press does not also call `Exit()`! Nice!
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
-		widgets[0]->Select();
+		widgets[w_button]->Select();
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> EOF", RGBColors::orange);
 	}
 	
@@ -94,7 +110,7 @@ struct UITest
 	{
 		engine.output.Log("(GAME) <UI::MoveUp()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
-		if (currentWidget == w_button)
+		if (currentWidget == w_showNotice)
 			currentWidget = w_switch;
 		else
 			currentWidget--;
@@ -107,24 +123,62 @@ struct UITest
 		engine.output.Log("(GAME) <UI::MoveDown()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
 		if (currentWidget == w_switch)
-			currentWidget = w_button;
+			currentWidget = w_showNotice;
 		else
 			currentWidget++;
 		widgets[currentWidget]->Select();
 		engine.output.Log("(GAME) <UI::MoveDown()> EOF", RGBColors::orange);
 	}
 
+	void SetNotice()
+	{
+		if (((Switch*)widgets[w_showNotice])->m_on)
+			widgets[w_notice]->Show();
+		else
+			widgets[w_notice]->Hide();
+	}
+
 	UITest(ID<UI> ui) : ui(ui)
 	{
-		widgets[0] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(0, 0), "Exit", true);
-		widgets[1] = new IntField(engine, ui, nullptr, 0, 999, "123", Point(0, 4), "Int = ", true);
-		widgets[2] = new StringField(engine, ui, nullptr, {keyrange_all}, Point(0, 8), "String = ", 4, "Test", true);
-		widgets[3] = new Switch(engine, ui, nullptr, Keys::return_, Point(0, 12), "Switch", false, true);
-
+		widgets[w_frame] = new Frame(engine, ui, Point(0, 0), UPoint(19, 19));
+		widgets[w_showNotice] = new Switch(engine, ui, std::bind(&UITest::SetNotice, this), Keys::return_, Point(3, -1), "Show\1Notice", false, false);
+		widgets[w_button] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(2, 2), "Exit", true);
+		widgets[w_intfield] = new IntField(engine, ui, nullptr, 0, 999, "123", Point(2, 6), "Int = ", true);
+		widgets[w_stringfield] = new StringField(engine, ui, nullptr, {keyrange_all}, Point(2, 10), "String = ", 4, "Test", true);
+		widgets[w_switch] = new Switch(engine, ui, nullptr, Keys::return_, Point(2, 14), "Switch", false, true);
+		widgets[w_notice] = new AboutBox(engine, ui, Point(1, 1),
+			{
+			//   ---------------
+				"widgetstest, a",
+				"user interface",
+				"example based",
+				"on KTech.",
+				"Copyright (C)",
+				"2023-2024 Kaup",
+				"",
+				"GPLv3-or-later.",
+				"NO WARRANTY",
+				"PROVIDED.",
+				"See COPYING",
+				"file for more",
+				"information."
+			}
+		);
+		SetNotice();
 		widgets[currentWidget]->Select();
 
 		engine.input.RegisterCallback(Keys::Shift::tab, std::bind(&UITest::MoveUp, this));
 		engine.input.RegisterCallback(Keys::tab, std::bind(&UITest::MoveDown, this));
+	}
+
+	~UITest()
+	{
+		engine.output.outputAfterQuit.push_back(
+			"Results:\n" +
+			std::to_string(((IntField*)widgets[w_intfield])->m_number) + '\n' +
+			((StringField*)widgets[w_stringfield])->m_string + '\n' +
+			(((Switch*)widgets[w_switch])->m_on ? "True\n" : "False\n")
+		);
 	}
 };
 

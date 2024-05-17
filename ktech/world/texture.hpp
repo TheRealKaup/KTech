@@ -41,10 +41,14 @@ struct KTech::Texture
 	CellA m_value;
 	std::vector<std::vector<CellA>> m_t;
 	
-	void Simple(UPoint size, CellA value, Point relateivePosition = Point(0, 0));
-	void Rectangle(UPoint size, CellA value, Point relateivePosition = Point(0, 0));// Load from a file.
-	UPoint File(const std::string& fileName, Point relateivePosition = Point(0, 0));
-	void Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition = Point(0, 0));
+	void Simple(UPoint size, CellA value);
+	void Simple(UPoint size, CellA value, Point relateivePosition);
+	void Rectangle(UPoint size, CellA value);
+	void Rectangle(UPoint size, CellA value, Point relateivePosition);
+	UPoint File(const std::string& fileName);
+	UPoint File(const std::string& fileName, Point relateivePosition);
+	UPoint Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
+	UPoint Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition);
 
 	std::vector<CellA>& operator[](size_t y);
 	const std::vector<CellA>& operator[](size_t y) const;
@@ -60,6 +64,9 @@ struct KTech::Texture
 	void SetForegroundAlpha(uint8_t value);
 	void SetBackgroundAlpha(uint8_t value);
 	void SetAlpha(uint8_t value);
+	void ReplaceCharacter(char oldValue, char newValue);
 	
 	void ExportToFile(const std::string& fileName) const;
+	// For debugging
+	void Print();
 };

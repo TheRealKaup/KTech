@@ -29,8 +29,9 @@
 #include "../engine/input/input.hpp"
 
 // Widget is now a non-optional KTech standard
-struct KTech::Widget
+class KTech::Widget
 {
+public:
 	struct ChildWidget
 	{
 		ID<Widget> widget;
@@ -59,9 +60,6 @@ struct KTech::Widget
 
 	inline virtual bool OnTick() { return false; };
 
-	inline virtual void RenderSelected () {}
-	inline virtual void RenderUnselected () {}
-
 	bool AddWidget(ID<Widget> widget);
 	bool RemoveWidget(ID<Widget> widget);
 	bool RemoveAllWidgets();
@@ -75,4 +73,10 @@ struct KTech::Widget
 	void Deselect();
 	void Show();
 	void Hide();
+
+protected:
+	inline virtual void OnSelect () {}
+	inline virtual void OnDeselect () {}
+	inline virtual void OnShow () {}
+	inline virtual void OnHide () {}
 };

@@ -32,6 +32,8 @@
 class KTech::Output
 {
 public:
+	std::vector<std::string> outputAfterQuit;
+
 	Output(Engine* const engine, KTech::UPoint imageSize);
 	~Output();
 

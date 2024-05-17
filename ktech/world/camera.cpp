@@ -130,9 +130,16 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 						start.x = 0;
 					// Render character
 					if (texture.m_value.c != ' ')
-						for (size_t y = start.y; y < end.y; y++)
-							for (size_t x = start.x; x < end.x; x++)
-								m_image[y][x].c = texture.m_value.c;
+					{
+						if (' ' <= texture.m_value.c && texture.m_value.c <= '~')
+							for (size_t y = start.y; y < end.y; y++)
+								for (size_t x = start.x; x < end.x; x++)
+									m_image[y][x].c = texture.m_value.c;
+						else
+							for (size_t y = start.y; y < end.y; y++)
+								for (size_t x = start.x; x < end.x; x++)
+									m_image[y][x].c = ' ';
+					}
 					// Render foreground
 					tempAlpha = texture.m_value.f.a * layer->m_alpha / 255;
 					if (tempAlpha > 0)
@@ -212,7 +219,7 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 						for (; x < texture.m_t[y].size() && start.x < m_res.x; x++, start.x++)
 						{
 							if (texture.m_t[y][x].c != ' ')
-								m_image[start.y][start.x].c = texture.m_t[y][x].c; // Character
+								m_image[start.y][start.x].c = (' ' <= texture.m_t[y][x].c && texture.m_t[y][x].c <= '~') ? texture.m_t[y][x].c : ' '; // Character
 							// Precalculate foreground * layer alpha (8 bit depth)
 							tempAlpha = texture.m_t[y][x].f.a * layer->m_alpha / 255;
 							if (tempAlpha > 0)
