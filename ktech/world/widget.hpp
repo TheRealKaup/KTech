@@ -58,8 +58,6 @@ public:
 	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), const std::string& name = "");
 	virtual ~Widget();
 
-	inline virtual bool OnTick() { return false; };
-
 	bool AddWidget(ID<Widget> widget);
 	bool RemoveWidget(ID<Widget> widget);
 	bool RemoveAllWidgets();
@@ -75,8 +73,12 @@ public:
 	void Hide();
 
 protected:
+	inline virtual bool OnTick() { return false; };
+	
 	inline virtual void OnSelect () {}
 	inline virtual void OnDeselect () {}
 	inline virtual void OnShow () {}
 	inline virtual void OnHide () {}
+
+	friend class KTech::Memory;
 };

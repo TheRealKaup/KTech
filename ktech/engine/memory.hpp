@@ -35,8 +35,10 @@ public:
 	Container<Widget> widgets;
 	Container<UI> uis;
 
-	// Render-on-demand
+	void CallOnTicks();
+
+private:
 	bool callChangedThisTick;
 
-	void CallOnTicks();
+	friend class KTech::Output;
 };

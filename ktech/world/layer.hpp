@@ -49,12 +49,15 @@ struct KTech::Layer
 	// Use this refereance temporarily - do not move this reference, it can become stale.
 	ID<Object>& operator[](size_t index);
 	
-	inline virtual bool OnTick() { return false; };
-
 	bool AddObject(ID<Object>& object);
 	bool RemoveObject(ID<Object>& object);
 	bool RemoveAllObjects();
 
 	bool EnterMap(ID<Map>& map);
 	bool LeaveMap();
+
+protected:
+	inline virtual bool OnTick() { return false; };
+
+	friend class KTech::Memory;
 };

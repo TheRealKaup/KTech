@@ -37,12 +37,9 @@ public:
 	struct RangedCallback;
 	struct RangedHandler;
 	class CallbacksGroup;
-
+	
 	std::string input;
 	std::string quitKey = "\x03";
-	
-	// Render-on-demand
-	bool inputThisTick = false;
 
 	// Prepares terminal, creates input loop thread
 	Input(Engine* const engine);
@@ -66,13 +63,17 @@ public:
 private:
 	Engine* const engine;
 
+	bool inputThisTick = false;
+
 	termios m_oldTerminalAttributes;
 	std::thread m_inputLoop;
-	std::vector<BasicHandler*> m_basicHandlers; // Never deleted, no need to store in pointers; handleded by indices
-	std::vector<RangedHandler*> m_rangedHandlers; // Never deleted, no need to store in pointers; handleded by indices
-	std::vector<CallbacksGroup*> m_groups; // Usually experiences deletions; handleded by pointers
+	std::vector<BasicHandler*> m_basicHandlers;
+	std::vector<RangedHandler*> m_rangedHandlers;
+	std::vector<CallbacksGroup*> m_groups;
 
 	static char* Get();
 
 	void Loop();
+
+	friend class KTech::Output;
 };

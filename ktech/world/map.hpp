@@ -42,8 +42,6 @@ public:
 	Map(Engine& engine, const std::string& name = "");
 	virtual ~Map();
 
-	inline virtual bool OnTick() { return false; };
-
 	bool AddLayer(ID<Layer>& layer);
 	bool AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
 
@@ -53,4 +51,9 @@ public:
 	bool RemoveAllCameras();
 
 	bool Render();
+
+protected:
+	inline virtual bool OnTick() { return false; };
+
+	friend class KTech::Memory;
 };

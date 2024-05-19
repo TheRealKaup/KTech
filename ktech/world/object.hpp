@@ -43,6 +43,12 @@ struct KTech::Object
 	Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), const std::string& name = "");
 	virtual ~Object();
 
+	bool EnterLayer(ID<Layer>& layer);
+	bool LeaveLayer();
+
+	bool Move(Point direction);
+	
+protected:
 	inline virtual bool OnTick() { return false; };
 	inline virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
 	inline virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
@@ -52,10 +58,7 @@ struct KTech::Object
 	inline virtual void OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object exited an overlap with a different object (`otherObject`)
 	inline virtual void OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
 	inline virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
-	
-	bool EnterLayer(ID<Layer>& layer);
-	bool LeaveLayer();
 
-
-	bool Move(Point direction);
+	friend class KTech::Collision;
+	friend class KTech::Memory;
 };

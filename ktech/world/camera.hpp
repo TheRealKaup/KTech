@@ -47,8 +47,6 @@ struct KTech::Camera
 	Camera(Engine& engine, ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~Camera();
 
-	inline virtual bool OnTick() { return false; };
-	
 	bool EnterMap(ID<Map>& map);
 	bool LeaveMap();
 
@@ -56,4 +54,9 @@ struct KTech::Camera
 
 	void Render(); // Will render the layers in `m_parentMap`
 	void Render(const std::vector<ID<Layer>>& layers);
+
+protected:
+	inline virtual bool OnTick() { return false; };
+
+	friend class KTech::Memory;
 };

@@ -49,8 +49,6 @@ struct KTech::UI
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~UI();
 
-	inline virtual bool OnTick() { return false; };
-	
 	bool AddWidget(ID<Widget> widget);
 	bool RemoveWidget(ID<Widget> widget);
 	bool RemoveAllWidgets();
@@ -58,4 +56,9 @@ struct KTech::UI
 	void Resize(UPoint resolution);
 
 	void Render();
+	
+protected:
+	inline virtual bool OnTick() { return false; };
+
+	friend class KTech::Memory;
 };

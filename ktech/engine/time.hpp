@@ -59,9 +59,6 @@ public:
 	int32_t deltaTime = 0;
 	int32_t ticksCounter = 0;
 
-	// Render-on-demand
-	bool invokedThisTick = false;
-
 	inline Time(Engine* const engine, int16_t ticksPerSecondLimit = 24)
 		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
 
@@ -77,7 +74,11 @@ public:
 private:
 	Engine* const engine;
 
+	bool invokedThisTick = false;
+
 	const TimePoint m_startTP;
 	TimePoint m_thisTickStartTP;
 	std::vector<Invocation*> m_invocations;
+
+	friend class KTech::Output;
 };
