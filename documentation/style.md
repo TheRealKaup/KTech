@@ -71,7 +71,7 @@ Within each section, the order of class members should be as listed:
     - Getters (e.g. `Texture::GetSize()`)
     - Setters (e.g. `Camera::Resize()`)
     - Anything else
-- `friend` declarations.
+- `friend` declarations
 
 The members' definitions should be in the same order they were declared in the class definition.
 
