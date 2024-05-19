@@ -44,12 +44,12 @@ namespace KTech
 	// Definitions in `world/`
 	struct Texture;
 	struct Collider;
-	struct Object;
-	struct Layer;
-	struct Camera;
-	struct Map;
+	class Object;
+	class Layer;
+	class Camera;
+	class Map;
 	class Widget;
-	struct UI;
+	class UI;
 	// Engine and its components.
 	// Definitions in `engine/`
 	class Collision;

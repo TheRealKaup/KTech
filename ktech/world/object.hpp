@@ -28,7 +28,7 @@
 #include "collider.hpp"
 #include "texture.hpp"
 
-struct KTech::Object
+class KTech::Object
 {
 	Engine& engine;
 	ID<Object> m_id;

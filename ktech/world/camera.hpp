@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-struct KTech::Camera
+class KTech::Camera
 {
 	Engine& engine;
 	ID<Camera> m_id;

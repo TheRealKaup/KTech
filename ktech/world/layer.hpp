@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-struct KTech::Layer
+class KTech::Layer
 {
 	Engine& engine;
 	ID<Layer> m_id;

@@ -32,7 +32,7 @@
 #include <vector>
 
 // Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.
-struct KTech::UI
+class KTech::UI
 {
 	Engine& engine;
 	ID<UI> m_id;

@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-struct KTech::Map
+class KTech::Map
 {
 public:
 	Engine& engine;
