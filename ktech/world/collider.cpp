@@ -77,13 +77,13 @@ void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_alp
     m_type = p_type;
     m_rPos = p_texture.m_rPos;
 
-	m_c.resize(p_texture.m_t.size());
-	for (size_t y = 0; y < p_texture.m_t.size(); y++)
+	m_c.resize(p_texture.m_size.y);
+	for (size_t y = 0; y < m_c.size(); y++)
 	{
 		// potentially broken if one of the values = 10 ('\n')
-		m_c[y].resize(p_texture.m_t[y].size());
+		m_c[y].resize(p_texture.m_size.x);
 		for (size_t x = 0; x < m_c[y].size(); x++)
-			m_c[y][x] = ((p_texture.m_t[y][x].c != ' ' && p_texture.m_t[y][x].f.a >= p_alphaThreshold) ? true : false);
+			m_c[y][x] = ((p_texture(x, y).c != ' ' && p_texture(x, y).f.a >= p_alphaThreshold) ? true : false);
 	}
 }
 
@@ -93,13 +93,13 @@ void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_al
     m_type = p_type;
     m_rPos = p_texture.m_rPos;
 
-	m_c.resize(p_texture.m_t.size());
-	for (size_t y = 0; y < p_texture.m_t.size(); y++)
+	m_c.resize(p_texture.m_size.y);
+	for (size_t y = 0; y < m_c.size(); y++)
 	{
 		// potentially broken if one of the values = 10 ('\n')
-		m_c[y].resize(p_texture.m_t[y].size());
+		m_c[y].resize(p_texture.m_size.x);
 		for (size_t x = 0; x < m_c[y].size(); x++)
-			m_c[y][x] = (p_texture.m_t[y][x].b.a >= p_alphaThreshold ? true : false);
+			m_c[y][x] = (p_texture(x, y).b.a >= p_alphaThreshold ? true : false);
 	}
 }
 

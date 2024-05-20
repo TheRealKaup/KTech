@@ -48,18 +48,18 @@ public:
 		// up-left corner
 		m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0));
 		// up-right corner
-		m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].GetSize().x + 1, 0));
+		m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 0));
 		// bottom-left corner
-		m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, m_textures[0].GetSize().y + 1));
+		m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, m_textures[0].m_size.y + 1));
 		// bottom-right corner
-		m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].GetSize().x + 1, m_textures[0].GetSize().y + 1));
+		m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, m_textures[0].m_size.y + 1));
 		// up frame
-		m_textures[5].Simple(KTech::UPoint(m_textures[0].GetSize().x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, 0));
+		m_textures[5].Simple(KTech::UPoint(m_textures[0].m_size.x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, 0));
 		// left frame
-		m_textures[6].Simple(KTech::UPoint(1, m_textures[0].GetSize().y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 1));
+		m_textures[6].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 1));
 		// bottom frame
-		m_textures[7].Simple(KTech::UPoint(m_textures[0].GetSize().x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, m_textures[0].GetSize().y + 1));
+		m_textures[7].Simple(KTech::UPoint(m_textures[0].m_size.x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, m_textures[0].m_size.y + 1));
 		// right frame
-		m_textures[8].Simple(KTech::UPoint(1, m_textures[0].GetSize().y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].GetSize().x + 1, 1));
+		m_textures[8].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 1));
 	}
 };

@@ -117,8 +117,8 @@ protected:
 	{
 		m_on = !m_on;
 
-		for (size_t x = 0; x < m_textures[0].m_t[0].size(); x++)
-			m_textures[0].m_t[0][x].f = m_downRGBA;
+		for (size_t x = 0; x < m_textures[0].m_size.y; x++)
+			m_textures[0](x, 0).f = m_downRGBA;
 		for (size_t i = 1; i < m_textures.size(); i++)
 			m_textures[i].m_value.f = m_downRGBA;
 		

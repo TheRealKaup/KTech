@@ -202,7 +202,7 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 					}
 
 					// Stop iterating through the texture until y reached the end of the texture, or final.y reached the end of the image.
-					for (; y < texture.m_t.size() && start.y < m_res.y; y++, start.y++)
+					for (; y < texture.m_size.y && start.y < m_res.y; y++, start.y++)
 					{
 						// Same goes for X
 						if (obj->m_pos.x + texture.m_rPos.x < m_pos.x)
@@ -216,25 +216,25 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 							start.x = obj->m_pos.x + texture.m_rPos.x - m_pos.x;
 						}
 
-						for (; x < texture.m_t[y].size() && start.x < m_res.x; x++, start.x++)
+						for (; x < texture.m_size.x && start.x < m_res.x; x++, start.x++)
 						{
-							if (texture.m_t[y][x].c != ' ')
-								m_image[start.y][start.x].c = (' ' <= texture.m_t[y][x].c && texture.m_t[y][x].c <= '~') ? texture.m_t[y][x].c : ' '; // Character
+							if (texture(x, y).c != ' ')
+								m_image[start.y][start.x].c = (' ' <= texture(x, y).c && texture(x, y).c <= '~') ? texture(x, y).c : ' '; // Character
 							// Precalculate foreground * layer alpha (8 bit depth)
-							tempAlpha = texture.m_t[y][x].f.a * layer->m_alpha / 255;
+							tempAlpha = texture(x, y).f.a * layer->m_alpha / 255;
 							if (tempAlpha > 0)
 							{
-								m_image[start.y][start.x].f.r = (texture.m_t[y][x].f.r * tempAlpha + m_image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
-								m_image[start.y][start.x].f.g = (texture.m_t[y][x].f.g * tempAlpha + m_image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
-								m_image[start.y][start.x].f.b = (texture.m_t[y][x].f.b * tempAlpha + m_image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
+								m_image[start.y][start.x].f.r = (texture(x, y).f.r * tempAlpha + m_image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
+								m_image[start.y][start.x].f.g = (texture(x, y).f.g * tempAlpha + m_image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
+								m_image[start.y][start.x].f.b = (texture(x, y).f.b * tempAlpha + m_image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
 							}
 							// Precalculate background * layer alpha (8 bit depth)
-							tempAlpha = texture.m_t[y][x].b.a * layer->m_alpha / 255;
+							tempAlpha = texture(x, y).b.a * layer->m_alpha / 255;
 							if (tempAlpha > 0)
 							{
-								m_image[start.y][start.x].b.r = (texture.m_t[y][x].b.r * tempAlpha + m_image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
-								m_image[start.y][start.x].b.g = (texture.m_t[y][x].b.g * tempAlpha + m_image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
-								m_image[start.y][start.x].b.b = (texture.m_t[y][x].b.b * tempAlpha + m_image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;
+								m_image[start.y][start.x].b.r = (texture(x, y).b.r * tempAlpha + m_image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
+								m_image[start.y][start.x].b.g = (texture(x, y).b.g * tempAlpha + m_image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
+								m_image[start.y][start.x].b.b = (texture(x, y).b.b * tempAlpha + m_image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;
 							}
 						}
 					}

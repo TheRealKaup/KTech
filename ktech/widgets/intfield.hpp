@@ -103,7 +103,7 @@ public:
 			m_currentDigit++;
 			m_number *= 10;
 			m_number += number[x] - '0';
-			m_textures[0].m_t[0][x] = KTech::CellA(number[x], tempRGBA);
+			m_textures[0](x, 0) = KTech::CellA(number[x], tempRGBA);
 		}
 		m_visibleNumber = m_number;
 	}
@@ -133,14 +133,14 @@ protected:
 			m_visibleNumber /= 10;
 
 			m_currentDigit--;
-			m_textures[0].m_t[0][m_currentDigit].c = ' ';
+			m_textures[0](m_currentDigit, 0).c = ' ';
 		}
 		else if (engine.input.Between('0', '9'))
 		{
 			if (m_currentDigit == m_maxDigits)
 				return;
 
-			m_textures[0].m_t[0][m_currentDigit].c = engine.input.input.at(0);
+			m_textures[0](m_currentDigit, 0).c = engine.input.input.at(0);
 			m_currentDigit++;
 
 			m_visibleNumber = m_visibleNumber * 10 + engine.input.GetInt();

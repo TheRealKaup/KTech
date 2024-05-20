@@ -127,13 +127,13 @@ protected:
 			m_currentChar--;
 			m_string.pop_back();
 
-			m_textures[0].m_t[0][m_currentChar].c = ' ';
+			m_textures[0](m_currentChar, 0).c = ' ';
 		}
 		else if (m_currentChar == m_maxChars)
 			return;
 		else
 		{
-			m_textures[0].m_t[0][m_currentChar].c = engine.input.input.at(0);
+			m_textures[0](m_currentChar, 0).c = engine.input.input.at(0);
 			m_string.push_back(engine.input.input.at(0));
 			m_currentChar++;
 		}

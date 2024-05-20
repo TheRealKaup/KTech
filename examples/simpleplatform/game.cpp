@@ -207,7 +207,7 @@ struct AutoUpdatingText : Object
 		if (m_historyRotation >= historyLength - 1)
 		{
 			m_historyRotation = 0;
-			m_textures[1].Write({std::to_string(averageData)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(m_textures[0].GetSize().x, 0));
+			m_textures[1].Write({std::to_string(averageData)}, RGBA(255, 255, 255, 255), RGBA(0, 0, 0, 127), Point(m_textures[0].m_size.x, 0));
 			return true;
 		}
 		else
@@ -295,7 +295,7 @@ int main()
 			"'F' to throw a gravity box off the layer.",
 			"'M' to turn on following camera."
 		}, RGBAColors::black, RGBAColors::transparent, Point(2, 2));
-	frame.m_textures[4].Resize(frame.m_textures[4].GetSize(), CellA());
+	frame.m_textures[4].Resize(frame.m_textures[4].m_size, CellA());
 	frame.m_textures[4].SetBackground(RGBA(255, 255, 255, 100));
 	frame.m_colliders.resize(4);
 	frame.m_colliders[0].Simple(KTech::UPoint(viewport.x, 1), 0, KTech::Point(0, 0));

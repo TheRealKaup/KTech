@@ -21,7 +21,6 @@
 #include "texture.hpp"
 
 #include "../utility/rgbacolors.hpp"
-#include "../engine/output.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -63,16 +62,19 @@ KTech::UPoint KTech::Texture::File(const std::string& p_fileName)
 	{
 		// Failed to open file
 		Resize(UPoint(2, 2));
-		m_t = {CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255)), CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255)),
-			CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255)), CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255))};
+		m_t[0] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
+		m_t[1] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
+		m_t[2] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
+		m_t[3] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
 		return m_size;
 	}
 	// Get size
-	file.read((char*)&m_size, 8);
+	UPoint newSize;
+	file.read((char*)&newSize, 8);
 	// Apply size
-	Resize(m_size);
+	Resize(newSize);
 	// Read from file
-	file.read((char*)m_t.data(), m_size.x * m_size.y);
+	file.read((char*)m_t.data(), m_t.size() * 9);
     return m_size;
 }
 
@@ -86,23 +88,17 @@ KTech::UPoint KTech::Texture::Write(const std::vector<std::string>& p_stringVect
 {
 	m_simple = false;
 	// Get size
-	m_size.y = p_stringVector.size();
+	size_t maxX = 0;
 	for (const std::string& row : p_stringVector)
-		if (row.size() > m_size.x)
-			m_size.x = row.size();
+		if (row.size() > maxX)
+			maxX = row.size();
 	// Apply size
-	Resize(m_size);
+	Resize(UPoint(maxX, p_stringVector.size()));
 	// Read from strings
-	for (size_t i = 0, x = 0, y = 0; i < m_t.size() && y < m_size.y; i++, x++)
-	{
-		if (x < p_stringVector[y].size())
-			m_t[i] = CellA(p_stringVector[y][x], (p_stringVector[y][x] == ' ' ? RGBA(RGBAColors::transparent) : p_frgba) , p_brgba);
-		else
-		{
-			x = 0;
-			y++;
-		}
-	}
+	for (size_t y = 0; y < m_size.y; y++)
+		for (size_t x = 0; x < m_size.x; x++)
+			if (x < p_stringVector[y].size())
+				operator()(x, y) = CellA(p_stringVector[y][x], (p_stringVector[y][x] == ' ' ? RGBA(RGBAColors::transparent) : p_frgba) , p_brgba);
 	return m_size;
 }
 
@@ -131,10 +127,15 @@ void KTech::Texture::Resize(UPoint p_newSize, CellA p_value)
 	}
 	else
 	{
+		// New vector
 		std::vector<CellA> newT(p_newSize.x * p_newSize.y);
+		// Copy
 		for (size_t x = 0; x < p_newSize.x; x++)
 			for (size_t y = 0; y < p_newSize.y; y++)
-					newT[p_newSize.x * y + x] = (x < m_size.x && y < m_size.y) ? m_t[m_size.x * y + x] : p_value;
+				newT[p_newSize.x * y + x] = (x < m_size.x && y < m_size.y) ? m_t[m_size.x * y + x] : p_value;
+		// Update size
+		m_size = p_newSize;
+		// Set to new vector
 		m_t = newT;
 	}
 }
