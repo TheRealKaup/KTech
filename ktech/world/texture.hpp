@@ -39,7 +39,7 @@ struct KTech::Texture
 	bool m_simple;
 	UPoint m_size;
 	CellA m_value;
-	std::vector<std::vector<CellA>> m_t;
+	std::vector<CellA> m_t;
 	
 	void Simple(UPoint size, CellA value);
 	void Simple(UPoint size, CellA value, Point relateivePosition);
@@ -50,10 +50,8 @@ struct KTech::Texture
 	UPoint Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
 	UPoint Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition);
 
-	std::vector<CellA>& operator[](size_t y);
-	const std::vector<CellA>& operator[](size_t y) const;
-
-	UPoint GetSize() const;
+	CellA& operator()(size_t x, size_t y);
+	const CellA& operator()(size_t x, size_t y) const;
 
 	// `newValue` - only fills the new cells.
 	void Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
