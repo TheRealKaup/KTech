@@ -30,6 +30,7 @@
 
 class KTech::Object
 {
+public:
 	Engine& engine;
 	ID<Object> m_id;
 	std::string m_name;

@@ -34,6 +34,7 @@
 // Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.
 class KTech::UI
 {
+public:
 	Engine& engine;
 	ID<UI> m_id;
 	std::string m_name;

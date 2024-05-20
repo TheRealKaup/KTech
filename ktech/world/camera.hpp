@@ -33,6 +33,7 @@
 
 class KTech::Camera
 {
+public:
 	Engine& engine;
 	ID<Camera> m_id;
 	std::string m_name;
