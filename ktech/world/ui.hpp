@@ -45,7 +45,7 @@ public:
 	RGBA m_frgba = RGBA(0, 0, 0, 0);
 	RGBA m_brgba = RGBA(0, 0, 0, 0);
 	uint8_t m_alpha = 255;
-	std::vector<std::vector<Cell>> m_image;
+	std::vector<Cell> m_image;
 
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~UI();

@@ -203,7 +203,7 @@ int main()
 		{
 			// Render, draw and print
 			ui.Render();
-			engine.output.Draw(ui.m_image);
+			engine.output.Draw(ui.m_image, ui.m_res);
 			engine.output.Print();
 		}
 		else if (engine.output.ShouldPrintThisTick())

@@ -42,7 +42,7 @@ public:
 	Point m_pos;
 	UPoint m_res;
 	Cell m_background = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)); // The background to render upon.
-	std::vector<std::vector<Cell>> m_image = {};
+	std::vector<Cell> m_image = {};
 
 	Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	Camera(Engine& engine, ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");

@@ -101,13 +101,13 @@ void KTech::Output::Clear()
 			m_image[y][x] = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0));
 }
 
-void KTech::Output::Draw(const std::vector<std::vector<Cell>>& p_render, Point p_pos, uint16_t p_left, uint16_t p_top, uint16_t p_right, uint16_t p_bottom, uint8_t p_alpha)
+void KTech::Output::Draw(const std::vector<Cell>& p_render, UPoint p_size, Point p_pos, uint16_t p_left, uint16_t p_top, uint16_t p_right, uint16_t p_bottom, uint8_t p_alpha)
 {
 	// Default the rectangle
 	if (p_bottom == 0)
-		p_bottom = p_render.size();
+		p_bottom = p_size.y;
 	if (p_right == 0)
-		p_right = p_render[0].size();
+		p_right = p_size.x;
 	// Return if rectangle is invalid
 	if (p_left >= p_right || p_top >= p_bottom)
 		return;
@@ -117,14 +117,14 @@ void KTech::Output::Draw(const std::vector<std::vector<Cell>>& p_render, Point p
 	{
 		for (size_t xF = (p_pos.x < 0 ? 0 : p_pos.x), xR = p_left; xF < m_image[yF].size() && xR < p_right; xF++, xR++)
 		{
-			m_image[yF][xF].c = p_render[yR][xR].c;
+			m_image[yF][xF].c = p_render[p_size.x * yR + xR].c;
 			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
-			m_image[yF][xF].f.r = (p_render[yR][xR].f.r * p_alpha + m_image[yF][xF].f.r * (255 - p_alpha)) / 255;
-			m_image[yF][xF].f.g = (p_render[yR][xR].f.g * p_alpha + m_image[yF][xF].f.g * (255 - p_alpha)) / 255;
-			m_image[yF][xF].f.b = (p_render[yR][xR].f.b * p_alpha + m_image[yF][xF].f.b * (255 - p_alpha)) / 255;
-			m_image[yF][xF].b.r = (p_render[yR][xR].b.r * p_alpha + m_image[yF][xF].b.r * (255 - p_alpha)) / 255;
-			m_image[yF][xF].b.g = (p_render[yR][xR].b.g * p_alpha + m_image[yF][xF].b.g * (255 - p_alpha)) / 255;
-			m_image[yF][xF].b.b = (p_render[yR][xR].b.b * p_alpha + m_image[yF][xF].b.b * (255 - p_alpha)) / 255;
+			m_image[yF][xF].f.r = (p_render[p_size.x * yR + xR].f.r * p_alpha + m_image[yF][xF].f.r * (255 - p_alpha)) / 255;
+			m_image[yF][xF].f.g = (p_render[p_size.x * yR + xR].f.g * p_alpha + m_image[yF][xF].f.g * (255 - p_alpha)) / 255;
+			m_image[yF][xF].f.b = (p_render[p_size.x * yR + xR].f.b * p_alpha + m_image[yF][xF].f.b * (255 - p_alpha)) / 255;
+			m_image[yF][xF].b.r = (p_render[p_size.x * yR + xR].b.r * p_alpha + m_image[yF][xF].b.r * (255 - p_alpha)) / 255;
+			m_image[yF][xF].b.g = (p_render[p_size.x * yR + xR].b.g * p_alpha + m_image[yF][xF].b.g * (255 - p_alpha)) / 255;
+			m_image[yF][xF].b.b = (p_render[p_size.x * yR + xR].b.b * p_alpha + m_image[yF][xF].b.b * (255 - p_alpha)) / 255;
 		}
 	}
 }

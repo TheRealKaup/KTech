@@ -27,7 +27,7 @@ KTech::UI::UI(Engine& p_engine, UPoint p_res, const std::string& p_name)
 	: engine(p_engine), m_res(p_res), m_name(p_name)
 {
 	engine.memory.uis.Add(this);
-	m_image.resize(m_res.y, std::vector<Cell>(m_res.x));
+	m_image.resize(m_res.y * m_res.x);
 }
 
 KTech::UI::~UI()
@@ -76,11 +76,8 @@ bool KTech::UI::RemoveAllWidgets()
 
 void KTech::UI::Resize(UPoint p_res)
 {
-	static size_t y;
 	m_res = p_res;
-	m_image.resize(p_res.y);
-	for (y = 0; y < p_res.y; y++)
-		m_image[y].resize(p_res.x);
+	m_image.resize(m_res.y * m_res.x);
 }
 
 // Similar to `Camera::Render()`
@@ -94,9 +91,8 @@ void KTech::UI::Render()
 	uint8_t tempAlpha;
 
 	// Reset the image to background.
-	for (size_t y = 0; y < m_res.y; y++)
-		for (size_t x = 0; x < m_res.x; x++)
-			m_image[y][x] = m_background;
+	for (size_t i = 0; i < m_image.size(); i++)
+		m_image[i] = m_background;
 
 	for (size_t w = 0; w < m_widgets.size(); w++)
 	{
@@ -139,11 +135,11 @@ void KTech::UI::Render()
 					if (' ' <= texture.m_value.c && texture.m_value.c <= '~')
 						for (size_t y = start.y; y < end.y; y++)
 							for (size_t x = start.x; x < end.x; x++)
-								m_image[y][x].c = texture.m_value.c;
+								m_image[m_res.x * y + x].c = texture.m_value.c;
 					else
 						for (size_t y = start.y; y < end.y; y++)
 							for (size_t x = start.x; x < end.x; x++)
-								m_image[y][x].c = ' ';
+								m_image[m_res.x * y + x].c = ' ';
 				}
 				// Render foreground
 				tempAlpha = texture.m_value.f.a * m_alpha / 255;
@@ -161,9 +157,9 @@ void KTech::UI::Render()
 					{
 						for (size_t x = start.x; x < end.x; x++)
 						{
-							m_image[y][x].f.r = tempFRGBA.r + m_image[y][x].f.r * (255 - tempFRGBA.a) / 255;
-							m_image[y][x].f.g = tempFRGBA.g + m_image[y][x].f.g * (255 - tempFRGBA.a) / 255;
-							m_image[y][x].f.b = tempFRGBA.b + m_image[y][x].f.b * (255 - tempFRGBA.a) / 255;
+							m_image[m_res.x * y + x].f.r = tempFRGBA.r + m_image[m_res.x * y + x].f.r * (255 - tempFRGBA.a) / 255;
+							m_image[m_res.x * y + x].f.g = tempFRGBA.g + m_image[m_res.x * y + x].f.g * (255 - tempFRGBA.a) / 255;
+							m_image[m_res.x * y + x].f.b = tempFRGBA.b + m_image[m_res.x * y + x].f.b * (255 - tempFRGBA.a) / 255;
 						}
 					}
 				}
@@ -183,9 +179,9 @@ void KTech::UI::Render()
 					{
 						for (size_t x = start.x; x < end.x; x++)
 						{
-							m_image[y][x].b.r = tempBRGBA.r + m_image[y][x].b.r * (255 - tempBRGBA.a) / 255;
-							m_image[y][x].b.g = tempBRGBA.g + m_image[y][x].b.g * (255 - tempBRGBA.a) / 255;
-							m_image[y][x].b.b = tempBRGBA.b + m_image[y][x].b.b * (255 - tempBRGBA.a) / 255;
+							m_image[m_res.x * y + x].b.r = tempBRGBA.r + m_image[m_res.x * y + x].b.r * (255 - tempBRGBA.a) / 255;
+							m_image[m_res.x * y + x].b.g = tempBRGBA.g + m_image[m_res.x * y + x].b.g * (255 - tempBRGBA.a) / 255;
+							m_image[m_res.x * y + x].b.b = tempBRGBA.b + m_image[m_res.x * y + x].b.b * (255 - tempBRGBA.a) / 255;
 						}
 					}
 				}
@@ -225,22 +221,22 @@ void KTech::UI::Render()
 					for (; x < texture.m_size.x && start.x < m_res.x; x++, start.x++)
 					{
 						if (texture(x, y).c != ' ')
-							m_image[start.y][start.x].c = (' ' <= texture(x, y).c && texture(x, y).c <= '~') ? texture(x, y).c : ' '; // Character
+							m_image[m_res.x * start.y + start.x].c = (' ' <= texture(x, y).c && texture(x, y).c <= '~') ? texture(x, y).c : ' '; // Character
 						// Precalculate foreground * layer alpha (8 bit depth)
 						tempAlpha = texture(x, y).f.a * m_alpha / 255;
 						if (tempAlpha > 0)
 						{
-							m_image[start.y][start.x].f.r = (texture(x, y).f.r * tempAlpha + m_image[start.y][start.x].f.r * (255 - tempAlpha)) / 255;
-							m_image[start.y][start.x].f.g = (texture(x, y).f.g * tempAlpha + m_image[start.y][start.x].f.g * (255 - tempAlpha)) / 255;
-							m_image[start.y][start.x].f.b = (texture(x, y).f.b * tempAlpha + m_image[start.y][start.x].f.b * (255 - tempAlpha)) / 255;
+							m_image[m_res.x * start.y + start.x].f.r = (texture(x, y).f.r * tempAlpha + m_image[m_res.x * start.y + start.x].f.r * (255 - tempAlpha)) / 255;
+							m_image[m_res.x * start.y + start.x].f.g = (texture(x, y).f.g * tempAlpha + m_image[m_res.x * start.y + start.x].f.g * (255 - tempAlpha)) / 255;
+							m_image[m_res.x * start.y + start.x].f.b = (texture(x, y).f.b * tempAlpha + m_image[m_res.x * start.y + start.x].f.b * (255 - tempAlpha)) / 255;
 						}
 						// Precalculate background * layer alpha (8 bit depth)
 						tempAlpha = texture(x, y).b.a * m_alpha / 255;
 						if (tempAlpha > 0)
 						{
-							m_image[start.y][start.x].b.r = (texture(x, y).b.r * tempAlpha + m_image[start.y][start.x].b.r * (255 - tempAlpha)) / 255;
-							m_image[start.y][start.x].b.g = (texture(x, y).b.g * tempAlpha + m_image[start.y][start.x].b.g * (255 - tempAlpha)) / 255;
-							m_image[start.y][start.x].b.b = (texture(x, y).b.b * tempAlpha + m_image[start.y][start.x].b.b * (255 - tempAlpha)) / 255;
+							m_image[m_res.x * start.y + start.x].b.r = (texture(x, y).b.r * tempAlpha + m_image[m_res.x * start.y + start.x].b.r * (255 - tempAlpha)) / 255;
+							m_image[m_res.x * start.y + start.x].b.g = (texture(x, y).b.g * tempAlpha + m_image[m_res.x * start.y + start.x].b.g * (255 - tempAlpha)) / 255;
+							m_image[m_res.x * start.y + start.x].b.b = (texture(x, y).b.b * tempAlpha + m_image[m_res.x * start.y + start.x].b.b * (255 - tempAlpha)) / 255;
 						}
 					}
 				}
@@ -254,9 +250,9 @@ void KTech::UI::Render()
 		{
 			for (size_t x = 0; x < m_res.x; x++)
 			{
-				m_image[y][x].f.r = tempFRGBA.r + (255 - m_frgba.a) * m_image[y][x].f.r / 255;
-				m_image[y][x].f.g = tempFRGBA.g + (255 - m_frgba.a) * m_image[y][x].f.g / 255;
-				m_image[y][x].f.b = tempFRGBA.b + (255 - m_frgba.a) * m_image[y][x].f.b / 255;
+				m_image[m_res.x * y + x].f.r = tempFRGBA.r + (255 - m_frgba.a) * m_image[m_res.x * y + x].f.r / 255;
+				m_image[m_res.x * y + x].f.g = tempFRGBA.g + (255 - m_frgba.a) * m_image[m_res.x * y + x].f.g / 255;
+				m_image[m_res.x * y + x].f.b = tempFRGBA.b + (255 - m_frgba.a) * m_image[m_res.x * y + x].f.b / 255;
 			}
 		}
 	}
@@ -267,9 +263,9 @@ void KTech::UI::Render()
 		{
 			for (size_t x = 0; x < m_res.x; x++)
 			{
-				m_image[y][x].b.r = tempBRGBA.r + (255 - m_brgba.a) * m_image[y][x].b.r / 255;
-				m_image[y][x].b.g = tempBRGBA.g + (255 - m_brgba.a) * m_image[y][x].b.g / 255;
-				m_image[y][x].b.b = tempBRGBA.b + (255 - m_brgba.a) * m_image[y][x].b.b / 255;
+				m_image[m_res.x * y + x].b.r = tempBRGBA.r + (255 - m_brgba.a) * m_image[m_res.x * y + x].b.r / 255;
+				m_image[m_res.x * y + x].b.g = tempBRGBA.g + (255 - m_brgba.a) * m_image[m_res.x * y + x].b.g / 255;
+				m_image[m_res.x * y + x].b.b = tempBRGBA.b + (255 - m_brgba.a) * m_image[m_res.x * y + x].b.b / 255;
 			}
 		}
 	}
