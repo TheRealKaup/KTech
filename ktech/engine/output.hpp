@@ -34,7 +34,7 @@ class KTech::Output
 public:
 	std::vector<std::string> outputAfterQuit;
 
-	Output(Engine* const engine, KTech::UPoint imageSize);
+	Output(Engine* const engine, KTech::UPoint imageResolution);
 	~Output();
 
 	static void Log(const std::string& text, RGB color);
@@ -42,7 +42,7 @@ public:
 	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName);
 	// Clears the in-engine image, not the terminal.
 	void Clear();
-	void Draw(const std::vector<Cell>& image, UPoint size, Point position = Point(0, 0), uint16_t left = 0, uint16_t top = 0, uint16_t right = 0, uint16_t bottom = 0, uint8_t alpha = 255);
+	void Draw(const std::vector<Cell>& image, UPoint size, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = 255);
 	void Print();
 
 	// If game loop is designed to render-on-demand, use this function to determine whether there is demand, that is, should the game loop
@@ -55,6 +55,7 @@ private:
 	Engine* const engine;
 
 	winsize m_terminalSize;
-	std::vector<std::vector<Cell>> m_image;
+	std::vector<Cell> m_image;
+	const UPoint m_res;
 	std::string m_stringImage;
 };

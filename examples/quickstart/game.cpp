@@ -85,7 +85,7 @@ int main()
 		if (engine.output.ShouldRenderThisTick())
 			camera.Render(map.m_layers);
 		engine.output.Clear();
-		engine.output.Draw(camera.m_image, camera.m_res, KTech::Point(0, 0), 0, 0, 0, 0, engine.time.ticksCounter % 256);
+		engine.output.Draw(camera.m_image, camera.m_res, KTech::Point(0, 0), KTech::UPoint(0, 0), KTech::UPoint(0, 0), engine.time.ticksCounter % 256);
 		engine.output.Print();
 
 		engine.time.WaitUntilNextTick();

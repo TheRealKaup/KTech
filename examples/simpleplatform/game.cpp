@@ -349,24 +349,29 @@ int main()
 			{
 				engine.output.Clear(); // Allows to make foreground darker
 				camera.Render({ layer.m_id, voidLayer.m_id, darkLayer.m_id });
-				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), 0, 0, 0, 0, 127);
+				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0), 127);
 				character.cam.Render(map.m_layers);
 				engine.output.Draw(
 					character.cam.m_image,
 					character.cam.m_res,
 					Point(
 						18 - (character.cam.m_pos.x <= 0 ? character.cam.m_pos.x - 1 : 0),
-						9 - (character.cam.m_pos.y <= 0 ? character.cam.m_pos.y - 1 : 0)),
-					character.cam.m_pos.x <= 0 ? -character.cam.m_pos.x + 1 : 0,
-					character.cam.m_pos.y <= 0 ? -character.cam.m_pos.y + 1 : 0,
-					character.cam.m_pos.x + character.cam.m_res.x >= viewport.x ? viewport.x - character.cam.m_pos.x - 1 : 0,
-					character.cam.m_pos.y + character.cam.m_res.y >= viewport.y ? viewport.y - character.cam.m_pos.y - 1 : 0
+						9 - (character.cam.m_pos.y <= 0 ? character.cam.m_pos.y - 1 : 0)
+					),
+					UPoint(
+						character.cam.m_pos.x <= 0 ? -character.cam.m_pos.x + 1 : 0,
+						character.cam.m_pos.y <= 0 ? -character.cam.m_pos.y + 1 : 0
+					),
+					UPoint(
+						character.cam.m_pos.x + character.cam.m_res.x >= viewport.x ? viewport.x - character.cam.m_pos.x - 1 : 0,
+						character.cam.m_pos.y + character.cam.m_res.y >= viewport.y ? viewport.y - character.cam.m_pos.y - 1 : 0
+					)
 				);
 			}
 			else
 			{
 				camera.Render(map.m_layers);
-				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), 0, 0, 0, 0);
+				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0));
 			}
 			engine.output.Print();
 		}
