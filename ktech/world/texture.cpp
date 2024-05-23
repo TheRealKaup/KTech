@@ -25,35 +25,37 @@
 #include <fstream>
 #include <iostream>
 
-void KTech::Texture::Simple(UPoint p_size, CellA p_value)
+KTech::Texture& KTech::Texture::Simple(UPoint p_size, CellA p_value)
 {
 	m_simple = true;
 	m_size = p_size;
 	m_value = p_value;
+	return *this;
 }
 
-void KTech::Texture::Simple(UPoint p_size, CellA p_value, Point p_pos)
+KTech::Texture& KTech::Texture::Simple(UPoint p_size, CellA p_value, Point p_pos)
 {
 	m_rPos = p_pos;
-	Simple(p_size, p_value);
+	return Simple(p_size, p_value);
 }
 
-void KTech::Texture::Rectangle(UPoint p_size, CellA p_value)
+KTech::Texture& KTech::Texture::Rectangle(UPoint p_size, CellA p_value)
 {
 	m_simple = false;
 	m_size = p_size;
 	m_t.resize(p_size.x * p_size.y);
 	for (CellA& i : m_t)
 		i = p_value;
+	return *this;
 }
 
-void KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_pos)
+KTech::Texture& KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_pos)
 {
 	m_rPos = p_pos;
-	Rectangle(p_size, p_value);
+	return Rectangle(p_size, p_value);
 }
 
-KTech::UPoint KTech::Texture::File(const std::string& p_fileName)
+KTech::Texture& KTech::Texture::File(const std::string& p_fileName)
 {
 	m_simple = false;
 	// Open file
@@ -66,25 +68,27 @@ KTech::UPoint KTech::Texture::File(const std::string& p_fileName)
 		m_t[1] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
 		m_t[2] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
 		m_t[3] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
-		return m_size;
 	}
-	// Get size
-	UPoint newSize;
-	file.read((char*)&newSize, 8);
-	// Apply size
-	Resize(newSize);
-	// Read from file
-	file.read((char*)m_t.data(), m_t.size() * 9);
-    return m_size;
+	else
+	{
+		// Get size
+		UPoint newSize;
+		file.read((char*)&newSize, 8);
+		// Apply size
+		Resize(newSize);
+		// Read from file
+		file.read((char*)m_t.data(), m_t.size() * 9);
+	}
+	return *this;
 }
 
-KTech::UPoint KTech::Texture::File(const std::string& p_fileName, Point p_pos)
+KTech::Texture& KTech::Texture::File(const std::string& p_fileName, Point p_pos)
 {
 	m_rPos = p_pos;
 	return File(p_fileName);
 }
 
-KTech::UPoint KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba)
+KTech::Texture& KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba)
 {
 	m_simple = false;
 	// Get size
@@ -97,12 +101,11 @@ KTech::UPoint KTech::Texture::Write(const std::vector<std::string>& p_stringVect
 	// Read from strings
 	for (size_t y = 0; y < m_size.y; y++)
 		for (size_t x = 0; x < m_size.x; x++)
-			if (x < p_stringVector[y].size())
-				operator()(x, y) = CellA(p_stringVector[y][x], (p_stringVector[y][x] == ' ' ? RGBA(RGBAColors::transparent) : p_frgba) , p_brgba);
-	return m_size;
+			operator()(x, y) = CellA((x < p_stringVector[y].size() ? p_stringVector[y][x] : ' '), p_frgba, p_brgba);
+	return *this;
 }
 
-KTech::UPoint KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba, Point p_pos)
+KTech::Texture& KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba, Point p_pos)
 {
 	m_rPos = p_pos;
 	return Write(p_stringVector, p_frgba, p_brgba);
@@ -221,7 +224,8 @@ void KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
 	else
 	{
 		for (size_t i = 0; i < m_t.size(); i++)
-			m_t[i].c = newValue;
+			if (m_t[i].c == oldValue)
+				m_t[i].c = newValue;
 	}
 }
 

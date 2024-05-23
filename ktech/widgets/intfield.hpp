@@ -159,8 +159,8 @@ protected:
 
 	void RenderSelected()
 	{
-		for (size_t i = 0; i < m_textures.size(); i++)
-			m_textures[i].SetForeground(m_selectedRGBA);
+		for (KTech::Texture& texture : m_textures)
+			texture.SetForeground(m_selectedRGBA);
 	}
 
 	void RenderUnselected()
@@ -190,7 +190,7 @@ protected:
 			m_number = m_visibleNumber;
 
 		// Change color
-		for (size_t i = 0; i < m_textures.size(); i++)
-			m_textures[i].SetForeground(m_unselectedRGBA);
+		for (KTech::Texture& texture : m_textures)
+			texture.SetForeground(m_unselectedRGBA);
 	}
 };

@@ -31,7 +31,7 @@ public:
 		KTech::ID<KTech::UI> ui,
 		KTech::Point pos,
 		const std::vector<std::string>& text,
-		KTech::RGBA foregroundRGBA = KTech::RGBA( 255, 255, 255, 255 ),
+		KTech::RGBA foregroundRGBA = KTech::RGBA( 0, 0, 0, 255 ),
 		KTech::RGBA backgroundRGBA = KTech::RGBAColors::gray)
 		: Widget(engine, ui, pos), m_foregroundRGBA(foregroundRGBA), m_backgroundRGBA(backgroundRGBA)
 	{
@@ -43,8 +43,7 @@ public:
 	{
 		m_textures.resize(9);
 		// text
-		m_textures[0].Resize(m_textures[0].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1)), KTech::CellA('\0', m_foregroundRGBA, m_backgroundRGBA));
-		m_textures[0].ReplaceCharacter(' ', '\0');
+		m_textures[0].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1)).ReplaceCharacter(' ', '\0');
 		// up-left corner
 		m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0));
 		// up-right corner

@@ -94,67 +94,81 @@ KTech::CR KTech::Collision::GetPotentialCollisionResult(uint8_t p_t1, uint8_t p_
 	return result;
 }
 
-// `s` - simple (rectangle)
-// `p` - global position
-bool KTech::Collision::AreSimpleCollidersOverlapping(UPoint p_s1, Point p_p1, UPoint p_s2, Point p_p2)
+bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point p_p1, const Collider& p_c2, const Point& p_p2)
 {
- 	return (p_p1.x < p_p2.x + p_s2.x && p_p1.x + p_s1.x > p_p2.x && p_p1.y < p_p2.y + p_s2.y && p_p1.y + p_s1.y > p_p2.y);
-}
-
-// `s` - simple (rectangle)
-// `c` - complex (2d vector)
-// `p` - global position
-bool KTech::Collision::AreSimpleAndComplexCollidersOverlapping(UPoint p_simple, Point p_simplePos, const std::vector<std::vector<bool>>& p_complex, Point p_complexPos)
-{
-	// Start Y from 0 if the simple is before the complex, or at the same position.
-	// Otherwise, add some to Y so the scanning will start from the point in which the simple collider starts.
-	size_t y = (p_complexPos.y < p_simplePos.y ? p_simplePos.y - p_complexPos.y : 0);
-	// Iterate with Y until it reaches the end of the complex, or the end of the simple.
-	for (; y < p_complex.size() && p_complexPos.y + y < p_simplePos.y + p_simple.y; y++)
+	// First check for simple overlap
+	if (p_p1.x < p_p2.x + p_c2.m_size.x &&
+		p_p1.x + p_c1.m_size.x > p_p2.x &&
+		p_p1.y < p_p2.y + p_c2.m_size.y &&
+		p_p1.y + p_c1.m_size.y > p_p2.y)
 	{
-		// Start X from 0 if the simple is before the complex, or at the same position.
-		// Otherwise, add some to X so the scanning will start from the point in which the simple collider starts.
-		size_t x = (p_complexPos.x < p_simplePos.x ? p_simplePos.x - p_complexPos.x : 0);
-		// Iterate with X until it reaches the end of the complex, or the end of the simple.
-		for (; x < p_complex[y].size() && p_complexPos.x + x < p_simplePos.x + p_simple.x; x++)
-			if (p_complex[y][x])
-				if (p_simplePos.x <= p_complexPos.x + x && p_complexPos.x + x <= p_simplePos.x + p_simple.x && p_simplePos.y <= p_complexPos.y + y && p_complexPos.y + y <= p_simplePos.y + p_simple.y)
-					return true;
-	}
-	return false;
-}
-
-// `c` - complex (2d vector)
-// `p` - global position
-bool KTech::Collision::AreComplexCollidersOverlapping(const std::vector<std::vector<bool>>& p_c1, Point p_p1, const std::vector<std::vector<bool>>& p_c2, Point p_p2)
-{
-	size_t y1 = 0;
-	size_t y2 = 0;
-	// If complex1 is before complex2, then add to y1 so it starts where complex2 starts, and keep y2 0
-	if (p_p1.y < p_p2.y)
-		y1 = p_p2.y - p_p1.y;
-	// Otherwise, if complex2 is before complex1, then add to y2 so it starts where complex1 starts, and keep y1 0
-	else if (p_p2.y < p_p1.y)
-		y2 = p_p1.y - p_p2.y;
-
-	// Iterate with both Ys until one of them reaches the end of their colliders
-	for (; y1 < p_c1.size() && y2 < p_c2.size(); y1++, y2++)
-	{
-		size_t x1 = 0;
-		size_t x2 = 0;
-		// If complex1 is before complex2, then add to x1 so it starts where complex2 starts, and keep x2 0
-		if (p_p1.x < p_p2.x)
-			x1 = p_p2.x - p_p1.x;
-		// Otherwise, if complex2 is before complex1, then add to x2 so it starts where complex1 starts, and keep x1 0
-		else if (p_p2.x < p_p1.x)
-			x2 = p_p1.x - p_p2.x;
-
-		// Iterate with both Xs until one of them reaches the end of their colliders
-		for (; x1 < p_c1[y1].size() && x2 < p_c2[y2].size(); x1++, x2++)
-			if (p_c1[y1][x1] && p_c2[y2][x2])
+		if (p_c1.m_simple)
+		{
+			if (p_c2.m_simple)
+			{
+				// Both colliders are simplet to begin with
 				return true;
+			}
+			else
+			{
+				// `p_c1` is simple, `p_c2` is complex
+				for (size_t y = (p_p2.y < p_p1.y ? p_p1.y - p_p2.y : 0); y < p_c2.m_size.x && p_p2.y + y < p_p1.y + p_c1.m_size.y; y++)
+					for (size_t x = (p_p2.x < p_p1.x ? p_p1.x - p_p2.x : 0); x < p_c2.m_size.y && p_p2.x + x < p_p1.x + p_c1.m_size.x; x++)
+						if (p_c2(x, y))
+							return true;
+				return false;
+			}
+		}
+		else
+		{
+			if (p_c2.m_simple)
+			{
+				// `p_c1` is compelx, `p_c2` is simple
+				for (size_t y = (p_p1.y < p_p2.y ? p_p2.y - p_p1.y : 0); y < p_c1.m_size.x && p_p1.y + y < p_p2.y + p_c2.m_size.y; y++)
+					for (size_t x = (p_p1.x < p_p2.x ? p_p2.x - p_p1.x : 0); x < p_c1.m_size.y && p_p1.x + x < p_p2.x + p_c2.m_size.x; x++)
+						if (p_c1(x, y))
+							return true;
+				return false;
+			}
+			else
+			{
+				// `p_c1` and `p_c2` are compelx
+
+				size_t y1 = 0;
+				size_t y2 = 0;
+				// If complex1 is before complex2, then add to y1 so it starts where complex2 starts, and keep y2 0
+				if (p_p1.y < p_p2.y)
+					y1 = p_p2.y - p_p1.y;
+				// Otherwise, if complex2 is before complex1, then add to y2 so it starts where complex1 starts, and keep y1 0
+				else if (p_p2.y < p_p1.y)
+					y2 = p_p1.y - p_p2.y;
+
+				// Iterate with both Ys until one of them reaches the end of their colliders
+				for (; y1 < p_c1.m_size.y && y2 < p_c2.m_size.y; y1++, y2++)
+				{
+					size_t x1 = 0;
+					size_t x2 = 0;
+					// If complex1 is before complex2, then add to x1 so it starts where complex2 starts, and keep x2 0
+					if (p_p1.x < p_p2.x)
+						x1 = p_p2.x - p_p1.x;
+					// Otherwise, if complex2 is before complex1, then add to x2 so it starts where complex1 starts, and keep x1 0
+					else if (p_p2.x < p_p1.x)
+						x2 = p_p1.x - p_p2.x;
+
+					// Iterate with both Xs until one of them reaches the end of their colliders
+					for (; x1 < p_c1.m_size.x && x2 < p_c2.m_size.x; x1++, x2++)
+						if (p_c1(x1, y1) && p_c2(x2, y2))
+							return true;
+				}
+				return false;
+			}
+		}
 	}
-	return false;
+	else
+	{
+		// If there's not even simple overlap, there will be no compelx overlap as well
+		return false;
+	}
 }
 
 void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
@@ -195,7 +209,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 			// Set collider
 	 		const Collider& col = (thisObj->m_colliders[c]);
 			// Skip this one if it is invalid
-			if (!col.m_active || col.GetSize().x == 0 || col.GetSize().y == 0)
+			if (!col.m_active || col.m_size.x == 0 || col.m_size.y == 0)
 				continue;
 
 			for (oc = 0; oc < otherObj->m_colliders.size(); oc++) // Other object's colliders
@@ -203,7 +217,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 				// Set other collider
 				const Collider& otherCol = otherObj->m_colliders[oc];
 				// Skip this one if it is invalid
-				if (!otherCol.m_active || otherCol.GetSize().x == 0 || otherCol.GetSize().y == 0)
+				if (!otherCol.m_active || otherCol.m_size.x == 0 || otherCol.m_size.y == 0)
 					continue;
 
 				// Get the potential collision result in advance
@@ -217,38 +231,13 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 				if (potentialCollisionResult == CR::O)
 				{
 					// Compare current and future overlapping according to the types of the colliders
-					bool currentOverlapState, futureOverlapState;
-					if (col.m_simple)
-					{
-						if (otherCol.m_simple)
-						{
-							currentOverlapState = AreSimpleCollidersOverlapping(col.m_size, Point(col.m_rPos.x + thisObj->m_pos.x, col.m_rPos.y + thisObj->m_pos.y), otherCol.m_size, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-							futureOverlapState = AreSimpleCollidersOverlapping(col.m_size, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y), otherCol.m_size, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-						}
-						else
-						{
-							currentOverlapState = AreSimpleAndComplexCollidersOverlapping(col.m_size, Point(col.m_rPos.x + thisObj->m_pos.x, col.m_rPos.y + thisObj->m_pos.y), otherCol.m_c, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(col.m_size, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y), otherCol.m_c, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-						}
-					}
-					else
-					{
-						if (otherCol.m_simple)
-						{
-							currentOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCol.m_size, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y), col.m_c, Point(col.m_rPos.x + thisObj->m_pos.x, col.m_rPos.y + thisObj->m_pos.y));
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCol.m_size, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y), col.m_c, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y));
-						}
-						else
-						{
-							currentOverlapState = AreComplexCollidersOverlapping(col.m_c, Point(col.m_rPos.x + thisObj->m_pos.x, col.m_rPos.y + thisObj->m_pos.y), otherCol.m_c, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-							futureOverlapState = AreComplexCollidersOverlapping(col.m_c, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y), otherCol.m_c, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-						}
-					}
+					bool currentOverlapState = AreCollidersOverlapping(col, thisObj->m_pos + col.m_rPos, otherCol, otherObj->m_pos + otherCol.m_rPos);
+					bool futureOverlapState = AreCollidersOverlapping(col, thisObj->m_pos + col.m_rPos + p_dir, otherCol, otherObj->m_pos);
 
 					if (!currentOverlapState && futureOverlapState)
-						p_overlapData.push_back({p_thisObjID, otherObjID, c, oc}); // Entered overlap!
+						p_overlapData.push_back({p_thisObjID, otherObjID, c, oc}); // Entered overlap
 					else if (currentOverlapState && !futureOverlapState)
-						p_exitOverlapData.push_back({p_thisObjID, otherObjID, c, oc}); // Exited overlap!
+						p_exitOverlapData.push_back({p_thisObjID, otherObjID, c, oc}); // Exited overlap
 				}
 				// Proceed to checking collision (repositioned overlap) only if the potential collision result is not already known.
 				// This means that if the currently known CR is a block and the potential CR is also a block, then there is no reason to check collision again since encountering another blocking collider doesn't matter.
@@ -257,24 +246,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 				// Basically, by detecting a block, this part of the code gets locked on a block, until a push is found, which causes this part of the code to get locked on a push and never check for more collisions again in the current `otherObj`'s iteration.
 				else if (cr != potentialCollisionResult)
 				{
-					// Compare future overlapping according to the types of the colliders
-					bool currentOverlapState, futureOverlapState;
-					if (col.m_simple)
-					{
-						if (otherCol.m_simple)
-							futureOverlapState = AreSimpleCollidersOverlapping(col.m_size, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y), otherCol.m_size, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-						else
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(col.m_size, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y), otherCol.m_c, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-					}
-					else
-					{
-						if (otherCol.m_simple)
-							futureOverlapState = AreSimpleAndComplexCollidersOverlapping(otherCol.m_size, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y), col.m_c, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y));
-						else
-							futureOverlapState = AreComplexCollidersOverlapping(col.m_c, Point(col.m_rPos.x + thisObj->m_pos.x + p_dir.x, col.m_rPos.y + thisObj->m_pos.y + p_dir.y), otherCol.m_c, Point(otherCol.m_rPos.x + otherObj->m_pos.x, otherCol.m_rPos.y + otherObj->m_pos.y));
-					}
-
-					if (futureOverlapState)
+					if (AreCollidersOverlapping(col, thisObj->m_pos + col.m_rPos + p_dir, otherCol, otherObj->m_pos + otherCol.m_rPos))
 					{
 						// Collision!
 						cr = potentialCollisionResult;

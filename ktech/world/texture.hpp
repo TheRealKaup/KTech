@@ -41,14 +41,14 @@ struct KTech::Texture
 	CellA m_value;
 	std::vector<CellA> m_t;
 	
-	void Simple(UPoint size, CellA value);
-	void Simple(UPoint size, CellA value, Point relateivePosition);
-	void Rectangle(UPoint size, CellA value);
-	void Rectangle(UPoint size, CellA value, Point relateivePosition);
-	UPoint File(const std::string& fileName);
-	UPoint File(const std::string& fileName, Point relateivePosition);
-	UPoint Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
-	UPoint Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition);
+	Texture& Simple(UPoint size, CellA value);
+	Texture& Simple(UPoint size, CellA value, Point relateivePosition);
+	Texture& Rectangle(UPoint size, CellA value);
+	Texture& Rectangle(UPoint size, CellA value, Point relateivePosition);
+	Texture& File(const std::string& fileName);
+	Texture& File(const std::string& fileName, Point relateivePosition);
+	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
+	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relateivePosition);
 
 	CellA& operator()(size_t x, size_t y);
 	const CellA& operator()(size_t x, size_t y) const;

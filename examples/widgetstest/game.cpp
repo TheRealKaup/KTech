@@ -76,13 +76,8 @@ struct UITest
 
 	void CancelCountdown()
 	{
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
 		((Button*)widgets[w_button])->SetText("Exit", true);
 		((Button*)widgets[w_button])->m_OnPress = std::bind(&UITest::StartExitCountdown, this);
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
-		widgets[w_button]->Select();
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Cancel invoke", RGBColors::orange);
 		engine.time.CancelInvocation(countdownInvocation);
 
 		((IntField*)widgets[w_intfield])->SetValue("789");
@@ -92,18 +87,12 @@ struct UITest
 
 	void StartExitCountdown()
 	{
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Delete", RGBColors::orange);
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Create", RGBColors::orange);
 		((Button*)widgets[w_button])->SetText("Exiting in 3", true);
 		((Button*)widgets[w_button])->m_OnPress = std::bind(&UITest::CancelCountdown, this);
 		countdown = 3;
 		// Invoke countdown
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
 		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
-		// As can be seen, the first `return_` press does not also call `Exit()`! Nice!
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> Select", RGBColors::orange);
-		widgets[w_button]->Select();
-		engine.output.Log("(GAME) <UI::StartExitCountdown()> EOF", RGBColors::orange);
 	}
 	
 	void MoveUp()

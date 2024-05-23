@@ -52,6 +52,12 @@ public:
 		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(key, std::bind(&Switch::OnPress, this), false));
 	}
 
+	virtual ~Switch()
+	{
+		if (m_downInvocation == nullptr)
+			engine.time.CancelInvocation(m_downInvocation);
+	}
+
 	void SetText(const std::string& text, bool withFrame)
 	{
 		KTech::RGBA tempRGBA;
@@ -103,6 +109,8 @@ public:
 	}
 
 protected:
+	KTech::Time::Invocation* m_downInvocation = nullptr;
+
 	virtual void OnSelect() override
 	{
 		RenderSelected();
@@ -117,10 +125,8 @@ protected:
 	{
 		m_on = !m_on;
 
-		for (size_t x = 0; x < m_textures[0].m_size.y; x++)
-			m_textures[0](x, 0).f = m_downRGBA;
-		for (size_t i = 1; i < m_textures.size(); i++)
-			m_textures[i].m_value.f = m_downRGBA;
+		for (KTech::Texture& texture : m_textures)
+			texture.SetForeground(m_downRGBA);
 		
 		engine.time.Invoke(std::bind(&Switch::RemovePressColor, this), 100, KTech::Time::Measurement::milliseconds);
 
@@ -131,21 +137,21 @@ protected:
 	void RenderSelected()
 	{
 		if (m_on)
-			for (size_t i = 0; i < m_textures.size(); i++)
-				m_textures[i].SetForeground(m_selectedOnRGBA);
-		if (!m_on)
-			for (size_t i = 0; i < m_textures.size(); i++)
-				m_textures[i].SetForeground(m_selectedOffRGBA);
+			for (KTech::Texture& texture : m_textures)
+				texture.SetForeground(m_selectedOnRGBA);
+		else
+			for (KTech::Texture& texture : m_textures)
+				texture.SetForeground(m_selectedOffRGBA);
 	}  
 
 	void RenderUnselected()
 	{
 		if (m_on)
-			for (size_t i = 0; i < m_textures.size(); i++)
-				m_textures[i].SetForeground(m_unselectedOnRGBA);
-		if (!m_on)
-			for (size_t i = 0; i < m_textures.size(); i++)
-				m_textures[i].SetForeground(m_unselectedOffRGBA);
+			for (KTech::Texture& texture : m_textures)
+				texture.SetForeground(m_unselectedOnRGBA);
+		else
+			for (KTech::Texture& texture : m_textures)
+				texture.SetForeground(m_unselectedOffRGBA);
 	}
 
 	void RemovePressColor()
@@ -153,20 +159,21 @@ protected:
 		if (m_selected)
 		{
 			if (m_on)
-				for (size_t i = 0; i < m_textures.size(); i++)
-					m_textures[i].SetForeground(m_selectedOnRGBA);
-			if (!m_on)
-				for (size_t i = 0; i < m_textures.size(); i++)
-					m_textures[i].SetForeground(m_selectedOffRGBA);
+				for (KTech::Texture& texture : m_textures)
+					texture.SetForeground(m_selectedOnRGBA);
+			else
+				for (KTech::Texture& texture : m_textures)
+					texture.SetForeground(m_selectedOffRGBA);
 		}
 		else
 		{
 			if (m_on)
-				for (size_t i = 0; i < m_textures.size(); i++)
-					m_textures[i].SetForeground(m_unselectedOnRGBA);
-			if (!m_on)
-				for (size_t i = 0; i < m_textures.size(); i++)
-					m_textures[i].SetForeground(m_unselectedOffRGBA);
+				for (KTech::Texture& texture : m_textures)
+					texture.SetForeground(m_unselectedOnRGBA);
+			else
+				for (KTech::Texture& texture : m_textures)
+					texture.SetForeground(m_unselectedOffRGBA);
 		}
+		m_downInvocation = nullptr;
 	}
 };

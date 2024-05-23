@@ -22,8 +22,6 @@
 
 #include "texture.hpp"
 
-#include <fstream>
-
 void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_pos)
 {
     m_simple = true;
@@ -32,43 +30,23 @@ void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_pos)
     m_size = p_size;
 }
 
-bool KTech::Collider::File(const std::string& p_fileName, uint8_t p_type, Point p_pos)
-{
-    m_simple = false;
-    m_type = p_type;
-    m_rPos = p_pos;
-
-	std::ifstream file(p_fileName);
-	if (!file.is_open())
-		return false;
-	std::string line;
-
-	for (size_t y = 0; std::getline(file, line); y++)
-	{
-		// potentially broken if one of the values = 10 ('\n')
-		m_c.resize(m_c.size() + 1);
-		m_c[y].resize(line.length());
-		for (size_t x = 0; x < line.length(); x++)
-			m_c[y][x] = line[x];
-	}
-	
-	return true;
-}
-
 void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint8_t p_type, Point p_pos)
 {
     m_simple = false;
     m_type = p_type;
     m_rPos = p_pos;
-
-	m_c.resize(p_stringVector.size());
-	for (size_t y = 0; y < p_stringVector.size(); y++)
-	{
-		// potentially broken if one of the values = 10 ('\n')
-		m_c[y].resize(p_stringVector[y].length());
-		for (size_t x = 0; x < m_c[y].size(); x++)
-			m_c[y][x] = p_stringVector[y][x] == ' ' ? false : true;
-	}
+	// Get size
+	m_size = UPoint(0, p_stringVector.size());
+	for (const std::string& row : p_stringVector)
+		if (row.size() > m_size.x)
+			m_size.x = row.size();
+	// Apply size
+	m_c.resize(m_size.x * m_size.y);
+	// Read from strings
+	for (size_t y = 0; y < m_size.y; y++)
+		for (size_t x = 0; x < m_size.x; x++)
+			if (x < p_stringVector[y].size())
+				operator()(x, y) = p_stringVector[y][x] != ' ' ? true : false;
 }
 
 void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_alphaThreshold, uint8_t p_type)
@@ -76,15 +54,13 @@ void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_alp
     m_simple = false;
     m_type = p_type;
     m_rPos = p_texture.m_rPos;
-
-	m_c.resize(p_texture.m_size.y);
-	for (size_t y = 0; y < m_c.size(); y++)
-	{
-		// potentially broken if one of the values = 10 ('\n')
-		m_c[y].resize(p_texture.m_size.x);
-		for (size_t x = 0; x < m_c[y].size(); x++)
-			m_c[y][x] = ((p_texture(x, y).c != ' ' && p_texture(x, y).f.a >= p_alphaThreshold) ? true : false);
-	}
+	// Get size
+	m_size = p_texture.m_size;
+	// Apply size
+	m_c.resize(m_size.x * m_size.y);
+	// Read from strings
+	for (size_t i = 0; i < m_c.size(); i++)
+		m_c[i] = ((p_texture.m_t[i] != ' ') && (p_texture.m_t[i].f.a >= p_alphaThreshold)) ? true : false;
 }
 
 void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_alphaThreshold, uint8_t p_type)
@@ -92,38 +68,21 @@ void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_al
     m_simple = false;
     m_type = p_type;
     m_rPos = p_texture.m_rPos;
-
-	m_c.resize(p_texture.m_size.y);
-	for (size_t y = 0; y < m_c.size(); y++)
-	{
-		// potentially broken if one of the values = 10 ('\n')
-		m_c[y].resize(p_texture.m_size.x);
-		for (size_t x = 0; x < m_c[y].size(); x++)
-			m_c[y][x] = (p_texture(x, y).b.a >= p_alphaThreshold ? true : false);
-	}
+	// Get size
+	m_size = p_texture.m_size;
+	// Apply size
+	m_c.resize(m_size.x * m_size.y);
+	// Read from strings
+	for (size_t i = 0; i < m_c.size(); i++)
+		m_c[i] = (p_texture.m_t[i].b.a >= p_alphaThreshold) ? true : false;
 }
 
-std::vector<bool>& KTech::Collider::operator[](size_t y)
+uint8_t& KTech::Collider::operator()(size_t x, size_t y)
 {
-	return m_c[y];
+	return m_c[m_size.x * y + x];
 }
 
-const std::vector<bool>& KTech::Collider::operator[](size_t y) const
+const uint8_t& KTech::Collider::operator()(size_t x, size_t y) const
 {
-	return m_c[y];
-}
-
-// [Simple/Complex] Get the size of the texture.
-KTech::UPoint KTech::Collider::GetSize() const
-{
-	if (m_simple)
-		return m_size;
-	else
-	{
-		UPoint result(0, m_c.size());
-		for (const std::vector<bool>& row : m_c)
-			if (row.size() > result.x)
-				result.x = row.size();
-		return result;
-	}
+	return m_c[m_size.x * y + x];
 }
