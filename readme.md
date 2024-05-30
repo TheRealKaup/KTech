@@ -45,7 +45,6 @@ Here's how a very simple KTech game can look like:
 
 - **Graphics** - Rendering terminal graphics with 24-bit color depth, opacity and layers.
 - **Physics** - Object movement with pushing, blocking and overlapping events, based on different collider types.
-- **Audio** - Loading, mixing and playing.
 - **UI** - Comprises an expanding collection of widgets.
 - **Time** - Game loop and invocations management.
 - **Input** - Terminal-optimized user input processing.
