@@ -16,7 +16,7 @@
 
 KTech is a C++ terminal 2D game engine library, currently available for GNU/Linux.
 
-As a game engine, KTech is capable of rendering graphics, playing audio, processing movement of objects, handling player input, and more.
+As a game engine, KTech is capable of rendering graphics, processing movement of objects, handling player input, and more.
 
 As a library, KTech offers an ecosystem of types, functions and variables that work together and are managed by the user.
 
