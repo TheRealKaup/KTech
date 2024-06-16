@@ -2,7 +2,8 @@
 
 This document contains answers for potential questions.
 
-[Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions), [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
+- [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
+- [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
 
 ## Why are `Collider`'s and `Texture`'s constructors normal functions?
 
