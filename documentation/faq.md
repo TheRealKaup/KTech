@@ -6,7 +6,7 @@ This document contains answers for potential questions.
 
 ## Why are `Collider`'s and `Texture`'s constructors normal functions?
 
-Using normal constructors was ambiguous to the coder and and the compiler in this case. The writing convention of `vector.resize(n)` and `vector[i].Constructor()`, where "vector" is a vector of `Texture`s or `Collider`s, is just the simple and easy alternative I found. I might change this method, maybe to a factory design.
+Using normal constructors was ambiguous to the coder and the compiler in this case. The writing convention of `vector.resize(n)` and `vector[i].Constructor()`, where "vector" is a vector of `Texture`s or `Collider`s, is just the simple and easy alternative I found. I might change this method, maybe to a factory design.
 
 ## Why is there no predefined game loop?
 
