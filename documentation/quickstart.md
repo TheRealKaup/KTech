@@ -1,6 +1,6 @@
-# Introduction to Quick Start Guide
+# Preamble
 
-This document is a short tutorial on using KTech. While it manages to cover most of the library, it may omit some little things.
+This document contains a short tutorial on using KTech. It does not cover all of the library.
 
 If you are looking for the library reference, refer to the [documentation section in the `"readme.md"` file](https://github.com/TheRealKaup/KTech/blob/master/readme.md#documentation) (it isn't available yet, and right now this tutorial is all there is).
 

@@ -2,7 +2,6 @@
 
 This document contains specifications for KTech's code.
 
-Table of Contents:
 - [Preamble](#preamble)
 - [Naming](#naming)
 - [Classes](#classes)
