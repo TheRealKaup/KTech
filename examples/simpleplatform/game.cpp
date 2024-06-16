@@ -44,16 +44,6 @@ struct Character : Object
 		}
 	}
 
-	void Right()
-	{
-		Move({ 1 });
-	}
-
-	void Left()
-	{
-		Move({ -1 });
-	}
-
 	virtual bool OnTick() override
 	{
 		bool changed = false;
@@ -126,7 +116,7 @@ struct Character : Object
 			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
 		m_colliders.resize(2);
-		m_colliders[0].ByTextureCharacter(m_textures[0], 100, 1);
+		m_colliders[0].ByTextureCharacter(m_textures[0], 1);
 		m_colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
 
 		KTech::Output::Log("<Character::Character()> Registering callbacks", RGBColors::red);
@@ -135,13 +125,13 @@ struct Character : Object
 		engine.input.RegisterCallback(" ", std::bind(&Character::Jump, this), true);
 		engine.input.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this), true);
 
-		engine.input.RegisterCallback("d", std::bind(&Character::Right, this), true);
-		engine.input.RegisterCallback("D", std::bind(&Character::Right, this), true);
-		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Right, this), true);
+		engine.input.RegisterCallback("d", std::bind(&Character::Move, this, Point(1, 0)), true);
+		engine.input.RegisterCallback("D", std::bind(&Character::Move, this, Point(1, 0)), true);
+		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, Point(1, 0)), true);
 
-		engine.input.RegisterCallback("a", std::bind(&Character::Left, this), true);
-		engine.input.RegisterCallback("A", std::bind(&Character::Left, this), true);
-		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Left, this), true);
+		engine.input.RegisterCallback("a", std::bind(&Character::Move, this, Point(-1, 0)), true);
+		engine.input.RegisterCallback("A", std::bind(&Character::Move, this, Point(-1, 0)), true);
+		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, Point(-1, 0)), true);
 
 		engine.input.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this), true);
 		engine.input.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this), true);
@@ -163,7 +153,7 @@ struct GravityBox : Object
 
 	virtual bool OnTick() override
 	{
-		// If catched, do not fall.
+		// If caught, do not fall.
 		bool moved = false;
 		for (size_t i = 0; i < fallingSpeed; i++)
 			if (Move(Point(0, 1)))
@@ -184,7 +174,7 @@ struct GravityBox : Object
 
 		m_colliders.resize(1);
 		m_colliders[0].Simple(KTech::UPoint(3, 3), 2, KTech::Point(0, 0));
-	
+
 		EnterLayer(layer);
 	}
 };
@@ -277,7 +267,7 @@ int main()
 	KTech::Output::Log("<main()> Loading assets/land.ktecht", RGBColors::blue);
 	worldProps.m_textures[2].File("assets/land.ktecht", Point(0, 3));
 	worldProps.m_colliders.resize(1);
-	worldProps.m_colliders[0].ByTextureBackground(worldProps.m_textures[2], 100, 0);
+	worldProps.m_colliders[0].ByTextureBackground(worldProps.m_textures[2], 1, 0);
 	layer.AddObject(worldProps.m_id);
 
 	KTech::Output::Log("<main()> Creating frame", RGBColors::blue);

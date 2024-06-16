@@ -1,395 +1,228 @@
-# Table of Contents:
-
-- [Table of Contents](#table-of-contents)
-- [Introduction to Quick Start Guide](#introduction-to-quick-start-guide)
-- [Key Concepts](#key-concepts)
-  - [The File System](#the-file-system)
-  - [World Hierarchy](#world-hierarchy)
-  - [Engine](#engine)
-  - [Game Loop](#game-loop)
-  - [Widgets](#widgets)
-- [Game Example](#game-example)
-- [Building](#building)
-  
 # Introduction to Quick Start Guide
 
-This document is a short tutorial on using KTech. Note that it covers only a small portion of the library and minimally explains how to use it.
+This document is a short tutorial on using KTech. While it manages to cover most of the library, it may omit some little things.
 
-If you are looking for a concise tutorial, or the library reference, refer to the [documentation section in the `readme.md` file](https://github.com/TheRealKaup/KTech/blob/master/readme.md#documentation) (both aren't available yet, and as for now this tutorial is KTech's entire documentation).
+If you are looking for the library reference, refer to the [documentation section in the `"readme.md"` file](https://github.com/TheRealKaup/KTech/blob/master/readme.md#documentation) (it isn't available yet, and right now this tutorial is all there is).
+
+- [Key Concepts](#key-concepts)
+	- [Licensing](#licensing)
+	- [The File System](#the-file-system)
+	- [World Hierarchy](#world-hierarchy)
+	- [Engine](#engine)
+	- [Game Loop](#game-loop)
+- [Creating a Game](#creating-a-game)
+	- [Project Setup](#project-setup)
+	- [Game Example](#game-example)
+	- [Building (Premake)](#building-premake)
 
 # Key Concepts
 
+## Licensing
+
+KTech is licensed under [the GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html) or any later version. Read the article ["A Quick Guide to GPLv3"](https://www.gnu.org/licenses/quick-guide-gplv3.html) from GNU's website to learn about it. You are completely allowed to sell copies of your game (for example, via Steam), and so does anyone else, though I am not sure how significantly this affects sales in practice.
+
+Using the Steamworks API with KTech (to utilize Steam achievements, for instance) contradicts the GPLv3 due to it not falling under the definition of "System Libraries" (thus, not being exempted from the copyleft). As a solution, I might in the future decide to specifically allow using the Steamworks API with KTech.
+
 ## The File System
 
-KTech is a static library. It's in [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
+KTech is provided as a static library. It's in [the `"ktech/"` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
 
-The core library is declared in the `ktech.hpp` header file of the `ktech` directory. This file is what you include in your game project. This is the "core" library since it is the minimum required to include in your project to start creating a game.
+The core library is declared in the `"ktech/ktech.hpp"`. This file is what you `#include` in your game source files.
 
-The contents of `ktech.hpp` are enclosed within a namespace called `KTech`.
+The content of `"ktech.hpp"` are enclosed within a namespace called `KTech`. This file only include class forward declarations. Class definitions are stored in the rest of the header files (`".hpp"`) in `"ktech/"`, and the definitions of class members are usually stored in additional source files (`".cpp"`).
 
-The source files (`.cpp`) in the `ktech` directory are the core library's definitions.
+The non-core parts of the library are so far only the optional UI elements ("widgets") that are stored in the `"ktech/widgets/"` directory. If you want to use any of the widgets there, you may selectively include the header files in your game source files.
 
-The non-core parts of the library are currently only the widgets (UI objects) that are in the `ktech/widgets` directory. If you want to use any of the widgets there, you may selectively include the header files in there.
+Notice that `"ktech.hpp"` includes all of the header files that have class definitions only if `KTECH_DEFINITION` hasn't been defined. This macro behaves as an include guard within KTech, and you should not have it defined in your game source files before including `"ktech.hpp"` yourself, so don't worry about it.
+
+The content of `"ktech/"` is split into directories:
+- `"basic/"` - basic classes.
+- `"engine/"` - `Engine` class and engine components.
+- `"utility/"` - utility classes.
+- `"widgets/"` - optional widgets that you may include from here.
+- `"world/"` - world classes.
 
 ## Basic Structures
 
-KTech comes with a couple of fundamental structures that are available via the `KTech` namespace. They are:
+KTech uses some simple structures:
 - `RGB` - Represents a single 24 bit depth color.
-- `RGBA` - Represents a single 24 bit depth color with an extra alpha channel.
-- `Point` - 2D vector comprising 2 32 bit signed integers (`x` and `y`).
-- `UPoint` - 2D vector comprising 2 32 bit unsigned integers (`x` and `y`).
-- `Cell` - Represents a terminal cell comprising of a foreground `RGB`, background `RGB` and a `char`.
-- `CellA` - Represents a terminal cell with alpha channels comprising of a foreground `RGBA`, background `RGBA` and a `char`.
+- `RGBA` - Represents a single 24 bit depth color with an alpha channel.
+- `Point` - Comprises 2 32 bit signed integers (`x` and `y`), usually represents a 2D position.
+- `UPoint` - Comprises 2 32 bit unsigned integers (`x` and `y`), usually represents a size.
+- `Cell` - Represents a terminal cell, comprising a foreground `RGB`, background `RGB` and a `char`.
+- `CellA` - Represents a terminal cell with alpha channels, comprising a foreground `RGBA`, background `RGBA` and a `char`.
 
-## World Hierarchy
+## World Structures
 
-The library contains more complex structures that build up a world. These structures are `Map`, `Layer`, `Camera`, `Object`, `Texture` and `Collider`, which are available via the `KTech` namespace.
+The library contains more complex classes that end up building a game world. These structures are `Map`, `Layer`, `Camera`, `Object`, `Texture`, `Collider`, `UI` and `Widget`:
+
+Hierarchy:
 
 ```
-          Map
-         /   \
-      Layer  Camera
-       /      
-    Object  
-     /   \
+Map
+|_____
+|     \
+Layer  Camera      UI
+|                  |
+Object             Widgets
+|_______
+|       \
 Texture  Collider
 ```
 
+In general:
+
 ### `Map`
 
-Maps are completely disconnected from each other. They are a good way to divide your game to levels, for example. Maps contain a list of their layers.
+Isolated collection of `Layer`s and `Camera`s (`Map`s do not interact with each other). They are a good way to divide your game to levels or dimensions, for instance.
 
 ### `Layer`
 
-Layers are designed to be loaded together. Layers contain a list of their objects.
-
-When you render a map, it will render all of the layers in it, in the order they where added to the map. Meaning, textures in the first layer will be rendered first, and textures in the second layer will be rendered on top.
-
-Physics-wise, objects interact only with other objects in the same layer.
+Collection of `Object`s. Rendering multiple `Layer`s means that the `Texture`s from the first `Layer` will be shown below `Texture`s from the second or following `Layer`s. Collision-wise, `Object`s interact with other `Object`s from the same `Layer`.  Contains `Object`s.
 
 ### `Object`
 
-Objects comprise textures and collider that behave relative to their parent object's position. Textures represent the object's appearance, and colliders represent the object's physical space.
+Comprise a collection of `Texture`s and `Collider`s that behave relative to the position of their parent `Object`.
 
 ### `Texture`
 
-There are simple and complex textures, that both comprise of `CellA` values, because textures are meant to be rendered for the terminal. Complex colliders are 2D arrays. Simple textures are instead rectangles, and thus are faster to render and have smaller memory usage, but they are of course less capable than complex colliders.
+Represents the 2D appearance of `Object`s. There are simple and complex `Texture`s. Complex `Texture`s store an array of different `CellA` values, while simple `Texture`s store a singular `CellA` which makes them a plain rectangle. `Complex` textures are more visually capable, but `Simple` textures are significantly faster to render and need less memory.
 
-### `Colliders`
+### `Collider`
 
-There are simple and complex colliders, in a similar manner to textures. Complex colliders are made of 2D array of `bool`s to represent where there is collider and where there isn't. Both complex and simple colliders have a `type` value, which is used to determine their collision result with other colliders.
-
-Collision between objects can result in a push, a block, or an overlap event.
+Represents the 2D physical space of `Object`s. In a similar fashion to `Textures`, there are simple and complex `Collider`s. Both simple and complex `Collider`s are based on `bool` values, and have a singular "type", which is used to determine their collision result with other colliders (block, push, or overlap).
 
 ### `Camera`
 
-Cameras are able to render a `Cell` based image that can be printed to the terminal, given layers that contain objects with textures.
+Able to render `Layer`s containing `Object`s with `Texture`s into a `Cell`-based image that can be given to the engine in order to be printed to the terminal.
+
+### `UI`
+
+Behaves both as a `Layer` and a `Camera`, for `Widget`s.
+
+### `Widget`
+
+A user interface element. Similar to `Object` but doesn't have `Colliders`. Provides basic state-machine features (selecting, deselecting, showing, hiding and nesting).
 
 ## `Engine`
 
-The `Engine` class comprises components that make the game run. These components manage different aspects, and are:
-- `Collision` - Manages movement of objects and calculates collision events.
-- `Audio` - Manages audio sources and playing audio
-- `Time` - Manages invocations and provides game loop utilities
-- `IO` - Manages user input and printing graphics
-- `Memory` - Manages linking the world structure together
+The `Engine` class is built of engine components that work together in order to make your game run: `Collision`, `Input`, `Memory`, `Output` and `Time`.
+
+In general:
 
 ### `Collision`
 
-Gets requests to move a certain object, calculates how its movement would look like, and based on that updates positions of objects and calls the relevant collision events on the relevant objects. Object movement and `Collision` work on demand and immediately return results and update the positions of objects after being called.
+Moves `Object`s on demand. It does that by processing how given `Object` movement would look like, updates positions of affected `Object`s and calls the relevant function callbacks.
 
-If you would look inside `ktech.hpp` at `Object` you would see a lot of virtual functions. These are the callback functions that `Collision` could call when it determines collision events.
+**Editor note: the following `Collision` explanation should be moved to a section that is intentionally thorough.**
 
-You can create a class derived of `Object` and define new functionalities for these virtual functions to make them do things.
+These said callbacks are virtual `Object` functions (such as `Object::OnBlocked()` and `Object::OnOverlap()`) that you may override by making a derived class of `Object`.
 
-`Collision` also stores `colliderTypes` which represents the types of colliders that is global for the `Engine` instance. You can look at `colliderTypes` this way:
+`Collision` also stores `colliderTypes`, which is a 2D vector that determines collision results between `Object`s. You can look at `colliderTypes` this way:
 
-| What if (column) collides with (row) | Collider type 1 | Collider type 2 | Collider type 3 |
-|--------------------------------------|-----------------|-----------------|-----------------|
-| Collider type 1                      | Block           | Push            | Overlap         |
-| Collider type 2                      | Block           | Push            | Overlap         |
-| Collider type 3                      | Overlap         | Overlap         | Overlap         |
+| What if (row) collides with (column) | Type 1  | Type 2  | Type 3  |
+|--------------------------------------|---------|---------|---------|
+| Type 1                               | Block   | Push    | Overlap |
+| Type 2                               | Block   | Push    | Overlap |
+| Type 3                               | Overlap | Overlap | Overlap |
 
 Meaning, type 1 is a collider that can't be pushed, type 2 can be pushed, and type 3 overlaps with everything.
 
-### `Audio`
+### `Input`
 
-Currently `Audio` has no connections to the other components of the engine, and pretty much works as a wrapper to the "PortAudio" library.
-
-`Audio` can load .wav files and play, pause, resume and stop single-dimension audio sources. It's quite primitive at the moment.
-
-### `Time`
-
-`Time` provides utilities used to create a game loop (which will be discussed soon).
-
-It can also create invocations that call given callback functions.
-
-### `IO`
-
-`IO` manages both input and output, although they are quite separate.
-
-As for input, `IO` can be asked to attach a callback function when a certain key is pressed. It can also make groups of these attached callback functions, which make input handling easier, especially when it comes to UI.
-
-As for output, `IO` can receive images rendered by `Camera`s to draw a "final image" that can later be actually printed to the terminal. The reason there is an extra step of drawing between rendering and printing is to allow multiple cameras at the same time to be displayed which can be useful for whatever reason.
+Calls registered callback functions when a given key is pressed. Also offers a way to group callback functions to ease distributing key presses in a UI.
 
 ### `Memory`
 
-`Memory` is the serialization solution for the world hierarchy. It contains a `Container` for each of the structures the can be stored - `Map`, `Layer`, `Camera` and `Object`.
+Holds pointers to all created world structures, and makes accessing them serializable with `ID`s.
 
-The containers receive pointers to structures and return an `ID` that can be used to reach the structure again.
+### `Output`
+
+Draws a "final image" using images rendered by `Camera` and `UI`. The final image can then be printed to the terminal. This extra drawing step allows for multiple rendered images to be shown at the same time.
+
+### `Time`
+
+Provides game loop utilities. It can also create future invocations given specified time.
 
 ## Game Loop
 
-The game loop in this context is a loop that attempts to run at a consistent speed. Iterations are called game ticks. Each tick usually does the same tasks, such as processing user input (which causes other events such as object movements), rendering, drawing and printing.
+The game loop is what coordinates the timing of game ticks, and with KTech, the use needs to create their own.
 
-The `Engine` class nor any other part of the library provides a prepared game loop function. Instead, the user constructs one with the functions provided in the `Time` component of `Engine`.
+A tick is a singular game iteration, which usually does the following tasks in the following order:
 
-## `Widget`s
+- Call callback functions:
+	- Distribute input (`Input::CallHandlers()`)
+	- Due invocations (`Time::CallInvocations()`)
+	- On-tick functions (`Memory::CallOnTicks()`)
+- Output the current state of the game:
+	- Render (`Camera::Render()`, `UI::Render()`)
+	- Draw (`Output::Draw()`)
+	- Print (`Output::Print()`)
+- Continue to the next tick:
+	- Enter the thread to sleep for a duration of how long should a tick be, subtracted by how long the current tick elapsed (`Time::WaitUntilNextTick()`)
 
-Widgets are UI elements derived from the `Widget` class which is derived from the `Object` class.
+The simplest form of a game loop follows these tasks each iteration, and exists when `Engine::running` turns false.
 
-In the KTech ecosystem they are optional additions, and you can include them in your game as you wish.
+By letting the user create their own game loop, they can add and remove tasks, and arrange them however they want.
 
-They collect user input automatically and can be enabled and disabled with their universal `Select()` and `Deselect()` functions.
-
-The currently available widgets are:
-- Button
-- Integer input field
-- String input field
-- Switch
+It is recommended to also implement a "render-on-demand" mechanism using `Output::ShouldRenderThisTick()` and `Output::ShouldPrintThisTick()`, to significantly improve resource usage.
 
 # Creating a Game
 
-## Setting Up a Project
+## Project Setup
 
-- Create a source file for your game (such as `game.cpp`).
-- Create a copy of the KTech library, that is, [the `ktech` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech), in a place accessible to your game source file (e.g. in the same directory).
-- Include the `ktech.hpp` header file from the library in your game source file.
+- Create a source file for your game (for example, `"game.cpp"`).
+- Create a copy of the KTech library ([the `"ktech/"` directory in this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech)), in a place accessible from you game source file (for example, in the same directory).
+- `#include` the `"ktech.hpp"` header file from the library in your game source file.
+
+You should end up with a game root directory that looks like this:
+
+- `"game.cpp"`: `#include "ktech/ktech.hpp"`
+- `"ktech/"`
+  - `ktech.hpp`
+  - the rest of the library...
+
+Create an additional file named `premake5.lua` in your root directory, and follow the [Building](#building) section to script it.
 
 ## Game Example
 
-### Engine
+[`"examples/quickstart/game.cpp"`](https://github.com/TheRealKaup/KTech/tree/master/examples/quickstart/game.cpp) contains a very simple and well-commented KTech game example. It shows how to create a moving character, initialize a game, and construct a game loop.
 
-To start creating world structures you must first create an `Engine` instance:
+## Building (Premake)
 
-```c++
-#include "ktech/ktech.hpp"
+KTech uses **Premake** to configure and generate build files. CMake is not used because of the counterintuitive documentation and odd scripting language. Premake is used instead because of the [truly nice documentation](https://premake.github.io/docs/) and usage of the proper scripting language Lua, which is not even required learning directly to start writing Premake scripts. If you aren't familiar with Premake I recommend having a look at the "Getting Started" and "Writing Premake Scripts" sections of its documentation, which are short and well written. The following text assumes you've read those sections.
 
-static KTech::Engine engine(KTech::UPoint(40, 20), 24);
-```
+The `"ktech/"` directory contains a [`"premake5.lua"`](/ktech/premake5.lua) script, which creates a Premake project named "KTechLibrary" for the KTech static library.
 
-Here we are creating a file `Engine` instance.
-
-The first `UPoint` argument is the size of the viewport, which is set manually rather than automatically with the size of the terminal itself.
-
-The integer argument is the ticks per second (TPS) limit, that is, the speed of the game loop. Normally this will also be the graphical frames per second (FPS) limit. That can change at any point while the game is running.
-
-### Creating a World
-
-To create world structures and connect them together, you can create them on the stack or on the heap, but you have to pass a reference to an `Engine` so the structures could communicate with each other in a memory safe and serializable way.
-
-For example, here we are creating a `Map` with a `Camera` and a `Layer` that has an `Object`:
-
-```c++
-int main()
-{
-	KTech::Map map(engine);
-
-	KTech::Camera camera(engine, KTech::Point(0, 0), KTech::UPoint(40, 20));
-	map.AddCamera(camera.id);
-
-	KTech::Layer layer(engine, map.id);
-
-	KTech::Object object(engine, KTech::Point(17, 7));
-	object.EnterLayer(layer.id);
-}
-```
-
-### Adding `Texture`s and `Collider`s to an `Object`
-
-The `Object` from the previous code is empty, that is, it has no textures and no colliders.
-
-`Object`s have 2 `std::vector`s, one with `Texture`s (`Object::textures`) and one with `Collider`s (`Object:colliders`). Normally, to add textures and colliders to an object you would resize those vectors to fit the amount of textures and colliders you want, and then use the functions within `Texture`s and `Collider`s to make something out of them.
-
-For example, here we are adding to the object from before some textures and colliders:
-
-```c++
-	object.textures.resize(2); // Add textures to the object
-	object.textures[0].Write(
-		{
-			" @@@ ",
-			"@@@@@",
-			"@@@@@",
-		}, KTech::RGBA(0, 100, 0), KTech::RGBAColors::transparent, KTech::Point(0, -1)
-	);
-	object.textures[1].Simple(KTech::UPoint(1, 2), KTech::CellA('|', KTech::RGBA(80, 40, 15)), KTech::Point(2, 2));
-	object.colliders.resize(2); // Add colliders to textures
-	object.colliders[0].ByTextureCharacter(object.textures[0], 1, 0);
-	object.colliders[1].Simple(KTech::UPoint(1, 2), 0, KTech::Point(2, 3));
-```
-
-And also add a background color to the layer so there's a sky:
-
-```c++
-	layer.brgba = KTech::RGBA(100, 200, 255, 255);
-```
-
-By the way, we are using the default `colliderTypes` of the `Collision` engine component.
-
-### Game Loop
-
-So far we have an engine and a world but nothing to run it. The solution is a game loop started after initializing the game:
-
-```c++
-	// Game loop
-	while (engine.running)
-	{
-		// Start
-		engine.time.StartThisTick();
-
-		// Calls
-		engine.io.Call();
-		engine.time.CallInvocations();
-		engine.memory.CallOnTicks();
-
-		// Render, draw and print
-		camera.Render(map.layers);
-		engine.io.Draw(camera.image);
-		engine.io.Print();
-
-		// End
-		engine.time.WaitUntilNextTick();
-	}
-```
-
-This is the recommended general form of a KTech game loop, but you can of course change the order of the operations however you would like, as this the entire point of having to construct the game loop yourself. This is what each operation does:
-- `engine.time.StartThisTick()` updates the engine component `Time`'s information about the time of which the tick started.
-- `engine.io.Call()` calls callback functions that are registered to input keys that were pressed since the last call of this function.
-- `engine.memory.CallOnTicks()` calls the `OnTick()` function present in the world structures contained in the memory containers.
-- `camera.Render(map.layers)` makes the camera render the given layers, which in this case is the single layer added to the map earlier.
-- `engine.io.Draw(camera.image)` takes the camera's rendered image and draws it to the engine's final image.
-- `engine.io.Print()` finally prints the image to the terminal.
-- `engine.time.WaitUntilNextTick()` will block the thread until the next tick should start.
-
-### Player Character
-
-You can inherit a class from `Object` and add functionality to it. This way you can create a user-controlled character.
-
-For example:
-
-```c++
-struct Character : KTech::Object
-{
-	void Down()
-	{
-		Move(KTech::Point(0, 1));
-	}
-	void Up()
-	{
-		Move(KTech::Point(0, -1));
-	}
-	void Right()
-	{
-		Move(KTech::Point(1, 0));
-	}
-	void Left()
-	{
-		Move(KTech::Point(-1, 0));
-	}
-
-	Character(KTech::Engine& engine, KTech::ID<KTech::Layer>& layer, KTech::Point pos)
-		: Object(engine, layer, pos, "character")
-	{
-		textures.resize(1);
-		textures[0].Write(
-			{
-				" O ",
-				"/|\\",
-				"/ \\"
-			}, { 200, 0, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
-		);
-		colliders.resize(2);
-		colliders[0].ByTextureCharacter(textures[0], 100, 1);
-
-		engine.io.RegisterCallback(KTech::Keys::down, std::bind(&Character::Down, this), true);
-		engine.io.RegisterCallback(KTech::Keys::up, std::bind(&Character::Up, this), true);
-		engine.io.RegisterCallback(KTech::Keys::right, std::bind(&Character::Right, this), true);
-		engine.io.RegisterCallback(KTech::Keys::left, std::bind(&Character::Left, this), true);
-
-		EnterLayer(layer);
-	}
-};
-```
-
-This `Object`-inherited class initializes by inheriting `Object`'s constructor and then adding textures and colliders.
-
-I encourage you to see what `Object`'s constructor does for youself by reading its definition in `ktech/object.cpp`, but in summary, it memorizes the engine reference, sets a position and enters a layer. Normally you would use this constructor (or the other one which doesn't enter a layer) when inheriting from `Object` as shown in the example above.
-
-After passing the given arguments to `Object`'s constructor, the `Character` constructor adds to itself a texture and a collider, and then it registered input callbacks.
-
-`IO::RegisterCallback()` requires 3 arguments:
-- `const std::string& stringKey` - The trigger key, which should be the string that `IO` receives from the terminal when the key is pressed. Simple character keys like letters and numbers are recived as `"a"` or `"2"`, and other keys are received as escape codes which are listed in the `KTech::Keys` namespace. Note that capitalization matters, and `IO` does not automatically translate, for example, `a` to `A`, and vice versa. You would need to register a callback for each capitalization if you want to get calls for both.
-- `const std::function<void()>& callback` - Your callback function. To make it call a member function, `std::bind` is used to attach this character's pointer to it.
-- `bool onTick` - If true, will memorize key presses until `IO::Call()` is called, which will finally call the callback function. If false, will immediately call your callback function when the key is received. Using the method of calling `IO::Call()` in your game loop each iteration, as done in the game loop example from earlier, is much more preferable when it comes to moving things, and could prevent physics glitches. On the other hand, not having you callback functions get called on tick is preferable when it comes to UI, as in, using widgets.
-
-The input callbacks registered are for moving down, up, right and left. They do so by using the `Object::Move()` function which receives a `Point()` representing the relative targeted position that `Collision` will attempt to move the object to.
-
-As you might have noticed, the down direction is positive Y, up is negative Y, left is negative X, and right is positive X. This is because the axis origin is at the top left corner of the terminal, since this is the point printing is started at.
-
-To create a `Character` instance, you can, for example, add in your `main()` function before the game loop at the game initialization stage the following instantiation:
-```C++
-Character character(engine, layer.id, KTech::Point(2, 2));
-```
-
-# Building
-
-KTech uses **Premake** to generate build files. CMake is not used because of the counterintuitive documentation and odd scripting language. Premake is used instead because of the [truly nice documentation](https://premake.github.io/docs/) and usage of the proper scripting language Lua, which is not even required to learn in a dedicated way to start writing Premake scripts. If you aren't familiar with Premake I recommend having a look at the "Getting Started" and "Writing Premake Scripts" sections of its documentation, they are short and well written. The following text assumes you've read those sections.
-
-The `ktech` directory contains a [`premake5.lua`](/ktech/premake5.lua) script. You should read the file, but in summary, it does 2 things:
-- Links PortAudio for the workspace scope, making the following created projects in the workspace inherit that value and link PortAudio. This is required.
-- Create a Premake project named "KTechLibrary" for the KTech static library.
-
-To include the library in your game source files you will need to create a `premake5.lua` script that should do the following things:
-- Create a Premake workspace (the library Premake project does not depend on any workspace settings, such as location or configurations).
-- `include` the library's `premake5.lua` script (i.e. `include "<ktech_library_path>"`, e.g. `include "ktech"` from the repository's root).
-- Create a project for your game:
-  - Its `kind` should be set to `ConsoleApp`.
-  - Its `language` should be set to `C++`.
-  - It should link `KTechLibrary`.
-  - It should add your game files, and probably a `targetdir`, `objdir` and `targetname`.
+To link the library will have to create a `"premake5.lua"` script for your game that should do the following things:
+- Create a Premake workspace.
+- `include` the library's `"premake5.lua"` script (i.e. `include "path/to/ktech/dir"`.
+- Create a `ConsoleApp` project, and link "`KTechLibrary`".
 
 To generate the build files, you will need to call `premake5` from the directory with the script, with the following platform argument. If you are on Gnu/Linux, you would call `premake5 gmake2`, and then to build the library and your game, you will use `make`.
 
-## Example
+```lua
+workspace "KTech" -- this name doesn't actually matter to the KTech library itself
+	configurations { "Debug", "Release" }
+	location "build" -- where building files will be generated
 
-The `ktech/` directory is placed in the root of your game development directory ("`game_root/`"). It includes its `premake5.lua` script as it should.
+include "ktech" -- this should lead to the KTech library directory
 
-`game_root/` also contains the game files - `ui.hpp`, `ui.cpp` and `main.cpp`.
-
-Your `premake5.lua` script is located in `game_root/` and contains:
-
-```Lua
--- Create a workspace that its projects will be built in `build/`
-workspace "KTech"
-	configurations { "Release" }
-	location "build"
-
--- Include the KTech library
-include "ktech"
-
--- Create a project/target for your game
-project "MyKTechGame"
+project "ktechgame" -- the name of your game
 	kind "ConsoleApp"
 	language "C++"
-	targetdir "%{wks.location}/bin" -- The final executable binary file will be located in `game_root/build/bin/`.
-	objdir "%{wks.location}/obj/%{prj.name}" -- The object files will be located in `game_root/build/obj/MyKTechGame/`.
-	targetname "%{prj.name}" -- The final executable binary file will be named "MyKTechProject".
+	targetdir "%{wks.location}/bin" -- where binary files will be generated
+	objdir "%{wks.location}/obj/%{prj.name}" -- where object files will be generated
+	targetname "%{prj.name}" -- the name of the binary file
 
-	links { "KTechLibrary" }
-	
-	files { "*.cpp", "*.hpp"  } -- Include all the files in this diretory that include these patterns, which will include "ui.hpp", "ui.cpp" and "main.cpp". 
+	links { "KTechLibrary" } -- include the KTech static library
+
+	files { "*.cpp", "*.hpp" } -- include your game source files
+
+	filter "configurations:Debug"
+		symbols "On" -- turn on symbols if you want to debug
 ```
 
-On Gnu/Linux you will run from `game_root/` the command `premake5 gmake2`, which will generate build files in `game_root/build/`, and you will run `make -C build/` to build the `MyKTechGame` project.
+On Gnu/Linux you will run `$ premake5 gmake2` from where your `"premake5.lua"` is located, which will generate the build configuration files. With `make` you will then run `$ make -C workspace_build_dir`, where "workspace_build_dir" is the `location` you specified in the `workspace` settings.
 
-The binary file will be outputted as `game_root/build/bin/MyKTechGame`, and can be run by calling `./build/bin/MyKTechGame` from `game_root/`.
+The binary file will be generated `workspace:location/project:targetdir`, as you have specified in your `"premake5.lua"` file.

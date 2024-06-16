@@ -43,7 +43,7 @@ public:
 	{
 		m_textures.resize(9);
 		// text
-		m_textures[0].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1)).ReplaceCharacter(' ', '\0');
+		m_textures[0].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1)).ReplaceCharacter(' ', '\0').SetBackground(m_backgroundRGBA);
 		// up-left corner
 		m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0));
 		// up-right corner

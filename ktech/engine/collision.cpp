@@ -89,7 +89,7 @@ KTech::CR KTech::Collision::GetPotentialCollisionResult(uint8_t p_t1, uint8_t p_
 {
 	CR result = CR::O;
 	if (p_t1 < colliderTypes.size())
-		if (p_t2 >= 0 && p_t2 < colliderTypes[p_t1].size())
+		if (p_t2 < colliderTypes[p_t1].size())
 			result = colliderTypes[p_t1][p_t2];
 	return result;
 }
@@ -113,7 +113,7 @@ bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point
 			{
 				// `p_c1` is simple, `p_c2` is complex
 				for (size_t y = (p_p2.y < p_p1.y ? p_p1.y - p_p2.y : 0); y < p_c2.m_size.x && p_p2.y + y < p_p1.y + p_c1.m_size.y; y++)
-					for (size_t x = (p_p2.x < p_p1.x ? p_p1.x - p_p2.x : 0); x < p_c2.m_size.y && p_p2.x + x < p_p1.x + p_c1.m_size.x; x++)
+					for (size_t x = (p_p2.x < p_p1.x ? p_p1.x - p_p2.x : 0); x < p_c2.m_size.x && p_p2.x + x < p_p1.x + p_c1.m_size.x; x++)
 						if (p_c2(x, y))
 							return true;
 				return false;
@@ -125,7 +125,7 @@ bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point
 			{
 				// `p_c1` is compelx, `p_c2` is simple
 				for (size_t y = (p_p1.y < p_p2.y ? p_p2.y - p_p1.y : 0); y < p_c1.m_size.x && p_p1.y + y < p_p2.y + p_c2.m_size.y; y++)
-					for (size_t x = (p_p1.x < p_p2.x ? p_p2.x - p_p1.x : 0); x < p_c1.m_size.y && p_p1.x + x < p_p2.x + p_c2.m_size.x; x++)
+					for (size_t x = (p_p1.x < p_p2.x ? p_p2.x - p_p1.x : 0); x < p_c1.m_size.x && p_p1.x + x < p_p2.x + p_c2.m_size.x; x++)
 						if (p_c1(x, y))
 							return true;
 				return false;

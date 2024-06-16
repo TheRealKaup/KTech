@@ -54,15 +54,15 @@ struct KTech::Texture
 	const CellA& operator()(size_t x, size_t y) const;
 
 	// `newValue` - only fills the new cells.
-	void Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
-	void SetCell(CellA value);
-	void SetForeground(RGBA value);
-	void SetBackground(RGBA value);
-	void SetCharacter(char value);
-	void SetForegroundAlpha(uint8_t value);
-	void SetBackgroundAlpha(uint8_t value);
-	void SetAlpha(uint8_t value);
-	void ReplaceCharacter(char oldValue, char newValue);
+	Texture& Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
+	Texture& SetCell(CellA value);
+	Texture& SetForeground(RGBA value);
+	Texture& SetBackground(RGBA value);
+	Texture& SetCharacter(char value);
+	Texture& SetForegroundAlpha(uint8_t value);
+	Texture& SetBackgroundAlpha(uint8_t value);
+	Texture& SetAlpha(uint8_t value);
+	Texture& ReplaceCharacter(char oldValue, char newValue);
 	
 	void ExportToFile(const std::string& fileName) const;
 	// For debugging

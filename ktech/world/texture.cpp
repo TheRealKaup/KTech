@@ -101,7 +101,7 @@ KTech::Texture& KTech::Texture::Write(const std::vector<std::string>& p_stringVe
 	// Read from strings
 	for (size_t y = 0; y < m_size.y; y++)
 		for (size_t x = 0; x < m_size.x; x++)
-			operator()(x, y) = CellA((x < p_stringVector[y].size() ? p_stringVector[y][x] : ' '), p_frgba, p_brgba);
+			operator()(x, y) = (x < p_stringVector[y].size()) ? CellA(p_stringVector[y][x], p_stringVector[y][x] != ' ' ? p_frgba : RGBA(0, 0, 0, 0), p_stringVector[y][x] != ' ' ? p_brgba : RGBA(0, 0, 0, 0)) : CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0));
 	return *this;
 }
 
@@ -121,7 +121,7 @@ const KTech::CellA& KTech::Texture::operator()(size_t x, size_t y) const
 	return m_t[m_size.x * y + x];
 }
 
-void KTech::Texture::Resize(UPoint p_newSize, CellA p_value)
+KTech::Texture& KTech::Texture::Resize(UPoint p_newSize, CellA p_value)
 {
 	if (m_simple)
 	{
@@ -141,63 +141,70 @@ void KTech::Texture::Resize(UPoint p_newSize, CellA p_value)
 		// Set to new vector
 		m_t = newT;
 	}
+	return *this;
 }
 
-void KTech::Texture::SetCell(CellA p_value)
+KTech::Texture& KTech::Texture::SetCell(CellA p_value)
 {
 	if (m_simple)
 		m_value = p_value;
 	else
 		for (size_t i = 0; i < m_t.size(); i++)
 			m_t[i] = p_value;
+	return *this;
 }
 
-void KTech::Texture::SetForeground(RGBA p_value)
+KTech::Texture& KTech::Texture::SetForeground(RGBA p_value)
 {
 	if (m_simple)
 		m_value.f = p_value;
 	else
 		for (size_t i = 0; i < m_t.size(); i++)
 			m_t[i].f = p_value;
+	return *this;
 }
 
-void KTech::Texture::SetBackground(RGBA p_value)
+KTech::Texture& KTech::Texture::SetBackground(RGBA p_value)
 {
 	if (m_simple)
 		m_value.b = p_value;
 	else
 		for (size_t i = 0; i < m_t.size(); i++)
 			m_t[i].b = p_value;
+	return *this;
 }
 
-void KTech::Texture::SetCharacter(char p_value)
+KTech::Texture& KTech::Texture::SetCharacter(char p_value)
 {
 	if (m_simple)
 		m_value.c = p_value;
 	else
 		for (size_t i = 0; i < m_t.size(); i++)
 			m_t[i].c = p_value;
+	return *this;
 }
 
-void KTech::Texture::SetForegroundAlpha(uint8_t p_value)
+KTech::Texture& KTech::Texture::SetForegroundAlpha(uint8_t p_value)
 {
 	if (m_simple)
 		m_value.f.a = p_value;
 	else
 		for (size_t i = 0; i < m_t.size(); i++)
 			m_t[i].f.a = p_value;
+	return *this;
 }
 
-void KTech::Texture::SetBackgroundAlpha(uint8_t p_value)
+KTech::Texture& KTech::Texture::SetBackgroundAlpha(uint8_t p_value)
 {
 	if (m_simple)
 		m_value.b.a = p_value;
 	else
 		for (size_t i = 0; i < m_t.size(); i++)
 			m_t[i].b.a = p_value;
+	return *this;
 }
 
-void KTech::Texture::SetAlpha(uint8_t p_value)
+KTech::Texture& KTech::Texture::SetAlpha(uint8_t p_value)
 {
 	if (m_simple)
 	{
@@ -212,9 +219,10 @@ void KTech::Texture::SetAlpha(uint8_t p_value)
 			m_t[i].b.a = p_value;
 		}
 	}
+	return *this;
 }
 
-void KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
+KTech::Texture& KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
 {
 	if (m_simple)
 	{
@@ -227,6 +235,7 @@ void KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
 			if (m_t[i].c == oldValue)
 				m_t[i].c = newValue;
 	}
+	return *this;
 }
 
 void KTech::Texture::ExportToFile(const std::string& p_fileName) const

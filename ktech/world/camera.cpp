@@ -35,10 +35,10 @@ KTech::Camera::Camera(Engine& p_engine, Point p_pos, UPoint p_res, const std::st
 	m_image.resize(m_res.y * m_res.x);
 }
 
-KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_map, Point p_pos, UPoint p_res, const std::string& p_name)
+KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_map, bool p_active, Point p_pos, UPoint p_res, const std::string& p_name)
 	: Camera(p_engine, p_pos, p_res)
 {
-	EnterMap(p_map);
+	EnterMap(p_map, p_active);
 }
 
 KTech::Camera::~Camera()
@@ -49,11 +49,11 @@ KTech::Camera::~Camera()
 	engine.memory.cameras.Remove(m_id);
 }
 
-bool KTech::Camera::EnterMap(ID<Map>& p_map)
+bool KTech::Camera::EnterMap(ID<Map>& p_map, bool p_active)
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
 		return false;
-	return engine.memory.maps[p_map]->AddCamera(m_id);
+	return engine.memory.maps[p_map]->AddCamera(m_id, p_active);
 }
 
 bool KTech::Camera::LeaveMap()

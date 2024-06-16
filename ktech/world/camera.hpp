@@ -45,10 +45,10 @@ public:
 	std::vector<Cell> m_image = {};
 
 	Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
-	Camera(Engine& engine, ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	Camera(Engine& engine, ID<Map>& parentMap, bool asActiveCamera, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~Camera();
 
-	bool EnterMap(ID<Map>& map);
+	bool EnterMap(ID<Map>& map, bool asActiveCamera);
 	bool LeaveMap();
 
 	void Resize(UPoint resolution); // Will also update `m_image`.
