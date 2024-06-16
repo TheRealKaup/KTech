@@ -16,7 +16,7 @@
 
 KTech is a C++ terminal 2D game engine library, currently available for GNU/Linux.
 
-As a game engine, KTech is capable of rendering graphics, playing audio, processing movement of objects, handling player input, and more.
+As a game engine, KTech is capable of rendering graphics, processing movement of objects, handling player input, and more.
 
 As a library, KTech offers an ecosystem of types, functions and variables that work together and are managed by the user.
 
@@ -45,7 +45,6 @@ Here's how a very simple KTech game can look like:
 
 - **Graphics** - Rendering terminal graphics with 24-bit color depth, opacity and layers.
 - **Physics** - Object movement with pushing, blocking and overlapping events, based on different collider types.
-- **Audio** - Loading, mixing and playing.
 - **UI** - Comprises an expanding collection of widgets.
 - **Time** - Game loop and invocations management.
 - **Input** - Terminal-optimized user input processing.
@@ -56,10 +55,10 @@ Here's how a very simple KTech game can look like:
 
 ## Interesting Details
 
-- KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal-based textures. TextureCreator covers and improves one aspect of KTech game development, and in the future will be part of a full software development kit.
-- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between game and engine different from popular game engines, this is the design I intentionally chose, because it gives the KTech user stronger control and understanding of what's happening.
-- The engine relies only on the CPU for its processing (audio, graphics, collision...) and achieves more than playable performance.
-- Making a game with KTech can be entirely done from a terminal by using a terminal text editor (like Vim) for writing code, the TextureCreator application for creating textures, a C++ compiler accessible from a terminal, and by simply running the game to play it in the terminal.
+- KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal-based textures. TextureCreator covers and improves one aspect of KTech game development, and in the future may be part of a full software development kit.
+- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between "game" and "engine" different from popular game engines, it give the user wider control and better understanding of what's happening.
+- KTech knows no more than the CPU, yet achieves more than playable performance.
+- Making a game with KTech can be entirely done from a terminal: use a terminal text editor (such as Vim) for writing code, the TextureCreator application for creating textures, Premake and Make for building. Then, simply run the game.
 - I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this is the biggest programming project I have ever worked on, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into it.
 
 ---
@@ -93,5 +92,7 @@ Here's a screenshot of the game, from 9.10.2023 (d/m/y):
 ### TextureCreator
 
 An application made with KTech for creating cell-based texture files for KTech games. This program is required because each terminal character cell has an RGB foreground color, an RGB background color and a character. This kind of texture can't be created by a normal pixel-based image creator.
+
+Git repository - https://github.com/TheRealKaup/TextureCreator.
 
 ![TextureCreator Screenshot](https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png)
