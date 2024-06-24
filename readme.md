@@ -20,7 +20,7 @@ As a game engine, KTech is capable of rendering graphics, processing movement of
 
 As a library, KTech offers an ecosystem of types, functions and variables that work together to form a game.
 
-Not to be confused, KTech is not a software development kit (SDK) like how one might imagine a "game engine". This means KTech is not an application that comes with a graphical user interface, and rather, it's a library; source files and header files you include in your game project.
+Not to be confused, KTech is not a software development kit (SDK) in the traditional sense of "game engine". KTech is a library; source and header files you include in your game project.
 
 As terminal software, the graphics are printed to the terminal, and user inputs are received as escape codes and come in a sequence as if typed. This makes KTech games unique graphics-wise and input-wise, as they lead to unconventional solutions.
 
