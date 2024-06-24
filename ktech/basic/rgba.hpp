@@ -25,9 +25,14 @@
 #undef KTECH_DEFINITION
 #include "rgb.hpp"
 
+//! \brief Color value with alpha channel
+//! \ingroup basic
 struct KTech::RGBA
 {
-	uint8_t r, g, b, a;
+	uint8_t r; //!< Red channel
+	uint8_t g; //!< Green channel
+	uint8_t b; //!< Blue channel
+	uint8_t a; //!< Alpha channel
 	
 	inline constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255)
 		: r(red), g(green), b(blue), a(alpha) {}

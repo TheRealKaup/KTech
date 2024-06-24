@@ -24,10 +24,12 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
-// Collision Result
+/*!
+	\brief Collision Result
+*/
 enum class KTech::CR : uint8_t
 {
-	B,	// Block
-	P,	// Push
-	O	// Overlap
+	B,	//!< Block
+	P,	//!< Push
+	O	//!< Overlap
 };

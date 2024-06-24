@@ -28,28 +28,35 @@
 #include <string>
 #include <vector>
 
+/*!
+	\brief Collection of `Layer`s and `Camera`s.
+	
+	`Map`s do not interact with each other, making them a good way to divide your game to levels or parallel dimensions, for instance.
+	\ingroup world
+*/
 class KTech::Map
 {
 public:
 	Engine& engine;
 	ID<Map> m_id;
 	std::string m_name;
-	std::vector<ID<Camera>> m_cameras = {};
-	std::vector<ID<Layer>> m_layers = {};
+	std::vector<ID<Camera>> m_cameras = {}; //!< `Camera`s, only 1 can be active
+	std::vector<ID<Layer>> m_layers = {}; //!< `Layer`s, normally all are active
 
-	size_t m_activeCameraI = -1;
+	size_t m_activeCameraI = -1; //!< Index of the `Camera` that should be active. If bigger than `m_cameras`, no `Camera` is deemed active
 
 	Map(Engine& engine, const std::string& name = "");
 	virtual ~Map();
 
 	bool AddLayer(ID<Layer>& layer);
-	bool AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
+	bool AddCamera(ID<Camera>& camera, bool asActiveCamera = false /*!< Set `m_activeCameraI` to point to this given `Camera``*/);
 
 	bool RemoveLayer(ID<Layer>& layer);
 	bool RemoveCamera(ID<Camera>& camera);
 	bool RemoveAllLayers();
 	bool RemoveAllCameras();
 
+	//! Render using `m_cameras[m_activeCameraI]`
 	bool Render();
 
 protected:

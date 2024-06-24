@@ -25,6 +25,8 @@
 #undef KTECH_DEFINITION
 #include "upoint.hpp"
 
+//! \brief Usually represents a position
+//! \ingroup basic
 struct KTech::Point
 {
 	int32_t x, y;

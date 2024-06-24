@@ -35,23 +35,6 @@ The non-core parts of the library are so far only the optional UI elements ("wid
 
 Notice that `"ktech.hpp"` includes all of the header files that have class definitions only if `KTECH_DEFINITION` hasn't been defined. This macro behaves as an include guard within KTech, and you should not have it defined in your game source files before including `"ktech.hpp"` yourself, so don't worry about it.
 
-The content of `"ktech/"` is split into directories:
-- `"basic/"` - basic classes.
-- `"engine/"` - `Engine` class and engine components.
-- `"utility/"` - utility classes.
-- `"widgets/"` - optional widgets that you may include from here.
-- `"world/"` - world classes.
-
-## Basic Structures
-
-KTech uses some simple structures:
-- `RGB` - Represents a single 24 bit depth color.
-- `RGBA` - Represents a single 24 bit depth color with an alpha channel.
-- `Point` - Comprises 2 32 bit signed integers (`x` and `y`), usually represents a 2D position.
-- `UPoint` - Comprises 2 32 bit unsigned integers (`x` and `y`), usually represents a size.
-- `Cell` - Represents a terminal cell, comprising a foreground `RGB`, background `RGB` and a `char`.
-- `CellA` - Represents a terminal cell with alpha channels, comprising a foreground `RGBA`, background `RGBA` and a `char`.
-
 ## World Structures
 
 The library contains more complex classes that end up building a game world. These structures are `Map`, `Layer`, `Camera`, `Object`, `Texture`, `Collider`, `UI` and `Widget`:
@@ -69,28 +52,6 @@ Object             Widgets
 |       \
 Texture  Collider
 ```
-
-In general:
-
-### `Map`
-
-Isolated collection of `Layer`s and `Camera`s (`Map`s do not interact with each other). They are a good way to divide your game to levels or dimensions, for instance.
-
-### `Layer`
-
-Collection of `Object`s. Rendering multiple `Layer`s means that the `Texture`s from the first `Layer` will be shown below `Texture`s from the second or following `Layer`s. Collision-wise, `Object`s interact with other `Object`s from the same `Layer`.  Contains `Object`s.
-
-### `Object`
-
-Comprise a collection of `Texture`s and `Collider`s that behave relative to the position of their parent `Object`.
-
-### `Texture`
-
-Represents the 2D appearance of `Object`s. There are simple and complex `Texture`s. Complex `Texture`s store an array of different `CellA` values, while simple `Texture`s store a singular `CellA` which makes them a plain rectangle. `Complex` textures are more visually capable, but `Simple` textures are significantly faster to render and need less memory.
-
-### `Collider`
-
-Represents the 2D physical space of `Object`s. In a similar fashion to `Textures`, there are simple and complex `Collider`s. Both simple and complex `Collider`s are based on `bool` values, and have a singular "type", which is used to determine their collision result with other colliders (block, push, or overlap).
 
 ### `Camera`
 

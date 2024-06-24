@@ -121,7 +121,7 @@ bool KTech::Map::RemoveAllCameras()
 
 bool KTech::Map::Render()
 {
-	if (m_activeCameraI >= 0 && m_activeCameraI < m_cameras.size())
+	if (m_activeCameraI < m_cameras.size())
 	{
 		engine.memory.cameras[m_cameras[m_activeCameraI]]->Render(m_layers);
 		return true;

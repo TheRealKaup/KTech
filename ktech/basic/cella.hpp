@@ -26,11 +26,13 @@
 #include "cell.hpp"
 #include "rgba.hpp"
 
+//! \brief Terminal cell value with alpha channels
+//! \ingroup basic
 struct KTech::CellA
 {
-	RGBA f;
-	RGBA b;
-	char c;
+	RGBA f; //!< Character
+	RGBA b; //!< Foreground (character's) color
+	char c; //!< Background color
 
 	inline constexpr CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0))
 		: c(character), f(foreground), b(background) {}

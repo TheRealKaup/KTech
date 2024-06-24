@@ -24,6 +24,8 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
+//! \brief Usually represents a size
+//! \ingroup basic
 struct KTech::UPoint
 {
 	uint32_t x, y;

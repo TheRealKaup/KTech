@@ -29,6 +29,11 @@
 #include <string>
 #include <vector>
 
+/*!
+	\brief Collection of `Object`s.
+
+	\ingroup world
+*/
 class KTech::Layer
 {
 public:
@@ -36,18 +41,17 @@ public:
 	ID<Layer> m_id;
 	std::string m_name;
 	ID<Map> m_parentMap;
-	std::vector<ID<Object>> m_objects;
-	bool m_visible = true;
+	std::vector<ID<Object>> m_objects; //!< `Object`s
+	bool m_visible = true; //!< Determines whether to render itself and its `Object`s
 
-	uint8_t m_alpha = 255;
-	RGBA m_frgba = RGBA(0, 0, 0, 0);
-	RGBA m_brgba = RGBA(0, 0, 0, 0);
+	uint8_t m_alpha = 255; //!< Additional alpha channel for its `Object`s
+	RGBA m_frgba = RGBA(0, 0, 0, 0); //!< Added foreground color (after its `Object`s are rendered)
+	RGBA m_brgba = RGBA(0, 0, 0, 0); //!< Added background color (after its `Object`s are rendered)
 
 	Layer(Engine& engine, const std::string& name = "");
 	Layer(Engine& engine, ID<Map>& parentMap, const std::string& name = "");
 	virtual ~Layer();
 
-	// Use this refereance temporarily - do not move this reference, it can become stale.
 	ID<Object>& operator[](size_t index);
 	
 	bool AddObject(ID<Object>& object);

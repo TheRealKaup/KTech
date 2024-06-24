@@ -42,6 +42,7 @@ public:
 	inline Collision(Engine* engine)
 		: engine(engine) {};
 
+	//! Test
 	bool MoveObject(ID<Object>& object, Point direction);
 
 private:

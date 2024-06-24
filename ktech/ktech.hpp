@@ -30,18 +30,21 @@
 
 #include <cstdint>
 
+/*!
+	\brief Contains the core KTech library.
+
+	Predefined `Widget`s in `ktech/widgets/` are optional and may be included separately.
+*/
 namespace KTech
 {
-	// Basic structures.
-	// Definitions in `basic_structs/`.
+	//! \defgroup basic Basic structures
 	struct RGB;
 	struct RGBA;
 	struct Point;
 	struct UPoint;
 	struct Cell;
 	struct CellA;
-	// World structures.
-	// Definitions in `world/`
+	//! \defgroup world World Structures
 	struct Texture;
 	struct Collider;
 	class Object;
@@ -50,15 +53,14 @@ namespace KTech
 	class Map;
 	class Widget;
 	class UI;
-	// Engine and its components.
-	// Definitions in `engine/`
+	//! \defgroup engine Engine and its components
 	class Collision;
 	class Input;
 	class Memory;
 	class Output;
 	class Time;
 	class Engine;
-	// Defined in `utility/`
+	//! \defgroup utility Miscellaneous utilities
 	enum class CR : uint8_t;	
 	template<class T>
 	struct ID;
@@ -70,6 +72,8 @@ namespace KTech
 	namespace RGBAColors {}
 	namespace Keys {}
 }
+
+//! \defgroup widgets Optional predefined widgets
 
 // Avoids errors caused by files building order by not including the following inclusions in the other header files.
 // For example `audio.hpp` might be processed first by the compiler, which will include `engine.hpp` via here, thus causing

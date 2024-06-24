@@ -25,11 +25,13 @@
 #undef KTECH_DEFINITION
 #include "rgb.hpp"
 
+//! \brief Terminal cell value
+//! \ingroup basic
 struct KTech::Cell
 {
-	char c;
-	RGB f;
-	RGB b;
+	char c; //!< Character
+	RGB f; //!< Foreground (character's) color
+	RGB b; //!< Background color
 
 	inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
 		: c(character), f{foreground}, b(background) {}

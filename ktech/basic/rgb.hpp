@@ -24,9 +24,13 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
+//! \brief Color value
+//! \ingroup basic
 struct KTech::RGB
 {
-	uint8_t r, g, b;
+	uint8_t r; //!< Red channel
+	uint8_t g; //!< Green channel
+	uint8_t b; //!< Blue channel
 	
 	inline constexpr RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0)
 		: r(red), g(green), b(blue) {}
