@@ -34,9 +34,9 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 ## Documentation
 
-- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away.
-- **[reference.md](documentation/reference.md)** - (will exist in the future) direct and concise information about each element of the library.
-- **[faq.md](documentation/faq.md)** - (will exist in the future) answers for frequently asked questions.
+- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away **(includes building)**.
+- **[faq.md](documentation/faq.md)** - answers for frequently asked questions.
+- **Doxygen** (work in progress) - library reference, comprising concise information about each element.
 - **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
 
 ---
