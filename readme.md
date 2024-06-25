@@ -26,7 +26,7 @@ As terminal software, the graphics are printed to the terminal, and user inputs 
 
 Here's how a very simple KTech game can look like:
 
-![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png)
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png" alt="KTech Simple Platform Game" width="400"/>
 
 The code for this one is in [examples/simpleplatform/game.cpp](examples/simpleplatform/game.cpp).
 
