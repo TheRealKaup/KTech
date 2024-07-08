@@ -57,10 +57,10 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 ## Interesting Details
 
 - KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal-based textures. TextureCreator covers and improves one aspect of KTech game development, and in the future may be part of a full software development kit.
-- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between "game" and "engine" different from popular game engines, it give the user wider control and better understanding of what's happening.
+- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between "game" and "engine" different from popular game engines, it gives the user wider control and better understanding of what's happening.
 - KTech knows no more than the CPU, yet achieves more than playable performance.
 - Making a game with KTech can be entirely done from a terminal: use a terminal text editor (such as Vim) for writing code, the TextureCreator application for creating textures, Premake and Make for building. Then, simply run the game.
-- I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this is the biggest programming project I have ever worked on, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into it.
+- I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this has been the biggest programming project I have ever worked on, and I wouldn't be surprised to know that so far I invested a 4 digit number of hours into it.
 
 ---
 
