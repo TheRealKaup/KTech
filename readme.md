@@ -26,7 +26,7 @@ As terminal software, the graphics are printed to the terminal, and user inputs 
 
 Here's how a very simple KTech game can look like:
 
-<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png" alt="KTech Simple Platform Game" height="500"/>
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png" alt="KTech Simple Platform Game" max-height="500"/>
 
 The code for this one is in [examples/simpleplatform/game.cpp](examples/simpleplatform/game.cpp).
 
@@ -88,7 +88,7 @@ A KTech game in active development. The player is a freelance hacker that gets j
 
 Here's a screenshot of the game, from 9.10.2023 (d/m/y):
 
-<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/netset-9.10.2023.png" alt="netset screenshot from 9.10.2023" height="500"/>
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/netset-9.10.2023.png" alt="netset screenshot from 9.10.2023" max-height="500"/>
 
 ### TextureCreator
 
@@ -96,4 +96,4 @@ An application made with KTech for creating cell-based texture files for KTech g
 
 Git repository - https://github.com/TheRealKaup/TextureCreator.
 
-<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png" alt="TextureCreator Screenshot" height="500"/>
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png" alt="TextureCreator Screenshot" max-height="500"/>
