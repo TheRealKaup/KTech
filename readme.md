@@ -18,23 +18,26 @@ KTech is a C++ terminal 2D game engine library, currently available for GNU/Linu
 
 As a game engine, KTech is capable of rendering graphics, processing movement of objects, handling player input, and more.
 
-As a library, KTech offers an ecosystem of types, functions and variables that work together and are managed by the user.
+As a library, KTech offers an ecosystem of types, functions and variables that work together to form a game.
 
-Not to be confused, KTech is not a software development kit (SDK) like most known game engines are. This means KTech is not an application that comes with a graphical user interface, and rather, it's a library; source files and header files you include in your game project.
+Not to be confused, KTech is not a software development kit (SDK), as goes the traditional sense of the term "game engine". KTech is a library; source and header files you include in your game project.
 
-As terminal software, the graphics are printed to the terminal, and user inputs are received as escape codes and come in a sequence as if typed. This makes KTech games unique graphics-wise and input-wise, as they lead to unconventional solutions.
+As terminal software, the graphics are printed to the terminal, and user inputs are received as escape codes in a sequence as if typed. This makes KTech games unique graphics-wise and input-wise, as they lead to unconventional solutions.
 
 Here's how a very simple KTech game can look like:
 
-![KTech Small Game](https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png)
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/simpleplatform1_10-12-23.png" alt="KTech Simple Platform Game" max-height="500"/>
+
+The code for this one is in [examples/simpleplatform/game.cpp](examples/simpleplatform/game.cpp).
 
 ---
 
 ## Documentation
 
-- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away.
-- **[reference.md](documentation/reference.md)** - (will exist in the future) direct and concise information about each element of the library.
-- **[faq.md](documentation/faq.md)** - (will exist in the future) answers for frequently asked questions.
+- **[quickstart.md](documentation/quickstart.md)** - quick start guide if you want to experiment with KTech right away **(includes building)**.
+- **[faq.md](documentation/faq.md)** - answers for frequently asked questions.
+- **[examples/](examples/)** (work in progress) - well-commented game examples.
+- **Doxygen** (work in progress) - library reference, comprising concise information about each element.
 - **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
 
 ---
@@ -54,10 +57,10 @@ Here's how a very simple KTech game can look like:
 ## Interesting Details
 
 - KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal-based textures. TextureCreator covers and improves one aspect of KTech game development, and in the future may be part of a full software development kit.
-- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between "game" and "engine" different from popular game engines, it give the user wider control and better understanding of what's happening.
+- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between "game" and "engine" different from popular game engines, it gives the user wider control and better understanding of what's happening.
 - KTech knows no more than the CPU, yet achieves more than playable performance.
 - Making a game with KTech can be entirely done from a terminal: use a terminal text editor (such as Vim) for writing code, the TextureCreator application for creating textures, Premake and Make for building. Then, simply run the game.
-- I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this is the biggest programming project I have ever worked on, and I wouldn't be surprised to know that until now I have invested a 4 digit number of hours into it.
+- I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this has been the biggest programming project I have ever worked on, and I wouldn't be surprised to know that so far I invested a 4 digit number of hours into it.
 
 ---
 
@@ -85,7 +88,7 @@ A KTech game in active development. The player is a freelance hacker that gets j
 
 Here's a screenshot of the game, from 9.10.2023 (d/m/y):
 
-![netset screenshot from 9.10.2023](https://github.com/TheRealKaup/TheRealKaup/blob/main/netset-9.10.2023.png)
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/netset-9.10.2023.png" alt="netset screenshot from 9.10.2023" max-height="500"/>
 
 ### TextureCreator
 
@@ -93,4 +96,4 @@ An application made with KTech for creating cell-based texture files for KTech g
 
 Git repository - https://github.com/TheRealKaup/TextureCreator.
 
-![TextureCreator Screenshot](https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png)
+<img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png" alt="TextureCreator Screenshot" max-height="500"/>
