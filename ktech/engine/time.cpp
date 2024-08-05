@@ -142,7 +142,7 @@ size_t KTech::Time::GetInt(const TimePoint& p_tp, Measurement p_measurement)
 
 void KTech::Time::WaitUntilNextTick()
 {
-	// Calcualte `tpsPotential`
+	// Calculate `tpsPotential`
 	deltaTime = GetDelta(m_thisTickStartTP, TimePoint() /*now*/, Measurement::microseconds);
 	tpsPotential = 1000000.0f / deltaTime;
 	// Sleep according to `tpsLimit`

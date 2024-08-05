@@ -91,6 +91,9 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 	for (size_t l = 0; l < p_layers.size(); l++)
 	{
 		KTech::Layer* layer = engine.memory.layers[p_layers[l]];
+		
+		if (!layer->m_visible)
+			continue;
 
 		for (size_t o = 0; o < layer->m_objects.size(); o++)
 		{

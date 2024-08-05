@@ -10,3 +10,5 @@ include "ktech"
 for i,dir in ipairs(os.matchfiles("examples/*/premake5.lua")) do
     include(dir)
 end
+
+include("documentation/tutorial")

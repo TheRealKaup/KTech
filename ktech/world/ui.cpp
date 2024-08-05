@@ -97,6 +97,7 @@ void KTech::UI::Render()
 	for (size_t w = 0; w < m_widgets.size(); w++)
 	{
 		KTech::Widget* widget = engine.memory.widgets[m_widgets[w]];
+		
 		if (!widget->m_shown)
 			continue;
 

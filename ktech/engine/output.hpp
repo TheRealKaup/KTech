@@ -32,6 +32,7 @@
 class KTech::Output
 {
 public:
+	const UPoint resolution;
 	std::vector<std::string> outputAfterQuit;
 
 	Output(Engine* const engine, KTech::UPoint imageResolution);
@@ -56,6 +57,5 @@ private:
 
 	winsize m_terminalSize;
 	std::vector<Cell> m_image;
-	const UPoint m_res;
 	std::string m_stringImage;
 };

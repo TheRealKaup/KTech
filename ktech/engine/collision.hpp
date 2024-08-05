@@ -31,8 +31,6 @@
 class KTech::Collision
 {
 public:
-	Engine* const engine;
-
 	std::vector<std::vector<CR>> colliderTypes = {
 		{ CR::B, CR::P, CR::O }, // Unpushable - 0
 		{ CR::B, CR::P, CR::O }, // Pushable - 1
@@ -45,6 +43,8 @@ public:
 	bool MoveObject(ID<Object>& object, Point direction);
 
 private:
+	Engine* const engine;
+	
 	struct CollisionData{
 		ID<Object> activeObject;
 		ID<Object> passiveObject;
