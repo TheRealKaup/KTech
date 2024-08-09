@@ -19,31 +19,31 @@
 /*
 	Welcome to the official KTech tutorial!
 
-	This is my attempt at teaching a subject while putting everything into practice in an interactive fashion. Hopefully, by the end of this tutorial you'll know every aspect of KTech, but also - have experience with every aspect of KTech. The latter can be as important as the former.
+	This is my attempt at teaching a subject while putting everything into practice in an interactive fashion. Hopefully, by the end of this tutorial you'll not only know every aspect of KTech, but also have experience with every aspect of KTech. The latter can be as important as the former.
 
-	When you come across something you don't know (that isn't about to be explained), pause, learn it, and only then come back; don't frustrate yourself and waste your time. I assume you know how to use the terminal, how to program and build C++ code, that you have cloned KTech's git repository, and of course know what KTech is (2D terminal game engine library). 
+	When you come across something you don't know (that isn't about to be explained), pause, learn it, and only then come back; don't frustrate yourself and waste your time. I assume you know how to use the terminal and program C++ code, and that you cloned KTech's git repository to work on.
 
-	The tutorial is separated into parts, each one is a C++ source file that usually contains a heavily-commented example of functional KTech code (this file, "1-introduction.cpp", is the very first part). You should read the tutorial linearly if you are new to KTech; literally read the individual files from top to bottom, and the parts in an ascending order. 
+	The tutorial is separated into chapters, each one is a C++ source file that usually contains a heavily-commented example of functional KTech code (this file, "1-introduction.cpp", is the very first chapter). You should read the tutorial linearly if you are new to KTech; literally read the individual files from top to bottom, and the chapters in an ascending order. 
 
 
 
 	Let's start by getting things up and running; building, and running.
 
-	Within this directory there's an additional file named "premake5.lua" - it is the configuration file for the command line tool Premake that KTech uses to generate build files. This particular configuration file will generate the build files for the entire tutorial and all its parts at once. I will not teach you how to use Premake as it already has a fine documentation at https://premake.github.io/docs/, though knowing how to script it is not needed right now; we just want to run the configuration file we already have.
+	Within this directory there's an additional file named "premake5.lua" - it is the configuration file for the command line tool Premake that KTech uses to generate build files. This particular configuration file will generate the build files for the entire tutorial and all its chapters at once. I will not teach you how to use Premake as it already has a fine documentation at https://premake.github.io/docs/, though knowing how to script it is not needed right now; we just want to run the configuration file we already have.
 
-	First, generate build files. Assure you have Premake installed on your system and run the following command from the root directory of KTech's repository ("gmake2" for GNU make files):
-		`premake5 gmake2`
-	This will run Premake on the "premake5.lua" configuration file in the root directory, which in turn runs the configuration files in this tutorial directory and the library directory ("ktech/"), since that's compiled separately. The result is a new directory in the root named "build/", which now contains the build files for everything.
+	First, generate build files. Ensure you have Premake installed on your system and run the following command from the root directory of your cloned repository ("gmake2" for GNU make files):
+		`$ premake5 gmake2`
+	Premake will read the "premake5.lua" configuration file present in the repository's root, which will in turn read the additional configuration files in KTech's and the tutorial's directories. The result is a directory named "build/" containing the build files for everything.
 	
-	Secondly, build. To generate binary files, run `make` on the GNU make files that were generated in the "build/" directory by Premake as so:
-		`make -C build/`
-	First `make` will build the KTech static library, then this file and the following files in the tutorial. The result should be executable binaries in "build/bin/".
+	Secondly, build. To generate binary files, run `make` on the GNU makefiles that were generated in the "build/" directory by Premake, as so:
+		`$ make -C build/`
+	`make` will build KTech as a static library, then this file and the following files in the tutorial as individual console applications. The result are executable binaries in "build/bin/".
 
-	Lastly, run the following command to run the binary built out of this source file:
-		`./build/bin/1-introduction`
-	And now you are running the game written in the end of this source file. Each part of the tutorial should have its own binary file.
+	Lastly, run the following command to run the binary that was built out of this source file:
+		`$ ./build/bin/1-introduction`
+	And now you are running the program written in the end of this source file. Each chapter of the tutorial should have its own binary file.
 
-	This has built the entire code of the tutorial now, but you may be asked to modify code later on. To update the binary files you should simply regenerate them as was done in the second command above.
+	This has built the entire code of the tutorial now, but you may modify code later on. To update the binary files you should simply rebuild like was done in the second command.
 
 
 
@@ -56,19 +56,19 @@
 // With KTech, you still define your game's entry function.
 int main()
 {
-	// Create an engine instance; we'll dive deeper into this in the next part.
+	// Create an engine instance; we'll dive deeper into this in the next chapter.
 	KTech::Engine engine(KTech::UPoint(9, 9), 24);
 	
-	// Everything in KTech is declared within the "KTech" namespace. You can declare a using-directive on it if you find it more convenient.
+	// Everything in KTech is declared within the `KTech` namespace. You can declare a using-directive on it if you find it more convenient.
 	using namespace KTech;
 
 	/*
-		You can proceed to the next part.
+		You can proceed to the next chapter.
 	*/	
 
-	// Do a couple of other things that will be explained later:
+	// Do a couple of other things that'll get explained later:
 	Map map(engine);
-	Camera camera(engine, map.m_id, true);
+	Camera camera(engine, map.m_id, true, Point(0, 0), engine.output.resolution);
 	Layer layer(engine, map.m_id);
 	Object object(engine, layer.m_id, Point(2, 2));
 

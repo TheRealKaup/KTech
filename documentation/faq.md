@@ -11,30 +11,38 @@ This document contains answers for potential questions.
 
 ## How to build KTech (with Premake)?
 
-KTech uses **Premake** to configure and generate build files. CMake is not used because of the counterintuitive documentation and odd scripting language. Premake is used instead because of the [truly nice documentation](https://premake.github.io/docs/) and usage of the proper scripting language Lua, which is not even required learning directly to start writing Premake scripts. If you aren't familiar with Premake I recommend having a look at the "Getting Started" and "Writing Premake Scripts" sections of its documentation, which are short and well written. The following text assumes you've read those sections.
+KTech uses **Premake** to configure and generate build files, because it has [fine documentation](https://premake.github.io/docs/) and is configured with the normal scripting language Lua, unlike CMake with its counterintuitive documentation and odd scripting language.
 
-The `"ktech/"` directory contains a [`"premake5.lua"`](/ktech/premake5.lua) script, which creates a Premake static library project named "KTechLibrary".
+To generate the build files for KTech and the game examples in the "`examples/`" directory, ensure Premake is installed on your system and run the command `premake5 [action]` from the Git repository's root (e.g. `premake5 gmake2` to generate GNU Makefiles).
 
-To link the library, you will have to create a `"premake5.lua"` script for your own game that should do the following things:
+To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to "`build/bin/`".
+
+## How to build your own KTech game (with Premake)?
+
+If you aren't too familiar with Premake I recommend reading the "Getting Started" and "Writing Premake Scripts" sections of its [documentation](https://premake.github.io/docs/); they are short and well written.
+
+The "`ktech/`" directory contains a ["`premake5.lua`"](/ktech/premake5.lua) script, which creates a static library Premake project named "`KTechLibrary`".
+
+To link the library, you will have to create a "`premake5.lua`" script for your own game that should do the following things:
 - Create a Premake workspace.
-- `include` the library's `"premake5.lua"` script (i.e. `include "path/to/ktech/"`).
-- Create a `ConsoleApp` project for your game, and within it link "`KTechLibrary`" (i.e. `links { "KTechLibrary" }`).
+- Include the library's "`premake5.lua`" script.
+- Create a `ConsoleApp` project for your game, and within it link `KTechLibrary`.
 
 For example (`--` is a Lua comment):
 
 ```lua
 workspace "KTech" -- this name doesn't matter to KTech
 	configurations { "Debug", "Release" }
-	location "build" -- where building files will be generated
+	location "build" -- where to generate build files (doesn't matter to KTech)
 
-include "ktech/" -- this should lead to the KTech library directory
+include "ktech/" -- KTech's directory, which contains its "`premake5.lua`" configuration file
 
-project "ktechgame" -- the name of your game
+project "ktechgame" -- the name of your game (doesn't matter to KTech)
 	kind "ConsoleApp"
 	language "C++"
-	targetdir "%{wks.location}/bin" -- where binary files will be generated
-	objdir "%{wks.location}/obj/%{prj.name}" -- where object files will be generated
-	targetname "%{prj.name}" -- the name of the binary file
+	targetdir "%{wks.location}/bin" -- where to generate binary files
+	objdir "%{wks.location}/obj/%{prj.name}" -- where to generate object files
+	targetname "%{prj.name}" -- the name which will be given to your game's binary file
 
 	links { "KTechLibrary" } -- include the KTech static library
 
@@ -44,9 +52,11 @@ project "ktechgame" -- the name of your game
 		symbols "On" -- turn on symbols if you want to debug
 ```
 
-To generate the build files, you will need to call `premake5 [action]` from the directory your script is in (e.g. `premake5 gmake2` to generate GNU makefiles).
+To generate the build files for KTech and your game, ensure Premake is installed on your system and run the command `premake5 [action]` from the directory your "`premake5.lua`" script is in (e.g. `premake5 gmake2` to generate GNU Makefiles).
 
-To generate binary files with GNU Make, you will then run `make -C workspace_build_dir`, where "workspace_build_dir" leads to the `location` you specified in your `workspace`. The binary file of your game will be generated where the `targetdir` you specified in your `project` leads.
+To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to "`build/bin/`".
+
+The "Debug" configuration (on KTech's end) enables debug symbols and deliberately doesn't hide the terminal cursor to improve GDB using experience. The "Release" configuration does the opposite; it doesn't enable debug symbols and hides the terminal cursor.
 
 ## How does the licensing work?
 
