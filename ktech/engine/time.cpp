@@ -22,7 +22,7 @@
 
 #include <thread>
 
-KTech::Time::Invocation* KTech::Time::Invoke(const std::function<void()>& p_callback, uint32_t p_time, Measurement p_measurement)
+KTech::Time::Invocation* KTech::Time::Invoke(const std::function<bool()>& p_callback, uint32_t p_time, Measurement p_measurement)
 {
 	switch (p_measurement)
 	{
@@ -78,8 +78,8 @@ void KTech::Time::CallInvocations()
 			// Call
 			if (m_invocations[i]->callback)
 			{
-				m_invocations[i]->callback();
-				invokedThisTick = true;
+				if (m_invocations[i]->callback())
+					changedThisTick = true;
 			}
 			// Remove invocation
 			delete m_invocations[i];

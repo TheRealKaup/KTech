@@ -25,11 +25,11 @@
 struct KTech::Input::BasicCallback
 {
 	bool enabled = true;
-	std::function<void()> ptr;
+	std::function<bool()> ptr;
 	BasicHandler* parentHandler;
 	bool onTick;
 	
-	inline BasicCallback(const std::function<void()>& callback, BasicHandler* parentHandler, bool onTick)
+	inline BasicCallback(const std::function<bool()>& callback, BasicHandler* parentHandler, bool onTick)
 		: ptr(callback), parentHandler(parentHandler), onTick(onTick) {}
 	
 	~BasicCallback();
@@ -38,10 +38,10 @@ struct KTech::Input::BasicCallback
 struct KTech::Input::RangedCallback
 {
 	bool enabled = true;
-	std::function<void()> ptr;
+	std::function<bool()> ptr;
 	RangedHandler* parentHandler;
 
-	inline RangedCallback(const std::function<void()>& callback, RangedHandler* parentHandler)
+	inline RangedCallback(const std::function<bool()>& callback, RangedHandler* parentHandler)
 		: ptr(callback), parentHandler(parentHandler) {}
 	
 	~RangedCallback();

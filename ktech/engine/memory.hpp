@@ -38,7 +38,7 @@ public:
 	void CallOnTicks();
 
 private:
-	bool callChangedThisTick;
+	bool changedThisTick = false;
 
-	friend class KTech::Output;
+	friend class Output;
 };

@@ -121,7 +121,7 @@ protected:
 		RenderUnselected();
 	}
 
-	void OnPress()
+	bool OnPress()
 	{
 		m_on = !m_on;
 
@@ -132,6 +132,8 @@ protected:
 
 		if (m_OnPress)
 			m_OnPress();
+		
+		return true;
 	}
 
 	void RenderSelected()
@@ -154,7 +156,7 @@ protected:
 				texture.SetForeground(m_unselectedOffRGBA);
 	}
 
-	void RemovePressColor()
+	bool RemovePressColor()
 	{
 		if (m_selected)
 		{
@@ -175,5 +177,6 @@ protected:
 					texture.SetForeground(m_unselectedOffRGBA);
 		}
 		m_downInvocation = nullptr;
+		return true;
 	}
 };

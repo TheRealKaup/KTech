@@ -114,7 +114,7 @@ protected:
 			texture.SetForeground(m_unselectedRGBA);
 	}
 
-	void RemovePressColor()
+	bool RemovePressColor()
 	{
 		if (m_selected)
 			for (KTech::Texture& texture : m_textures)
@@ -123,14 +123,16 @@ protected:
 			for (KTech::Texture& texture : m_textures)
 				texture.SetForeground(m_unselectedRGBA);
 		m_downInvocation = nullptr;
+		return true;
 	}
 
-	void InsideOnPress()
+	bool InsideOnPress()
 	{
 		for (KTech::Texture& texture : m_textures)
 			texture.SetForeground(m_downRGBA);
 		m_downInvocation = engine.time.Invoke(std::bind(&Button::RemovePressColor, this), 100, KTech::Time::Measurement::milliseconds);
 		if (m_OnPress)
 			m_OnPress();
+		return true;
 	}
 };

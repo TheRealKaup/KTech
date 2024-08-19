@@ -58,14 +58,14 @@ struct KTech::Point
 	inline constexpr Point& operator+=(const Point& point)
 	{
 		x += point.x;
-		y += point.x;
+		y += point.y;
 		return *this;
 	}
 
 	inline constexpr Point& operator-=(const Point& point)
 	{
 		x -= point.x;
-		y -= point.x;
+		y -= point.y;
 		return *this;
 	}
 };

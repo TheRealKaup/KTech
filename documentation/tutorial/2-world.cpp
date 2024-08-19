@@ -82,7 +82,7 @@ int main ()
 	);
 
 	/*
-		Practice: add another `Texture` to `object1`, using the `Texture::Simple()` pseudo-constructor. Don't forget to increase the size of `m_textures`.
+		Task: add another `Texture` to `object1`, using the `Texture::Simple()` pseudo-constructor. Don't forget to increase the size of `m_textures`.
 
 
 
@@ -106,7 +106,7 @@ int main ()
 	KTech::Layer layer1(engine);
 	// And add `object1` to it:
 	layer1.AddObject(
-		object1.m_id // All world structures store a copy of their personal `ID` in a member named `m_id` (e.g. `Object::m_id`, `Layer::m_id`...).
+		object1.m_id // All world structures store their personal `ID` in a member named `m_id` (e.g. `Object::m_id`, `Layer::m_id`...).
 	);
 
 	/*

@@ -23,8 +23,6 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "rgbcolors.hpp"
-#include "../engine/output.hpp"
 
 #include <cstddef>
 
@@ -76,57 +74,42 @@ struct KTech::Container
 
 	// Adds the pointer to the container.
 	// Automatically called by objects, layers, cameras and maps for themselves.
-	// You shouldn't call this manualy on a structure.
+	// You shouldn't call this manually on a structure.
 	ID<T> Add(T* structure)
 	{
-		KTech::Output::Log("<Container::Add()> Start of function...", RGBColors::lime);
 		T** tmp = new T*[m_size + 1];
-		KTech::Output::Log("<Container::Add()> Created new extended array " + std::to_string((size_t)tmp), RGBColors::lime);
-		KTech::Output::Log("<Container::Add()> Move to new array", RGBColors::lime);
 		for (size_t i = 0; i < m_size; i++)
 			tmp[i] = m_arr[i];
-		KTech::Output::Log("<Container::Add()> Add given structure", RGBColors::lime);
 		structure->m_id.m_i = m_size;
 		tmp[m_size] = structure;
 		if (m_size > 0)
 		{
-			KTech::Output::Log("<Container::Add()> Delete old array " + std::to_string((size_t)m_arr), RGBColors::lime);
 			delete[] m_arr;
 		}
-		KTech::Output::Log("<Container::Add()> Update info", RGBColors::lime);
 		m_arr = tmp;
 		m_size++;
-		KTech::Output::Log("<Container::Add()> End of function, returning ID.", RGBColors::lime);
 		return m_arr[m_size - 1]->m_id;
 	}
 
 	// Remove a structure from storage (doesn't delete it's memory).
 	// Returns true if the structure was found and removed.
-	// Returns false if the structre is missing.
+	// Returns false if the structure is missing.
 	bool Remove(const ID<T>& id)
 	{
-		KTech::Output::Log("<Container::Remove()> Start of function...", RGBColors::lime);
-		KTech::Output::Log("<Container::Remove()> Convert given ID to index", RGBColors::lime);
 		size_t toRemove = IDToIndex(id);
 		if (toRemove == m_size)
 		{
-			KTech::Output::Log("<Container::Remove()> End of function.", RGBColors::lime);
 			return false;
 		}
 		T** tmp = new T*[m_size - 1];
-		KTech::Output::Log("<Container::Remove()> Created new smaller array " + std::to_string((size_t)tmp), RGBColors::lime);
-		KTech::Output::Log("<Container::Remove()> Moving to new array", RGBColors::lime);
 		size_t i = 0;
 		for (; i < toRemove; i++)
 			tmp[i] = m_arr[i];
 		for (i++; i < m_size; i++)
 			tmp[i - 1] = m_arr[i];
-		KTech::Output::Log("<Container::Remove()> Delete old array " + std::to_string((size_t)m_arr), RGBColors::lime);
 		delete[] m_arr;
-		KTech::Output::Log("<Container::Remove()> Update info", RGBColors::lime);
 		m_size--;
 		m_arr = tmp;
-		KTech::Output::Log("<Container::Remove()> End of function.", RGBColors::lime);
 		return true;
 	}
 

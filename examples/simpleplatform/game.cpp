@@ -28,20 +28,25 @@ struct Character : Object
 {
 	KTech::ID<Layer> voidLayer;
 
-	static constexpr int jumpStreng = 5;
+	static constexpr int jumpStrength = 5;
 
 	Camera cam;
 	bool onGround = false;
 	int yVelocity = 0;
 
 	ID<Object> box;
+	Animation jumpAnimation;
 
-	void Jump()
+	bool Jump()
 	{
 		if (onGround) {
-			yVelocity = jumpStreng;
+			yVelocity = jumpStrength;
 			onGround = false;
+			jumpAnimation.Stop();
+			jumpAnimation.Play();
+			return true;
 		}
+		return false;
 	}
 
 	virtual bool OnTick() override
@@ -92,7 +97,7 @@ struct Character : Object
 			box = nullID<Object>;
 	}
 
-	void PushBoxToDifferentLayer()
+	bool PushBoxToDifferentLayer()
 	{
 		engine.output.Log("<Character::PushBoxToDifferentLayer()> Start of function...", RGBColors::red);
 		if (engine.memory.objects.Exists(box))
@@ -100,14 +105,26 @@ struct Character : Object
 			engine.output.Log("<Character::PushBoxToDifferentLayer()> Moving object to voidLayer", RGBColors::red);
 			engine.memory.objects[box]->EnterLayer(voidLayer);
 			box = ID<Object>(0, 0);
+			return true;
 		}
+		return false;
 	}
 
 	Character(Engine& engine, ID<Layer>& layer, ID<Layer>& voidLayer)
-		: Object(engine, Point(5, 2), "character"), voidLayer(voidLayer), cam(engine, KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 ))
+		: Object(engine, Point(5, 2), "character"), voidLayer(voidLayer), cam(engine, KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 )),
+			jumpAnimation(engine, m_id, {
+				Animation::Instruction(Animation::Instruction::Type::TextureSetPosition, 1, Point(0, 3)),
+				Animation::Instruction(Animation::Instruction::Type::TextureShow, 1),
+				Animation::Instruction(Animation::Instruction::Type::Delay, 2, Time::Measurement::ticks),
+				Animation::Instruction(Animation::Instruction::Type::TextureMove, 1, Point(0, 1)),
+				Animation::Instruction(Animation::Instruction::Type::Delay, 2, Time::Measurement::ticks),
+				Animation::Instruction(Animation::Instruction::Type::TextureMove, 1, Point(0, 1)),
+				Animation::Instruction(Animation::Instruction::Type::Delay, 2, Time::Measurement::ticks),
+				Animation::Instruction(Animation::Instruction::Type::TextureHide, 1),
+			})
 	{
 		KTech::Output::Log("<Character::Character()> Start of function...", RGBColors::red);
-		m_textures.resize(1);
+		m_textures.resize(2);
 		m_textures[0].Write(
 			{
 				" O ",
@@ -115,6 +132,9 @@ struct Character : Object
 				"/ \\"
 			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
 		);
+		m_textures[1].Simple(UPoint(3, 1), CellA('~', RGBAColors::gray, RGBA(255, 255, 255, 63)));
+		m_textures[1].m_active = false;
+
 		m_colliders.resize(2);
 		m_colliders[0].ByTextureCharacter(m_textures[0], 1);
 		m_colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
@@ -218,10 +238,11 @@ struct AutoUpdatingText : Object
 
 bool charCamOn = false;
 
-void TurnOnCharacterCamera()
+bool TurnOnCharacterCamera()
 {
 	charCamOn = !charCamOn;
 	engine.output.Clear();
+	return true;
 }
 
 int main()
@@ -331,9 +352,10 @@ int main()
 	while (engine.running)
 	{
 		engine.input.CallHandlers();
+		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 
-		if (map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size() && engine.output.ShouldRenderThisTick())
+		if (engine.output.ShouldRenderThisTick() && map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size())
 		{
 			if (charCamOn) 
 			{

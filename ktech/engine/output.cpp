@@ -21,6 +21,7 @@
 #include "output.hpp"
 
 #include "../utility/keys.hpp"
+#include "../utility/rgbcolors.hpp"
 #include "../basic/cell.hpp"
 #include "../basic/upoint.hpp"
 #include "../engine/engine.hpp"
@@ -259,11 +260,14 @@ void KTech::Output::Print()
 
 bool KTech::Output::ShouldRenderThisTick()
 {
-	if (engine->input.inputThisTick || engine->time.invokedThisTick || engine->memory.callChangedThisTick || engine->time.ticksCounter == 0)
+	if (engine->input.changedThisTick
+		|| engine->memory.changedThisTick
+		|| engine->time.changedThisTick
+		|| engine->time.ticksCounter == 0)
 	{
-		engine->input.inputThisTick = false;
-		engine->time.invokedThisTick = false;
-		engine->memory.callChangedThisTick = false;
+		engine->input.changedThisTick = false;
+		engine->memory.changedThisTick = false;
+		engine->time.changedThisTick = false;
 		return true;
 	}
 	return false;

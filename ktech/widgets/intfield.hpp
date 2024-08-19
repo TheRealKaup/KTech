@@ -123,12 +123,12 @@ protected:
 		RenderUnselected();
 	}
 
-	void InternalInsert()
+	bool InternalInsert()
 	{
 		if (engine.input.Is(KTech::Keys::backspace) || engine.input.Is(KTech::Keys::delete_))
 		{
 			if (m_currentDigit == 0)
-				return;
+				return false;
 
 			m_visibleNumber /= 10;
 
@@ -138,7 +138,7 @@ protected:
 		else if (engine.input.Between('0', '9'))
 		{
 			if (m_currentDigit == m_maxDigits)
-				return;
+				return false;
 
 			m_textures[0](m_currentDigit, 0).c = engine.input.input.at(0);
 			m_currentDigit++;
@@ -155,6 +155,7 @@ protected:
 
 		if (m_OnInsert)
 			m_OnInsert();
+		return true;
 	}
 
 	void RenderSelected()

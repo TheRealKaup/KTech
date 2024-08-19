@@ -56,7 +56,7 @@ KTech::Input::~Input()
 	m_inputLoop.detach();
 }
 
-KTech::Input::BasicCallback* KTech::Input::RegisterCallback(const std::string& p_input, const std::function<void()>& p_callback, bool p_onTick)
+KTech::Input::BasicCallback* KTech::Input::RegisterCallback(const std::string& p_input, const std::function<bool()>& p_callback, bool p_onTick)
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 		return nullptr;
@@ -77,7 +77,7 @@ KTech::Input::BasicCallback* KTech::Input::RegisterCallback(const std::string& p
 	return m_basicHandlers[i]->m_callbacks[m_basicHandlers[i]->m_callbacks.size() - 1]; // Last callback of last handler
 }
 
-KTech::Input::RangedCallback* KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<void()>& p_callback)
+KTech::Input::RangedCallback* KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback)
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 		return nullptr;
@@ -151,7 +151,8 @@ void KTech::Input::CallHandlers()
 				if (callback->enabled && callback->onTick)
 				{
 					input = handler->m_input; // Would be preferable to not copy it this way each iteration
-					callback->ptr();
+					if (callback->ptr())
+						changedThisTick = true; // Render-on-demand
 				}
 			}
 			handler->m_timesPressed = 0;
@@ -177,7 +178,6 @@ void KTech::Input::Loop()
 	{
 		// Get input and update `std::string Input::input`
 		input.assign(Get());
-		inputThisTick = true;
 		// Quit
 		if (input == quitKey)
 		{
@@ -192,7 +192,8 @@ void KTech::Input::Loop()
 				m_basicHandlers[i]->m_timesPressed++; // Used in synced calling
 				for (size_t j = 0; j < m_basicHandlers[i]->m_callbacks.size(); j++) // Call the calls
 					if (m_basicHandlers[i]->m_callbacks[j]->enabled && !m_basicHandlers[i]->m_callbacks[j]->onTick) // Check if the callback shouldn't be called on tick
-						m_basicHandlers[i]->m_callbacks[j]->ptr(); // Call
+						if (m_basicHandlers[i]->m_callbacks[j]->ptr()) // Call
+							changedThisTick = true; // Render-on-demand
 				break; // Break because there shouldn't be a similar handler
 			}
 		}
@@ -202,6 +203,7 @@ void KTech::Input::Loop()
 				if (m_rangedHandlers[i]->m_key1 <= input[0] && input[0] <= m_rangedHandlers[i]->m_key2) // If the key is in range
 					for (RangedCallback*& callback: m_rangedHandlers[i]->m_callbacks)
 						if (callback->enabled)
-							callback->ptr(); // Call
+							if (callback->ptr()) // Call
+								changedThisTick = true; // Render-on-demand
 	}
 }

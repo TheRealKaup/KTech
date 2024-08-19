@@ -62,7 +62,7 @@ struct UITest
 
 	uint8_t countdown;
 	// Countdown iteration
-	void Countdown()
+	bool Countdown()
 	{
 		if (countdown > 0)
 		{
@@ -72,6 +72,7 @@ struct UITest
 		}
 		else
 			Quit();
+		return true;
 	}
 
 	void CancelCountdown()
@@ -95,7 +96,7 @@ struct UITest
 		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 	}
 	
-	void MoveUp()
+	bool MoveUp()
 	{
 		engine.output.Log("(GAME) <UI::MoveUp()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
@@ -105,9 +106,10 @@ struct UITest
 			currentWidget--;
 		widgets[currentWidget]->Select();
 		engine.output.Log("(GAME) <UI::MoveUp()> EOF", RGBColors::orange);
+		return true;
 	}
 
-	void MoveDown()
+	bool MoveDown()
 	{
 		engine.output.Log("(GAME) <UI::MoveDown()> SOF", RGBColors::orange);
 		widgets[currentWidget]->Deselect();
@@ -117,6 +119,7 @@ struct UITest
 			currentWidget++;
 		widgets[currentWidget]->Select();
 		engine.output.Log("(GAME) <UI::MoveDown()> EOF", RGBColors::orange);
+		return true;
 	}
 
 	void SetNotice()
@@ -137,7 +140,6 @@ struct UITest
 		widgets[w_switch] = new Switch(engine, ui, nullptr, Keys::return_, Point(2, 14), "Switch", false, true);
 		widgets[w_notice] = new AboutBox(engine, ui, Point(1, 1),
 			{
-			//   ---------------
 				"widgetstest, a",
 				"user interface",
 				"example based",

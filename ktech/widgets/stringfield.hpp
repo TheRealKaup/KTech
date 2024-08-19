@@ -117,12 +117,12 @@ protected:
 		RenderUnselected();
 	}
 
-	void OnInsert()
+	bool OnInsert()
 	{
 		if (engine.input.Is(KTech::Keys::backspace) || engine.input.Is(KTech::Keys::delete_))
 		{
 			if (m_currentChar == 0)
-				return;
+				return false;
 
 			m_currentChar--;
 			m_string.pop_back();
@@ -130,7 +130,7 @@ protected:
 			m_textures[0](m_currentChar, 0).c = ' ';
 		}
 		else if (m_currentChar == m_maxChars)
-			return;
+			return false;
 		else
 		{
 			m_textures[0](m_currentChar, 0).c = engine.input.input.at(0);
@@ -139,6 +139,7 @@ protected:
 		}
 		if (m_OnInsert)
 			m_OnInsert();
+		return true;
 	}
 
 	void RenderSelected()

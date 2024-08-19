@@ -46,8 +46,8 @@ public:
 	// Resets terminal
 	~Input();
 
-	BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<void()>& callback, bool onTick = false);
-	RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<void()>& callback);
+	BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback, bool onTick = false);
+	RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback);
 	CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
 
 	bool Is(const std::string& stringKey);
@@ -63,17 +63,16 @@ public:
 private:
 	Engine* const engine;
 
-	bool inputThisTick = false;
-
 	termios m_oldTerminalAttributes;
 	std::thread m_inputLoop;
 	std::vector<BasicHandler*> m_basicHandlers;
 	std::vector<RangedHandler*> m_rangedHandlers;
 	std::vector<CallbacksGroup*> m_groups;
+	bool changedThisTick = false;
 
 	static char* Get();
 
 	void Loop();
 
-	friend class KTech::Output;
+	friend class Output;
 };

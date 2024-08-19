@@ -47,9 +47,9 @@ public:
 
 	struct Invocation
 	{
-		std::function<void()> callback;
+		std::function<bool()> callback;
 		size_t ticksLeft; // Current ticks left in this instance
-		inline Invocation(const std::function<void()>& callback, size_t ticks)
+		inline Invocation(const std::function<bool()>& callback, size_t ticks)
 			: callback(callback), ticksLeft(ticks) {}
 	};
 
@@ -62,7 +62,7 @@ public:
 	inline Time(Engine* const engine, int16_t ticksPerSecondLimit = 24)
 		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
 
-	Invocation* Invoke(const std::function<void()>& callback, uint32_t time, Measurement timeMeasurement);
+	Invocation* Invoke(const std::function<bool()>& callback, uint32_t time, Measurement timeMeasurement);
 	bool CancelInvocation(Invocation* invocation);
 	void CallInvocations();
 
@@ -74,11 +74,10 @@ public:
 private:
 	Engine* const engine;
 
-	bool invokedThisTick = false;
-
 	const TimePoint m_startTP;
 	TimePoint m_thisTickStartTP;
 	std::vector<Invocation*> m_invocations;
+	bool changedThisTick = false;
 
-	friend class KTech::Output;
+	friend class Output;
 };
