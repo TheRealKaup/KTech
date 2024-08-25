@@ -36,7 +36,6 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 - **[faq.md](documentation/faq.md)** - answers for frequently asked questions **(includes detailed building instructions)**.
 - **[tutorial/](documentation/tutorial/1-introduction.cpp)** - comprehensive tutorial conveyed via code and practice.
-- **[examples/](examples/)** (work in progress) - well-commented game examples.
 - **Doxygen** (work in progress) - library reference, comprising concise information about each element.
 - **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
 
