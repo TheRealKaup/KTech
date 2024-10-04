@@ -23,10 +23,17 @@
 #define KTECH_DEFINITION
 #include "../../ktech.hpp"
 #undef KTECH_DEFINITION
+#include "../../utility/keys.hpp"
 
 #include <functional>
 #include <string>
+
+#ifdef _WIN32
+#include <Windows.h>
+#undef RGB
+#else
 #include <termio.h>
+#endif
 #include <thread>
 
 class KTech::Input
@@ -63,14 +70,19 @@ public:
 private:
 	Engine* const engine;
 
+#ifdef _WIN32
+	HANDLE m_stdinHandle;
+	DWORD m_oldMode;
+#else
 	termios m_oldTerminalAttributes;
+#endif
 	std::thread m_inputLoop;
 	std::vector<BasicHandler*> m_basicHandlers;
 	std::vector<RangedHandler*> m_rangedHandlers;
 	std::vector<CallbacksGroup*> m_groups;
 	bool changedThisTick = false;
-
-	static char* Get();
+	
+	void Get();
 
 	void Loop();
 

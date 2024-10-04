@@ -64,7 +64,7 @@ namespace KTech
 	template<class T>
 	struct ID;
 	template<class T>
-	inline constexpr ID<T> nullID = ID<T>(0, 0);
+	constexpr ID<T> nullID = ID<T>(0, 0);
 	template<typename T>
 	struct Container;
 	namespace RGBColors {}
