@@ -62,10 +62,7 @@ public:
 
 		// Delay
 		inline Instruction(Type type, size_t time, Time::Measurement timeMeasurement)
-			: type(type), intData(time), timeMeasurement(timeMeasurement) 
-		{
-
-		}
+			: type(type), intData(time), timeMeasurement(timeMeasurement) {}
 	};
 
 	Engine& engine;

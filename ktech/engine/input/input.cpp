@@ -25,13 +25,28 @@
 #include "../engine.hpp"
 
 #include <cstring>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
-#define maxInputLength 7
+#define MAX_INPUT_LENGTH 7
 
 KTech::Input::Input(Engine* const p_engine)
 	: engine(p_engine)
 {
+#ifdef _WIN32
+	m_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
+	GetConsoleMode(m_stdinHandle, &m_oldMode);
+	SetConsoleMode(m_stdinHandle, m_oldMode
+		//| ENABLE_VIRTUAL_TERMINAL_INPUT
+		& !ENABLE_ECHO_INPUT // Disable echo
+		& !ENABLE_LINE_INPUT // Disable canonical mode
+		& !ENABLE_PROCESSED_INPUT // Disable system handling of signals (e.g. Ctrl+C)
+		& !ENABLE_MOUSE_INPUT
+		& !ENABLE_WINDOW_INPUT
+		| ENABLE_EXTENDED_FLAGS // Selecting text pauses output
+	);
+#else
 	// (INPUT) Set terminal attributes
 	tcgetattr(0, &m_oldTerminalAttributes);
 	termios terminalAttributes = m_oldTerminalAttributes;
@@ -41,6 +56,7 @@ KTech::Input::Input(Engine* const p_engine)
 	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
 	terminalAttributes.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSANOW, &terminalAttributes);
+#endif
 
 	// (INPUT) Create input loop
 	m_inputLoop = std::thread(std::bind(&Input::Loop, this));
@@ -49,8 +65,12 @@ KTech::Input::Input(Engine* const p_engine)
 KTech::Input::~Input()
 {
 	// Return to the old terminal attributes
+#if _WIN32
+	SetConsoleMode(m_stdinHandle, m_oldMode);
+#else
 	tcsetattr(0, TCSANOW, &m_oldTerminalAttributes);
-	
+#endif
+
 	// Detach so in the case that the game quit regardless of player input,
 	// the input loop thread would end.
 	m_inputLoop.detach();
@@ -160,14 +180,19 @@ void KTech::Input::CallHandlers()
 	}
 }
 
-char* KTech::Input::Get()
+char* KTech::Input::Get() const
 {
-	static char* buf = new char[maxInputLength];
+	char buf[MAX_INPUT_LENGTH];
 	
 	// Clear previous buffer
-	memset(buf, 0, maxInputLength);
+	memset(buf, 0, MAX_INPUT_LENGTH);
 	// Read input to buffer (blocking)
-	read(0, buf, maxInputLength);
+#ifdef _WIN32
+	LPDWORD nReadCharacters = 0;
+	ReadConsole(m_stdinHandle, buf, 3, (LPDWORD)(&nReadCharacters), NULL);
+#else
+	read(0, buf, MAX_INPUT_LENGTH);
+#endif
 
 	return buf;
 }

@@ -24,9 +24,15 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../basic/point.hpp"
+#include "../basic/upoint.hpp"
 
 #include <string>
+#ifdef _WIN32
+#include <Windows.h>
+#undef RGB
+#else
 #include <termio.h>
+#endif
 #include <vector>
 
 class KTech::Output
@@ -35,7 +41,7 @@ public:
 	const UPoint resolution;
 	std::vector<std::string> outputAfterQuit;
 
-	Output(Engine* const engine, KTech::UPoint imageResolution);
+	Output(Engine* const engine, UPoint imageResolution);
 	~Output();
 
 	static void Log(const std::string& text, RGB color);
@@ -55,7 +61,17 @@ public:
 private:
 	Engine* const engine;
 
+#if _WIN32
+	HANDLE m_stdoutHandle;
+	DWORD m_oldMode;
+	CONSOLE_SCREEN_BUFFER_INFO m_csbi;
+	struct winsize {
+		size_t ws_row;
+		size_t ws_col;
+	} m_terminalSize;
+#else
 	winsize m_terminalSize;
+#endif
 	std::vector<Cell> m_image;
 	std::string m_stringImage;
 };

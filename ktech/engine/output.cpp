@@ -34,6 +34,15 @@ KTech::Output::Output(Engine* p_engine, KTech::UPoint p_res)
 	m_image(p_res.x * p_res.y, Cell(' ', RGBColors::black, RGBColors::black)),
 	m_stringImage(p_res.y * 3 + p_res.x * p_res.y * 39, ' ')
 {
+#ifdef _WIN32
+	m_stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleMode(m_stdoutHandle, &m_oldMode);
+	SetConsoleMode(m_stdoutHandle, m_oldMode
+		| ENABLE_VIRTUAL_TERMINAL_PROCESSING // "Virtual processing"
+		| ENABLE_PROCESSED_OUTPUT // "Output processing"
+	);
+#endif
+
 #ifdef DEBUG
 	// Switch to alternative buffer (don't hide cursor for breaking with a debugger like GDB)
 	std::cout << "\033[?1049h";
@@ -49,6 +58,9 @@ KTech::Output::~Output()
 	std::cout << "\033[?25h\033[?1049l" << std::flush;
 	for (std::string& out : outputAfterQuit)
 		std::cout << out;
+	#ifdef _WIN32
+		SetConsoleMode(m_stdoutHandle, m_oldMode);
+	#endif
 }
 
 void KTech::Output::Log(const std::string& p_text, RGB p_color)
@@ -122,7 +134,13 @@ void KTech::Output::Draw(const std::vector<Cell>& p_image, UPoint p_res, Point p
 void KTech::Output::Print()
 {
 	// Get terminal size
+#ifdef _WIN32
+	GetConsoleScreenBufferInfo(m_stdoutHandle, &m_csbi);
+	m_terminalSize.ws_col = m_csbi.srWindow.Right - m_csbi.srWindow.Left + 1;
+	m_terminalSize.ws_row = m_csbi.srWindow.Bottom - m_csbi.srWindow.Top + 1;
+#else
 	ioctl(fileno(stdout), TIOCGWINSZ, &m_terminalSize);
+#endif
 
 	// Write the image to stringImage
 	size_t l = 0;
@@ -255,7 +273,8 @@ void KTech::Output::Print()
 		m_stringImage[l + 2] = 'm';
 		l += 3;
 	}
-	std::cout << "\033[H\033[3J\033[2J" << m_stringImage.substr(0, l) << std::flush;
+	// ESC[H to move cursor to top-left corner
+	std::cout << "\033[H\033" << m_stringImage.substr(0, l) << std::flush;
 }
 
 bool KTech::Output::ShouldRenderThisTick()
@@ -276,8 +295,18 @@ bool KTech::Output::ShouldRenderThisTick()
 bool KTech::Output::ShouldPrintThisTick()
 {
 	winsize tempTerminalSize;
+#ifdef _WIN32
+	GetConsoleScreenBufferInfo(m_stdoutHandle, &m_csbi);
+	tempTerminalSize.ws_col = m_csbi.srWindow.Right - m_csbi.srWindow.Left + 1;
+	tempTerminalSize.ws_row = m_csbi.srWindow.Bottom - m_csbi.srWindow.Top + 1;
+#else
 	ioctl(fileno(stdout), TIOCGWINSZ, &tempTerminalSize);
+#endif
 	if (tempTerminalSize.ws_row != m_terminalSize.ws_row || tempTerminalSize.ws_col != m_terminalSize.ws_col)
+	{
+		// Clear terminal to remove potential tears
+		std::cout << "[3J\033[2J" << std::flush;
 		return true;
+	}
 	return false;
 }
