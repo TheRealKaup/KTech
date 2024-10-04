@@ -201,7 +201,7 @@ void KTech::Input::Get()
 	for (size_t i = 0; buf[i]; i++)
 		input += buf[i];
 #else
-	read(0, buf, MAX_INPUT_LENGTH);
+	read(0, buf, sizeof(buf) / sizeof(BufChar));
 	input.assign(buf);
 #endif
 }
