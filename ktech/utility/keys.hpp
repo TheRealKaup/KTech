@@ -30,7 +30,11 @@ namespace KTech::Keys
 	constexpr char const* down = "\x1b[B";
 	constexpr char const* right = "\x1b[C";
 	constexpr char const* left = "\x1b[D";
-	constexpr char const* return_ = "\x0a";
+#ifdef _WIN32
+	constexpr char const* return_ = "\r";
+#else
+	constexpr char const* return_ = "\n";
+#endif
 	constexpr char const* backspace = "\x7f";
 	constexpr char const* escape = "\x1b";
 	constexpr char const* pageUp = "\x1b[5~";
