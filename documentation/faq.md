@@ -2,8 +2,9 @@
 
 This document contains answers for potential questions.
 
-- [How to build KTech?](#how-to-build-ktech)
-- [How does the licensing work (with Premake)?](#how-to-build-ktech-with-premake)
+- [How to build KTech?](#how-to-build-ktech-with-premake)
+- [How to build your own KTech game (with Premake)?](#how-to-build-your-own-ktech-game-with-premake)
+- [How does the licensing work?](#how-does-the-licensing-work)
 - [Is KTech Stable?](#is-ktech-stable)
 - [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
 - [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
