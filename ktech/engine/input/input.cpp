@@ -29,25 +29,27 @@
 #include <unistd.h>
 #endif
 
-#define MAX_INPUT_LENGTH 7
-
 KTech::Input::Input(Engine* const p_engine)
 	: engine(p_engine)
 {
+	// Set terminal attributes
 #ifdef _WIN32
 	m_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
 	GetConsoleMode(m_stdinHandle, &m_oldMode);
-	SetConsoleMode(m_stdinHandle, m_oldMode
-		//| ENABLE_VIRTUAL_TERMINAL_INPUT
-		& !ENABLE_ECHO_INPUT // Disable echo
-		& !ENABLE_LINE_INPUT // Disable canonical mode
-		& !ENABLE_PROCESSED_INPUT // Disable system handling of signals (e.g. Ctrl+C)
-		& !ENABLE_MOUSE_INPUT
-		& !ENABLE_WINDOW_INPUT
-		| ENABLE_EXTENDED_FLAGS // Selecting text pauses output
+	SetConsoleMode(m_stdinHandle,
+		// Enable:
+		(m_oldMode
+		| ENABLE_VIRTUAL_TERMINAL_INPUT // Receive input as escape sequences
+		| ENABLE_EXTENDED_FLAGS) // Selecting text (because it pauses output)
+		// Disable:
+		& ~(ENABLE_ECHO_INPUT // Echo
+		| ENABLE_LINE_INPUT // Canonical mode
+		| ENABLE_PROCESSED_INPUT // System handling of signals (e.g. Ctrl+C)
+		| ENABLE_MOUSE_INPUT // Inputs regarding the mouse
+		| ENABLE_WINDOW_INPUT) // Input regarding the window
 	);
+	SetConsoleCP(20127); // us-ascii code page (list of code pages: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
 #else
-	// (INPUT) Set terminal attributes
 	tcgetattr(0, &m_oldTerminalAttributes);
 	termios terminalAttributes = m_oldTerminalAttributes;
 	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
@@ -58,7 +60,7 @@ KTech::Input::Input(Engine* const p_engine)
 	tcsetattr(0, TCSANOW, &terminalAttributes);
 #endif
 
-	// (INPUT) Create input loop
+	// Create the input loop
 	m_inputLoop = std::thread(std::bind(&Input::Loop, this));
 }
 
@@ -180,29 +182,36 @@ void KTech::Input::CallHandlers()
 	}
 }
 
-char* KTech::Input::Get() const
+void KTech::Input::Get()
 {
-	char buf[MAX_INPUT_LENGTH];
-	
+#ifdef _WIN32
+	typedef TCHAR BufChar;
+#else
+	typedef char BufChar;
+#endif
+	BufChar buf[7];
+
 	// Clear previous buffer
-	memset(buf, 0, MAX_INPUT_LENGTH);
+	memset(buf, 0, sizeof(buf));
 	// Read input to buffer (blocking)
 #ifdef _WIN32
 	LPDWORD nReadCharacters = 0;
-	ReadConsole(m_stdinHandle, buf, 3, (LPDWORD)(&nReadCharacters), NULL);
+	ReadConsole(m_stdinHandle, buf, sizeof(buf) / sizeof(BufChar), (LPDWORD)(&nReadCharacters), NULL);
+	input.clear();
+	for (size_t i = 0; buf[i]; i++)
+		input += buf[i];
 #else
 	read(0, buf, MAX_INPUT_LENGTH);
+	input.assign(buf);
 #endif
-
-	return buf;
 }
 
 void KTech::Input::Loop()
 {
 	while (engine->running)
 	{
-		// Get input and update `std::string Input::input`
-		input.assign(Get());
+		// Get input
+		Get();
 		// Quit
 		if (input == quitKey)
 		{

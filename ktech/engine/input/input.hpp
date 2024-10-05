@@ -23,6 +23,7 @@
 #define KTECH_DEFINITION
 #include "../../ktech.hpp"
 #undef KTECH_DEFINITION
+#include "../../utility/keys.hpp"
 
 #include <functional>
 #include <string>
@@ -33,7 +34,6 @@
 #else
 #include <termio.h>
 #endif
-
 #include <thread>
 
 class KTech::Input
@@ -81,8 +81,8 @@ private:
 	std::vector<RangedHandler*> m_rangedHandlers;
 	std::vector<CallbacksGroup*> m_groups;
 	bool changedThisTick = false;
-
-	char* Get() const;
+	
+	void Get();
 
 	void Loop();
 
