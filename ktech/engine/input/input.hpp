@@ -57,13 +57,12 @@ public:
 	RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback);
 	CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
 
-	bool Is(const std::string& stringKey);
-	bool Is(char charKey);
-	bool Bigger(char charKey);
-	bool Smaller(char charKey);
-	bool Between(char charKey1, char charKey2);
-	
-	uint8_t GetInt();
+	bool Is(const std::string& stringKey) const;
+	bool Is(char charKey) const;
+	bool Bigger(char charKey) const;
+	bool Smaller(char charKey) const;
+	bool Between(char charKey1, char charKey2) const;
+	uint8_t GetInt() const;
 
  	void CallHandlers();
 

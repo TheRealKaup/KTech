@@ -46,7 +46,7 @@ public:
 
 	static void Log(const std::string& text, RGB color);
 
-	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName);
+	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName) const;
 	// Clears the in-engine image, not the terminal.
 	void Clear();
 	void Draw(const std::vector<Cell>& image, UPoint size, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = 255);

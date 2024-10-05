@@ -40,13 +40,14 @@ KTech::Input::Input(Engine* const p_engine)
 		// Enable:
 		(m_oldMode
 		| ENABLE_VIRTUAL_TERMINAL_INPUT // Receive input as escape sequences
-		| ENABLE_EXTENDED_FLAGS) // Selecting text (because it pauses output)
+		| ENABLE_EXTENDED_FLAGS) // Needed to disable selecting text (because it pauses output)
 		// Disable:
 		& ~(ENABLE_ECHO_INPUT // Echo
 		| ENABLE_LINE_INPUT // Canonical mode
 		| ENABLE_PROCESSED_INPUT // System handling of signals (e.g. Ctrl+C)
 		| ENABLE_MOUSE_INPUT // Inputs regarding the mouse
-		| ENABLE_WINDOW_INPUT) // Input regarding the window
+		| ENABLE_WINDOW_INPUT // Input regarding the window
+		| ENABLE_QUICK_EDIT_MODE) // Selecting text
 	);
 	SetConsoleCP(20127); // us-ascii code page (list of code pages: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
 #else
@@ -126,32 +127,32 @@ KTech::Input::CallbacksGroup* KTech::Input::CreateCallbacksGroup(bool p_enabled)
 	return m_groups[m_groups.size() - 1];
 }
 
-bool KTech::Input::Is(const std::string& p_stringKey)
+bool KTech::Input::Is(const std::string& p_stringKey) const
 {
 	return (input == p_stringKey);
 }
 
-bool KTech::Input::Is(char p_charKey)
+bool KTech::Input::Is(char p_charKey) const
 {
 	return input.length() == 1 && input[0] == p_charKey;
 }
 
-uint8_t KTech::Input::GetInt()
+uint8_t KTech::Input::GetInt() const
 {
 	return input[0] - '0';
 }
 
-bool KTech::Input::Bigger(char p_charKey)
+bool KTech::Input::Bigger(char p_charKey) const
 {
 	return (input[0] >= p_charKey) && (input[1] == 0);
 }
 
-bool KTech::Input::Smaller(char p_charKey)
+bool KTech::Input::Smaller(char p_charKey) const
 {
 	return (input[0] <= p_charKey) && (input[1] == 0);
 }
 
-bool KTech::Input::Between(char p_charKey1, char p_charKey2)
+bool KTech::Input::Between(char p_charKey1, char p_charKey2) const
 {
 	return (input[0] >= p_charKey1) && (input[0] <= p_charKey2) && (input[1] == 0);
 }

@@ -70,7 +70,7 @@ void KTech::Output::Log(const std::string& p_text, RGB p_color)
 	logIndex++;
 }
 
-void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::string& p_years, const std::string& p_author, const std::string& p_projectName)
+void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::string& p_years, const std::string& p_author, const std::string& p_projectName) const
 {
 	// Clear the terminal
 	std::cout << "\033[H\033[3J\033[2J";
@@ -273,8 +273,13 @@ void KTech::Output::Print()
 		m_stringImage[l + 2] = 'm';
 		l += 3;
 	}
-	// ESC[H to move cursor to top-left corner
-	std::cout << "\033[H\033" << m_stringImage.substr(0, l) << std::flush;
+	// Move cursor to top-left corner ("ESC[H") and print
+#if defined(_WIN32) && !defined(DEBUG)
+	// Hide cursor ("ESC[?25l") since it always reappears on resize due to a Windows console bug
+	std::cout << "\033[H\033[?25l" << m_stringImage.substr(0, l) << std::flush;
+#else
+	std::cout << "\033[H" << m_stringImage.substr(0, l) << std::flush;
+#endif
 }
 
 bool KTech::Output::ShouldRenderThisTick()
