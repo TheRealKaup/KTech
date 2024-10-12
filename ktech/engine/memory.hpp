@@ -28,12 +28,12 @@
 class KTech::Memory
 {
 public:
-	Container<Object> objects;
-	Container<Layer> layers;
-	Container<Camera> cameras;
-	Container<Map> maps;
-	Container<Widget> widgets;
-	Container<UI> uis;
+	CachingRegistry<Object> objects;
+	CachingRegistry<Layer> layers;
+	CachingRegistry<Camera> cameras;
+	CachingRegistry<Map> maps;
+	CachingRegistry<Widget> widgets;
+	CachingRegistry<UI> uis;
 
 	void CallOnTicks();
 

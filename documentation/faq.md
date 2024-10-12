@@ -9,6 +9,7 @@ This document contains answers for potential questions.
 - [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
 - [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
 - [How does the file system work?](#how-does-the-file-system-work)
+- [How does `CachingRegistry` works?](#how-does-cachingregistry-works)
 
 ## How to build KTech (with Premake)?
 
@@ -95,3 +96,15 @@ The contents of `"ktech/"` is split into multiple sub-directories:
 - `"world/"` - world classes.
 
 Note that `"ktech.hpp"` includes all of required header files only if `KTECH_DEFINITION` is undefined. This macro is an include guard completely internal to KTech, and you shouldn't define it before including `"ktech.hpp"`. Apart from that, don't worry about this macro.
+
+## How does `CachingRegistry` works?
+
+`KTech::ID` is initialized with a UUID value when constructed, meaning, references to world structures (classes that have an `ID m_id` member) are serializable. All that is left is some kind of a container to store world structure instances or register world structure pointers, so world structures can be retrieved using their `ID`s.
+
+I chose to register pointers rather than store instances, and `KTech::CachingRegistry` is the registry class; its purpose is to retrieve a registered world structure pointer, given a corresponding UUID. As its name suggests, it doesn't simply iterate through all registered world structures and retrieves that one that has the matching given UUID, but rather, it uses some kind of caching-related optimization.
+
+`KTech::ID` doesn't only comprise a UUID value, but also an index (`ID::m_i`). This member is used by `CachingRegistry` to cache the last known index in the registry of the associated world structure. When `CachingRegistry` attempts to retrieve a world structure pointer, it first checks if the UUID of the given `ID` matches the UUID of the world structure registered at the given cached index. Optimally they match, so it simply returns the pointer from the cached index. If they don't, it iterates down the registry until it finds the matching UUID (i.e. the wanted world structure).
+
+If the passed `ID` is a non-const reference, `CachingRegistry` will also update its cached index before returning the world structure pointer, expediting future usages of that `ID`. This is why giving `CachingRegistry` non-const `ID` references is preferable, as it should make your game faster if it commonly removes world structures from the register (since removing world structures registered at lower indices is the only valid way a cached index could become stale).
+
+Additionally, considering KTech is designed to work single threaded (with the exception of the input thread), keeping a direct pointer to a world structure retrieved from `CachingRegistry` for the duration of a singular function, after validating it (using `CachingRegistry::Exists()` or checking that the returned pointer is not `nullptr`), is valid practice, as nothing external can erase the pointed world structure from memory, and the input thread ought not remove world structures.
