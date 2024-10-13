@@ -1,4 +1,4 @@
-# Preamble
+# Outline
 
 This document contains answers for potential questions.
 
@@ -10,6 +10,9 @@ This document contains answers for potential questions.
 - [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
 - [How does the file system work?](#how-does-the-file-system-work)
 - [How does `CachingRegistry` works?](#how-does-cachingregistry-works)
+- [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
+
+# Q&A
 
 ## How to build KTech (with Premake)?
 
@@ -108,3 +111,17 @@ I chose to register pointers rather than store instances, and `KTech::CachingReg
 If the passed `ID` is a non-const reference, `CachingRegistry` will also update its cached index before returning the world structure pointer, expediting future usages of that `ID`. This is why giving `CachingRegistry` non-const `ID` references is preferable, as it should make your game faster if it commonly removes world structures from the register (since removing world structures registered at lower indices is the only valid way a cached index could become stale).
 
 Additionally, considering KTech is designed to work single threaded (with the exception of the input thread), keeping a direct pointer to a world structure retrieved from `CachingRegistry` for the duration of a singular function, after validating it (using `CachingRegistry::Exists()` or checking that the returned pointer is not `nullptr`), is valid practice, as nothing external can erase the pointed world structure from memory, and the input thread ought not remove world structures.
+
+## KTech's history with the Windows Console and the POSIX terminal
+
+KTech was initially written for Windows in 2022. At least a year later I moved it to GNU/Linux, which forced upon it a wide set of changes rooted in the understanding of the terminal utility.
+
+In Windows, you can basically do anything. You can use the `GetAsyncKeyState()` function from the Windows API, which serves an ideal method to get key states and detect key presses for a game engine. When the game starts, you can take one of the many approaches in Windows to resize the Console to fit the game's viewport, such as by finding its window handle, setting its size and locking it there, or something, I don't really remember. The functions from the `Windows.h` library didn't always functioned as expected and sometimes you had to look for odd workarounds after frustrating hours of trial and error, but nonetheless, the KTech I had back then behaved like an actual modern game, one that would take dominion of the section on the screen that is simply supposed to display it. KTech was not terminal software, it was Windows Console software. Though to be fair, I called it a "Console" game engine, KCGE; Kaup's Console Game Engine, with an intentional reference to the Windows Console.
+
+Switching to GNU/Linux, I started porting my project to the Unix (POSIX) terminal. I remember totally not conceptualizing what differs in this new environment, so I went on a journey to make each terminal capability that worked on Windows, work on GNU/Linux, in the exact same way. Okay, input. Normal terminal input is received in a sequence as if typed, like when you open a text editor and hold the letter "a"; it inputs "a", and after a certain delay it spams "a". This isn't what you want for a game, so I had to track down the "`GetAsyncKeyState()` of Linux". That isn't really a thing, unless you count reading the actual keyboard device file, which is something I tried, and didn't implement because it required root access. I then learned about X11 and tried utilizing it, to get input and also window management up and running. I quit before I got anything working.
+
+KCGE was no longer named that; the goal I set was to make an actual terminal game engine. I remembered that as I was installing Arch Linux on my system I was given a terminal, but no X11. It means KTech games can't be played on Linux TTYs, and that would really mean KTech would be an X11 program rather than a terminal program. Yet that's not all of it. What if someone launches the game on Wayland? I'll have to verify XWayland manages to handle my library. Well, what if the player is using a window manager that doesn't expect the terminal to normally, and randomly, resize itself? What if changing the font doesn't work the same across all terminal emulators? But undoubtedly, the crux of it all: what if the user is expecting the terminal application to behave like a terminal application?
+
+It was made apparent to me that KTech is not to besiege the terminal, but rather the opposite. The terminal's size, font, inputs, location on the screen; these are all under the responsibilities of the terminal and the window manager, which are themselves under the user's control. Violating this idea ultimately violates the user's rightful sovereignty over their personal computer. For example, a terminal program ought to adapt to the terminal's displayed buffer, in lieu of resizing the terminal to fit the program. Alas, the standardized terminal still has some limitations that if broken won't necessarily contradict with this view, notably, removing delay before keys start repeating, locally in the terminal.
+
+Over a year later I returned the Windows port, because I have big plans for KTech and the games I'm gonna make with it. This time the currently installed doctrine was kept (obviously, as I want games to behave the same between Windows and GNU/Linux), but almost: selecting text in the Windows Console strangely pauses output, which is more annoying than ideological, so that feature I decided to disable.
