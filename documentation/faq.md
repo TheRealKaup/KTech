@@ -1,6 +1,6 @@
 # Outline
 
-This document contains answers for potential questions.
+This document contains answers for ~~frequently~~ potentially asked questions.
 
 - [How to build KTech?](#how-to-build-ktech-with-premake)
 - [How to build your own KTech game (with Premake)?](#how-to-build-your-own-ktech-game-with-premake)
