@@ -9,7 +9,7 @@ This document contains answers for potential questions.
 - [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
 - [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
 - [How does the file system work?](#how-does-the-file-system-work)
-- [How does `CachingRegistry` works?](#how-does-cachingregistry-works)
+- [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
 - [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
 
 # Q&A
@@ -18,29 +18,29 @@ This document contains answers for potential questions.
 
 KTech uses **Premake** to configure and generate build files, because it has [fine documentation](https://premake.github.io/docs/) and is configured with the normal scripting language Lua, unlike CMake with its counterintuitive documentation and odd scripting language.
 
-To generate the build files for KTech and the game examples in the "`examples/`" directory, ensure Premake is installed on your system and run the command `premake5 [action]` from the Git repository's root (e.g. `premake5 gmake2` to generate GNU Makefiles).
+To generate the build files for KTech and the game examples in the `examples/` directory, ensure Premake is installed on your system and run the command `premake5 [action]` from the Git repository's root (e.g. `premake5 gmake2` to generate GNU Makefiles).
 
-To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to "`build/bin/`".
+To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to the directory `build/bin/`.
 
 ## How to build your own KTech game (with Premake)?
 
-If you aren't too familiar with Premake I recommend reading the "Getting Started" and "Writing Premake Scripts" sections of its [documentation](https://premake.github.io/docs/); they are short and well written.
+If you aren't familiar with Premake I recommend reading the "Writing Premake Scripts" or at least the "Getting Started" sections of its wonderfully concise [documentation](https://premake.github.io/docs/).
 
-The "`ktech/`" directory contains a ["`premake5.lua`"](/ktech/premake5.lua) script, which creates a static library Premake project named "`KTechLibrary`".
+The library's [`ktech/premake5.lua`](/ktech/premake5.lua) script/configuration file instructs Premake to create a static library Premake project named `KTechLibrary`.
 
-To link the library, you will have to create a "`premake5.lua`" script for your own game that should do the following things:
+To link the library, you will have to create your own `premake5.lua` script that should do the following things:
 - Create a Premake workspace.
-- Include the library's "`premake5.lua`" script.
-- Create a `ConsoleApp` project for your game, and within it link `KTechLibrary`.
+- Include `ktech/premake5.lua`.
+- Create a `ConsoleApp` Premake project for your game that links `KTechLibrary`.
 
-For example (`--` is a Lua comment):
+For example (`--` in Lua precedes a comment):
 
 ```lua
-workspace "KTech" -- this name doesn't matter to KTech
+workspace "KTechGame" -- this name doesn't matter to KTech
 	configurations { "Debug", "Release" }
 	location "build" -- where to generate build files (doesn't matter to KTech)
 
-include "ktech/" -- KTech's directory, which contains its "`premake5.lua`" configuration file
+include "ktech/" -- KTech's directory, which contains its `premake5.lua` script
 
 project "ktechgame" -- the name of your game (doesn't matter to KTech)
 	kind "ConsoleApp"
@@ -57,50 +57,50 @@ project "ktechgame" -- the name of your game (doesn't matter to KTech)
 		symbols "On" -- turn on symbols if you want to debug
 ```
 
-To generate the build files for KTech and your game, ensure Premake is installed on your system and run the command `premake5 [action]` from the directory your "`premake5.lua`" script is in (e.g. `premake5 gmake2` to generate GNU Makefiles).
+To generate the build files for KTech and your game, ensure Premake is installed on your system and run the command `premake5 [action]` from the directory your `premake5.lua` script is in (e.g. `premake5 gmake2` to generate GNU Makefiles).
 
-To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to "`build/bin/`".
+To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to `build/bin/`.
 
-The "Debug" configuration (on KTech's end) enables debug symbols and deliberately doesn't hide the terminal cursor to improve GDB using experience. The "Release" configuration does the opposite; it doesn't enable debug symbols and hides the terminal cursor.
+The "Debug" configuration (on KTech's end) enables debug symbols and intentionally doesn't hide the terminal cursor to improve GDB using experience. The "Release" configuration leaves debug symbols disabled and hides the terminal cursor.
 
 ## How does the licensing work?
 
-KTech is licensed under [the GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html) or any later version. Read the article ["A Quick Guide to GPLv3"](https://www.gnu.org/licenses/quick-guide-gplv3.html) from GNU's website to learn about it. You are completely allowed to sell copies of your game (for example, via Steam), and so does anyone else, though I am not sure how significantly this affects sales in practice.
+KTech is licensed under the [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (GPLv3) or any later version. Read the article "[A Quick Guide to GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html)" from GNU's website to learn about it. You are completely allowed to sell copies of your game (for example, via Steam), and so does anyone else, though I am not sure how significantly this affects sales in practice.
 
 Using the Steamworks API with KTech (to utilize Steam achievements, for instance) contradicts the GPLv3 due to it not falling under the definition of "System Libraries" (thus, not being exempted from the copyleft). As a solution, I might in the future decide to specifically allow using the Steamworks API with KTech.
 
 ## Is KTech Stable?
 
-KTech is reasonably uncomplicated and is written under pretty rigid code conventions (see [style.md](style.md)). Despite so, I frequently encounter bugs. This is very much not to be unexpected, as KTech has seen much more coding done on it than actual usage. Parallel to the last time I've worked on my game _netset_, I've composed what would seem a worryingly long list of overlooked parts (see [issue #58](https://github.com/TheRealKaup/KTech/issues/58)). Solving most of them was as easy as finding them. The asnwer to the question: no. But this just means KTech is not fundamentally faulty, and rather it needs more testing and feedback.
+KTech is reasonably uncomplicated and is written under pretty rigid code conventions (see [style.md](style.md)). Despite so, I frequently encounter bugs. This is very much not to be unexpected, as KTech has seen much more coding done on it than actual usage. Parallel to the last time I've worked on my game _netset_, I've composed what would seem a worryingly long list of overlooked parts (see [issue #58](https://github.com/TheRealKaup/KTech/issues/58)). Solving most of them was as easy as finding them. The asnwer to the question: no. But, what I'm propounding is that evidently, KTech is not fundamentally faulty, and rather it needs more testing and feedback.
 
 ## Why are `Collider`'s and `Texture`'s constructors normal functions?
 
-Using normal constructors was ambiguous to the coder and the compiler in this case. The writing convention of `vector.resize(n)` and `vector[i].Constructor()`, where "vector" is a vector of `Texture`s or `Collider`s, is just the simple and easy alternative I found. I might change this method, maybe to a factory design.
+Using normal constructors was ambiguous to the coder and the compiler in this case. The writing convention of `vector.resize(n)` and `vector[i].Constructor()`, where "vector" is a vector of `Texture`s or `Collider`s, is just the simple and easy alternative I found. I might change this method, maybe to a factory or a template-based design.
 
 ## Why is there no predefined game loop?
 
-It seems to me preferable forcing to write a game loop and understand how it works. Depends on how extensible a predefined game loop should be, it might require an amount of parameters and new features that is equivalent in code complexity to writing a game loop on the game side as is done now.
+It seems to me preferable forcing the user to write a game loop and understand how it works. Depends on how extensible a predefined game loop should be, it might require an amount of parameters and new features that is equivalent in code complexity to writing a game loop on the game side as is done now, which I believe is not too inconveniencing anyway.
 
 ## How does the file system work?
 
-KTech is provided as a static library. It's declared and defined within [the `"ktech/"` directory of this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
+KTech is provided as a static library. It's declared and defined within [the `ktech/` directory of this repository](https://github.com/TheRealKaup/KTech/tree/master/ktech).
 
-The core library is declared in `"ktech/ktech.hpp"`. This file is what your game source files should `#include`.
+The core library is declared in `ktech/ktech.hpp`. This file is what your game source files should `#include`.
 
-`"ktech.hpp"` contains forward declarations, all of which are enclosed within a namespace named `KTech`. Classes are defined in the other header files (`".hpp"`), and class members are usually defined in additional source files (`".cpp"`).
+`ktech.hpp` contains forward declarations, all of which are enclosed within a namespace named `KTech`. Classes are defined in the other header files (`*.hpp`), and class members are usually defined in additional source files (`*.cpp`).
 
-The non-core parts of the library are so far only the optional predefined UI elements ("widgets") that are stored in `"ktech/widgets/"`. If you want to use any of KTech's widgets, you may selectively include the header files from that directory.
+The non-core parts of the library are so far only the optional predefined UI elements ("widgets") that are stored in `ktech/widgets/`. If you want to use any of KTech's widgets, you may selectively include the header files from that directory.
 
-The contents of `"ktech/"` is split into multiple sub-directories:
-- `"basic/"` - basic classes.
-- `"engine/"` - the `Engine` class and engine components.
-- `"utility/"` - utility classes.
-- `"widgets/"` - optional widgets that you may include from here.
-- `"world/"` - world classes.
+The contents of `ktech/` is split into multiple sub-directories:
+- `basic/` - basic classes.
+- `engine/` - the `Engine` class and engine components.
+- `utility/` - utility classes.
+- `widgets/` - optional widgets that you may include from here.
+- `world/` - world classes.
 
-Note that `"ktech.hpp"` includes all of required header files only if `KTECH_DEFINITION` is undefined. This macro is an include guard completely internal to KTech, and you shouldn't define it before including `"ktech.hpp"`. Apart from that, don't worry about this macro.
+Note that `ktech.hpp` includes all of the required header files only if `KTECH_DEFINITION` is undefined (and it is normally undefined). This macro is an include guard completely internal to KTech, and you shouldn't define it before including `ktech.hpp`. Apart from that, don't worry about this macro.
 
-## How does `CachingRegistry` works?
+## How does `CachingRegistry` work?
 
 `KTech::ID` is initialized with a UUID value when constructed, meaning, references to world structures (classes that have an `ID m_id` member) are serializable. All that is left is some kind of a container to store world structure instances or register world structure pointers, so world structures can be retrieved using their `ID`s.
 
@@ -122,6 +122,6 @@ Switching to GNU/Linux, I started porting my project to the Unix (POSIX) termina
 
 KCGE was no longer named that; the goal I set was to make an actual terminal game engine. I remembered that as I was installing Arch Linux on my system I was given a terminal, but no X11. It means KTech games couldn't be played on a Linux TTY, deeming them X11 programs rather than terminal programs. Yet that's not all of it. What if someone launches the game on Wayland? I'll have to verify XWayland manages to handle my library. Well, what if the player is using a window manager that doesn't expect the terminal to normally, and randomly, resize itself? What if changing the font doesn't work the same across all terminal emulators? But undoubtedly, the crux of it all: what if the user is expecting the terminal application to behave like a terminal application?
 
-It was made apparent to me that KTech is not to besiege the terminal, but rather the opposite. The terminal's size, font, inputs, location on the screen; these are all under the responsibilities of the terminal and the window manager, which are themselves under the user's control. Violating this idea ultimately violates the user's rightful sovereignty over their personal computer. For example, a terminal program ought to adapt to the terminal's displayed buffer, in lieu of resizing the terminal to fit the program. Alas, the standardized terminal still has some limitations that if broken won't necessarily contradict this view, notably, removing delay before keys start repeating, locally, in the terminal.
+It was made apparent to me that KTech is not to besiege the terminal, but rather the opposite. The terminal's size, font, inputs, location on the screen; these are all under the responsibilities of the terminal and the window manager, which are themselves under the user's control. Violating this idea ultimately violates the user's rightful sovereignty over their personal computer. For example, a terminal program ought to adapt to the terminal's displayed buffer, in lieu of resizing the terminal to fit the program. Alas, the standardized terminal still has some limitations that if broken won't necessarily contradict this view, notably, removing delay before keys start repeating, locally, in the terminal, is impossible as far as I know.
 
 Over a year later I returned the Windows port, because I have big plans for KTech and the games I'm gonna make with it. This time the currently installed doctrine was kept (obviously, as I want games to behave the same between Windows and GNU/Linux), but almost: selecting text in the Windows Console strangely pauses output, which is more annoying than ideological, so that feature, on the Windows port, I decided to disable.
