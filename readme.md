@@ -23,7 +23,7 @@ Not to be confused, KTech is not a software development kit (SDK), as goes the t
 
 As terminal software, the graphics are printed to the terminal, and user inputs are received as escape codes in a sequence as if typed. This makes KTech games unique graphics-wise and input-wise, as they lead to unconventional solutions.
 
-Making a game with KTech can be done entirely from a terminal: use a terminal text editor (such as Vim) for coding, the [TextureCreator](#texturecreator) application for creating textures, [Premake and Make for building](/documentation/faq.md#how-to-build-ktech-with-premake). Then, simply run the game.
+Making a game with KTech can be done entirely from a terminal: use a terminal text editor (such as Vim) for coding, the [TextureCreator](#texturecreator) application for creating textures, [Premake and Make for building](/documentation/faq.md#how-to-build-ktech-with-premake), and then, simply run the game.
 
 Here's how a very simple KTech game can look like:
 
