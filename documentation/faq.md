@@ -11,6 +11,8 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 - [How does the file system work?](#how-does-the-file-system-work)
 - [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
 - [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
+- [Will there be a software development kit?](#will-there-be-a-software-development-kit)
+- [Is KTech GPU-accelerated?]()
 
 # Q&A
 
@@ -125,3 +127,13 @@ KCGE was no longer named that; the goal I set was to make an actual terminal gam
 It was made apparent to me that KTech is not to besiege the terminal, but rather the opposite. The terminal's size, font, inputs, location on the screen; these are all under the responsibilities of the terminal and the window manager, which are themselves under the user's control. Violating this idea ultimately violates the user's rightful sovereignty over their personal computer. For example, a terminal program ought to adapt to the terminal's displayed buffer, in lieu of resizing the terminal to fit the program. Alas, the standardized terminal still has some limitations that if broken won't necessarily contradict this view, notably, removing delay before keys start repeating, locally, in the terminal, is impossible as far as I know.
 
 Over a year later I returned the Windows port, because I have big plans for KTech and the games I'm gonna make with it. This time the currently installed doctrine was kept (obviously, as I want games to behave the same between Windows and GNU/Linux), but almost: selecting text in the Windows Console strangely pauses output, which is more annoying than ideological, so that feature, on the Windows port, I decided to disable.
+
+## Will there be a software development kit?
+
+Personally I haven't directly planned on writing more SDK-like components similar to [TextureCreator](https://github.com/TheRealKaup/TextureCreator), though I will expand TextureCreator's capabilities as I return to developing my game netset. If someone wants to take the engine for a ride and make another tool with it, I'd be honored.
+
+## Is KTech GPU-accelerated?
+
+KTech doesn't know more than the CPU, but it should be clear that some terminal has to display its prints. Such terminal is likely rendered by a GPU, and also could be itself a GPU-accelerated terminal emulator.
+
+Nonetheless, KTech achieves beyond playable performance.

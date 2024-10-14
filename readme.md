@@ -3,7 +3,6 @@
 - [Introduction](#introduction) - general explanation of what KTech is.
 - [Documentation](#documentation) - links to the project's documentation.
 - [Capabilities](#capabilities) - key features included in the library. 
-- [Interesting Details](#interesting-details) - some specifics that could arouse your curiosity.
 - [Contributing](#contributing) - how to contribute to the development of KTech.
 - [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
@@ -23,6 +22,8 @@ As a library, KTech offers an ecosystem of types, functions and variables that w
 Not to be confused, KTech is not a software development kit (SDK), as goes the traditional sense of the term "game engine". KTech is a library; source and header files you include in your game project.
 
 As terminal software, the graphics are printed to the terminal, and user inputs are received as escape codes in a sequence as if typed. This makes KTech games unique graphics-wise and input-wise, as they lead to unconventional solutions.
+
+Making a game with KTech can be done entirely from a terminal: use a terminal text editor (such as Vim) for coding, the [TextureCreator](#texturecreator) application for creating textures, [Premake and Make for building](/documentation/faq.md#how-to-build-ktech-with-premake). Then, simply run the game.
 
 Here's how a very simple KTech game can look like:
 
@@ -50,16 +51,6 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 - **Input** - Terminal-optimized user input processing.
 - **Memory** - Serializable containers for game structures.
 - Some other quirks and features.
-
----
-
-## Interesting Details
-
-- KTech is simply a library, which naturally makes certain aspects of KTech game development tedious without external help. For this reason I made an application, using KTech itself, called "TextureCreator" that helps creating terminal-based textures. TextureCreator covers and improves one aspect of KTech game development, and in the future may be part of a full software development kit.
-- The game developer (the KTech user) constructs their own game loop with functions provided by the library. While this makes the distinction between "game" and "engine" different from popular game engines, it gives the user wider control and better understanding of what's happening.
-- KTech knows no more than the CPU, yet achieves more than playable performance.
-- Making a game with KTech can be entirely done from a terminal: use a terminal text editor (such as Vim) for writing code, the TextureCreator application for creating textures, Premake and Make for building. Then, simply run the game.
-- I, Kaup, started the development of KTech in March 2022. While progress was inconsistent, this has been the biggest programming project I have ever worked on, and I wouldn't be surprised to know that so far I invested a 4 digit number of hours into it.
 
 ---
 
