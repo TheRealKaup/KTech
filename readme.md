@@ -35,7 +35,7 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 ## Documentation
 
-- **[faq.md](documentation/faq.md)** - answers for frequently asked questions **(includes detailed building instructions)**.
+- **[faq.md](documentation/faq.md)** - answers to frequently asked questions **(includes detailed building instructions)**.
 - **[tutorial/](documentation/tutorial/1-introduction.cpp)** - comprehensive tutorial conveyed via code and practice.
 - **Doxygen** (work in progress) - library reference, comprising concise information about each element.
 - **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
@@ -44,12 +44,12 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 ## Capabilities
 
-- **Graphics** - Rendering terminal graphics with 24-bit color depth, opacity and layers.
-- **Physics** - Object movement with pushing, blocking and overlapping events, based on different collider types.
-- **UI** - Comprises an expanding collection of widgets.
-- **Time** - Game loop and invocations management.
-- **Input** - Terminal-optimized user input processing.
-- **Memory** - Serializable containers for game structures.
+- **Graphics** - rendering terminal graphics with 24-bit color depth, opacity and layers.
+- **Physics** - object movement with pushing, blocking and overlapping events, based on different collider types.
+- **UI** - comprises an expanding collection of widgets.
+- **Time** - game loop and invocations management.
+- **Input** - terminal-optimized user input processing.
+- **Memory** - serializable containers for game structures.
 - Some other quirks and features.
 
 ---
@@ -65,8 +65,7 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 ## Contact Information
 
 Kaup (Ethan Kaufman):
-- Email: ethan.kauf736@gmail.com
-- Instagram: https://www.instagram.com/kaufboi/
+- Email - ethan.kauf736@gmail.com
 
 ---
 
