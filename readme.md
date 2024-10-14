@@ -4,8 +4,8 @@
 - [Documentation](#documentation) - links to the project's documentation.
 - [Capabilities](#capabilities) - key features included in the library. 
 - [Contributing](#contributing) - how to contribute to the development of KTech.
-- [Contact Information](#contact-information) - how to contact me (Kaup).
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
+- [Contact Information](#contact-information) - how to contact the developer.
 
 ![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
 
@@ -35,10 +35,10 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 ## Documentation
 
-- **[faq.md](documentation/faq.md)** - answers to frequently asked questions **(includes detailed building instructions)**.
-- **[tutorial/](documentation/tutorial/1-introduction.cpp)** - comprehensive tutorial conveyed via code and practice.
-- **Doxygen** (work in progress) - library reference, comprising concise information about each element.
-- **[COPYING](COPYING)** - the license which covers KTech (GPLv3-or-later).
+- [`faq.md`](documentation/faq.md) - answers to frequently asked questions **(includes detailed building instructions)**.
+- [`tutorial/`](documentation/tutorial/1-introduction.cpp) (work in progress) - comprehensive tutorial conveyed via code and practice.
+- Doxygen (work in progress) - library reference, comprising concise information about each element.
+- [`COPYING`](COPYING) - the license which covers KTech (GPLv3-or-later).
 
 ---
 
@@ -62,13 +62,6 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 ---
 
-## Contact Information
-
-Kaup (Ethan Kaufman):
-- Email - ethan.kauf736@gmail.com
-
----
-
 ## Interrelated Projects
 
 ### netset
@@ -84,3 +77,9 @@ Here's a screenshot of the game, from 9.10.2023 (d/m/y):
 An application made with KTech for creating cell-based texture files for KTech games. This program is required because each terminal character cell has an RGB foreground color, an RGB background color and a character. This kind of texture can't be created by a normal pixel-based image creator.
 
 <img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/texturecreatorscreenshot.png" alt="TextureCreator Screenshot" max-height="500"/>
+
+---
+
+## Contact Information
+
+For legal and business matters, Kaup (Ethan Kaufman), via email: ethan.kauf736@gmail.com
