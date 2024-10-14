@@ -23,6 +23,7 @@
 #include "../utility/rgbacolors.hpp"
 
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 
 KTech::Texture& KTech::Texture::Simple(UPoint p_size, CellA p_value)
@@ -60,25 +61,17 @@ KTech::Texture& KTech::Texture::File(const std::string& p_fileName)
 	m_simple = false;
 	// Open file
 	std::ifstream file(p_fileName);
-	if (!file.is_open())
-	{
-		// Failed to open file
-		Resize(UPoint(2, 2));
-		m_t[0] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
-		m_t[1] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
-		m_t[2] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
-		m_t[3] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
-	}
-	else
-	{
-		// Get size
-		UPoint newSize;
-		file.read((char*)&newSize, 8);
-		// Apply size
-		Resize(newSize);
-		// Read from file
-		file.read((char*)m_t.data(), m_t.size() * 9);
-	}
+	if (!file.is_open()) 
+		return Null(); // Failed to open file
+	// Get size
+	UPoint newSize;
+	file.read((char*)&newSize, sizeof(UPoint));
+	if (newSize.x * newSize.y * sizeof(CellA) != std::filesystem::file_size(p_fileName) - sizeof(UPoint))
+		return Null(); // Size doesn't match real size
+	// Apply size
+	Resize(newSize);
+	// Read from file
+	file.read((char*)m_t.data(), m_t.size() * sizeof(CellA));
 	return *this;
 }
 
@@ -109,6 +102,22 @@ KTech::Texture& KTech::Texture::Write(const std::vector<std::string>& p_stringVe
 {
 	m_rPos = p_pos;
 	return Write(p_stringVector, p_frgba, p_brgba);
+}
+
+KTech::Texture& KTech::Texture::Null()
+{
+	Resize(UPoint(2, 2));
+	m_t[0] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
+	m_t[1] = CellA(' ', RGBAColors::transparent, RGBA(255, 0, 220, 255));
+	m_t[2] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
+	m_t[3] = CellA(' ', RGBAColors::transparent, RGBA(0, 0, 0, 255));
+	return *this;
+}
+
+KTech::Texture& KTech::Texture::Null(Point p_pos)
+{
+	m_rPos = p_pos;
+	return Null();
 }
 
 KTech::CellA& KTech::Texture::operator()(size_t x, size_t y)

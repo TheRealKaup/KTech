@@ -49,6 +49,9 @@ struct KTech::Texture
 	Texture& File(const std::string& fileName, Point relativePosition);
 	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
 	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition);
+	// Creates "missing texture"
+	Texture& Null();
+	Texture& Null(Point relativePosition);
 
 	CellA& operator()(size_t x, size_t y);
 	const CellA& operator()(size_t x, size_t y) const;
