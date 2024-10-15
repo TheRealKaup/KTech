@@ -1,8 +1,8 @@
-# Preamble
+# Outline
 
 This document contains specifications for KTech's code.
 
-- [Preamble](#preamble)
+- [Outline](#outline)
 - [Naming](#naming)
 - [Classes](#classes)
     - [Order of class members](#order-of-class-members)
@@ -13,6 +13,7 @@ This document contains specifications for KTech's code.
     - [Other conventions about classes](#other-conventions-about-classes)
 - [Source and header files](#source-and-header-files)
 	- [Inclusion](#inclusion)
+- [Other](#other)
 
 # Naming
 
@@ -47,15 +48,14 @@ Within each section, the order of class members should be as listed:
 - Classes
 - Variables:
     - Static variables
-    - Engine data:
+    - Regarding world structures, engine data (in an order that minimizes padding):
         - `Engine` reference or pointer
         - Personal `ID`
         - String name
         - Parent's `ID`
         - Children's `ID`s
         - Active status
-    - External data (which are variables that are mostly processed by other classes, such as those that represent appearance and physical space)
-    - Internal data (which are variables that are mostly processed by the class itself, usually anything that isn't external data)
+    - Anything else, or everything else for non-world structures (in an order that minimizes padding)
 - Constructors (including fake constructors like those in `Texture` and `Collider`)
 - Destructor
 - Operator overrides
@@ -78,7 +78,7 @@ The members' definitions should be in the same order they were declared in the c
 
 The order of parameters in constructors of "simple classes" (to do: replace this vague term) should be the same order that the corresponding member variables are declared in.
 
-If all constructors of a class initialize a member variable, or that memeber variable has a default constructor that is used in a constructor that makes said member variable irrelevant, don't set a defualt value for that member variable where it is declared.
+If all constructors of a class initialize a member variable, or that member variable has a default constructor that is used in a constructor that makes said member variable irrelevant, don't set a default value for that member variable where it is declared.
 
 For example:
 
@@ -244,4 +244,21 @@ For example:
 #include "../engine/engine.hpp"
 
 #include <iostream>
+```
+
+# Other
+
+Enumerations should typically be based on `uint8_t`, unless 1 byte isn't sufficient.
+
+The curly brackets of scopes should have their own line:
+
+```cpp
+void Function()
+{ // Good
+
+}
+
+void Function() { // Bad
+
+}
 ```

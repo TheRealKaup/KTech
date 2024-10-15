@@ -75,11 +75,11 @@ private:
 #else
 	termios m_oldTerminalAttributes;
 #endif
+	bool changedThisTick = false;
 	std::thread m_inputLoop;
 	std::vector<BasicHandler*> m_basicHandlers;
 	std::vector<RangedHandler*> m_rangedHandlers;
 	std::vector<CallbacksGroup*> m_groups;
-	bool changedThisTick = false;
 	
 	void Get();
 

@@ -53,11 +53,11 @@ public:
 			: callback(callback), ticksLeft(ticks) {}
 	};
 
-	int16_t tpsLimit;
 	float tps = 0.0f;
 	float tpsPotential = 0.0f;
 	int32_t deltaTime = 0;
 	int32_t ticksCounter = 0;
+	int16_t tpsLimit;
 
 	inline Time(Engine* const engine, int16_t ticksPerSecondLimit = 24)
 		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
@@ -72,12 +72,11 @@ public:
 	void WaitUntilNextTick();
 
 private:
+	bool changedThisTick = false;
 	Engine* const engine;
-
 	const TimePoint m_startTP;
 	TimePoint m_thisTickStartTP;
 	std::vector<Invocation*> m_invocations;
-	bool changedThisTick = false;
 
 	friend class Output;
 };

@@ -25,9 +25,9 @@
 struct KTech::Input::BasicCallback
 {
 	bool enabled = true;
+	bool onTick;
 	std::function<bool()> ptr;
 	BasicHandler* parentHandler;
-	bool onTick;
 	
 	inline BasicCallback(const std::function<bool()>& callback, BasicHandler* parentHandler, bool onTick)
 		: ptr(callback), parentHandler(parentHandler), onTick(onTick) {}

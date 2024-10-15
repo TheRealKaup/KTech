@@ -35,12 +35,12 @@ struct KTech::Texture
 {
 	bool m_active = true;
 
-	Point m_rPos;
 	bool m_simple;
-	UPoint m_size;
 	CellA m_value;
+	Point m_rPos;
+	UPoint m_size;
 	std::vector<CellA> m_t;
-	
+
 	Texture& Simple(UPoint size, CellA value);
 	Texture& Simple(UPoint size, CellA value, Point relativePosition);
 	Texture& Rectangle(UPoint size, CellA value);

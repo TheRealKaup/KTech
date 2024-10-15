@@ -33,11 +33,11 @@ struct KTech::Collider
 {
 	bool m_active = true;
 
-	Point m_rPos;
 	bool m_simple;
+	uint8_t m_type;
+	Point m_rPos;
 	UPoint m_size;
 	std::vector<uint8_t> m_c;
-	uint8_t m_type;
 
 	void Simple(UPoint size, uint8_t type, Point relativePosition = Point(0, 0));
 	void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relativePosition = Point(0, 0));
