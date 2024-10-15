@@ -1,4 +1,4 @@
-# *KTech*, Kaup's C++ Terminal Game Engine Library
+# *KTech*, Kaup's C++ Terminal Game Engine
 
 - [Introduction](#introduction) - general explanation of what KTech is.
 - [Documentation](#documentation) - links to the project's documentation.
