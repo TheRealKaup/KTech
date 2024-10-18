@@ -56,7 +56,7 @@ KTech::Texture& KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_
 	return Rectangle(p_size, p_value);
 }
 
-KTech::Texture& KTech::Texture::File(const std::string& p_fileName)
+KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_fileName)
 {
 	m_simple = false;
 	// Open file
@@ -75,7 +75,7 @@ KTech::Texture& KTech::Texture::File(const std::string& p_fileName)
 	return *this;
 }
 
-KTech::Texture& KTech::Texture::File(const std::string& p_fileName, Point p_pos)
+KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_fileName, Point p_pos)
 {
 	m_rPos = p_pos;
 	return File(p_fileName);

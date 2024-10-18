@@ -28,6 +28,7 @@
 #include "../basic/rgba.hpp"
 #include "../basic/cella.hpp"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -45,8 +46,8 @@ struct KTech::Texture
 	Texture& Simple(UPoint size, CellA value, Point relativePosition);
 	Texture& Rectangle(UPoint size, CellA value);
 	Texture& Rectangle(UPoint size, CellA value, Point relativePosition);
-	Texture& File(const std::string& fileName);
-	Texture& File(const std::string& fileName, Point relativePosition);
+	Texture& File(const std::filesystem::path& fileName);
+	Texture& File(const std::filesystem::path& fileName, Point relativePosition);
 	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
 	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition);
 	// Creates "missing texture"
