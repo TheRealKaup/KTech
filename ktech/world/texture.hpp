@@ -46,8 +46,8 @@ struct KTech::Texture
 	Texture& Simple(UPoint size, CellA value, Point relativePosition);
 	Texture& Rectangle(UPoint size, CellA value);
 	Texture& Rectangle(UPoint size, CellA value, Point relativePosition);
-	Texture& File(const std::filesystem::path& fileName);
-	Texture& File(const std::filesystem::path& fileName, Point relativePosition);
+	Texture& File(const std::filesystem::path& filePath);
+	Texture& File(const std::filesystem::path& filePath, Point relativePosition);
 	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
 	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition);
 	// Creates "missing texture"
@@ -68,7 +68,7 @@ struct KTech::Texture
 	Texture& SetAlpha(uint8_t value);
 	Texture& ReplaceCharacter(char oldValue, char newValue);
 	
-	void ExportToFile(const std::string& fileName) const;
+	void ExportToFile(const std::filesystem::path& filePath) const;
 	// For debugging
 	void Print();
 };

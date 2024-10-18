@@ -56,17 +56,17 @@ KTech::Texture& KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_
 	return Rectangle(p_size, p_value);
 }
 
-KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_fileName)
+KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_filePath)
 {
 	m_simple = false;
 	// Open file
-	std::ifstream file(p_fileName);
+	std::ifstream file(p_filePath);
 	if (!file.is_open()) 
 		return Null(); // Failed to open file
 	// Get size
 	UPoint newSize;
 	file.read((char*)&newSize, sizeof(UPoint));
-	if (newSize.x * newSize.y * sizeof(CellA) != std::filesystem::file_size(p_fileName) - sizeof(UPoint))
+	if (newSize.x * newSize.y * sizeof(CellA) != std::filesystem::file_size(p_filePath) - sizeof(UPoint))
 		return Null(); // Size doesn't match real size
 	// Apply size
 	Resize(newSize);
@@ -75,10 +75,10 @@ KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_fileName)
 	return *this;
 }
 
-KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_fileName, Point p_pos)
+KTech::Texture& KTech::Texture::File(const std::filesystem::path& p_filePath, Point p_pos)
 {
 	m_rPos = p_pos;
-	return File(p_fileName);
+	return File(p_filePath);
 }
 
 KTech::Texture& KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_frgba, RGBA p_brgba)
@@ -247,14 +247,17 @@ KTech::Texture& KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
 	return *this;
 }
 
-void KTech::Texture::ExportToFile(const std::string& p_fileName) const
+void KTech::Texture::ExportToFile(const std::filesystem::path& p_filePath) const
 {
 	// Create/open file
-	std::ofstream file(p_fileName);
-	// Write size
-	file.write((char*)&m_size, 8);
-	// Write texture
-	file.write((char*)m_t.data(), m_t.size() * 9);
+	std::ofstream file(p_filePath);
+	if (file.is_open())
+	{
+		// Write size
+		file.write((char*)&m_size, 8);
+		// Write texture
+		file.write((char*)m_t.data(), m_t.size() * 9);
+	}
 }
 
 void KTech::Texture::Print()
