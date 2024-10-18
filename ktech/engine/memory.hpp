@@ -23,7 +23,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/container.hpp"
+#include "../utility/cachingregistry.hpp"
 
 class KTech::Memory
 {

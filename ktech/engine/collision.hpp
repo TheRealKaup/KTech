@@ -34,7 +34,7 @@ public:
 	std::vector<std::vector<CR>> colliderTypes = {
 		{ CR::B, CR::P, CR::O }, // Unpushable - 0
 		{ CR::B, CR::P, CR::O }, // Pushable - 1
-		{ CR::O, CR::O, CR::O } // overlapping - 2
+		{ CR::O, CR::O, CR::O } // Overlapping - 2
 	};
 
 	inline Collision(Engine* engine)

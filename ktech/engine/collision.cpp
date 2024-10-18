@@ -106,7 +106,7 @@ bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point
 		{
 			if (p_c2.m_simple)
 			{
-				// Both colliders are simplet to begin with
+				// Both colliders are simple to begin with
 				return true;
 			}
 			else
@@ -123,7 +123,7 @@ bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point
 		{
 			if (p_c2.m_simple)
 			{
-				// `p_c1` is compelx, `p_c2` is simple
+				// `p_c1` is complex, `p_c2` is simple
 				for (size_t y = (p_p1.y < p_p2.y ? p_p2.y - p_p1.y : 0); y < p_c1.m_size.x && p_p1.y + y < p_p2.y + p_c2.m_size.y; y++)
 					for (size_t x = (p_p1.x < p_p2.x ? p_p2.x - p_p1.x : 0); x < p_c1.m_size.x && p_p1.x + x < p_p2.x + p_c2.m_size.x; x++)
 						if (p_c1(x, y))
@@ -132,7 +132,7 @@ bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point
 			}
 			else
 			{
-				// `p_c1` and `p_c2` are compelx
+				// `p_c1` and `p_c2` are complex
 
 				size_t y1 = 0;
 				size_t y2 = 0;
@@ -166,7 +166,7 @@ bool KTech::Collision::AreCollidersOverlapping(const Collider& p_c1, const Point
 	}
 	else
 	{
-		// If there's not even simple overlap, there will be no compelx overlap as well
+		// If there's not even simple overlap, there will be no complex overlap as well
 		return false;
 	}
 }
@@ -225,7 +225,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 
 				// If the current known result is block (0) and the potential result of this other object is also block then there is no reason to proceed checking.
 				// If the current known result if push (1) and the potential result is also push then once again there is no reason to proceed checking.
-				// But, if the potential result is overlap then proceed checking no matter the known result, we want to get all the overlaps occurences.
+				// But, if the potential result is overlap then proceed checking no matter the known result, we want to get all the overlap occurrences.
 				
 				// Check enter/exit overlap events
 				if (potentialCollisionResult == CR::O)

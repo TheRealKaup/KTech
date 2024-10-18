@@ -93,7 +93,7 @@ namespace KTech
 #include "world/widget.hpp"
 #include "world/ui.hpp"
 
-#include "utility/container.hpp"
+#include "utility/cachingregistry.hpp"
 #include "utility/cr.hpp"
 #include "utility/id.hpp"
 #include "utility/keys.hpp"

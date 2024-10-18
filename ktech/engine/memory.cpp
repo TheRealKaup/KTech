@@ -20,7 +20,7 @@
 
 #include "memory.hpp"
 
-#include "../utility/container.hpp" 
+#include "../utility/cachingregistry.hpp" 
 #include "../world/camera.hpp"
 #include "../world/layer.hpp"
 #include "../world/map.hpp"
