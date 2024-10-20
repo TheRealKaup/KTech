@@ -212,19 +212,22 @@ void KTech::Input::CallCallbacks()
 void KTech::Input::Get()
 {
 #ifdef _WIN32
-	// Add space in history
-	m_triggers.push_back(std::move(std::string()));
-	// Write input to history (TCHAR to char conversion)
+	// Read
+	TCHAR tcharBuf[7];
+	memset(tcharBuf, 0, sizeof(tcharBuf));
 	LPDWORD nReadCharacters = 0;
-	TCHAR buf[7];
-	memset(buf, 0, sizeof(buf));
-	ReadConsole(m_stdinHandle, buf.data(), buf.length(), (LPDWORD)(&nReadCharacters), NULL);
-	m_triggers[m_triggers.size() - 1].resize(nReadCharacters);
-	for (size_t i = 0; i < nReadCharacters; i++)
-		m_triggers[m_triggers.size() - 1] += buf[i];
+	ReadConsole(m_stdinHandle, tcharBuf, sizeof(tcharBuf) / sizeof(TCHAR), (LPDWORD)(&nReadCharacters), NULL);
+	// Convert `TCHAR` string to `char` string
+	std::string charBuf((size_t)nReadCharacters, '\0');
+	for (size_t i = 0; i < (size_t)nReadCharacters; i++)
+		charBuf[i] = tcharBuf[i];
+	// Move to input history
+	m_triggers.push_back(std::move(charBuf));
 #else
+	// Read
 	std::string buf(7, '\0');
 	buf.resize(read(0, buf.data(), buf.size()));
+	// Move to input history
 	m_triggers.push_back(std::move(buf));
 #endif
 }
