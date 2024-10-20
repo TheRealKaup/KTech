@@ -22,29 +22,24 @@
 
 #include "input.hpp"
 
-struct KTech::Input::CallbacksGroup
+struct KTech::Input::Handler
 {
-	enum class Status : uint8_t
+	enum class Type : uint8_t
 	{
-		disabled,
-		enabled,
-		removeDisabled, // Remove and then return status to disabled
-		removeEnabled, // Remove and then return status to enabled
+		String,
+		Range
 	};
 
+	// const Type m_type;
+	const char m_start = '\0', m_end = '\0';
+	const std::string m_string;
 	std::vector<Callback*> m_callbacks;
-	Status m_status;
-	bool m_synced = true;
 
-	CallbacksGroup(bool enabled = true)
-		: m_status(enabled ? Status::enabled : Status::disabled) {}
-		
-	void AddCallback(Callback* basicCallback);
-	
-	void DeleteCallbacks();
-	
-	void Enable();
-	void Disable();
+	inline Handler(const::std::string& input)
+		: m_string(input) {}
 
-	void Update();
+	inline Handler(char key1, char key2)
+		: m_start(key1), m_end(key2) {}
+
+	void RemoveCallback(Callback* callback);
 };

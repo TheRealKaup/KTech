@@ -49,7 +49,7 @@ public:
 		// Textures
 		SetText(text, withFrame);
 		// Input handlers
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(key, std::bind(&Switch::OnPress, this), false));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(key, std::bind(&Switch::OnPress, this)));
 	}
 
 	virtual ~Switch()

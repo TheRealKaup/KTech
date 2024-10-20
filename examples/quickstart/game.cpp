@@ -51,15 +51,10 @@ struct Character : KTech::Object
 				&Character::Move, // Pointer to the callback function, `Object::Move()`, which requests `Collision` to move this object.
 				this, // Bind this object to the function.
 				KTech::Point(0, 1) // `Move()` has one `Point` parameter which represents where to attempt moving relatively (direction), so bind +1 on the Y axis (which means down) to it.
-			),
-			true // When the key is pressed the function will be called with the next tick if true, or immediately (unsynced and completely outside the game loop's thread) if false. The former works better with physics-related matters (1), while the latter is preferable for UI (2).
-			// Detailed explanations:
-			// 1 - Synchronizing movements triggered by input with changes in physical states (e.g., `Object::Move()` registered to the space key with a ground check executed on-tick to allow further jumping) is helpful to avoid unexpected behavior. On-tick input callback functions are normally called by `Input::CallHandlers()` which may be placed within the game loop, thus they safely finish before any on-tick operations start. 
-			// 2 - KTech does not remember the order of key presses, but rather calls synchronized callback function in the order their corresponding keys were initially registered. Meaning, if the player types into a text field at a keys-per-second rate higher than the game loop's ticks-per-second rate and the input callbacks are called on-tick, the order of input reaching the text field will likely not match the original order of keys pressed by the player.
-		);
-		engine.input.RegisterCallback(KTech::Keys::up, std::bind(&Character::Move, this, KTech::Point(0, -1)), true); // Move up.
-		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, KTech::Point(1, 0)), true); // Move right.
-		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, KTech::Point(-1, 0)), true); // Move left.
+			));
+		engine.input.RegisterCallback(KTech::Keys::up, std::bind(&Character::Move, this, KTech::Point(0, -1))); // Move up.
+		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, KTech::Point(1, 0))); // Move right.
+		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, KTech::Point(-1, 0))); // Move left.
 	
 		// Challenge: currently there is nothing for the character instance to be pushed by (which is allowed by collider type we set a moment ago). So, copy this class, change its keybindings and create an instance of it along with the original character (but pass it a different initial position). Now you have two characters controlled by different sets of keys; try making them push each other. 
 	}
@@ -152,7 +147,7 @@ int main()
 	while (engine.running)
 	{
 		// Call...
-		engine.input.CallHandlers(); // ...synchronized input callbacks (as were registered by `character`).
+		engine.input.CallCallbacks(); // ...synchronized input callbacks (as were registered by `character`).
 		engine.time.CallInvocations(); // ...timed invocations (though none were made here).
 		engine.memory.CallOnTicks(); // ...on-tick functions (also left unutilized in this example).
 

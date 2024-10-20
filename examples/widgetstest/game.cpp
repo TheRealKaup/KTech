@@ -186,7 +186,7 @@ int main()
 	while (engine.running)
 	{
 		// Calls
-		engine.input.CallHandlers();
+		engine.input.CallCallbacks();
 		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 

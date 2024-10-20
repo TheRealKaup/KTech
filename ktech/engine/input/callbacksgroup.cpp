@@ -20,18 +20,12 @@
 
 #include "callbacksgroup.hpp"
 
-#include "callbacks_handlers.hpp"
+#include "callback.hpp"
 
-void KTech::Input::CallbacksGroup::AddCallback(BasicCallback* callback)
+void KTech::Input::CallbacksGroup::AddCallback(Callback* p_callback)
 {
-	m_basicCallbacks.push_back(callback);
-	callback->enabled = false;
-}
-
-void KTech::Input::CallbacksGroup::AddCallback(RangedCallback* callback)
-{
-	m_rangedCallbacks.push_back(callback);
-	callback->enabled = false;
+	m_callbacks.push_back(p_callback);
+	p_callback->enabled = false;
 }
 
 void KTech::Input::CallbacksGroup::Enable()
@@ -49,10 +43,8 @@ void KTech::Input::CallbacksGroup::Disable()
 void KTech::Input::CallbacksGroup::DeleteCallbacks()
 {
 	// Disable as soon as possible the callbacks (since the actual callbacks are probably deleted right after)
-	for (BasicCallback* basicCallback : m_basicCallbacks)
-		basicCallback->enabled = false;
-	for (RangedCallback* rangedCallback : m_rangedCallbacks)
-		rangedCallback->enabled = false;
+	for (Callback* callback : m_callbacks)
+		callback->enabled = false;
 	// Then request to delete the callbacks
 	// (removeDisabled will set the group to be disabled later, removeEnabled will set to enabled)
 	m_status = (m_status == Status::disabled ? Status::removeDisabled : Status::removeEnabled);
@@ -61,60 +53,43 @@ void KTech::Input::CallbacksGroup::DeleteCallbacks()
 
 void KTech::Input::CallbacksGroup::Update()
 {
-	if (!m_synced)
+	switch (m_status)
 	{
-		switch (m_status)
+		case Status::disabled:
 		{
-			case Status::disabled:
-			{
-				// Disalbe the callbacks
-				for (BasicCallback* basicCallback : m_basicCallbacks)
-					basicCallback->enabled = false;
-				for (RangedCallback* rangedCallback : m_rangedCallbacks)
-					rangedCallback->enabled = false;
-				break;
-			}
-			case Status::enabled:
-			{
-				// Enable the callbacks
-				for (BasicCallback* basicCallback : m_basicCallbacks)
-					basicCallback->enabled = true;
-				for (RangedCallback* rangedCallback : m_rangedCallbacks)
-					rangedCallback->enabled = true;
-				break;
-			}
-			case Status::removeDisabled:
-			{
-				// Delete the callbacks from memory (which will automatically delete the callbacks from
-				// their parent handlers' callback vector)
-				for (BasicCallback*& basicCallback : m_basicCallbacks)
-				{
-					delete basicCallback;
-				}
-				for (RangedCallback*& rangedCallback : m_rangedCallbacks)
-					delete rangedCallback;
-				// Clearthe group's vectors
-				m_basicCallbacks.clear();
-				m_rangedCallbacks.clear();
-				// Disable the group as requested
-				m_status = CallbacksGroup::Status::disabled;
-				break;
-			}
-			case Status::removeEnabled:
-			{
-				// The same as ^ but enable the group afterwards
-				for (BasicCallback* basicCallback : m_basicCallbacks)
-				{
-					delete basicCallback;
-				}
-				for (RangedCallback* rangedCallback : m_rangedCallbacks)
-					delete rangedCallback;
-				m_basicCallbacks.clear();
-				m_rangedCallbacks.clear();
-				m_status = Status::enabled;
-				break;
-			}
+			// Disable the callbacks
+			for (Callback* callback : m_callbacks)
+				callback->enabled = false;
+			break;
 		}
-		m_synced = true;
+		case Status::enabled:
+		{
+			// Enable the callbacks
+			for (Callback* callback : m_callbacks)
+				callback->enabled = true;
+			break;
+		}
+		case Status::removeDisabled:
+		{
+			// Delete the callbacks from memory (which will automatically delete the callbacks from
+			// their parent handlers' callback vector)
+			for (Callback*& callback : m_callbacks)
+				delete callback;
+			// Clear the group's vectors
+			m_callbacks.clear();
+			// Disable the group as requested
+			m_status = CallbacksGroup::Status::disabled;
+			break;
+		}
+		case Status::removeEnabled:
+		{
+			// The same as ^ but enable the group afterwards
+			for (Callback* callback : m_callbacks)
+				delete callback;
+			m_callbacks.clear();
+			m_status = Status::enabled;
+			break;
+		}
 	}
+	m_synced = true;
 }

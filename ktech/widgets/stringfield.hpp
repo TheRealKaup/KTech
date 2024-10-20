@@ -61,8 +61,8 @@ public:
 		// Input handlers
 		for (KeyRange& keyRange : allowedCharacters)
 			m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback(keyRange.key1, keyRange.key2, std::bind(&StringField::OnInsert, this)));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::OnInsert, this), false));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::OnInsert, this), false));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, std::bind(&StringField::OnInsert, this)));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, std::bind(&StringField::OnInsert, this)));
 	}
 
 	void SetText(const std::string& text, bool withFrame)

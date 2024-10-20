@@ -18,33 +18,11 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "handler.hpp"
 
-#include "input.hpp"
-
-struct KTech::Input::CallbacksGroup
+void KTech::Input::Handler::RemoveCallback(Callback* p_callback)
 {
-	enum class Status : uint8_t
-	{
-		disabled,
-		enabled,
-		removeDisabled, // Remove and then return status to disabled
-		removeEnabled, // Remove and then return status to enabled
-	};
-
-	std::vector<Callback*> m_callbacks;
-	Status m_status;
-	bool m_synced = true;
-
-	CallbacksGroup(bool enabled = true)
-		: m_status(enabled ? Status::enabled : Status::disabled) {}
-		
-	void AddCallback(Callback* basicCallback);
-	
-	void DeleteCallbacks();
-	
-	void Enable();
-	void Disable();
-
-	void Update();
-};
+	for (size_t i = 0; i < m_callbacks.size(); i++)
+		if (m_callbacks[i] == p_callback)
+			m_callbacks.erase(m_callbacks.begin() + i);
+}
