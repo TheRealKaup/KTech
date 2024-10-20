@@ -18,16 +18,18 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "callbacks_handlers.hpp"
+#pragma once
 
-KTech::Input::Callback::~Callback()
-{
-	parentHandler->RemoveCallback(this);
-}
+#include "input.hpp"
 
-void KTech::Input::Handler::RemoveCallback(Callback* p_callback)
+struct KTech::Input::Callback
 {
-	for (size_t i = 0; i < m_callbacks.size(); i++)
-		if (m_callbacks[i] == p_callback)
-			m_callbacks.erase(m_callbacks.begin() + i);
-}
+	bool enabled = true;
+	const std::function<bool()> ptr;
+	Handler* const parentHandler;
+
+	inline Callback(const std::function<bool()>& callback, Handler* parentHandler)
+		: ptr(callback), parentHandler(parentHandler) {}
+	
+	~Callback();
+};

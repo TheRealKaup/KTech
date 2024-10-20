@@ -22,18 +22,6 @@
 
 #include "input.hpp"
 
-struct KTech::Input::Callback
-{
-	bool enabled = true;
-	const std::function<bool()> ptr;
-	Handler* const parentHandler;
-
-	inline Callback(const std::function<bool()>& callback, Handler* parentHandler)
-		: ptr(callback), parentHandler(parentHandler) {}
-	
-	~Callback();
-};
-
 struct KTech::Input::Handler
 {
 	enum class Type : uint8_t
@@ -42,16 +30,16 @@ struct KTech::Input::Handler
 		Range
 	};
 
-	const Type m_type;
-	const char m_key1 = '\0', m_key2 = '\0';
-	const std::string m_input;
+	// const Type m_type;
+	const char m_start = '\0', m_end = '\0';
+	const std::string m_string;
 	std::vector<Callback*> m_callbacks;
 
 	inline Handler(const::std::string& input)
-		: m_input(input), m_type(Type::String) {}
+		: m_string(input) {}
 
 	inline Handler(char key1, char key2)
-		: m_key1(key1), m_key2(key2), m_type(Type::Range) {}
+		: m_start(key1), m_end(key2) {}
 
 	void RemoveCallback(Callback* callback);
 };

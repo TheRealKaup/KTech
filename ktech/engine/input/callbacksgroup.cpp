@@ -20,7 +20,7 @@
 
 #include "callbacksgroup.hpp"
 
-#include "callbacks_handlers.hpp"
+#include "callback.hpp"
 
 void KTech::Input::CallbacksGroup::AddCallback(Callback* p_callback)
 {
@@ -57,7 +57,7 @@ void KTech::Input::CallbacksGroup::Update()
 	{
 		case Status::disabled:
 		{
-			// Disalbe the callbacks
+			// Disable the callbacks
 			for (Callback* callback : m_callbacks)
 				callback->enabled = false;
 			break;
