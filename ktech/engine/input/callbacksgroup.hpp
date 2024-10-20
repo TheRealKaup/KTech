@@ -22,9 +22,8 @@
 
 #include "input.hpp"
 
-class KTech::Input::CallbacksGroup
+struct KTech::Input::CallbacksGroup
 {
-public:
 	enum class Status : uint8_t
 	{
 		disabled,
@@ -33,11 +32,14 @@ public:
 		removeEnabled, // Remove and then return status to enabled
 	};
 
+	std::vector<Callback*> m_callbacks;
+	Status m_status;
+	bool m_synced = true;
+
 	CallbacksGroup(bool enabled = true)
 		: m_status(enabled ? Status::enabled : Status::disabled) {}
 		
-	void AddCallback(BasicCallback* basicCallback);
-	void AddCallback(RangedCallback* rangedCallback);
+	void AddCallback(Callback* basicCallback);
 	
 	void DeleteCallbacks();
 	
@@ -45,10 +47,4 @@ public:
 	void Disable();
 
 	void Update();
-
-private:
-	std::vector<BasicCallback*> m_basicCallbacks;
-	std::vector<RangedCallback*> m_rangedCallbacks;
-	Status m_status;
-	bool m_synced = true;
 };

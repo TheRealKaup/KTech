@@ -87,7 +87,7 @@ int main()
 
 	while (engine.running)
 	{
-		engine.input.CallHandlers();
+		engine.input.CallCallbacks();
 		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 

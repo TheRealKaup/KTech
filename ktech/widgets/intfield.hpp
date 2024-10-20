@@ -57,8 +57,8 @@ public:
 		SetValue(defaultNum);
 		// Input handlers
 		m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this), false));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this), false));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this)));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this)));
 	}
 
 	void SetText(const std::string& text, bool withFrame)

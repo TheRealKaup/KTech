@@ -20,24 +20,12 @@
 
 #include "callbacks_handlers.hpp"
 
-KTech::Input::BasicCallback::~BasicCallback()
+KTech::Input::Callback::~Callback()
 {
 	parentHandler->RemoveCallback(this);
 }
 
-KTech::Input::RangedCallback::~RangedCallback()
-{
-	parentHandler->RemoveCallback(this);
-}
-
-void KTech::Input::BasicHandler::RemoveCallback(BasicCallback* p_callback)
-{
-	for (size_t i = 0; i < m_callbacks.size(); i++)
-		if (m_callbacks[i] == p_callback)
-			m_callbacks.erase(m_callbacks.begin() + i);
-}
-
-void KTech::Input::RangedHandler::RemoveCallback(RangedCallback* p_callback)
+void KTech::Input::Handler::RemoveCallback(Callback* p_callback)
 {
 	for (size_t i = 0; i < m_callbacks.size(); i++)
 		if (m_callbacks[i] == p_callback)

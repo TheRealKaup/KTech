@@ -140,21 +140,21 @@ struct Character : Object
 		m_colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
 
 		KTech::Output::Log("<Character::Character()> Registering callbacks", RGBColors::red);
-		engine.input.RegisterCallback("w", std::bind(&Character::Jump, this), true);
-		engine.input.RegisterCallback("W", std::bind(&Character::Jump, this), true);
-		engine.input.RegisterCallback(" ", std::bind(&Character::Jump, this), true);
-		engine.input.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this), true);
+		engine.input.RegisterCallback("w", std::bind(&Character::Jump, this));
+		engine.input.RegisterCallback("W", std::bind(&Character::Jump, this));
+		engine.input.RegisterCallback(" ", std::bind(&Character::Jump, this));
+		engine.input.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this));
 
-		engine.input.RegisterCallback("d", std::bind(&Character::Move, this, Point(1, 0)), true);
-		engine.input.RegisterCallback("D", std::bind(&Character::Move, this, Point(1, 0)), true);
-		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, Point(1, 0)), true);
+		engine.input.RegisterCallback("d", std::bind(&Character::Move, this, Point(1, 0)));
+		engine.input.RegisterCallback("D", std::bind(&Character::Move, this, Point(1, 0)));
+		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, Point(1, 0)));
 
-		engine.input.RegisterCallback("a", std::bind(&Character::Move, this, Point(-1, 0)), true);
-		engine.input.RegisterCallback("A", std::bind(&Character::Move, this, Point(-1, 0)), true);
-		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, Point(-1, 0)), true);
+		engine.input.RegisterCallback("a", std::bind(&Character::Move, this, Point(-1, 0)));
+		engine.input.RegisterCallback("A", std::bind(&Character::Move, this, Point(-1, 0)));
+		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, Point(-1, 0)));
 
-		engine.input.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this), true);
-		engine.input.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this), true);
+		engine.input.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this));
+		engine.input.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this));
 
 		KTech::Output::Log("<Character::Character()> Entering layer", RGBColors::red);
 		EnterLayer(layer);
@@ -351,7 +351,7 @@ int main()
 	KTech::Output::Log("<main()> Entering game loop", RGBColors::blue);
 	while (engine.running)
 	{
-		engine.input.CallHandlers();
+		engine.input.CallCallbacks();
 		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 

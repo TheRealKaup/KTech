@@ -79,46 +79,46 @@ KTech::Input::~Input()
 	m_inputLoop.detach();
 }
 
-KTech::Input::BasicCallback* KTech::Input::RegisterCallback(const std::string& p_input, const std::function<bool()>& p_callback, bool p_onTick)
+KTech::Input::Callback* KTech::Input::RegisterCallback(const std::string& p_input, const std::function<bool()>& p_callback)
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 		return nullptr;
 	// If a handler already exists for this input, add the callback to the calls vector
 	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
-	for (; i < m_basicHandlers.size(); i++)
+	for (; i < m_handlers.size(); i++)
 	{
-		if (m_basicHandlers[i]->m_input == p_input)
+		if (m_handlers[i]->m_input == p_input)
 		{
-			m_basicHandlers[i]->m_callbacks.push_back(new BasicCallback(p_callback, m_basicHandlers[i], p_onTick));
-			return m_basicHandlers[i]->m_callbacks[m_basicHandlers[i]->m_callbacks.size() - 1]; // Last callback
+			m_handlers[i]->m_callbacks.push_back(new Callback(p_callback, m_handlers[i]));
+			return m_handlers[i]->m_callbacks[m_handlers[i]->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	m_basicHandlers.push_back(new BasicHandler(p_input));
+	m_handlers.push_back(new Handler(p_input));
 	// And add a callback to it
-	m_basicHandlers[i]->m_callbacks.push_back(new BasicCallback(p_callback, m_basicHandlers[i], p_onTick));
-	return m_basicHandlers[i]->m_callbacks[m_basicHandlers[i]->m_callbacks.size() - 1]; // Last callback of last handler
+	m_handlers[i]->m_callbacks.push_back(new Callback(p_callback, m_handlers[i]));
+	return m_handlers[i]->m_callbacks[m_handlers[i]->m_callbacks.size() - 1]; // Last callback of last handler
 }
 
-KTech::Input::RangedCallback* KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback)
+KTech::Input::Callback* KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback)
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 		return nullptr;
 	// If a handler already exists for this input, add the callback to the calls vector
 	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
-	for (; i < m_rangedHandlers.size(); i++)
+	for (; i < m_handlers.size(); i++)
 	{
-		if (m_rangedHandlers[i]->m_key1 == p_key1 && m_rangedHandlers[i]->m_key2 == p_key2)
+		if (m_handlers[i]->m_key1 == p_key1 && m_handlers[i]->m_key2 == p_key2)
 		{
-			m_rangedHandlers[i]->m_callbacks.push_back(new RangedCallback(p_callback, m_rangedHandlers[i]));
-			return m_rangedHandlers[i]->m_callbacks[m_rangedHandlers[i]->m_callbacks.size() - 1]; // Last callback
+			m_handlers[i]->m_callbacks.push_back(new Callback(p_callback, m_handlers[i]));
+			return m_handlers[i]->m_callbacks[m_handlers[i]->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	m_rangedHandlers.push_back(new RangedHandler(p_key1, p_key2));
+	m_handlers.push_back(new Handler(p_key1, p_key2));
 	// And add a callback to it
-	m_rangedHandlers[i]->m_callbacks.push_back(new RangedCallback(p_callback, m_rangedHandlers[i]));
-	return m_rangedHandlers[i]->m_callbacks[m_rangedHandlers[i]->m_callbacks.size() - 1]; // Last callback
+	m_handlers[i]->m_callbacks.push_back(new Callback(p_callback, m_handlers[i]));
+	return m_handlers[i]->m_callbacks[m_handlers[i]->m_callbacks.size() - 1]; // Last callback
 }
 
 KTech::Input::CallbacksGroup* KTech::Input::CreateCallbacksGroup(bool p_enabled)
@@ -157,53 +157,75 @@ bool KTech::Input::Between(char p_charKey1, char p_charKey2) const
 	return (input[0] >= p_charKey1) && (input[0] <= p_charKey2) && (input[1] == 0);
 }
 
-void KTech::Input::CallHandlers()
+void KTech::Input::CallCallbacks()
 {
 	// Update groups' callbacks' `enabled` if `synced` is false
 	for (CallbacksGroup*& group : m_groups)
+		if (!group->m_synced)
+			group->Update();
+	
+	// Call callbacks of triggered handlers
+	for (std::string& trigger : m_triggers)
 	{
-		group->Update();
-	}
-	// Call basic handlers' callbacks
-	for (BasicHandler*& handler : m_basicHandlers)
-	{
-		if (handler->m_timesPressed > 0)
+		input = trigger;
+		if (trigger.length() == 1) // Can be both string/range handler
 		{
-			for (BasicCallback*& callback : handler->m_callbacks)
+			for (Handler* handler : m_handlers)
 			{
-				if (callback->enabled && callback->onTick)
+				if (handler->m_type == Handler::Type::String) // String handler
 				{
-					input = handler->m_input; // Would be preferable to not copy it this way each iteration
-					if (callback->ptr())
-						changedThisTick = true; // Render-on-demand
+					if (trigger == handler->m_input)
+					{
+						// Call callbacks
+						for (Callback* callback : handler->m_callbacks)
+							if (callback->enabled && callback->ptr())
+								changedThisTick = true; // Render-on-demand
+					}
+				}
+				else if (handler->m_key1 <= trigger[0] && trigger[0] <= handler->m_key2) // Range handler
+					for (Callback* callback: handler->m_callbacks)
+						if (callback->enabled && callback->ptr())
+							changedThisTick = true; // Render-on-demand
+			}
+		}
+		else // Can only be string handler
+		{
+			for (Handler* handler : m_handlers)
+			{
+				if (handler->m_type == Handler::Type::String // String handler
+					&& trigger == handler->m_input)
+				{
+					// Call callbacks
+					for (Callback* callback : handler->m_callbacks)
+						if (callback->enabled && callback->ptr())
+							changedThisTick = true; // Render-on-demand
+					break; // Break because there shouldn't be a similar handler
 				}
 			}
-			handler->m_timesPressed = 0;
 		}
 	}
+
+	// All callbacks of triggered handlers were called; clear trigger history
+	m_triggers.clear();
 }
 
 void KTech::Input::Get()
 {
 #ifdef _WIN32
-	typedef TCHAR BufChar;
-#else
-	typedef char BufChar;
-#endif
-	BufChar buf[7];
-
-	// Clear previous buffer
-	memset(buf, 0, sizeof(buf));
-	// Read input to buffer (blocking)
-#ifdef _WIN32
+	// Add space in history
+	m_triggers.push_back(std::move(std::string()));
+	// Write input to history (TCHAR to char conversion)
 	LPDWORD nReadCharacters = 0;
-	ReadConsole(m_stdinHandle, buf, sizeof(buf) / sizeof(BufChar), (LPDWORD)(&nReadCharacters), NULL);
-	input.clear();
-	for (size_t i = 0; buf[i]; i++)
-		input += buf[i];
+	TCHAR buf[7];
+	memset(buf, 0, sizeof(buf));
+	ReadConsole(m_stdinHandle, buf.data(), buf.length(), (LPDWORD)(&nReadCharacters), NULL);
+	m_triggers[m_triggers.size() - 1].resize(nReadCharacters);
+	for (size_t i = 0; i < nReadCharacters; i++)
+		m_triggers[m_triggers.size() - 1] += buf[i];
 #else
-	read(0, buf, sizeof(buf) / sizeof(BufChar));
-	input.assign(buf);
+	std::string buf(7, '\0');
+	buf.resize(read(0, buf.data(), buf.size()));
+	m_triggers.push_back(std::move(buf));
 #endif
 }
 
@@ -213,32 +235,11 @@ void KTech::Input::Loop()
 	{
 		// Get input
 		Get();
-		// Quit
-		if (input == quitKey)
+		if (m_triggers[m_triggers.size() - 1] == quitKey)
 		{
+			// Quit
 			engine->running = false;
 			break;
 		}
-		// Call basic handler
-		for (size_t i = 0; i < m_basicHandlers.size(); i++)
-		{
-			if (input == m_basicHandlers[i]->m_input) // The input is of this handler, call handler's callbacks
-			{
-				m_basicHandlers[i]->m_timesPressed++; // Used in synced calling
-				for (size_t j = 0; j < m_basicHandlers[i]->m_callbacks.size(); j++) // Call the calls
-					if (m_basicHandlers[i]->m_callbacks[j]->enabled && !m_basicHandlers[i]->m_callbacks[j]->onTick) // Check if the callback shouldn't be called on tick
-						if (m_basicHandlers[i]->m_callbacks[j]->ptr()) // Call
-							changedThisTick = true; // Render-on-demand
-				break; // Break because there shouldn't be a similar handler
-			}
-		}
-		// Call ranged handler, only if the input is a single character
-		if (input.length() == 1)
-			for (size_t i = 0; i < m_rangedHandlers.size(); i++)
-				if (m_rangedHandlers[i]->m_key1 <= input[0] && input[0] <= m_rangedHandlers[i]->m_key2) // If the key is in range
-					for (RangedCallback*& callback: m_rangedHandlers[i]->m_callbacks)
-						if (callback->enabled)
-							if (callback->ptr()) // Call
-								changedThisTick = true; // Render-on-demand
 	}
 }

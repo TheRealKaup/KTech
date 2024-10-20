@@ -22,50 +22,36 @@
 
 #include "input.hpp"
 
-struct KTech::Input::BasicCallback
+struct KTech::Input::Callback
 {
 	bool enabled = true;
-	bool onTick;
-	std::function<bool()> ptr;
-	BasicHandler* parentHandler;
-	
-	inline BasicCallback(const std::function<bool()>& callback, BasicHandler* parentHandler, bool onTick)
-		: ptr(callback), parentHandler(parentHandler), onTick(onTick) {}
-	
-	~BasicCallback();
-};
+	const std::function<bool()> ptr;
+	Handler* const parentHandler;
 
-struct KTech::Input::RangedCallback
-{
-	bool enabled = true;
-	std::function<bool()> ptr;
-	RangedHandler* parentHandler;
-
-	inline RangedCallback(const std::function<bool()>& callback, RangedHandler* parentHandler)
+	inline Callback(const std::function<bool()>& callback, Handler* parentHandler)
 		: ptr(callback), parentHandler(parentHandler) {}
 	
-	~RangedCallback();
+	~Callback();
 };
 
-struct KTech::Input::BasicHandler
+struct KTech::Input::Handler
 {
+	enum class Type : uint8_t
+	{
+		String,
+		Range
+	};
+
+	const Type m_type;
+	const char m_key1 = '\0', m_key2 = '\0';
 	const std::string m_input;
-	std::vector<BasicCallback*> m_callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
-	uint8_t m_timesPressed = 0;
-	
-	inline BasicHandler(const std::string& input)
-		: m_input(input) {};
-	
-	void RemoveCallback(BasicCallback*);
-};
+	std::vector<Callback*> m_callbacks;
 
-struct KTech::Input::RangedHandler
-{
-	const char m_key1, m_key2;
-	std::vector<RangedCallback*> m_callbacks; // Callbacks are stored as pointers because the vector changes its size, and CallbackGroups need a consistent pointer to the their callbacks.
-	
-	inline RangedHandler(char key1, char key2)
-		: m_key1(key1), m_key2(key2) {};
+	inline Handler(const::std::string& input)
+		: m_input(input), m_type(Type::String) {}
 
-	void RemoveCallback(RangedCallback*);
+	inline Handler(char key1, char key2)
+		: m_key1(key1), m_key2(key2), m_type(Type::Range) {}
+
+	void RemoveCallback(Callback* callback);
 };

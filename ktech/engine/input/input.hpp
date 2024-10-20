@@ -39,22 +39,20 @@
 class KTech::Input
 {
 public:
-	struct BasicCallback;
-	struct BasicHandler;
-	struct RangedCallback;
-	struct RangedHandler;
+	struct Handler;
+	struct Callback;
 	class CallbacksGroup;
 	
 	std::string input;
-	std::string quitKey = "\x03";
+	std::string quitKey{"\x03"};
 
 	// Prepares terminal, creates input loop thread
 	Input(Engine* const engine);
 	// Resets terminal
 	~Input();
 
-	BasicCallback* RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback, bool onTick = false);
-	RangedCallback* RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback);
+	Callback* RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback);
+	Callback* RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback);
 	CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
 
 	bool Is(const std::string& stringKey) const;
@@ -64,7 +62,7 @@ public:
 	bool Between(char charKey1, char charKey2) const;
 	uint8_t GetInt() const;
 
- 	void CallHandlers();
+ 	void CallCallbacks();
 
 private:
 	Engine* const engine;
@@ -75,11 +73,12 @@ private:
 #else
 	termios m_oldTerminalAttributes;
 #endif
+
 	bool changedThisTick = false;
 	std::thread m_inputLoop;
-	std::vector<BasicHandler*> m_basicHandlers;
-	std::vector<RangedHandler*> m_rangedHandlers;
+	std::vector<Handler*> m_handlers;
 	std::vector<CallbacksGroup*> m_groups;
+	std::vector<std::string> m_triggers;
 	
 	void Get();
 
