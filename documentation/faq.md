@@ -112,7 +112,7 @@ I chose to register pointers rather than store instances, and `KTech::CachingReg
 
 If the passed `ID` is a non-const reference, `CachingRegistry` will also update its cached index before returning the world structure pointer, expediting future usages of that `ID`. This is why giving `CachingRegistry` non-const `ID` references is preferable, as it should make your game faster if it commonly removes world structures from the register (since removing world structures registered at lower indices is the only valid way a cached index could become stale).
 
-Additionally, considering KTech is designed to work single threaded (with the exception of the input thread), keeping a direct pointer to a world structure retrieved from `CachingRegistry` for the duration of a singular function, after validating it (using `CachingRegistry::Exists()` or checking that the returned pointer is not `nullptr`), is valid practice, as nothing external can erase the pointed world structure from memory, and the input thread ought not remove world structures.
+Additionally, considering KTech is designed to work single threaded, keeping a direct pointer to a world structure retrieved from `CachingRegistry` for the duration of a singular function, after validating it (using `CachingRegistry::Exists()` or checking that the returned pointer is not `nullptr`), is valid practice, as nothing external should erase the pointed world structure from memory in the meantime.
 
 ## KTech's history with the Windows Console and the POSIX terminal
 
