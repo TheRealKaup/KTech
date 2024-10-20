@@ -166,9 +166,9 @@ void KTech::Input::CallCallbacks()
 			group->Update();
 	
 	// Call callbacks of triggered handlers
-	for (std::string& trigger : m_triggers)
+	for (size_t i; i < m_inputQueue.size(); i++)
 	{
-		input = std::move(trigger);
+		input = std::move(m_inputQueue[i]);
 		if (input.length() == 1) // Can be both string/range handler
 		{
 			for (Handler* stringHandler : m_stringHandlers) // Input matches handler's string
@@ -207,7 +207,7 @@ void KTech::Input::CallCallbacks()
 	}
 
 	// All callbacks of triggered handlers were called; clear trigger history
-	m_triggers.clear();
+	m_inputQueue.clear();
 }
 
 void KTech::Input::Get()
@@ -223,13 +223,13 @@ void KTech::Input::Get()
 	for (size_t i = 0; i < (size_t)nReadCharacters; i++)
 		charBuf[i] = tcharBuf[i];
 	// Move to input history
-	m_triggers.push_back(std::move(charBuf));
+	m_inputQueue.push_back(std::move(charBuf));
 #else
 	// Read
 	std::string buf(7, '\0');
 	buf.resize(read(0, buf.data(), buf.size()));
 	// Move to input history
-	m_triggers.push_back(std::move(buf));
+	m_inputQueue.push_back(std::move(buf));
 #endif
 }
 
@@ -239,7 +239,7 @@ void KTech::Input::Loop()
 	{
 		// Get input
 		Get();
-		if (m_triggers[m_triggers.size() - 1] == quitKey)
+		if (m_inputQueue[m_inputQueue.size() - 1] == quitKey)
 		{
 			// Quit
 			engine->running = false;

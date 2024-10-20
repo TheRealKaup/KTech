@@ -78,7 +78,7 @@ private:
 	std::vector<Handler*> m_stringHandlers; // String and range handlers are split here for the sake of simplicity in `Input::CallCallbacks()` by pruning previously-existing `Handler::m_type`
 	std::vector<Handler*> m_rangeHandlers;
 	std::vector<CallbacksGroup*> m_groups;
-	std::vector<std::string> m_triggers;
+	std::vector<std::string> m_inputQueue;
 	
 	void Get();
 
