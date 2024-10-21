@@ -166,7 +166,7 @@ void KTech::Input::CallCallbacks()
 			group->Update();
 	
 	// Call callbacks of triggered handlers
-	for (size_t i; i < m_inputQueue.size(); i++)
+	for (size_t i = 0; i < m_inputQueue.size(); i++)
 	{
 		input = std::move(m_inputQueue[i]);
 		if (input.length() == 1) // Can be both string/range handler
