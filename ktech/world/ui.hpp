@@ -24,7 +24,7 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../utility/id.hpp"
-#include "../basic/cell.hpp"
+#include "../basic/cella.hpp"
 #include "../basic/rgba.hpp"
 #include "../basic/upoint.hpp"
 
@@ -41,11 +41,11 @@ public:
 	std::vector<ID<Widget>> m_widgets;
 
 	UPoint m_res;
-	Cell m_background = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)); // The background to render upon.
+	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
 	RGBA m_frgba = RGBA(0, 0, 0, 0);
 	RGBA m_brgba = RGBA(0, 0, 0, 0);
 	uint8_t m_alpha = 255;
-	std::vector<Cell> m_image;
+	std::vector<CellA> m_image;
 
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~UI();

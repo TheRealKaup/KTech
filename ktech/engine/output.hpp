@@ -50,6 +50,7 @@ public:
 	// Clears the in-engine image, not the terminal.
 	void Clear();
 	void Draw(const std::vector<Cell>& image, UPoint size, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = 255);
+	void Draw(const std::vector<CellA>& image, UPoint size, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = 255);
 	void Print();
 
 	// If game loop is designed to render-on-demand, use this function to determine whether there is demand, that is, should the game loop

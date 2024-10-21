@@ -106,7 +106,7 @@ void KTech::Output::Clear()
 		m_image[i] = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0));
 }
 
-void KTech::Output::Draw(const std::vector<Cell>& p_image, UPoint p_res, Point p_pos, UPoint p_start, UPoint p_end, uint8_t p_alpha)
+void KTech::Output::Draw(const std::vector<Cell>& p_srcImage, UPoint p_res, Point p_pos, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
 	// Default the rectangle
 	if (p_end.x == 0)
@@ -115,18 +115,63 @@ void KTech::Output::Draw(const std::vector<Cell>& p_image, UPoint p_res, Point p
 		p_end.y = p_res.y;
 
 	// Draw
-	for (size_t yF = (p_pos.y < 0 ? 0 : p_pos.y), yR = p_start.y; yF < resolution.y && yR < p_end.y; yF++, yR++)
+	for (size_t yDst = (p_pos.y < 0 ? 0 : p_pos.y), ySrc = p_start.y; yDst < resolution.y && ySrc < p_end.y; yDst++, ySrc++)
 	{
-		for (size_t xF = (p_pos.x < 0 ? 0 : p_pos.x), xR = p_start.x; xF < resolution.x && xR < p_end.x; xF++, xR++)
+		for (size_t xDst = (p_pos.x < 0 ? 0 : p_pos.x), xSrc = p_start.x; xDst < resolution.x && xSrc < p_end.x; xDst++, xSrc++)
 		{
-			m_image[resolution.x * yF + xF].c = p_image[p_res.x * yR + xR].c;
+			// Draw character
+			m_image[resolution.x * yDst + xDst].c = p_srcImage[p_res.x * ySrc + xSrc].c;
+			// Draw foreground
 			//                   8 ->                 16 ->     + 8 ->                16 ->                8.
-			m_image[resolution.x * yF + xF].f.r = (p_image[p_res.x * yR + xR].f.r * p_alpha + m_image[resolution.x * yF + xF].f.r * (255 - p_alpha)) / 255;
-			m_image[resolution.x * yF + xF].f.g = (p_image[p_res.x * yR + xR].f.g * p_alpha + m_image[resolution.x * yF + xF].f.g * (255 - p_alpha)) / 255;
-			m_image[resolution.x * yF + xF].f.b = (p_image[p_res.x * yR + xR].f.b * p_alpha + m_image[resolution.x * yF + xF].f.b * (255 - p_alpha)) / 255;
-			m_image[resolution.x * yF + xF].b.r = (p_image[p_res.x * yR + xR].b.r * p_alpha + m_image[resolution.x * yF + xF].b.r * (255 - p_alpha)) / 255;
-			m_image[resolution.x * yF + xF].b.g = (p_image[p_res.x * yR + xR].b.g * p_alpha + m_image[resolution.x * yF + xF].b.g * (255 - p_alpha)) / 255;
-			m_image[resolution.x * yF + xF].b.b = (p_image[p_res.x * yR + xR].b.b * p_alpha + m_image[resolution.x * yF + xF].b.b * (255 - p_alpha)) / 255;
+			m_image[resolution.x * yDst + xDst].f.r = (p_srcImage[p_res.x * ySrc + xSrc].f.r * p_alpha + m_image[resolution.x * yDst + xDst].f.r * (255 - p_alpha)) / 255;
+			m_image[resolution.x * yDst + xDst].f.g = (p_srcImage[p_res.x * ySrc + xSrc].f.g * p_alpha + m_image[resolution.x * yDst + xDst].f.g * (255 - p_alpha)) / 255;
+			m_image[resolution.x * yDst + xDst].f.b = (p_srcImage[p_res.x * ySrc + xSrc].f.b * p_alpha + m_image[resolution.x * yDst + xDst].f.b * (255 - p_alpha)) / 255;
+			// Draw background
+			m_image[resolution.x * yDst + xDst].b.r = (p_srcImage[p_res.x * ySrc + xSrc].b.r * p_alpha + m_image[resolution.x * yDst + xDst].b.r * (255 - p_alpha)) / 255;
+			m_image[resolution.x * yDst + xDst].b.g = (p_srcImage[p_res.x * ySrc + xSrc].b.g * p_alpha + m_image[resolution.x * yDst + xDst].b.g * (255 - p_alpha)) / 255;
+			m_image[resolution.x * yDst + xDst].b.b = (p_srcImage[p_res.x * ySrc + xSrc].b.b * p_alpha + m_image[resolution.x * yDst + xDst].b.b * (255 - p_alpha)) / 255;
+		}
+	}
+}
+
+void KTech::Output::Draw(const std::vector<CellA>& p_srcImage, UPoint p_res, Point p_pos, UPoint p_start, UPoint p_end, uint8_t p_alpha)
+{
+	// Default the rectangle
+	if (p_end.x == 0)
+		p_end.x = p_res.x;
+	if (p_end.y == 0)
+		p_end.y = p_res.y;
+
+	// Draw
+	for (size_t yDst = (p_pos.y < 0 ? 0 : p_pos.y), ySrc = p_start.y; yDst < resolution.y && ySrc < p_end.y; yDst++, ySrc++)
+	{
+		for (size_t xDst = (p_pos.x < 0 ? 0 : p_pos.x), xSrc = p_start.x; xDst < resolution.x && xSrc < p_end.x; xDst++, xSrc++)
+		{
+			// Draw character
+			if (p_srcImage[resolution.x * yDst + xDst].c != ' ')
+			{
+				if (' ' <= p_srcImage[resolution.x * yDst + xDst].c && p_srcImage[resolution.x * yDst + xDst].c <= '~')
+					m_image[resolution.x * yDst + xDst].c = p_srcImage[p_res.x * ySrc + xSrc].c;
+				else
+					m_image[resolution.x * yDst + xDst].c = ' ';
+			}
+			// Draw foreground
+			uint8_t tempAlpha = p_alpha * p_srcImage[p_res.x * ySrc + xSrc].f.a / 255;
+			if (tempAlpha > 0)
+			{
+				//                   8 ->                 16 ->     + 8 ->                16 ->                8.
+				m_image[resolution.x * yDst + xDst].f.r = (p_srcImage[p_res.x * ySrc + xSrc].f.r * tempAlpha + m_image[resolution.x * yDst + xDst].f.r * (255 - tempAlpha)) / 255;
+				m_image[resolution.x * yDst + xDst].f.g = (p_srcImage[p_res.x * ySrc + xSrc].f.g * tempAlpha + m_image[resolution.x * yDst + xDst].f.g * (255 - tempAlpha)) / 255;
+				m_image[resolution.x * yDst + xDst].f.b = (p_srcImage[p_res.x * ySrc + xSrc].f.b * tempAlpha + m_image[resolution.x * yDst + xDst].f.b * (255 - tempAlpha)) / 255;
+				// Draw background
+			}
+			tempAlpha = p_alpha * p_srcImage[p_res.x * ySrc + xSrc].b.a / 255;
+			if (tempAlpha > 0)
+			{
+				m_image[resolution.x * yDst + xDst].b.r = (p_srcImage[p_res.x * ySrc + xSrc].b.r * tempAlpha + m_image[resolution.x * yDst + xDst].b.r * (255 - tempAlpha)) / 255;
+				m_image[resolution.x * yDst + xDst].b.g = (p_srcImage[p_res.x * ySrc + xSrc].b.g * tempAlpha + m_image[resolution.x * yDst + xDst].b.g * (255 - tempAlpha)) / 255;
+				m_image[resolution.x * yDst + xDst].b.b = (p_srcImage[p_res.x * ySrc + xSrc].b.b * tempAlpha + m_image[resolution.x * yDst + xDst].b.b * (255 - tempAlpha)) / 255;
+			}
 		}
 	}
 }

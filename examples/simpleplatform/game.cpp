@@ -17,6 +17,7 @@
 */
 
 #include "../../ktech/ktech.hpp"
+#include "../../ktech/widgets/button.hpp"
 
 using namespace KTech;
 
@@ -236,6 +237,39 @@ struct AutoUpdatingText : Object
 	}
 };
 
+struct QuitUI : UI
+{
+	Button m_quitButton;
+
+	bool Toggle()
+	{
+		if (m_quitButton.m_selected)
+		{
+			m_quitButton.Hide();
+			m_quitButton.Deselect();
+			m_background.b = RGBA(0, 0, 0, 0);
+			m_background.f = RGBA(0, 0, 0, 0);
+		}
+		else
+		{
+			m_quitButton.Show();
+			m_quitButton.Select();
+			m_background.b = RGBA(0, 0, 0, 100);
+			m_background.f = RGBA(0, 0, 0, 100);
+		}
+		return true;
+	}
+
+	QuitUI(Engine& engine)
+		: UI(engine, viewport), m_quitButton(engine, m_id, std::bind(&Engine::Quit, &engine), Keys::return_, Point(viewport.x / 2 - 3, viewport.y / 2 - 2), "Quit", true)
+	{
+		AddWidget(m_quitButton.m_id);
+		m_quitButton.Hide();
+		m_quitButton.Deselect();
+		engine.input.RegisterCallback(Keys::escape, std::bind(&QuitUI::Toggle, this));
+	}
+};
+
 bool charCamOn = false;
 
 bool TurnOnCharacterCamera()
@@ -304,7 +338,8 @@ int main()
 			"'WASD'/'Arrow keys' to move.",
 			"'Space' to jump.",
 			"'F' to throw a gravity box off the layer.",
-			"'M' to turn on following camera."
+			"'M' to turn on following camera.",
+			"'ESC' to toggle menu."
 		}, RGBAColors::black, RGBAColors::transparent, Point(2, 2));
 	frame.m_textures[4].Resize(frame.m_textures[4].m_size, CellA());
 	frame.m_textures[4].SetBackground(RGBA(255, 255, 255, 100));
@@ -348,6 +383,8 @@ int main()
 	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.m_id, "TPS: ");
 	tpsText.m_name = "tpsText";
 	
+	QuitUI quitUI(engine);
+
 	KTech::Output::Log("<main()> Entering game loop", RGBColors::blue);
 	while (engine.running)
 	{
@@ -385,6 +422,8 @@ int main()
 				camera.Render(map.m_layers);
 				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0));
 			}
+			quitUI.Render();
+			engine.output.Draw(quitUI.m_image, quitUI.m_res);
 			engine.output.Print();
 		}
 		else if (engine.output.ShouldPrintThisTick())
