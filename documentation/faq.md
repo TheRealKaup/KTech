@@ -12,7 +12,7 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 - [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
 - [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
 - [Will there be a software development kit?](#will-there-be-a-software-development-kit)
-- [Is KTech GPU-accelerated?]()
+- [Is KTech GPU-accelerated?](#is-ktech-gpu-accelerated)
 
 # Q&A
 
