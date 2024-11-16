@@ -2,7 +2,9 @@
 
 - [Introduction](#introduction) - general explanation of what KTech is.
 - [Documentation](#documentation) - links to the project's documentation.
-- [Capabilities](#capabilities) - key features included in the library. 
+- [Building](documentation/faq.md#how-to-build-ktech-with-premake) - detailed building instructions.
+- [Running](documentation/faq.md#how-to-run-the-game-examples) - how to run the provided game examples.
+- [Capabilities](#capabilities) - key features included in the library.
 - [Contributing](#contributing) - how to contribute to the development of KTech.
 - [Interrelated Projects](#interrelated-projects) - other projects interrelated with KTech.
 - [Contact Information](#contact-information) - how to contact the developer.

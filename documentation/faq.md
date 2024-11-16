@@ -4,6 +4,7 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 
 - [How to build KTech?](#how-to-build-ktech-with-premake)
 - [How to build your own KTech game (with Premake)?](#how-to-build-your-own-ktech-game-with-premake)
+- [How to run the game examples?](#how-to-run-the-game-examples)
 - [How does the licensing work?](#how-does-the-licensing-work)
 - [Is KTech Stable?](#is-ktech-stable)
 - [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
@@ -64,6 +65,12 @@ To generate the build files for KTech and your game, ensure Premake is installed
 To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to `build/bin/`.
 
 The "Debug" configuration (on KTech's end) enables debug symbols and intentionally doesn't hide the terminal cursor to improve GDB using experience. The "Release" configuration leaves debug symbols disabled and hides the terminal cursor.
+
+## How to run the game examples?
+
+Note, the "widgetstest" game example is broken due to graphical bugs, for which the fix is a WIP (see issue #116).
+
+To be written.
 
 ## How does the licensing work?
 
