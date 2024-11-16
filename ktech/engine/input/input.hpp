@@ -33,6 +33,7 @@
 #else
 #include <termio.h>
 #endif
+#include <mutex>
 #include <thread>
 
 class KTech::Input
@@ -41,7 +42,7 @@ public:
 	struct Handler;
 	struct Callback;
 	class CallbacksGroup;
-	
+
 	std::string input;
 	std::string quitKey{"\x03"};
 
@@ -75,11 +76,12 @@ private:
 
 	bool changedThisTick = false;
 	std::thread m_inputLoop;
-	std::vector<Handler*> m_stringHandlers; // String and range handlers are split here for the sake of simplicity in `Input::CallCallbacks()` by pruning previously-existing `Handler::m_type`
+	std::vector<Handler*> m_stringHandlers;
 	std::vector<Handler*> m_rangeHandlers;
 	std::vector<CallbacksGroup*> m_groups;
 	std::vector<std::string> m_inputQueue;
-	
+	std::mutex m_inputQueueMutex;
+
 	void Get();
 
 	void Loop();

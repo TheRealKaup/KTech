@@ -164,7 +164,8 @@ void KTech::Input::CallCallbacks()
 	for (CallbacksGroup*& group : m_groups)
 		if (!group->m_synced)
 			group->Update();
-	
+	// Protect `std::vector m_inputQueue`
+	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 	// Call callbacks of triggered handlers
 	for (size_t i = 0; i < m_inputQueue.size(); i++)
 	{
@@ -205,7 +206,6 @@ void KTech::Input::CallCallbacks()
 			}
 		}
 	}
-
 	// All callbacks of triggered handlers were called; clear trigger history
 	m_inputQueue.clear();
 }
@@ -222,12 +222,16 @@ void KTech::Input::Get()
 	std::string charBuf((size_t)nReadCharacters, '\0');
 	for (size_t i = 0; i < (size_t)nReadCharacters; i++)
 		charBuf[i] = tcharBuf[i];
+	// Protect `std::vector m_inputQueue`
+	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 	// Move to input history
 	m_inputQueue.push_back(std::move(charBuf));
 #else
 	// Read
 	std::string buf(7, '\0');
 	buf.resize(read(0, buf.data(), buf.size()));
+	// Protect `std::vector m_inputQueue`
+	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 	// Move to input history
 	m_inputQueue.push_back(std::move(buf));
 #endif
@@ -239,6 +243,8 @@ void KTech::Input::Loop()
 	{
 		// Get input
 		Get();
+		// Protect `std::vector m_inputQueue`
+		std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 		if (m_inputQueue[m_inputQueue.size() - 1] == quitKey)
 		{
 			// Quit
