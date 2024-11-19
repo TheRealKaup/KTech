@@ -74,9 +74,9 @@ To be written.
 
 ## How does the licensing work?
 
-KTech is licensed under the [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (GPLv3) or any later version. Read the article "[A Quick Guide to GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html)" from GNU's website to learn about it. You are completely allowed to sell copies of your game (for example, via Steam), and so does anyone else, though I am not sure how significantly this affects sales in practice.
+KTech is licensed under the [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (GPLv3) or any later version. Read the article "[A Quick Guide to GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html)" from GNU's website to learn about it. You are completely allowed to sell copies of your game (for example, via Steam), and so does anyone else. How significantly this affects sales in practice is unclear.
 
-Using the Steamworks API with KTech (to utilize Steam achievements, for instance) contradicts the GPLv3 due to it not falling under the definition of "System Libraries" (thus, not being exempted from the copyleft). As a solution, I might in the future decide to specifically allow using the Steamworks API with KTech.
+The Steamworks API might be compatible with KTech (to utilize Steam achievements, for instance), under certain interpretations of the GPLv3. This might be true as long as it's implemented in a modular, optional and replaceable manner. An abstraction layer might be added to KTech to support this in the future.
 
 ## Is KTech Stable?
 
