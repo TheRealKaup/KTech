@@ -58,6 +58,7 @@ bool KTech::Collision::MoveObject(ID<Object>& p_obj, Point p_dir)
 		{
 			OBJECTS[pushData[i].activeObject]->OnPush(p_dir, pushData[i].activeCollider, pushData[i].passiveObject, pushData[i].passiveCollider);
 			OBJECTS[pushData[i].passiveObject]->OnPushed(p_dir, pushData[i].passiveCollider, pushData[i].activeObject, pushData[i].activeCollider);
+			OBJECTS[pushData[i].passiveObject]->OnMove(p_dir);
 		}
 		// Call overlap events
 		for (size_t i = 0; i < overlapData.size(); i++)
@@ -71,6 +72,7 @@ bool KTech::Collision::MoveObject(ID<Object>& p_obj, Point p_dir)
 			OBJECTS[exitOverlapData[i].activeObject]->OnOverlapExit(p_dir, exitOverlapData[i].activeCollider, exitOverlapData[i].passiveObject, exitOverlapData[i].passiveCollider);
 			OBJECTS[exitOverlapData[i].passiveObject]->OnOverlappedExit(p_dir, exitOverlapData[i].passiveCollider, exitOverlapData[i].activeObject, exitOverlapData[i].activeCollider);
 		}
+		OBJECTS[p_obj]->OnMove(p_dir);
 		return true;
 	}
 	// Unable to move - there are blocking objects.
@@ -81,7 +83,7 @@ bool KTech::Collision::MoveObject(ID<Object>& p_obj, Point p_dir)
 			OBJECTS[blockData[i].activeObject]->OnBlocked(p_dir, blockData[i].activeCollider, blockData[i].passiveObject, blockData[i].passiveCollider);
 			OBJECTS[blockData[i].passiveObject]->OnBlock(p_dir, blockData[i].passiveCollider, blockData[i].activeObject, blockData[i].activeCollider);
 		}
-		return false; 
+		return false;
 	}
 }
 
@@ -194,12 +196,12 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 		}
 		if (alreadyMoving || otherObjID == p_thisObjID)
 			continue;
-		
+
 		Object* otherObj = OBJECTS[otherObjID];
 
 		// *Needed in this scope!
 		CR cr = CR::O; // The collision result between this object and this other object. Default - overlap (nothing, ignored).
-		size_t c = 0; // Collider index 
+		size_t c = 0; // Collider index
 		size_t oc = 0; // Other collider index
 		size_t originallyBlockedColliderI = 0; // Used if not found a pushable collider
 		size_t originallyBlockingColliderI = 0; // ^
@@ -226,7 +228,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObjID, Point p_dir,
 				// If the current known result is block (0) and the potential result of this other object is also block then there is no reason to proceed checking.
 				// If the current known result if push (1) and the potential result is also push then once again there is no reason to proceed checking.
 				// But, if the potential result is overlap then proceed checking no matter the known result, we want to get all the overlap occurrences.
-				
+
 				// Check enter/exit overlap events
 				if (potentialCollisionResult == CR::O)
 				{

@@ -37,7 +37,7 @@ KTech::Object::Object(Engine& p_engine, ID<Layer>& p_layer, Point p_pos, const s
 
 KTech::Object::~Object()
 {
-	LeaveLayer();	
+	LeaveLayer();
 	engine.memory.objects.Remove(m_id);
 }
 

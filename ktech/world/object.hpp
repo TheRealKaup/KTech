@@ -48,9 +48,10 @@ public:
 	bool LeaveLayer();
 
 	bool Move(Point direction);
-	
+
 protected:
 	inline virtual bool OnTick() { return false; };
+	inline virtual void OnMove(Point direction) {};
 	inline virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
 	inline virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
 	inline virtual void OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) blocked this object
