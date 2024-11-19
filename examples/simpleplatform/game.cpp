@@ -56,7 +56,7 @@ struct Character : Object
 
 		bool left = false;
 		bool right = false;
-		
+
 		bool priorOnGround = onGround;
 
 		if (yVelocity > 0)
@@ -77,10 +77,10 @@ struct Character : Object
 			cam.m_pos = m_pos - Point(6, 6);
 			changed = true;
 		}
-	
+
 		return changed;
 	}
-	
+
 	virtual void OnOverlap(Point p_dir, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider) override
 	{
 		if (engine.memory.objects[p_otherObject]->m_colliders[p_otherCollider].m_type == 2)
@@ -378,11 +378,11 @@ int main()
 	KTech::Layer darkLayer(engine, map.m_id);
 	darkLayer.m_name = "darkLayer";
 	darkLayer.m_alpha = 127;
-	
+
 	KTech::Output::Log("<main()> Creating AutoUpdatingText", RGBColors::blue);
 	AutoUpdatingText tpsText(engine, &engine.time.tpsPotential, Point(2, 27), layer.m_id, "TPS: ");
 	tpsText.m_name = "tpsText";
-	
+
 	QuitUI quitUI(engine);
 
 	KTech::Output::Log("<main()> Entering game loop", RGBColors::blue);
@@ -394,11 +394,11 @@ int main()
 
 		if (engine.output.ShouldRenderThisTick() && map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size())
 		{
-			if (charCamOn) 
+			if (charCamOn)
 			{
 				engine.output.Clear(); // Allows to make foreground darker
 				camera.Render({ layer.m_id, voidLayer.m_id, darkLayer.m_id });
-				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0), 127);
+				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0), 100);
 				character.cam.Render(map.m_layers);
 				engine.output.Draw(
 					character.cam.m_image,
@@ -432,4 +432,6 @@ int main()
 		engine.time.WaitUntilNextTick();
 	}
 	KTech::Output::Log("<main()> End of function.", RGBColors::blue);
+
+	engine.output.outputAfterQuit.push_back(std::to_string(character.m_pos.y));
 }

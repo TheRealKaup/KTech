@@ -28,11 +28,11 @@
 struct KTech::RGBA
 {
 	uint8_t r, g, b, a;
-	
+
 	inline constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255)
 		: r(red), g(green), b(blue), a(alpha) {}
-	
-	inline constexpr RGBA(RGB rgb, uint8_t alpha = 255)
+
+	inline constexpr RGBA(RGB rgb, uint8_t alpha)
 		: r(rgb.r), g(rgb.g), b(rgb.b), a(alpha) {}
 
 	inline constexpr bool operator==(const RGBA& rgba) const

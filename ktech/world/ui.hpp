@@ -57,9 +57,15 @@ public:
 	void Resize(UPoint resolution);
 
 	void Render();
-	
+
 protected:
 	inline virtual bool OnTick() { return false; };
 
 	friend class KTech::Memory;
+
+private:
+	inline void RenderBackground();
+	inline void RenderSimple(Widget* widget, Texture& texture);
+	inline void RenderComplex(Widget* widget, Texture& texture);
+	inline void RenderForeground();
 };

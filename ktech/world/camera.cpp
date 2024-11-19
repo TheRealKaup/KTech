@@ -24,6 +24,7 @@
 #include "object.hpp"
 #include "layer.hpp"
 #include "map.hpp"
+#include "../utility/internals.hpp"
 #include "../utility/rgbcolors.hpp"
 #include "../engine/output.hpp"
 #include "../engine/engine.hpp"
@@ -78,182 +79,127 @@ void KTech::Camera::Render()
 
 void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 {
-	// Reset the image to background
-	for (size_t i = 0; i < m_image.size(); i++)
-		m_image[i] = m_background;
+	RenderBackground();
 
 	for (size_t l = 0; l < p_layers.size(); l++)
 	{
 		KTech::Layer* layer = engine.memory.layers[p_layers[l]];
-		
-		if (!layer->m_visible)
-			continue;
-
-		for (size_t o = 0; o < layer->m_objects.size(); o++)
+		if (layer->m_visible)
 		{
-			KTech::Object* obj = engine.memory.objects[layer->m_objects[o]];
-			
-			for (size_t t = 0; t < obj->m_textures.size(); t++)
+			for (size_t o = 0; o < layer->m_objects.size(); o++)
 			{
-				KTech::Texture& texture = obj->m_textures[t];
-				
-				if (!texture.m_active)
-					continue;
-
-				// Simple texture
-				if (texture.m_simple)
+				KTech::Object* object = engine.memory.objects[layer->m_objects[o]];
+				for (KTech::Texture& texture : object->m_textures)
 				{
-					// Pre-calculate starting position of rendering on image
-					Point start(obj->m_pos.x + (long)texture.m_rPos.x - m_pos.x, obj->m_pos.y + (long)texture.m_rPos.y - m_pos.y);
-					// Affirm texture is in range
-					if (start.y < -(long)texture.m_size.y || start.y > (long)m_res.y
-						|| start.x < -(long)texture.m_size.x || start.x > (long)m_res.x)
-						continue;
-					// Pre-calculate ending position
-					KTech::Point end(start.x + (long)texture.m_size.x, start.y + (long)texture.m_size.y);
-					// Limit end
-					if (end.y > m_res.y)
-						end.y = m_res.y;
-					if (end.x > m_res.x)
-						end.x = m_res.x;
-					// Limit start
-					if (start.y < 0)
-						start.y = 0;
-					if (start.x < 0)
-						start.x = 0;
-
-					// Render character
-					if (texture.m_value.c != ' ')
+					if (texture.m_active)
 					{
-						if (' ' <= texture.m_value.c && texture.m_value.c <= '~')
-							for (size_t y = start.y; y < end.y; y++)
-								for (size_t x = start.x; x < end.x; x++)
-									m_image[m_res.x * y + x].c = texture.m_value.c;
+						// Simple texture
+						if (texture.m_simple)
+							RenderSimple(layer->m_alpha, object, texture);
+						// Complex texture
 						else
-							for (size_t y = start.y; y < end.y; y++)
-								for (size_t x = start.x; x < end.x; x++)
-									m_image[m_res.x * y + x].c = ' ';
-					}
-
-					// Render foreground
-					uint8_t tempAlpha = texture.m_value.f.a * layer->m_alpha / 255;
-					if (tempAlpha > 0)
-					{
-						// Pre-calculate added color (can only store 8-bit depth)
-						RGBA tempRGBA(
-							texture.m_value.f.r * texture.m_value.f.a * layer->m_alpha / 65025,
-							texture.m_value.f.g * texture.m_value.f.a * layer->m_alpha / 65025,
-							texture.m_value.f.b * texture.m_value.f.a * layer->m_alpha / 65025,
-							tempAlpha
-						);
-
-						for (size_t y = start.y; y < end.y; y++)
-						{
-							for (size_t x = start.x; x < end.x; x++)
-							{
-								m_image[m_res.x * y + x].f.r = tempRGBA.r + m_image[m_res.x * y + x].f.r * (255 - tempRGBA.a) / 255;
-								m_image[m_res.x * y + x].f.g = tempRGBA.g + m_image[m_res.x * y + x].f.g * (255 - tempRGBA.a) / 255;
-								m_image[m_res.x * y + x].f.b = tempRGBA.b + m_image[m_res.x * y + x].f.b * (255 - tempRGBA.a) / 255;
-							}
-						}
-					}
-
-					// Render background
-					tempAlpha = texture.m_value.b.a * layer->m_alpha / 255;
-					if (tempAlpha > 0)
-					{
-						RGBA tempRGBA(
-							texture.m_value.b.r * texture.m_value.b.a * layer->m_alpha / 65025,
-							texture.m_value.b.g * texture.m_value.b.a * layer->m_alpha / 65025,
-							texture.m_value.b.b * texture.m_value.b.a * layer->m_alpha / 65025,
-							tempAlpha
-						);
-
-						for (size_t y = start.y; y < end.y; y++)
-						{
-							for (size_t x = start.x; x < end.x; x++)
-							{
-								m_image[m_res.x * y + x].b.r = tempRGBA.r + m_image[m_res.x * y + x].b.r * (255 - tempRGBA.a) / 255;
-								m_image[m_res.x * y + x].b.g = tempRGBA.g + m_image[m_res.x * y + x].b.g * (255 - tempRGBA.a) / 255;
-								m_image[m_res.x * y + x].b.b = tempRGBA.b + m_image[m_res.x * y + x].b.b * (255 - tempRGBA.a) / 255;
-							}
-						}
-					}
-				}
-				// Complex texture
-				else
-				{
-					Point dst(0, 0);
-					Point src(0, 0);
-					// If the texture is before the camera, iterate with Y from point in which camera view starts, and iterate with final.y from 0.
-					if (obj->m_pos.y + texture.m_rPos.y < m_pos.y)
-						src.y = m_pos.y - obj->m_pos.y - texture.m_rPos.y;
-					// Otherwise, iterate with Y from 0, and iterate with final.y from point in which texture starts.
-					else
-						dst.y = obj->m_pos.y + texture.m_rPos.y - m_pos.y;
-
-					// Stop iterating through the texture until y reached the end of the texture, or final.y reached the end of the image.
-					for (; src.y < texture.m_size.y && dst.y < m_res.y; src.y++, dst.y++)
-					{
-						// Same goes for X
-						if (obj->m_pos.x + texture.m_rPos.x < m_pos.x)
-							src.x = m_pos.x - obj->m_pos.x - texture.m_rPos.x;
-						else
-						{
-							src.x = 0;
-							dst.x = obj->m_pos.x + texture.m_rPos.x - m_pos.x;
-						}
-
-						for (; src.x < texture.m_size.x && dst.x < m_res.x; src.x++, dst.x++)
-						{
-							if (texture(src.x, src.y).c != ' ')
-								m_image[m_res.x * dst.y + dst.x].c = (' ' <= texture(src.x, src.y).c && texture(src.x, src.y).c <= '~') ? texture(src.x, src.y).c : ' '; // Character
-							// Precalculate foreground * layer alpha (8 bit depth)
-							uint8_t tempAlpha = texture(src.x, src.y).f.a * layer->m_alpha / 255;
-							if (tempAlpha > 0)
-							{
-								m_image[m_res.x * dst.y + dst.x].f.r = (texture(src.x, src.y).f.r * tempAlpha + m_image[m_res.x * dst.y + dst.x].f.r * (255 - tempAlpha)) / 255;
-								m_image[m_res.x * dst.y + dst.x].f.g = (texture(src.x, src.y).f.g * tempAlpha + m_image[m_res.x * dst.y + dst.x].f.g * (255 - tempAlpha)) / 255;
-								m_image[m_res.x * dst.y + dst.x].f.b = (texture(src.x, src.y).f.b * tempAlpha + m_image[m_res.x * dst.y + dst.x].f.b * (255 - tempAlpha)) / 255;
-							}
-							// Precalculate background * layer alpha (8 bit depth)
-							tempAlpha = texture(src.x, src.y).b.a * layer->m_alpha / 255;
-							if (tempAlpha > 0)
-							{
-								m_image[m_res.x * dst.y + dst.x].b.r = (texture(src.x, src.y).b.r * tempAlpha + m_image[m_res.x * dst.y + dst.x].b.r * (255 - tempAlpha)) / 255;
-								m_image[m_res.x * dst.y + dst.x].b.g = (texture(src.x, src.y).b.g * tempAlpha + m_image[m_res.x * dst.y + dst.x].b.g * (255 - tempAlpha)) / 255;
-								m_image[m_res.x * dst.y + dst.x].b.b = (texture(src.x, src.y).b.b * tempAlpha + m_image[m_res.x * dst.y + dst.x].b.b * (255 - tempAlpha)) / 255;
-							}
-						}
+							RenderComplex(layer->m_alpha, object, texture);
 					}
 				}
 			}
 		}
-		if (layer->m_frgba.a != 0)
+
+		RenderForeground(layer->m_frgba, layer->m_brgba);
+	}
+}
+
+inline void KTech::Camera::RenderBackground()
+{
+	// RESET image to background
+	for (size_t i = 0; i < m_image.size(); i++)
+		m_image[i] = m_background;
+}
+
+inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, Texture& p_texture)
+{
+	// PRE-CALCULATE start and end positions for image iterator
+	Point start(p_object->m_pos + p_texture.m_rPos - m_pos);
+	Point end(
+		start.x + static_cast<long>(p_texture.m_size.x),
+		start.y + static_cast<long>(p_texture.m_size.y)
+	);
+
+	// DELIMIT positions or return if not in range
+	if (!Delimit(start, end, m_res))
+		return;
+
+	// DRAW character according to expected behavior
+	char charToDraw = p_texture.m_value.c;
+	if (DetermineCharacter(charToDraw))
+		for (size_t y = start.y; y < end.y; y++) // Iterate
+			for (size_t x = start.x; x < end.x; x++)
+				m_image[m_res.x * y + x].c = charToDraw;
+
+	// DRAW foreground color
+	RGBA tempRGBA;
+	if (BakeRGBAWith(tempRGBA, p_texture.m_value.f, p_layerAlpha)) // Returns false if alpha is 0 and thus won't change anything
+		for (size_t y = start.y; y < end.y; y++) // ITERATE
+			for (size_t x = start.x; x < end.x; x++)
+				DrawBakedToRGB(m_image[m_res.x * y + x].f, tempRGBA);
+
+	// DRAW background color
+	if (BakeRGBAWith(tempRGBA, p_texture.m_value.b, p_layerAlpha)) // Returns false if alpha is 0 and thus won't change anything
+		for (size_t y = start.y; y < end.y; y++) // ITERATE
+			for (size_t x = start.x; x < end.x; x++)
+				DrawBakedToRGB(m_image[m_res.x * y + x].b, tempRGBA);
+}
+
+inline void KTech::Camera::RenderComplex(uint8_t p_layerAlpha, Object* p_object, Texture& p_texture)
+{
+	// PRE-CALCULATE start positions for texture and image iterators
+	Point texturePos(p_object->m_pos + p_texture.m_rPos - m_pos);
+	Point srcStart( // Texture start position
+		texturePos.x >= 0 ? 0 : - texturePos.x, // Is texture after image? Yes: start from 0 of texture. No: start from within texture.
+		texturePos.y >= 0 ? 0 : - texturePos.y
+	);
+	Point dstStart( // Image start position
+		texturePos.x <= 0 ? 0 : texturePos.x, // Is texture before image? Yes: start from 0 of image. No: start from within image.
+		texturePos.y <= 0 ? 0 : texturePos.y
+	);
+
+	// ITERATE through image and texture at the same time
+	for (size_t dstY = dstStart.y, srcY = srcStart.y;
+		dstY < m_res.y && srcY < p_texture.m_size.y;
+		dstY++, srcY++)
+	{
+		for (size_t dstX = dstStart.x, srcX = srcStart.x;
+			dstX < m_res.x && srcX < p_texture.m_size.x;
+			dstX++, srcX++)
 		{
-			RGBA tempRGBA(layer->m_frgba.a * layer->m_frgba.r / 255, layer->m_frgba.a * layer->m_frgba.g / 255, layer->m_frgba.a * layer->m_frgba.b / 255, layer->m_frgba.a);
-			for (size_t y = 0; y < m_res.y; y++)
-			{
-				for (size_t x = 0; x < m_res.x; x++)
-				{
-					m_image[m_res.x * y + x].f.r = tempRGBA.r + (255 - layer->m_frgba.a) * m_image[m_res.x * y + x].f.r / 255;
-					m_image[m_res.x * y + x].f.g = tempRGBA.g + (255 - layer->m_frgba.a) * m_image[m_res.x * y + x].f.g / 255;
-					m_image[m_res.x * y + x].f.b = tempRGBA.b + (255 - layer->m_frgba.a) * m_image[m_res.x * y + x].f.b / 255;
-				}
-			}
-		}
-		if (layer->m_brgba.a != 0)
-		{
-			RGBA tempRGBA(layer->m_brgba.a * layer->m_brgba.r / 255, layer->m_brgba.a * layer->m_brgba.g / 255, layer->m_brgba.a * layer->m_brgba.b / 255, layer->m_brgba.a);
-			for (size_t y = 0; y < m_res.y; y++)
-			{
-				for (size_t x = 0; x < m_res.x; x++)
-				{
-					m_image[m_res.x * y + x].b.r = tempRGBA.r + (255 - layer->m_brgba.a) * m_image[m_res.x * y + x].b.r / 255;
-					m_image[m_res.x * y + x].b.g = tempRGBA.g + (255 - layer->m_brgba.a) * m_image[m_res.x * y + x].b.g / 255;
-					m_image[m_res.x * y + x].b.b = tempRGBA.b + (255 - layer->m_brgba.a) * m_image[m_res.x * y + x].b.b / 255;
-				}
-			}
+			// DRAW character according to expected behavior
+			char charToDraw = p_texture(srcX, srcY).c;
+			if (DetermineCharacter(charToDraw))
+				m_image[m_res.x * dstY + dstX].c = charToDraw;
+
+			// DRAW foreground color
+			RGBA tempRGBA;
+			if (BakeRGBAWith(tempRGBA, p_texture(srcX, srcY).f, p_layerAlpha))
+				DrawBakedToRGB(m_image[m_res.x * dstY + dstX].f, tempRGBA);
+
+			// DRAW background color
+			if (BakeRGBAWith(tempRGBA, p_texture(srcX, srcY).b, p_layerAlpha))
+				DrawBakedToRGB(m_image[m_res.x * dstY + dstX].b, tempRGBA);
 		}
 	}
+}
+
+inline void KTech::Camera::RenderForeground(const RGBA& p_frgba, const RGBA& p_brgba)
+{
+	// DRAW foreground color
+	RGBA tempRGBA;
+	if (BakeRGBA(tempRGBA, p_frgba))
+		for (size_t y = 0; y < m_res.y; y++) // ITERATE
+			for (size_t x = 0; x < m_res.x; x++)
+				DrawBakedToRGB(m_image[m_res.x * y + x].f, tempRGBA);
+
+	// DRAW background color
+	if (BakeRGBA(tempRGBA, p_brgba))
+		for (size_t y = 0; y < m_res.y; y++) // ITERATE
+			for (size_t x = 0; x < m_res.x; x++)
+				DrawBakedToRGB(m_image[m_res.x * y + x].b, tempRGBA);
 }

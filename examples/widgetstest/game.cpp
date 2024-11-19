@@ -52,12 +52,12 @@ struct UITest
 		w_notice,
 		WIDGETS_SIZE
 	};
-	
+
 	Widget* widgets[WIDGETS_SIZE];
 	size_t currentWidget = w_intfield;
 
 	ID<UI> ui;
-	
+
 	Time::Invocation* countdownInvocation;
 
 	uint8_t countdown;
@@ -95,7 +95,7 @@ struct UITest
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
 		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
 	}
-	
+
 	bool MoveUp()
 	{
 		engine.output.Log("(GAME) <UI::MoveUp()> SOF", RGBColors::orange);
@@ -194,6 +194,7 @@ int main()
 		{
 			// Render, draw and print
 			ui.Render();
+			engine.output.Clear();
 			engine.output.Draw(ui.m_image, ui.m_res);
 			engine.output.Print();
 		}

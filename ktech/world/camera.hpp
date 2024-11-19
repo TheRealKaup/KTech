@@ -60,4 +60,10 @@ protected:
 	inline virtual bool OnTick() { return false; };
 
 	friend class KTech::Memory;
+
+private:
+	inline void RenderBackground();
+	inline void RenderSimple(uint8_t layerAlpha, Object* object, Texture& texture);
+	inline void RenderComplex(uint8_t layerAlpha, Object* object, Texture& texture);
+	inline void RenderForeground(const RGBA& frgba, const RGBA& brgba);
 };
