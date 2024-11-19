@@ -18,9 +18,9 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-/*        
-	  |  /  ----- ----- ----- -   -  
-	 || /\    |   |---  |     |---| 
+/*
+	  |  /  ----- ----- ----- -   -
+	 || /\    |   |---  |     |---|
 	|||/  \   |   \____ \____ |   |  kaup's c++ 2d terminal game engine library
 
 	In order to contact me (Kaup), refer to the "readme.md" file.
@@ -72,10 +72,7 @@ namespace KTech
 	namespace Keys {}
 }
 
-// Avoids errors caused by files building order by not including the following inclusions in the other header files.
-// For example `audio.hpp` might be processed first by the compiler, which will include `engine.hpp` via here, thus causing
-// an incomplete type error, as it contains an `Audio` member, meanwhile, the `Audio` class hasn't been defined yet. 
-#ifndef KTECH_DEFINITION
+#ifndef KTECH_DEFINITION // See `documentation/faq.md#`
 #include "basic/point.hpp"
 #include "basic/upoint.hpp"
 #include "basic/rgb.hpp"

@@ -107,7 +107,7 @@ The contents of `ktech/` is split into multiple sub-directories:
 - `widgets/` - optional widgets that you may include from here.
 - `world/` - world classes.
 
-Note that `ktech.hpp` includes all of the required header files only if `KTECH_DEFINITION` is undefined (and it is normally undefined). This macro is an include guard completely internal to KTech, and you shouldn't define it before including `ktech.hpp`. Apart from that, don't worry about this macro.
+Note that `ktech.hpp` includes all of the required header files only if `KTECH_DEFINITION` is undefined (it is indeed normally undefined). This macro is an include guard completely internal to KTech, and you shouldn't define it before including `ktech.hpp`. Apart from that, don't worry about this macro, unless you want to know more about it in the entry "[What is the `KTECH_DEFINITION` macro?](#what-is-the-ktech_definition-macro)"
 
 ## How does `CachingRegistry` work?
 
@@ -144,3 +144,60 @@ Personally I haven't directly planned on writing more SDK-like components simila
 KTech doesn't know more than the CPU, but it should be clear that some terminal has to display its prints. Such terminal is likely rendered by a GPU, and also could be itself a GPU-accelerated terminal emulator.
 
 Nonetheless, KTech achieves beyond playable performance.
+
+## What is the `KTECH_DEFINITION` macro?
+
+The `KTECH_DEFINITION` macro is defined in KTech's header files, in order to include the needed `KTech` namespace, while avoiding all of the header files below it. The reason this is needed is best explained with an example.
+
+Assume we have the `Output` engine component defined in `output.hpp`:
+
+```cpp
+#include "../ktech.hpp"
+
+class KTech::Output
+{
+	// ...
+}
+```
+
+And `Engine` defined in `engine.hpp`:
+
+```cpp
+class KTech::Engine
+{
+	// ...
+	Output output;
+	// ...
+}
+```
+
+If `engine.hpp` would be included alongside the `KTech` namespace by including `ktech.hpp` in `output.hpp`, the preprocessor will create something like this:
+
+```cpp
+namespace KTech
+{
+	// ...
+	class Output;
+	class Engine;
+	// ...
+}
+
+class KTech::Engine
+{
+	// ...
+	Output output;
+	Engine() : output(this) {}
+	// ...
+}
+
+class KTech::Output
+{
+	// ...
+}
+```
+
+The problem here is that `Output` is still undefined in `Engine` (not to mention that its constructor isn't even declared). Meaning, the creation of an `Output` instance in `Engine` prompts an error (to the compiler, it is an incomplete type).
+
+To solve this, the `KTECH_DEFINITION` macro is used as an include guard to prevent the inclusion of `engine.hpp`.
+
+This would be simpler if the namespace and the `#include` directives were separated into 2 files. That way, the user would include a header with all the `#include` directives, and KTech's code base would include a header with just the namespace. But, I wanted to have both in one place, so when a user looks at the contents of the file they include in their game (`ktech.hpp`), they immediately see what types and variables they get and may choose.
