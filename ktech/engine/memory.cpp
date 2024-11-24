@@ -20,7 +20,7 @@
 
 #include "memory.hpp"
 
-#include "../utility/cachingregistry.hpp" 
+#include "../utility/cachingregistry.hpp"
 #include "../world/camera.hpp"
 #include "../world/layer.hpp"
 #include "../world/map.hpp"
@@ -30,34 +30,46 @@
 
 void KTech::Memory::CallOnTicks()
 {
-	size_t i = 0;
-	for (; i < uis.m_vec.size() && !changedThisTick; i++)
-		changedThisTick = uis.m_vec[i]->OnTick();
-	for (; i < uis.m_vec.size(); i++)
-		uis.m_vec[i]->OnTick();
-	i = 0;
-	for (; i < widgets.m_vec.size() && !changedThisTick; i++)
-		changedThisTick = widgets.m_vec[i]->OnTick();
-	for (; i < widgets.m_vec.size(); i++)
-		widgets.m_vec[i]->OnTick();
-	i = 0;
-	for (; i < maps.m_vec.size() && !changedThisTick; i++)
-		changedThisTick = maps.m_vec[i]->OnTick();
-	for (; i < maps.m_vec.size(); i++)
-		maps.m_vec[i]->OnTick();
-	i = 0;
-	for (; i < cameras.m_vec.size() && !changedThisTick; i++)
-		changedThisTick = cameras.m_vec[i]->OnTick();
-	for (; i < cameras.m_vec.size(); i++)
-		cameras.m_vec[i]->OnTick();
-	i = 0;
-	for (; i < layers.m_vec.size() && !changedThisTick; i++)
-		changedThisTick = layers.m_vec[i]->OnTick();
-	for (; i < layers.m_vec.size(); i++)
-		layers.m_vec[i]->OnTick();
-	i = 0;
-	for (; i < objects.m_vec.size() && !changedThisTick; i++)
-		changedThisTick = objects.m_vec[i]->OnTick();
-	for (; i < objects.m_vec.size(); i++)
-		objects.m_vec[i]->OnTick();
+	for (UI* ui : uis.m_vec)
+	{
+		if (ui->OnTick() && !m_changedThisTick)
+		{
+			m_changedThisTick = true;
+		}
+	}
+	for (Widget* widget : widgets.m_vec)
+	{
+		if (widget->OnTick() && !m_changedThisTick)
+		{
+			m_changedThisTick = true;
+		}
+	}
+	for (Map* map : maps.m_vec)
+	{
+		if (map->OnTick() && !m_changedThisTick)
+		{
+			m_changedThisTick = true;
+		}
+	}
+	for (Camera* camera : cameras.m_vec)
+	{
+		if (camera->OnTick() && !m_changedThisTick)
+		{
+			m_changedThisTick = true;
+		}
+	}
+	for (Layer* layer : layers.m_vec)
+	{
+		if (layer->OnTick() && !m_changedThisTick)
+		{
+			m_changedThisTick = true;
+		}
+	}
+	for (Object* object : objects.m_vec)
+	{
+		if (object->OnTick() && !m_changedThisTick)
+		{
+			m_changedThisTick = true;
+		}
+	}
 }

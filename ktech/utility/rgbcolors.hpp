@@ -37,6 +37,7 @@ namespace KTech::RGBColors
 	constexpr RGB blue = RGB(0, 128, 255);
 	constexpr RGB primaryBlue = RGB(0, 0, 255);
 	constexpr RGB purple = RGB(128, 0, 255);
+	constexpr RGB magenta = RGB(255, 0, 220);
 	constexpr RGB pink = RGB(255, 0, 255);
 	constexpr RGB hotPink = RGB(255, 0, 128);
 	constexpr RGB white = RGB(255, 255, 255);

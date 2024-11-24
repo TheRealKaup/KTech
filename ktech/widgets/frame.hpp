@@ -31,8 +31,8 @@ public:
 		KTech::ID<KTech::UI> ui,
 		KTech::Point pos,
 		KTech::UPoint size,
-		KTech::RGBA unselectedRGBA = KTech::RGBA( 150, 150, 150, 255 ),
-		KTech::RGBA selectedRGBA = KTech::RGBA( 255, 255, 255, 255 ))
+		KTech::RGBA unselectedRGBA = KTech::RGBAColors::gray,
+		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
 		: Widget(engine, ui, pos), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA)
 	{
 		// Texture
@@ -42,32 +42,37 @@ public:
 	void SetSize(KTech::UPoint size)
 	{
 		KTech::RGBA tempRGBA = m_selected ? m_selectedRGBA : m_unselectedRGBA;
-		m_textures.resize(8);
-		// up-left corner
-		m_textures[0].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
-		// up-right corner
-		m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, 0));
-		// bottom-left corner
-		m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, size.y - 1));
-		// bottom-right corner
-		m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, size.y - 1));
-		// up frame
-		m_textures[4].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
-		// left frame
-		m_textures[5].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
-		// bottom frame
-		m_textures[6].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, size.y - 1));
-		// right frame
-		m_textures[7].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(size.x - 1, 1));
+		m_textures.resize(TEXTURES_SIZE);
+		m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
+		m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, 0));
+		m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, size.y - 1));
+		m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, size.y - 1));
+		m_textures[ti_topFrame].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
+		m_textures[ti_leftFrame].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
+		m_textures[ti_bottomFrame].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, size.y - 1));
+		m_textures[ti_rightFrame].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(size.x - 1, 1));
 	}
 
 protected:
-	virtual void OnSelect() override
+	enum TextureIndex : size_t
+	{
+		ti_topLeftCorner,
+		ti_topRightCorner,
+		ti_bottomLeftCorner,
+		ti_bottomRightCorner,
+		ti_topFrame,
+		ti_leftFrame,
+		ti_bottomFrame,
+		ti_rightFrame,
+		TEXTURES_SIZE
+	};
+
+	void OnSelect() override
 	{
 		RenderSelected();
 	}
 
-	virtual void OnDeselect() override
+	void OnDeselect() override
 	{
 		RenderUnselected();
 	}
@@ -75,12 +80,16 @@ protected:
 	void RenderSelected()
 	{
 		for (KTech::Texture& texture : m_textures)
+		{
 			texture.SetForeground(m_selectedRGBA);
-	}  
+		}
+	}
 
 	void RenderUnselected()
 	{
 		for (KTech::Texture& texture : m_textures)
+		{
 			texture.SetForeground(m_unselectedRGBA);
+		}
 	}
 };

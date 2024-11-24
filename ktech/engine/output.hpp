@@ -26,6 +26,7 @@
 #include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
 
+#include <limits>
 #include <string>
 #ifdef _WIN32
 #include <Windows.h>
@@ -41,7 +42,7 @@ public:
 	const UPoint resolution;
 	std::vector<std::string> outputAfterQuit;
 
-	Output(Engine* const engine, UPoint imageResolution);
+	Output(Engine* engine, UPoint imageResolution);
 	~Output();
 
 	static void Log(const std::string& text, RGB color);
@@ -49,19 +50,18 @@ public:
 	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName) const;
 	// Clears the in-engine image, not the terminal.
 	void Clear();
-	void Draw(const std::vector<Cell>& image, UPoint size, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = 255);
-	void Draw(const std::vector<CellA>& image, UPoint size, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = 255);
+	void Draw(const std::vector<Cell>& sourceImage, UPoint resolution, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+	void Draw(const std::vector<CellA>& sourceImage, UPoint resolution, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
 	void Print();
 
 	// If game loop is designed to render-on-demand, use this function to determine whether there is demand, that is, should the game loop
 	// render, draw and print.
-	bool ShouldRenderThisTick();
+	auto ShouldRenderThisTick() -> bool;
 	// Returns true if the terminal resized this tick, which means the game loop should print even if it didn't render.
-	bool ShouldPrintThisTick();
+	[[nodiscard]] auto ShouldPrintThisTick() const -> bool;
 
 private:
 	Engine* const engine;
-
 #if _WIN32
 	HANDLE m_stdoutHandle;
 	DWORD m_oldMode;
@@ -75,4 +75,10 @@ private:
 #endif
 	std::vector<Cell> m_image;
 	std::string m_stringImage;
+	static constexpr size_t printSequenceLength = 39;
+
+	void PopulateForegroundColor(size_t& dst, const RGB& src);
+	void PopulateBackgroundColor(size_t& dst, const RGB& src);
+	void PopulateCharacter(size_t& dst, size_t src);
+	void PopulateEndOfLine(size_t& dst);
 };

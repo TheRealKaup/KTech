@@ -44,7 +44,9 @@ void KTech::Input::CallbacksGroup::DeleteCallbacks()
 {
 	// Disable as soon as possible the callbacks (since the actual callbacks are probably deleted right after)
 	for (Callback* callback : m_callbacks)
+	{
 		callback->enabled = false;
+	}
 	// Then request to delete the callbacks
 	// (removeDisabled will set the group to be disabled later, removeEnabled will set to enabled)
 	m_status = (m_status == Status::disabled ? Status::removeDisabled : Status::removeEnabled);
@@ -59,14 +61,18 @@ void KTech::Input::CallbacksGroup::Update()
 		{
 			// Disable the callbacks
 			for (Callback* callback : m_callbacks)
+			{
 				callback->enabled = false;
+			}
 			break;
 		}
 		case Status::enabled:
 		{
 			// Enable the callbacks
 			for (Callback* callback : m_callbacks)
+			{
 				callback->enabled = true;
+			}
 			break;
 		}
 		case Status::removeDisabled:
@@ -74,7 +80,9 @@ void KTech::Input::CallbacksGroup::Update()
 			// Delete the callbacks from memory (which will automatically delete the callbacks from
 			// their parent handlers' callback vector)
 			for (Callback*& callback : m_callbacks)
+			{
 				delete callback;
+			}
 			// Clear the group's vectors
 			m_callbacks.clear();
 			// Disable the group as requested
@@ -85,7 +93,9 @@ void KTech::Input::CallbacksGroup::Update()
 		{
 			// The same as ^ but enable the group afterwards
 			for (Callback* callback : m_callbacks)
+			{
 				delete callback;
+			}
 			m_callbacks.clear();
 			m_status = Status::enabled;
 			break;

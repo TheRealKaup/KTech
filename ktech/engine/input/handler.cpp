@@ -23,6 +23,10 @@
 void KTech::Input::Handler::RemoveCallback(Callback* p_callback)
 {
 	for (size_t i = 0; i < m_callbacks.size(); i++)
+	{
 		if (m_callbacks[i] == p_callback)
+		{
 			m_callbacks.erase(m_callbacks.begin() + i);
+		}
+	}
 }

@@ -28,6 +28,7 @@
 #include "../basic/rgba.hpp"
 #include "../basic/upoint.hpp"
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -44,15 +45,15 @@ public:
 	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
 	RGBA m_frgba = RGBA(0, 0, 0, 0);
 	RGBA m_brgba = RGBA(0, 0, 0, 0);
-	uint8_t m_alpha = 255;
+	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();
 	std::vector<CellA> m_image;
 
-	UI(Engine& engine, UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	UI(Engine& engine, UPoint resolution = UPoint(10, 10), std::string name = "");
 	virtual ~UI();
 
-	bool AddWidget(ID<Widget> widget);
-	bool RemoveWidget(ID<Widget> widget);
-	bool RemoveAllWidgets();
+	auto AddWidget(ID<Widget> widget) -> bool;
+	auto RemoveWidget(ID<Widget> widget) -> bool;
+	auto RemoveAllWidgets() -> bool;
 
 	void Resize(UPoint resolution);
 

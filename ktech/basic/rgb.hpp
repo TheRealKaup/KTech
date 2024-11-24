@@ -27,16 +27,16 @@
 struct KTech::RGB
 {
 	uint8_t r, g, b;
-	
-	inline constexpr RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0)
+
+	constexpr RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0)
 		: r(red), g(green), b(blue) {}
 
-	inline constexpr bool operator==(const RGB& rgb) const
+	constexpr auto operator==(const RGB& rgb) const -> bool
 	{
 		return r == rgb.r && g == rgb.g && b == rgb.b;
 	}
 
-	inline constexpr bool operator!=(const RGB& rgb) const
+	constexpr auto operator!=(const RGB& rgb) const -> bool
 	{
 		return !(*this == rgb);
 	}

@@ -40,17 +40,17 @@ public:
 	std::vector<Texture> m_textures = {};
 	std::vector<Collider> m_colliders = {};
 
-	Object(Engine& engine, Point position = Point(0, 0), const std::string& name = "");
-	Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), const std::string& name = "");
+	Object(Engine& engine, Point position = Point(0, 0), std::string name = "");
+	Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), std::string name = "");
 	virtual ~Object();
 
-	bool EnterLayer(ID<Layer>& layer);
-	bool LeaveLayer();
+	auto EnterLayer(ID<Layer>& layer) -> bool;
+	auto LeaveLayer() -> bool;
 
-	bool Move(Point direction);
+	auto Move(Point direction) -> bool;
 
 protected:
-	inline virtual bool OnTick() { return false; };
+	inline virtual auto OnTick() -> bool { return false; };
 	inline virtual void OnMove(Point direction) {};
 	inline virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
 	inline virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)

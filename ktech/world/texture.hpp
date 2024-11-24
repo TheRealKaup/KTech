@@ -42,32 +42,32 @@ struct KTech::Texture
 	UPoint m_size;
 	std::vector<CellA> m_t;
 
-	Texture& Simple(UPoint size, CellA value);
-	Texture& Simple(UPoint size, CellA value, Point relativePosition);
-	Texture& Rectangle(UPoint size, CellA value);
-	Texture& Rectangle(UPoint size, CellA value, Point relativePosition);
-	Texture& File(const std::filesystem::path& filePath);
-	Texture& File(const std::filesystem::path& filePath, Point relativePosition);
-	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background);
-	Texture& Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition);
+	auto Simple(UPoint size, CellA value) -> Texture&;
+	auto Simple(UPoint size, CellA value, Point relativePosition) -> Texture&;
+	auto Rectangle(UPoint size, CellA value) -> Texture&;
+	auto Rectangle(UPoint size, CellA value, Point relativePosition) -> Texture&;
+	auto File(const std::filesystem::path& filePath) -> Texture&;
+	auto File(const std::filesystem::path& filePath, Point relativePosition) -> Texture&;
+	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background) -> Texture&;
+	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition) -> Texture&;
 	// Creates "missing texture"
-	Texture& Null();
-	Texture& Null(Point relativePosition);
+	auto Null() -> Texture&;
+	auto Null(Point relativePosition) -> Texture&;
 
-	CellA& operator()(size_t x, size_t y);
-	const CellA& operator()(size_t x, size_t y) const;
+	auto operator()(size_t x, size_t y) -> CellA&;
+	auto operator()(size_t x, size_t y) const -> const CellA&;
 
 	// `newValue` - only fills the new cells.
-	Texture& Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)));
-	Texture& SetCell(CellA value);
-	Texture& SetForeground(RGBA value);
-	Texture& SetBackground(RGBA value);
-	Texture& SetCharacter(char value);
-	Texture& SetForegroundAlpha(uint8_t value);
-	Texture& SetBackgroundAlpha(uint8_t value);
-	Texture& SetAlpha(uint8_t value);
-	Texture& ReplaceCharacter(char oldValue, char newValue);
-	
+	auto Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0))) -> Texture&;
+	auto SetCell(CellA value) -> Texture&;
+	auto SetForeground(RGBA value) -> Texture&;
+	auto SetBackground(RGBA value) -> Texture&;
+	auto SetCharacter(char value) -> Texture&;
+	auto SetForegroundAlpha(uint8_t value) -> Texture&;
+	auto SetBackgroundAlpha(uint8_t value) -> Texture&;
+	auto SetAlpha(uint8_t value) -> Texture&;
+	auto ReplaceCharacter(char oldValue, char newValue) -> Texture&;
+
 	void ExportToFile(const std::filesystem::path& filePath) const;
 	// For debugging
 	void Print();

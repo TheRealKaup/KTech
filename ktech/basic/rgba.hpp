@@ -29,18 +29,18 @@ struct KTech::RGBA
 {
 	uint8_t r, g, b, a;
 
-	inline constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255)
+	constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 0)
 		: r(red), g(green), b(blue), a(alpha) {}
 
-	inline constexpr RGBA(RGB rgb, uint8_t alpha)
+	constexpr RGBA(RGB rgb, uint8_t alpha)
 		: r(rgb.r), g(rgb.g), b(rgb.b), a(alpha) {}
 
-	inline constexpr bool operator==(const RGBA& rgba) const
+	constexpr auto operator==(const RGBA& rgba) const -> bool
 	{
 		return (r == rgba.r) && (g == rgba.g) && (b == rgba.b) && (a == rgba.a);
 	}
 
-	inline constexpr bool operator!=(const RGBA& rgba) const
+	constexpr auto operator!=(const RGBA& rgba) const -> bool
 	{
 		return !(*this == rgba);
 	}

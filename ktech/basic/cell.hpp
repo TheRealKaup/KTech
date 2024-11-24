@@ -24,6 +24,7 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "rgb.hpp"
+#include "../utility/rgbcolors.hpp"
 
 struct KTech::Cell
 {
@@ -31,15 +32,15 @@ struct KTech::Cell
 	RGB f;
 	RGB b;
 
-	inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
+	constexpr Cell(char character = ' ', RGB foreground = RGBColors::black, RGB background = RGBColors::black)
 		: c(character), f{foreground}, b(background) {}
 
-	inline constexpr bool operator==(const Cell& cell) const
+	constexpr auto operator==(const Cell& cell) const -> bool
 	{
 		return (c == cell.c) && (f == cell.f) && (b == cell.b);
 	}
 
-	inline constexpr bool operator!=(const Cell& cell) const
+	constexpr auto operator!=(const Cell& cell) const -> bool
 	{
 		return !(*this == cell);
 	}

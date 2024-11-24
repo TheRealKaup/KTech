@@ -38,11 +38,11 @@ struct KTech::Input::CallbacksGroup
 
 	CallbacksGroup(bool enabled = true)
 		: m_status(enabled ? Status::enabled : Status::disabled) {}
-		
-	void AddCallback(Callback* basicCallback);
-	
+
+	void AddCallback(Callback* callback);
+
 	void DeleteCallbacks();
-	
+
 	void Enable();
 	void Disable();
 

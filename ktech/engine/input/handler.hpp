@@ -35,10 +35,10 @@ struct KTech::Input::Handler
 	const std::string m_string;
 	std::vector<Callback*> m_callbacks;
 
-	inline Handler(const::std::string& input)
-		: m_string(input) {}
+	Handler(std::string input)
+		: m_string(std::move(input)) {}
 
-	inline Handler(char key1, char key2)
+	Handler(char key1, char key2)
 		: m_start(key1), m_end(key2) {}
 
 	void RemoveCallback(Callback* callback);

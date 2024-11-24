@@ -25,12 +25,11 @@
 #include "handler.hpp"
 #include "../engine.hpp"
 
-#include <cstring>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 
-KTech::Input::Input(Engine* const p_engine)
+KTech::Input::Input(Engine* p_engine)
 	: engine(p_engine)
 {
 	// Set terminal attributes
@@ -63,7 +62,7 @@ KTech::Input::Input(Engine* const p_engine)
 #endif
 
 	// Create the input loop
-	m_inputLoop = std::thread(std::bind(&Input::Loop, this));
+	m_inputLoop = std::thread([this]() { this->Loop(); });
 }
 
 KTech::Input::~Input()
@@ -80,138 +79,162 @@ KTech::Input::~Input()
 	m_inputLoop.detach();
 }
 
-KTech::Input::Callback* KTech::Input::RegisterCallback(const std::string& p_input, const std::function<bool()>& p_callback)
+auto KTech::Input::RegisterCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback) -> KTech::Input::Callback*
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
-		return nullptr;
-	// If a handler already exists for this input, add the callback to the calls vector
-	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
-	for (; i < m_stringHandlers.size(); i++)
 	{
-		if (m_stringHandlers[i]->m_string == p_input)
+		return nullptr;
+	}
+	// If a handler already exists for this input, add the callback to the calls vector
+	for (Handler* stringHandler : m_stringHandlers)
+	{
+		if (stringHandler->m_string == p_stringKey)
 		{
-			m_stringHandlers[i]->m_callbacks.push_back(new Callback(p_callback, m_stringHandlers[i]));
-			return m_stringHandlers[i]->m_callbacks[m_stringHandlers[i]->m_callbacks.size() - 1]; // Last callback
+			stringHandler->m_callbacks.push_back(new Callback(p_callback, stringHandler));
+			return stringHandler->m_callbacks[stringHandler->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	m_stringHandlers.push_back(new Handler(p_input));
+	m_stringHandlers.push_back(new Handler(p_stringKey));
 	// And add a callback to it
-	m_stringHandlers[i]->m_callbacks.push_back(new Callback(p_callback, m_stringHandlers[i]));
-	return m_stringHandlers[i]->m_callbacks[m_stringHandlers[i]->m_callbacks.size() - 1]; // Last callback of last handler
+	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(new Callback(p_callback, m_stringHandlers[m_stringHandlers.size() - 1]));
+	return m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback of last handler
 }
 
-KTech::Input::Callback* KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback)
+auto KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback) -> KTech::Input::Callback*
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
-		return nullptr;
-	// If a handler already exists for this input, add the callback to the calls vector
-	size_t i = 0; // Creating it out of the for's scope so I can use it as size of `handlers` later
-	for (; i < m_rangeHandlers.size(); i++)
 	{
-		if (m_rangeHandlers[i]->m_start == p_key1 && m_rangeHandlers[i]->m_end == p_key2)
+		return nullptr;
+	}
+	// If a handler already exists for this input, add the callback to the calls vector
+	for (Handler* rangeHandler : m_rangeHandlers)
+	{
+		if (rangeHandler->m_start == p_key1 && rangeHandler->m_end == p_key2)
 		{
-			m_rangeHandlers[i]->m_callbacks.push_back(new Callback(p_callback, m_rangeHandlers[i]));
-			return m_rangeHandlers[i]->m_callbacks[m_rangeHandlers[i]->m_callbacks.size() - 1]; // Last callback
+			rangeHandler->m_callbacks.push_back(new Callback(p_callback, rangeHandler));
+			return rangeHandler->m_callbacks[rangeHandler->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
 	m_rangeHandlers.push_back(new Handler(p_key1, p_key2));
 	// And add a callback to it
-	m_rangeHandlers[i]->m_callbacks.push_back(new Callback(p_callback, m_rangeHandlers[i]));
-	return m_rangeHandlers[i]->m_callbacks[m_rangeHandlers[i]->m_callbacks.size() - 1]; // Last callback
+	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(new Callback(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
+	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
 }
 
-KTech::Input::CallbacksGroup* KTech::Input::CreateCallbacksGroup(bool p_enabled)
+auto KTech::Input::CreateCallbacksGroup(bool p_enabled) -> KTech::Input::CallbacksGroup*
 {
 	m_groups.push_back(new CallbacksGroup(p_enabled));
 	return m_groups[m_groups.size() - 1];
 }
 
-bool KTech::Input::Is(const std::string& p_stringKey) const
+auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
 {
 	return (input == p_stringKey);
 }
 
-bool KTech::Input::Is(char p_charKey) const
+auto KTech::Input::Is(char p_charKey) const -> bool
 {
 	return input.length() == 1 && input[0] == p_charKey;
 }
 
-uint8_t KTech::Input::GetInt() const
+auto KTech::Input::GetInt() const -> uint8_t
 {
 	return input[0] - '0';
 }
 
-bool KTech::Input::Bigger(char p_charKey) const
+auto KTech::Input::Bigger(char p_charKey) const -> bool
 {
 	return (input[0] >= p_charKey) && (input[1] == 0);
 }
 
-bool KTech::Input::Smaller(char p_charKey) const
+auto KTech::Input::Smaller(char p_charKey) const -> bool
 {
 	return (input[0] <= p_charKey) && (input[1] == 0);
 }
 
-bool KTech::Input::Between(char p_charKey1, char p_charKey2) const
+auto KTech::Input::Between(char p_charKey1, char p_charKey2) const -> bool
 {
 	return (input[0] >= p_charKey1) && (input[0] <= p_charKey2) && (input[1] == 0);
 }
 
 void KTech::Input::CallCallbacks()
 {
-	// Update groups' callbacks' `enabled` if `synced` is false
-	for (CallbacksGroup*& group : m_groups)
-		if (!group->m_synced)
-			group->Update();
+	UpdateGroups();
 	// Protect `std::vector m_inputQueue`
 	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 	// Call callbacks of triggered handlers
-	for (size_t i = 0; i < m_inputQueue.size(); i++)
+	for (std::string& queuedInput : m_inputQueue)
 	{
-		input = std::move(m_inputQueue[i]);
+		input = std::move(queuedInput);
 		if (input.length() == 1) // Can be both string/range handler
 		{
-			for (Handler* stringHandler : m_stringHandlers) // Input matches handler's string
-			{
-				if (input == stringHandler->m_string) // String matches
-				{
-					// Call callbacks
-					for (Callback* callback : stringHandler->m_callbacks)
-						if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
-							changedThisTick = true; // Render-on-demand
-					// Break because there shouldn't be a similar handler
-					break;
-				}
-			}
-			for (Handler* rangeHandler : m_rangeHandlers) // Range handlers
-				if (rangeHandler->m_start <= input[0] && input[0] <= rangeHandler->m_end) // Input matches handler's range
-					for (Callback* callback: rangeHandler->m_callbacks) // Call callbacks
-						if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
-							changedThisTick = true; // Render-on-demand
+			CallStringHandlers();
+			CallRangeHandlers();
 		}
 		else // Can only be string handler
 		{
-			for (Handler* stringHandler : m_stringHandlers) // Input matches handler's string
-			{
-				if (input == stringHandler->m_string) // String matches
-				{
-					// Call callbacks
-					for (Callback* callback : stringHandler->m_callbacks)
-						if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
-							changedThisTick = true; // Render-on-demand
-					// Break because there shouldn't be a similar handler
-					break;
-				}
-			}
+			CallStringHandlers();
 		}
 	}
 	// All callbacks of triggered handlers were called; clear trigger history
 	m_inputQueue.clear();
 }
 
+void KTech::Input::UpdateGroups()
+{
+	// Update groups' callbacks' `enabled` if `synced` is false
+	for (CallbacksGroup*& group : m_groups)
+	{
+		if (!group->m_synced)
+		{
+			group->Update();
+		}
+	}
+}
+
+inline void KTech::Input::CallStringHandlers()
+{
+	for (Handler* stringHandler : m_stringHandlers) // Input matches handler's string
+	{
+		if (input == stringHandler->m_string) // String matches
+		{
+			// Call callbacks
+			for (Callback* callback : stringHandler->m_callbacks)
+			{
+				if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				{
+					m_changedThisTick = true; // Render-on-demand
+				}
+			}
+			// Break because there shouldn't be a similar handler
+			break;
+		}
+	}
+}
+
+void KTech::Input::CallRangeHandlers()
+{
+	for (Handler* rangeHandler : m_rangeHandlers) // Range handlers
+	{
+		if (rangeHandler->m_start <= input[0] && input[0] <= rangeHandler->m_end) // Input matches handler's range
+		{
+			for (Callback* callback: rangeHandler->m_callbacks) // Call callbacks
+			{
+				if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				{
+					m_changedThisTick = true; // Render-on-demand
+				}
+			}
+		}
+	}
+}
+
+
 void KTech::Input::Get()
 {
+	constexpr int maxCharacters = 7;
 #ifdef _WIN32
 	// Read
 	TCHAR tcharBuf[7];
@@ -219,16 +242,18 @@ void KTech::Input::Get()
 	LPDWORD nReadCharacters = 0;
 	ReadConsole(m_stdinHandle, tcharBuf, sizeof(tcharBuf) / sizeof(TCHAR), (LPDWORD)(&nReadCharacters), NULL);
 	// Convert `TCHAR` string to `char` string
-	std::string charBuf((size_t)nReadCharacters, '\0');
-	for (size_t i = 0; i < (size_t)nReadCharacters; i++)
+	std::string charBuf(static_cast<size_t>(nReadCharacters), '\0');
+	for (size_t i = 0; i < static_cast<size_t>(nReadCharacters); i++)
+	{
 		charBuf[i] = tcharBuf[i];
+	}
 	// Protect `std::vector m_inputQueue`
 	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 	// Move to input history
 	m_inputQueue.push_back(std::move(charBuf));
 #else
 	// Read
-	std::string buf(7, '\0');
+	std::string buf(maxCharacters, '\0');
 	buf.resize(read(0, buf.data(), buf.size()));
 	// Protect `std::vector m_inputQueue`
 	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);

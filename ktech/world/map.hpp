@@ -39,21 +39,21 @@ public:
 
 	size_t m_activeCameraI = -1;
 
-	Map(Engine& engine, const std::string& name = "");
+	Map(Engine& engine, std::string name = "");
 	virtual ~Map();
 
-	bool AddLayer(ID<Layer>& layer);
-	bool AddCamera(ID<Camera>& camera, bool asActiveCamera = false);
+	auto AddLayer(ID<Layer>& layer) -> bool;
+	auto AddCamera(ID<Camera>& camera, bool asActiveCamera = false) -> bool;
 
-	bool RemoveLayer(ID<Layer>& layer);
-	bool RemoveCamera(ID<Camera>& camera);
-	bool RemoveAllLayers();
-	bool RemoveAllCameras();
+	auto RemoveLayer(ID<Layer>& layer) -> bool;
+	auto RemoveCamera(ID<Camera>& camera) -> bool;
+	auto RemoveAllLayers() -> bool;
+	auto RemoveAllCameras() -> bool;
 
-	bool Render();
+	auto Render() -> bool;
 
 protected:
-	inline virtual bool OnTick() { return false; };
+	inline virtual auto OnTick() -> bool { return false; };
 
 	friend class KTech::Memory;
 };

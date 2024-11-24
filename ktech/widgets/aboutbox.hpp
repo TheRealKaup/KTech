@@ -31,7 +31,7 @@ public:
 		KTech::ID<KTech::UI> ui,
 		KTech::Point pos,
 		const std::vector<std::string>& text,
-		KTech::RGBA foregroundRGBA = KTech::RGBA( 0, 0, 0, 255 ),
+		KTech::RGBA foregroundRGBA = KTech::RGBAColors::black,
 		KTech::RGBA backgroundRGBA = KTech::RGBAColors::gray)
 		: Widget(engine, ui, pos), m_foregroundRGBA(foregroundRGBA), m_backgroundRGBA(backgroundRGBA)
 	{
@@ -41,24 +41,32 @@ public:
 
 	void SetText(const std::vector<std::string>& text)
 	{
-		m_textures.resize(9);
-		// text
-		m_textures[0].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1)).ReplaceCharacter(' ', '\0').SetBackground(m_backgroundRGBA);
-		// up-left corner
-		m_textures[1].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0));
-		// up-right corner
-		m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 0));
-		// bottom-left corner
-		m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, m_textures[0].m_size.y + 1));
-		// bottom-right corner
-		m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, m_textures[0].m_size.y + 1));
-		// up frame
-		m_textures[5].Simple(KTech::UPoint(m_textures[0].m_size.x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, 0));
-		// left frame
-		m_textures[6].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 1));
-		// bottom frame
-		m_textures[7].Simple(KTech::UPoint(m_textures[0].m_size.x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, m_textures[0].m_size.y + 1));
-		// right frame
-		m_textures[8].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 1));
+		m_textures.resize(TEXTURES_SIZE);
+		m_textures[ti_text].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1))
+			.ReplaceCharacter(' ', '\0')
+			.SetBackground(m_backgroundRGBA);
+		m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0));
+		m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 0));
+		m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, m_textures[0].m_size.y + 1));
+		m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, m_textures[0].m_size.y + 1));
+		m_textures[ti_topFrame].Simple(KTech::UPoint(m_textures[0].m_size.x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, 0));
+		m_textures[ti_leftFrame].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 1));
+		m_textures[ti_bottomFrame].Simple(KTech::UPoint(m_textures[0].m_size.x, 1), KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(1, m_textures[0].m_size.y + 1));
+		m_textures[ti_rightFrame].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 1));
 	}
+
+protected:
+	enum TextureIndex : size_t
+	{
+		ti_text,
+		ti_topLeftCorner,
+		ti_topRightCorner,
+		ti_bottomLeftCorner,
+		ti_bottomRightCorner,
+		ti_topFrame,
+		ti_leftFrame,
+		ti_bottomFrame,
+		ti_rightFrame,
+		TEXTURES_SIZE
+	};
 };

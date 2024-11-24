@@ -20,10 +20,6 @@
 
 #pragma once
 
-#define KTECH_DEFINITION
-#include "../ktech.hpp"
-#undef KTECH_DEFINITION
-
 namespace KTech::Keys
 {
 	constexpr char const* up = "\x1b[A";

@@ -37,10 +37,18 @@ namespace KTech::RGBAColors
 	constexpr RGBA blue = RGBA(0, 128, 255, 255);
 	constexpr RGBA primaryBlue = RGBA(0, 0, 255, 255);
 	constexpr RGBA purple = RGBA(128, 0, 255, 255);
+	constexpr RGBA magenta = RGBA(255, 0, 220, 255);
 	constexpr RGBA pink = RGBA(255, 0, 255, 255);
 	constexpr RGBA hotPink = RGBA(255, 0, 128, 255);
 	constexpr RGBA white = RGBA(255, 255, 255, 255);
 	constexpr RGBA gray = RGBA(160, 160, 160, 255);
 	constexpr RGBA black = RGBA(0, 0, 0, 255);
 	constexpr RGBA transparent = RGBA(0, 0, 0, 0);
+	// Special widgets colors
+	namespace Widgets
+	{
+		constexpr RGBA buttonDownBlue = RGBA(160, 160, 255, 255);
+		constexpr RGBA switchUnselectedOnGreen = RGBA( 90, 160, 90, 255 );
+		constexpr RGBA switchSelectedOnGreen = RGBA( 160, 255, 160, 255 );
+	}
 }

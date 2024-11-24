@@ -38,7 +38,7 @@ public:
 	void CallOnTicks();
 
 private:
-	bool changedThisTick = false;
+	bool m_changedThisTick = false;
 
 	friend class Output;
 };

@@ -29,52 +29,60 @@
 #include "../engine/output.hpp"
 #include "../engine/engine.hpp"
 
-KTech::Camera::Camera(Engine& p_engine, Point p_pos, UPoint p_res, const std::string& p_name)
-	: engine(p_engine), m_pos(p_pos), m_res(p_res)
+KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, const std::string& p_name)
+	: engine(p_engine), m_pos(p_position), m_res(p_resolution)
 {
 	engine.memory.cameras.Add(this);
 	m_image.resize(m_res.y * m_res.x);
 }
 
-KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_map, bool p_active, Point p_pos, UPoint p_res, const std::string& p_name)
-	: Camera(p_engine, p_pos, p_res)
+KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_parentMap, bool p_asActiveCamera, Point p_position, UPoint p_resolution, const std::string& p_name)
+	: Camera(p_engine, p_position, p_resolution)
 {
-	EnterMap(p_map, p_active);
+	EnterMap(p_parentMap, p_asActiveCamera);
 }
 
 KTech::Camera::~Camera()
 {
 	Output::Log("<Camera[" + m_name + "]::~Camera()>", RGBColors::red);
 	if (engine.memory.maps.Exists(m_parentMap))
+	{
 		engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
+	}
 	engine.memory.cameras.Remove(m_id);
 }
 
-bool KTech::Camera::EnterMap(ID<Map>& p_map, bool p_active)
+auto KTech::Camera::EnterMap(ID<Map>& p_map, bool p_asActiveCamera) -> bool
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
+	{
 		return false;
-	return engine.memory.maps[p_map]->AddCamera(m_id, p_active);
+	}
+	return engine.memory.maps[p_map]->AddCamera(m_id, p_asActiveCamera);
 }
 
-bool KTech::Camera::LeaveMap()
+auto KTech::Camera::LeaveMap() -> bool
 {
 	if (engine.memory.maps.Exists(m_parentMap))
+	{
 		return engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
+	}
 	m_parentMap = nullID<Map>;
 	return true;
 }
 
-void KTech::Camera::Resize(UPoint p_res)
+void KTech::Camera::Resize(UPoint p_resolution)
 {
-	m_res = p_res;
+	m_res = p_resolution;
 	m_image.resize(m_res.y * m_res.x);
 }
 
 void KTech::Camera::Render()
 {
 	if (engine.memory.maps.Exists(m_parentMap))
+	{
 		Render(engine.memory.maps[m_parentMap]->m_layers);
+	}
 }
 
 void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
@@ -95,10 +103,14 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 					{
 						// Simple texture
 						if (texture.m_simple)
+						{
 							RenderSimple(layer->m_alpha, object, texture);
+						}
 						// Complex texture
 						else
+						{
 							RenderComplex(layer->m_alpha, object, texture);
+						}
 					}
 				}
 			}
@@ -111,8 +123,10 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 inline void KTech::Camera::RenderBackground()
 {
 	// RESET image to background
-	for (size_t i = 0; i < m_image.size(); i++)
-		m_image[i] = m_background;
+	for (auto & cell : m_image)
+	{
+		cell = m_background;
+	}
 }
 
 inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, Texture& p_texture)
@@ -126,27 +140,47 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 
 	// DELIMIT positions or return if not in range
 	if (!Delimit(start, end, m_res))
+	{
 		return;
+	}
 
 	// DRAW character according to expected behavior
 	char charToDraw = p_texture.m_value.c;
 	if (DetermineCharacter(charToDraw))
+	{
 		for (size_t y = start.y; y < end.y; y++) // Iterate
+		{
 			for (size_t x = start.x; x < end.x; x++)
+			{
 				m_image[m_res.x * y + x].c = charToDraw;
+			}
+		}
+	}
 
 	// DRAW foreground color
 	RGBA tempRGBA;
 	if (BakeRGBAWith(tempRGBA, p_texture.m_value.f, p_layerAlpha)) // Returns false if alpha is 0 and thus won't change anything
+	{
 		for (size_t y = start.y; y < end.y; y++) // ITERATE
+		{
 			for (size_t x = start.x; x < end.x; x++)
+			{
 				DrawBakedToRGB(m_image[m_res.x * y + x].f, tempRGBA);
+			}
+		}
+	}
 
 	// DRAW background color
 	if (BakeRGBAWith(tempRGBA, p_texture.m_value.b, p_layerAlpha)) // Returns false if alpha is 0 and thus won't change anything
+	{
 		for (size_t y = start.y; y < end.y; y++) // ITERATE
+		{
 			for (size_t x = start.x; x < end.x; x++)
+			{
 				DrawBakedToRGB(m_image[m_res.x * y + x].b, tempRGBA);
+			}
+		}
+	}
 }
 
 inline void KTech::Camera::RenderComplex(uint8_t p_layerAlpha, Object* p_object, Texture& p_texture)
@@ -174,16 +208,22 @@ inline void KTech::Camera::RenderComplex(uint8_t p_layerAlpha, Object* p_object,
 			// DRAW character according to expected behavior
 			char charToDraw = p_texture(srcX, srcY).c;
 			if (DetermineCharacter(charToDraw))
+			{
 				m_image[m_res.x * dstY + dstX].c = charToDraw;
+			}
 
 			// DRAW foreground color
 			RGBA tempRGBA;
 			if (BakeRGBAWith(tempRGBA, p_texture(srcX, srcY).f, p_layerAlpha))
+			{
 				DrawBakedToRGB(m_image[m_res.x * dstY + dstX].f, tempRGBA);
+			}
 
 			// DRAW background color
 			if (BakeRGBAWith(tempRGBA, p_texture(srcX, srcY).b, p_layerAlpha))
+			{
 				DrawBakedToRGB(m_image[m_res.x * dstY + dstX].b, tempRGBA);
+			}
 		}
 	}
 }
@@ -193,13 +233,25 @@ inline void KTech::Camera::RenderForeground(const RGBA& p_frgba, const RGBA& p_b
 	// DRAW foreground color
 	RGBA tempRGBA;
 	if (BakeRGBA(tempRGBA, p_frgba))
+	{
 		for (size_t y = 0; y < m_res.y; y++) // ITERATE
+		{
 			for (size_t x = 0; x < m_res.x; x++)
+			{
 				DrawBakedToRGB(m_image[m_res.x * y + x].f, tempRGBA);
+			}
+		}
+	}
 
 	// DRAW background color
 	if (BakeRGBA(tempRGBA, p_brgba))
+	{
 		for (size_t y = 0; y < m_res.y; y++) // ITERATE
+		{
 			for (size_t x = 0; x < m_res.x; x++)
+			{
 				DrawBakedToRGB(m_image[m_res.x * y + x].b, tempRGBA);
+			}
+		}
+	}
 }

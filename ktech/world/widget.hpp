@@ -54,18 +54,18 @@ public:
 	std::vector<Texture> m_textures = {};
 	Input::CallbacksGroup* m_callbacksGroup;
 
-	Widget(Engine& engine, Point position = Point(0, 0), const std::string& name = "");
-	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), const std::string& name = "");
+	Widget(Engine& engine, Point position = Point(0, 0), std::string name = "");
+	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), std::string name = "");
 	virtual ~Widget();
 
-	bool AddWidget(ID<Widget> widget);
-	bool RemoveWidget(ID<Widget> widget);
-	bool RemoveAllWidgets();
+	auto AddWidget(ID<Widget> widget) -> bool;
+	auto RemoveWidget(ID<Widget> widget) -> bool;
+	auto RemoveAllWidgets() -> bool;
 
-	bool EnterWidget(ID<Widget> widget);
-	bool EnterUI(ID<UI> ui);
-	bool LeaveWidget();
-	bool LeaveUI();
+	auto EnterWidget(ID<Widget> widget) -> bool;
+	auto EnterUI(ID<UI> ui) -> bool;
+	auto LeaveWidget() -> bool;
+	auto LeaveUI() -> bool;
 
 	void Select();
 	void Deselect();
@@ -73,8 +73,8 @@ public:
 	void Hide();
 
 protected:
-	inline virtual bool OnTick() { return false; };
-	
+	inline virtual auto OnTick() -> bool { return false; };
+
 	inline virtual void OnSelect () {}
 	inline virtual void OnDeselect () {}
 	inline virtual void OnShow () {}

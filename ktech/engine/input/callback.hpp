@@ -28,8 +28,8 @@ struct KTech::Input::Callback
 	const std::function<bool()> ptr;
 	Handler* const parentHandler;
 
-	inline Callback(const std::function<bool()>& callback, Handler* parentHandler)
+	Callback(const std::function<bool()>& callback, Handler* parentHandler)
 		: ptr(callback), parentHandler(parentHandler) {}
-	
+
 	~Callback();
 };

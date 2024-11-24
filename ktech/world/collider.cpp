@@ -22,31 +22,38 @@
 
 #include "texture.hpp"
 
-void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_pos)
+void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_relativePosition)
 {
     m_simple = true;
     m_type = p_type;
-    m_rPos = p_pos;
+    m_rPos = p_relativePosition;
     m_size = p_size;
 }
 
-void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint8_t p_type, Point p_pos)
+void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint8_t p_type, Point p_relativePosition)
 {
     m_simple = false;
     m_type = p_type;
-    m_rPos = p_pos;
+    m_rPos = p_relativePosition;
 	// Get size
 	m_size = UPoint(0, p_stringVector.size());
 	for (const std::string& row : p_stringVector)
+	{
 		if (row.size() > m_size.x)
+		{
 			m_size.x = row.size();
+		}
+	}
 	// Apply size
 	m_c.resize(m_size.x * m_size.y);
 	// Read from strings
 	for (size_t y = 0; y < m_size.y; y++)
-		for (size_t x = 0; x < m_size.x; x++)
-			if (x < p_stringVector[y].size())
-				operator()(x, y) = p_stringVector[y][x] != ' ';
+	{
+		for (size_t x = 0; x < m_size.x && x < p_stringVector[y].size(); x++)
+		{
+			m_c[m_size.x * y + x] = p_stringVector[y][x] != ' ';
+		}
+	}
 }
 
 void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_type)
@@ -60,7 +67,9 @@ void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_typ
 	m_c.resize(p_texture.m_t.size());
 	// Read from texture
 	for (size_t i = 0; i < m_c.size(); i++)
+	{
 		m_c[i] = (p_texture.m_t[i].c != ' ');
+	}
 }
 
 void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_alphaThreshold, uint8_t p_type)
@@ -74,15 +83,7 @@ void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_al
 	m_c.resize(p_texture.m_t.size());
 	// Read from texture
 	for (size_t i = 0; i < m_c.size(); i++)
+	{
 		m_c[i] = (p_texture.m_t[i].b.a >= p_alphaThreshold);
-}
-
-uint8_t& KTech::Collider::operator()(size_t x, size_t y)
-{
-	return m_c[m_size.x * y + x];
-}
-
-const uint8_t& KTech::Collider::operator()(size_t x, size_t y) const
-{
-	return m_c[m_size.x * y + x];
+	}
 }

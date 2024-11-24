@@ -53,26 +53,26 @@ public:
 			: callback(callback), ticksLeft(ticks) {}
 	};
 
-	float tps = 0.0f;
-	float tpsPotential = 0.0f;
-	int32_t deltaTime = 0;
+	float tps;
+	float tpsPotential;
+	int32_t deltaTime;
 	int32_t ticksCounter = 0;
 	int16_t tpsLimit;
 
-	inline Time(Engine* const engine, int16_t ticksPerSecondLimit = 24)
+	inline Time(Engine* const engine, int16_t ticksPerSecondLimit)
 		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
 
-	Invocation* Invoke(const std::function<bool()>& callback, uint32_t time, Measurement timeMeasurement);
-	bool CancelInvocation(Invocation* invocation);
+	auto Invoke(const std::function<bool()>& callback, size_t time, Measurement timeMeasurement) -> Invocation*;
+	auto CancelInvocation(Invocation* invocation) -> bool;
 	void CallInvocations();
 
-	size_t GetDelta(const TimePoint& timePointA, const TimePoint& timePointB, Measurement timeMeasurement);
-	size_t GetInt(const TimePoint& tp, Measurement timeMeasurement);
+	[[nodiscard]] auto GetDelta(const TimePoint& timePointA, const TimePoint& timePointB, Measurement timeMeasurement) const -> size_t;
+	auto GetInt(const TimePoint& timePoint, Measurement timeMeasurement) -> size_t;
 
 	void WaitUntilNextTick();
 
 private:
-	bool changedThisTick = false;
+	bool m_changedThisTick = false;
 	Engine* const engine;
 	const TimePoint m_startTP;
 	TimePoint m_thisTickStartTP;

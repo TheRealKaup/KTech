@@ -37,13 +37,15 @@ struct KTech::Collider
 	uint8_t m_type;
 	Point m_rPos;
 	UPoint m_size;
-	std::vector<uint8_t> m_c;
+	std::vector<bool> m_c;
 
 	void Simple(UPoint size, uint8_t type, Point relativePosition = Point(0, 0));
 	void Write(const std::vector<std::string>& stringVector, uint8_t type, Point relativePosition = Point(0, 0));
 	void ByTextureCharacter(const Texture& texture, uint8_t type);
 	void ByTextureBackground(const Texture& texture, uint8_t alphaThreshold, uint8_t type);
 
-	uint8_t& operator()(size_t x, size_t y);
-	const uint8_t& operator()(size_t x, size_t y) const;
+	inline auto operator()(size_t x, size_t y) const -> bool
+	{
+		return m_c[m_size.x * y + x];
+	}
 };

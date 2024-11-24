@@ -40,11 +40,11 @@ public:
 	inline Collision(Engine* engine)
 		: engine(engine) {};
 
-	bool MoveObject(ID<Object>& object, Point direction);
+	auto MoveObject(ID<Object>& object, Point direction) -> bool;
 
 private:
 	Engine* const engine;
-	
+
 	struct CollisionData{
 		ID<Object> activeObject;
 		ID<Object> passiveObject;
@@ -52,13 +52,16 @@ private:
 		size_t passiveCollider;
 	};
 
-	CR GetPotentialCollisionResult(uint8_t t1, uint8_t t2);
+	auto GetPotentialCollisionResult(uint8_t type1, uint8_t type2) -> CR;
 	// Warning: `position1` and `position2` override `collider1.m_rPos` and `collider2.m_rPos` respectively
-	static bool AreCollidersOverlapping(const Collider& collider1, const Point position1, const Collider& collider2, const Point& position2);
-
-	void ExpandMovementTree(ID<Object>& thisObject,Point direction,
+	static auto AreCollidersOverlapping(const Collider& collider1, const Point& position1, const Collider& collider2, const Point& position2) -> bool;
+	static auto AreSimpleCollidersOverlapping(const Collider& collider1, const Point& position1, const Collider& collider2, const Point& position2) -> bool;
+	static auto AreSimpleAndComplexCollidersOverlapping(const Collider& complex, const Point& complexPosition, const Collider& simple, const Point& simplePosition) -> bool;
+	static auto AreComplexCollidersOverlapping(const Collider& collider1, const Point& position1, const Collider& collider2, const Point& position2) -> bool;
+	void ExpandMovementTree(ID<Object>& thisObject, Point direction,
 		std::vector<CollisionData>& pushData,
 		std::vector<CollisionData>& blockData,
 		std::vector<CollisionData>& overlapData,
 		std::vector<CollisionData>& exitOverlapData);
+	static auto IsInPushData(std::vector<CollisionData>& pushData, ID<Object>& object) -> bool;
 };

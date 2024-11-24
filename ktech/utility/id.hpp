@@ -34,22 +34,22 @@ struct KTech::ID
 	inline ID()
 		: m_i(0), m_uuid(GenerateUUID()) {}
 
-	constexpr inline ID(size_t i, size_t uuid)
-		: m_i(i), m_uuid(uuid) {}
-	
-	inline bool operator==(ID other) const
+	constexpr inline ID(size_t index, size_t uuid)
+		: m_i(index), m_uuid(uuid) {}
+
+	inline auto operator==(ID other) const -> bool
 	{
 		return other.m_uuid == m_uuid;
 	}
-	
-	inline static uint64_t GenerateUUID()
+
+	inline static auto GenerateUUID() -> uint64_t
 	{
 		static uint64_t uuid = 0;
 		uuid++;
 		return uuid;
 	}
 
-	inline uint64_t GetUUID() const
+	[[nodiscard]] inline auto GetUUID() const -> uint64_t
 	{
 		return m_uuid;
 	}

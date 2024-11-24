@@ -47,34 +47,32 @@ public:
 	std::string quitKey{"\x03"};
 
 	// Prepares terminal, creates input loop thread
-	Input(Engine* const engine);
+	Input(Engine* engine);
 	// Resets terminal
 	~Input();
 
-	Callback* RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback);
-	Callback* RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback);
-	CallbacksGroup* CreateCallbacksGroup(bool enabled = true);
+	auto RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback) -> Callback*;
+	auto RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback) -> Callback*;
+	auto CreateCallbacksGroup(bool enabled = true) -> CallbacksGroup*;
 
-	bool Is(const std::string& stringKey) const;
-	bool Is(char charKey) const;
-	bool Bigger(char charKey) const;
-	bool Smaller(char charKey) const;
-	bool Between(char charKey1, char charKey2) const;
-	uint8_t GetInt() const;
+	[[nodiscard]] auto Is(const std::string& stringKey) const -> bool;
+	[[nodiscard]] auto Is(char charKey) const -> bool;
+	[[nodiscard]] auto Bigger(char charKey) const -> bool;
+	[[nodiscard]] auto Smaller(char charKey) const -> bool;
+	[[nodiscard]] auto Between(char charKey1, char charKey2) const -> bool;
+	[[nodiscard]] auto GetInt() const -> uint8_t;
 
  	void CallCallbacks();
 
 private:
 	Engine* const engine;
-
 #ifdef _WIN32
 	HANDLE m_stdinHandle;
 	DWORD m_oldMode;
 #else
 	termios m_oldTerminalAttributes;
 #endif
-
-	bool changedThisTick = false;
+	bool m_changedThisTick = false;
 	std::thread m_inputLoop;
 	std::vector<Handler*> m_stringHandlers;
 	std::vector<Handler*> m_rangeHandlers;
@@ -82,8 +80,10 @@ private:
 	std::vector<std::string> m_inputQueue;
 	std::mutex m_inputQueueMutex;
 
+	void UpdateGroups();
+	void CallStringHandlers();
+	void CallRangeHandlers();
 	void Get();
-
 	void Loop();
 
 	friend class Output;

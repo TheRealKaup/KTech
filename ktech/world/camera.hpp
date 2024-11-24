@@ -48,8 +48,8 @@ public:
 	Camera(Engine& engine, ID<Map>& parentMap, bool asActiveCamera, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
 	virtual ~Camera();
 
-	bool EnterMap(ID<Map>& map, bool asActiveCamera);
-	bool LeaveMap();
+	auto EnterMap(ID<Map>& map, bool asActiveCamera) -> bool;
+	auto LeaveMap() -> bool;
 
 	void Resize(UPoint resolution); // Will also update `m_image`.
 
@@ -57,7 +57,7 @@ public:
 	void Render(const std::vector<ID<Layer>>& layers);
 
 protected:
-	inline virtual bool OnTick() { return false; };
+	inline virtual auto OnTick() -> bool { return false; };
 
 	friend class KTech::Memory;
 

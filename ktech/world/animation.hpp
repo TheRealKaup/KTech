@@ -72,7 +72,7 @@ public:
 
 	virtual ~Animation();
 
-	// Iterates instructions and invokes itself on delay. Will not replay the animation; to do so, call `Animation::Stop()` before calling this again. 
+	// Iterates instructions and invokes itself on delay. Will not replay the animation; to do so, call `Animation::Stop()` before calling this again.
 	bool Play();
 	// Cancel invocations and prepares for a replay.
 	void Stop();

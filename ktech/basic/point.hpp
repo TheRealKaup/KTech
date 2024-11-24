@@ -29,40 +29,40 @@ struct KTech::Point
 {
 	int32_t x, y;
 
-	inline constexpr Point(int32_t x = 0, int32_t y = 0)
+	constexpr Point(int32_t x = 0, int32_t y = 0)
 		: x(x), y(y) {}
 
-	inline constexpr Point(const UPoint& uPoint)
+	constexpr Point(const UPoint& uPoint)
 		: x(uPoint.x), y(uPoint.y) {}
 
-	inline constexpr bool operator==(const Point& point) const
+	constexpr auto operator==(const Point& point) const -> bool
 	{
 		return (x == point.x) && (y == point.y);
 	}
 
-	inline constexpr bool operator!=(const Point& point) const
+	constexpr auto operator!=(const Point& point) const -> bool
 	{
 		return !(*this == point);
 	}
 
-	inline constexpr Point operator+(const Point& point) const
+	constexpr auto operator+(const Point& point) const -> Point
 	{
-		return Point(x + point.x, y + point.y);
+		return {x + point.x, y + point.y};
 	}
 
-	inline constexpr Point operator-(const Point& point) const
+	constexpr auto operator-(const Point& point) const -> Point
 	{
-		return Point(x - point.x, y - point.y);
+		return {x - point.x, y - point.y};
 	}
 
-	inline constexpr Point& operator+=(const Point& point)
+	constexpr auto operator+=(const Point& point) -> Point&
 	{
 		x += point.x;
 		y += point.y;
 		return *this;
 	}
 
-	inline constexpr Point& operator-=(const Point& point)
+	constexpr auto operator-=(const Point& point) -> Point&
 	{
 		x -= point.x;
 		y -= point.y;

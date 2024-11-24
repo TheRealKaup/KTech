@@ -25,6 +25,7 @@
 #undef KTECH_DEFINITION
 #include "cell.hpp"
 #include "rgba.hpp"
+#include "../utility/rgbacolors.hpp"
 
 struct KTech::CellA
 {
@@ -32,18 +33,18 @@ struct KTech::CellA
 	RGBA b;
 	char c;
 
-	inline constexpr CellA(char character = ' ', RGBA foreground = RGBA(0, 0, 0, 0), RGBA background = RGBA(0, 0, 0, 0))
+	constexpr CellA(char character = ' ', RGBA foreground = RGBAColors::transparent, RGBA background = RGBAColors::transparent)
 		: c(character), f(foreground), b(background) {}
 
-	inline constexpr CellA(Cell cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)
+	constexpr CellA(Cell cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)
 		: c(cell.c), f(cell.f, foregroundAlpha), b(cell.b, backgroundAlpha) {}
 
-	inline constexpr bool operator==(const CellA& cellA) const
+	constexpr auto operator==(const CellA& cellA) const -> bool
 	{
 		return (c == cellA.c) && (f == cellA.f) && (b == cellA.b);
 	}
 
-	inline constexpr bool operator!=(const CellA& cellA) const
+	constexpr auto operator!=(const CellA& cellA) const -> bool
 	{
 		return !(*this == cellA);
 	}

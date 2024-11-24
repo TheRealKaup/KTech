@@ -24,8 +24,10 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../utility/id.hpp"
+#include "../utility/rgbacolors.hpp"
 #include "../basic/rgba.hpp"
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -39,23 +41,23 @@ public:
 	std::vector<ID<Object>> m_objects;
 	bool m_visible = true;
 
-	uint8_t m_alpha = 255;
-	RGBA m_frgba = RGBA(0, 0, 0, 0);
-	RGBA m_brgba = RGBA(0, 0, 0, 0);
+	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();
+	RGBA m_frgba = RGBAColors::transparent;
+	RGBA m_brgba = RGBAColors::transparent;
 
-	Layer(Engine& engine, const std::string& name = "");
-	Layer(Engine& engine, ID<Map>& parentMap, const std::string& name = "");
+	Layer(Engine& engine, std::string name = "");
+	Layer(Engine& engine, ID<Map>& parentMap, std::string name = "");
 	virtual ~Layer();
 
 	// Use this refereance temporarily - do not move this reference, it can become stale.
-	ID<Object>& operator[](size_t index);
-	
-	bool AddObject(ID<Object>& object);
-	bool RemoveObject(ID<Object>& object);
-	bool RemoveAllObjects();
+	auto operator[](size_t index) -> ID<Object>&;
 
-	bool EnterMap(ID<Map>& map);
-	bool LeaveMap();
+	auto AddObject(ID<Object>& object) -> bool;
+	auto RemoveObject(ID<Object>& object) -> bool;
+	auto RemoveAllObjects() -> bool;
+
+	auto EnterMap(ID<Map>& map) -> bool;
+	auto LeaveMap() -> bool;
 
 protected:
 	inline virtual bool OnTick() { return false; };

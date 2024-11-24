@@ -25,9 +25,9 @@
 class IntField : public KTech::Widget
 {
 public:
-	uint32_t m_number = 0;
-	uint32_t m_visibleNumber = 0;
-	
+	size_t m_number = 0;
+	size_t m_visibleNumber = 0;
+
 	std::function<void()> m_OnInsert;
 
 	KTech::RGBA m_unselectedRGBA, m_selectedRGBA;
@@ -35,30 +35,34 @@ public:
 	IntField(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnInsert,
-		uint32_t min = 0,
-		uint32_t max = 255,
+		size_t min,
+		size_t max,
 		const std::string& defaultNum = "0",
 		KTech::Point pos = {0, 0},
 		const std::string& text = "Value = ",
 		bool withFrame = false,
-		KTech::RGBA unselectedRGBA = { 150, 150, 150, 255 },
-		KTech::RGBA selectedRGBA = { 255, 255, 255, 255 })
-		: Widget(engine, ui, pos), m_OnInsert(OnInsert), m_min(min), m_max(max), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA)
+		KTech::RGBA unselectedRGBA = KTech::RGBAColors::gray,
+		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
+		: Widget(engine, ui, pos), m_OnInsert(std::move(OnInsert)), m_min(min), m_max(max), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA)
 	{
 		// Find max allowed digits
 		for (size_t i = 1; max / i > 0; i *= 10)
+		{
 			m_maxDigits++;
+		}
 		// Find min allowed digits
 		for (size_t i = 1; min / i > 0; i *= 10)
+		{
 			m_minDigits++;
+		}
 		// Textures
 		SetText(text, withFrame);
 		// Default value
 		SetValue(defaultNum);
 		// Input handlers
-		m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback('0', '9', std::bind(&IntField::InternalInsert, this)));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, std::bind(&IntField::InternalInsert, this)));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, std::bind(&IntField::InternalInsert, this)));
+		m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback('0', '9', [this]() -> bool { return Insert(); }));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return Insert(); }));
+		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return Insert(); }));
 	}
 
 	void SetText(const std::string& text, bool withFrame)
@@ -66,30 +70,22 @@ public:
 		KTech::RGBA tempRGBA = (m_selected ? m_selectedRGBA : m_unselectedRGBA);
 		if (withFrame)
 		{
-			m_textures.resize(10);
-			// up-left corner
-			m_textures[2].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
-			// up-right corner
-			m_textures[3].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 0));
-			// bottom-left corner
-			m_textures[4].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2));
-			// bottom-right corner
-			m_textures[5].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 2));
-			// up frame
-			m_textures[6].Simple(KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
-			// left frame
-			m_textures[7].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
-			// bottom frame
-			m_textures[8].Simple(KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2));
-			// right frame
-			m_textures[9].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 1));
+			m_textures.resize(TEXTURES_SIZE_FRAMED);
+			m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
+			m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 0));
+			m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2));
+			m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 2));
+			m_textures[ti_topFrame].Simple(KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
+			m_textures[ti_leftFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
+			m_textures[ti_bottomFrame].Simple(KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2));
+			m_textures[ti_rightFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 1));
 		}
 		else
-			m_textures.resize(2);
-		// input position
-		m_textures[0].m_rPos = KTech::Point(1 + text.length(), 1);
-		// text
-		m_textures[1].Write({text}, tempRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
+		{
+			m_textures.resize(TEXTURES_SIZE_FRAMELESS);
+		}
+		m_textures[ti_input].m_rPos = KTech::Point(1 + text.length(), 1);
+		m_textures[ti_text].Write({text}, tempRGBA, KTech::RGBAColors::transparent, KTech::Point(1, 1));
 	}
 
 	void SetValue(const std::string& number)
@@ -97,71 +93,101 @@ public:
 		m_currentDigit = 0;
 		m_number = 0;
 		KTech::RGBA tempRGBA = (m_selected ? m_selectedRGBA : m_unselectedRGBA);
-		m_textures[0].Rectangle(KTech::UPoint(m_maxDigits, 1), KTech::CellA(' ', tempRGBA));
+		m_textures[ti_input].Rectangle(KTech::UPoint(m_maxDigits, 1), KTech::CellA(' ', tempRGBA));
 		for (size_t x = 0; x < m_maxDigits && x < number.length(); x++)
 		{
 			m_currentDigit++;
 			m_number *= 10;
 			m_number += number[x] - '0';
-			m_textures[0](x, 0) = KTech::CellA(number[x], tempRGBA);
+			m_textures[ti_input](x, 0) = KTech::CellA(number[x], tempRGBA);
 		}
 		m_visibleNumber = m_number;
 	}
 
 protected:
+	enum TextureIndex : size_t
+	{
+		ti_input,
+		ti_text,
+		TEXTURES_SIZE_FRAMELESS,
+		ti_topLeftCorner = TEXTURES_SIZE_FRAMELESS,
+		ti_topRightCorner,
+		ti_bottomLeftCorner,
+		ti_bottomRightCorner,
+		ti_topFrame,
+		ti_leftFrame,
+		ti_bottomFrame,
+		ti_rightFrame,
+		TEXTURES_SIZE_FRAMED
+	};
+
 	uint32_t m_min, m_max;
 	uint8_t m_maxDigits = 0, m_minDigits = 0;
 	uint8_t m_currentDigit = 0;
-	
-	virtual void OnSelect() override
+
+	void OnSelect() override
 	{
 		RenderSelected();
 	}
 
-	virtual void OnDeselect() override
+	void OnDeselect() override
 	{
 		RenderUnselected();
 	}
 
-	bool InternalInsert()
+	auto Insert() -> bool
 	{
 		if (engine.input.Is(KTech::Keys::backspace) || engine.input.Is(KTech::Keys::delete_))
 		{
 			if (m_currentDigit == 0)
+			{
 				return false;
+			}
 
 			m_visibleNumber /= 10;
 
 			m_currentDigit--;
-			m_textures[0](m_currentDigit, 0).c = ' ';
+			m_textures[ti_input](m_currentDigit, 0).c = ' ';
 		}
 		else if (engine.input.Between('0', '9'))
 		{
 			if (m_currentDigit == m_maxDigits)
+			{
 				return false;
+			}
 
-			m_textures[0](m_currentDigit, 0).c = engine.input.input.at(0);
+			m_textures[ti_input](m_currentDigit, 0).c = engine.input.input.at(0);
 			m_currentDigit++;
 
 			m_visibleNumber = m_visibleNumber * 10 + engine.input.GetInt();
 		}
 
 		if (m_visibleNumber < m_min)
+		{
 			m_number = m_min;
+		}
 		else if (m_visibleNumber > m_max)
+		{
 			m_number = m_max;
+		}
 		else
+		{
 			m_number = m_visibleNumber;
+		}
 
 		if (m_OnInsert)
+		{
 			m_OnInsert();
+		}
 		return true;
 	}
 
 	void RenderSelected()
 	{
 		for (KTech::Texture& texture : m_textures)
+		{
 			texture.SetForeground(m_selectedRGBA);
+		}
 	}
 
 	void RenderUnselected()
@@ -175,7 +201,7 @@ protected:
 
 			std::string newTexture = std::to_string(m_min);
 			newTexture.resize(m_maxDigits, ' ');
-			m_textures[0].Write({ newTexture }, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
+			m_textures[ti_input].Write({ newTexture }, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
 		}
 		else if (m_visibleNumber > m_max)
 		{
@@ -185,13 +211,17 @@ protected:
 
 			std::string newTexture = std::to_string(m_max);
 			newTexture.resize(m_maxDigits, ' ');
-			m_textures[0].Write({ newTexture }, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
+			m_textures[ti_input].Write({ newTexture }, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
 		}
 		else if (m_visibleNumber >= m_min && m_visibleNumber <= m_max)
+		{
 			m_number = m_visibleNumber;
+		}
 
 		// Change color
 		for (KTech::Texture& texture : m_textures)
+		{
 			texture.SetForeground(m_unselectedRGBA);
+		}
 	}
 };
