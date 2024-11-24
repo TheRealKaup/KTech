@@ -136,9 +136,9 @@ auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 auto KTech::Texture::Null() -> Texture&
 {
 	Resize(UPoint(2, 2));
-	m_t[0] = CellA(' ', RGBAColors::transparent, RGBAColors::magenta);
+	m_t[0] = CellA(' ', RGBAColors::transparent, RGBAColors::black);
 	m_t[1] = CellA(' ', RGBAColors::transparent, RGBAColors::magenta);
-	m_t[2] = CellA(' ', RGBAColors::transparent, RGBAColors::black);
+	m_t[2] = CellA(' ', RGBAColors::transparent, RGBAColors::magenta);
 	m_t[3] = CellA(' ', RGBAColors::transparent, RGBAColors::black);
 	return *this;
 }
