@@ -14,6 +14,7 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 - [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
 - [Will there be a software development kit?](#will-there-be-a-software-development-kit)
 - [Is KTech GPU-accelerated?](#is-ktech-gpu-accelerated)
+- [Why is the library named "KTech"?](#why-is-the-library-named-ktech)
 
 # Q&A
 
@@ -201,3 +202,7 @@ The problem here is that `Output` is still undefined in `Engine` (not to mention
 To solve this, the `KTECH_DEFINITION` macro is used as an include guard to prevent the inclusion of `engine.hpp`.
 
 This would be simpler if the namespace and the `#include` directives were separated into 2 files. That way, the user would include a header with all the `#include` directives, and KTech's code base would include a header with just the namespace. But, I wanted to have both in one place, so when a user looks at the contents of the file they include in their game (`ktech.hpp`), they immediately see what types and variables they get and may choose.
+
+## Why is the library named "KTech"?
+
+Originally I called it KCGE, which meant "Kaup's Console Game Engine". As part of opening its codebase, I renamed it to KTech. The 'K' remained, and with "Tech" concatenated, this project truly is an AliExpress brand. It's corny and retro, and I think it's fitting.
