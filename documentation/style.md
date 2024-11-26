@@ -1,8 +1,18 @@
-# Outline
+# Preamble
 
-This document contains specifications for KTech's code.
+This document contains specifications for KTech's code. This document applies to the library itself (`ktech/*`), but not to code outside it (such as game examples in `examples/`).
 
-- [Outline](#outline)
+The goal of this document is to force consistency to facilitate library usage. For instance, enforcing casing and certain variable prefixes assists in reaching this goal.
+
+On the contrary, the scope of this document doesn't necessarily cover optimizations (such as avoiding 2D vectors). That's the responsibility of the coder and static analysis tool, and is not why this document was created to begin with.
+
+A function implementation is allowed as long as it behaves "[as if](https://en.wikipedia.org/wiki/As-if_rule)" it follows the exact specifications.
+
+## Outline
+
+- [Preamble](#preamble)
+    - [Outline](#outline)
+- [Static Analysis](#static-analysis)
 - [Naming](#naming)
 - [Classes](#classes)
     - [Order of class members](#order-of-class-members)
@@ -15,95 +25,82 @@ This document contains specifications for KTech's code.
 	- [Inclusion](#inclusion)
 - [Other](#other)
 
+# Static analysis
+
+Code should be examined and corrected using Clang-Tidy, using the checks: `'-*, modernize-*, performance-*, readability-*, -readability-identifier-length, -readability-magic-numbers'`. The below specifications should be compatible with these checks. If they contradict, submit a GitHub issue, and Clang-Tidy's suggestions take precedence.
+
 # Naming
 
-**Variables** and **enum values** - in camelCase.
+## Underscores
 
-**Functions**, **classes**, **namespaces** and **enums** - the first letter of each word, including the first word, should be in uppercase.
+**No underscores**, except when either:
 
-**Member variables**:
-- Add "m_" prefix (the following letter's capitalization shouldn't be affected), and,
-- avoid additional underscores.
-- Except when either:
-    - The variable is a member of a class that doesn't have normal function members, (meaning, the class's members are mostly accessed from outside, thus the "m_" prefix is unnecessary). For example, member variables of `Point` and member variables of `Collision::CollisionData`.
-    - The variable is a public member of an engine component (meaning, it's somewhat more of a global variable rather than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
-    - The variable is a reference or a pointer to `Engine`, or to a member variable of an engine component (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
+- The underscore is added as a suffix to a name that is occupied by a keyword, and choosing a different name is inconvenient (e.g. `Keys::return_`).
+- The underscore is part of an allowed prefix (e.g. `Texture::m_rPos`).
 
-**Parameters**:
-- If it's in the declaration of the function:
-    - Avoid abbreviations.
-- If it's in the separate definition of the function:
-    - Add "p_" prefix (the following letter's capitalization shouldn't be affected), and,
-    - make the rest of the name correspond with the member variable the parameter initializes (if it exists), and,
-    - avoid additional underscores.
+## Capitalization
+
+- **Variables** and **enum values**: camelCase (e.g. `Object::m_parentLayer`).
+- **Functions**, **classes**, **namespaces** and **enums**: PascalCase (e.g. `Input::RegisterRangedCallback()`).
+
+## Member variables
+
+Add "`m_`" prefix, except when either:
+
+- The variable is a member of a class that doesn't have normal function members, (meaning, the class's members are mostly accessed from outside, thus the "m_" prefix is redundant). For example, member variables of `Point`, and of `Collision::CollisionData`.
+- The variable is a public member of an engine component (meaning, it's more of a global variable than a member variable. Not adding the "m_" prefix makes this idea more intuitive and the code cleaner). For example, member variables of `Engine` itself and the variable `IO::input`.
+- The variable is a reference or a pointer to `Engine`, or to a member variable of an engine component (similar idea behind the last case). For example, `Object::engine` and a hypothetical pointer to `Memory::maps`.
+
+## Parameters
+
+- Add "`p_`" prefix, except if in a header file (`.hpp`).
+- Keep names verbose (e.g. good: `p_position`, bad: `p_pos`).
 
 # Classes
 
 ## Order of class members
 
-In the class definition, the public section should come first, then the protected section, then the private sections.
+In a class definition, the public section should come first, then the protected section, and lastly the private section.
 
-Within each section, the order of class members should be as listed:
-- Enums
-- Classes
+Within each section, the order of class members should be:
+
+- Enums & Classes
 - Variables:
     - Static variables
-    - Regarding world structures, engine data (in an order that minimizes padding):
-        - `Engine` reference or pointer
-        - Personal `ID`
-        - String name
-        - Parent's `ID`
-        - Children's `ID`s
-        - Active status
-    - Anything else, or everything else for non-world structures (in an order that minimizes padding)
+    - `Engine` reference or pointer
+    - Anything else (in an order that minimizes padding)
 - Constructors (including fake constructors like those in `Texture` and `Collider`)
 - Destructor
 - Operator overrides
 - Normal functions:
     - Static functions
     - Virtual functions
-    - Adders (e.g. `Layer::AddObject()`)
-    - Removers (e.g. `Map::RemoveCamera()`)
-    - Enterers (e.g. `Layer::EnterMap()`)
-    - Leavers (e.g. `Object::LeaveLayer()`)
-    - Checkers (e.g. `Input::Is()`)
-    - Getters (e.g. `Texture::GetSize()`)
-    - Setters (e.g. `Camera::Resize()`)
     - Anything else
 - `friend` declarations
 
-The members' definitions should be in the same order they were declared in the class definition.
+Members should be defined (i.e. in the class source file) in the order they were declared (i.e. in the class header file).
 
 ## Class constructors
 
-The order of parameters in constructors of "simple classes" (to do: replace this vague term) should be the same order that the corresponding member variables are declared in.
+If a member variable can only have one default variable (no matter which constructor constructed the object):
 
-If all constructors of a class initialize a member variable, or that member variable has a default constructor that is used in a constructor that makes said member variable irrelevant, don't set a default value for that member variable where it is declared.
+- Set the default value at the variable's declaration.
+- And, do not initialize it in any of the constructors.
 
-For example:
+If any the following constructor parameters exist, they should go in the following order:
 
-```c++
-struct KTech::Cell
-{
-    char c; // No default values here
-    RGB f;
-    RGB b;
-
-    // First `c`, then `f`, then `b`, as this is a simple class.
-    inline constexpr Cell(char character = ' ', RGB foreground = RGB(0, 0, 0), RGB background = RGB(0, 0, 0))
-        : c(character), f{foreground}, b(background) {}
-};
-```
-
-If a constructor accepts an `Engine` reference or pointer, that parameter should be the first one.
+- `Engine` reference or pointer
+- Parent structure to enter
+- Anything else
+- Optional name (last parameter)
 
 ## Expected behavior of adder, remover, enterer and leaver functions
 
-World structures (`Map`, `Camera`, `Layer`, `Object`, `UI` and `Widget`) add and remove from themselves child structures, and enter and leave parent structures. The functions that do these actions are called "adders", "removers", "enterers" and "leavers" respectively. This section specifies the expected behavior of these functions, as warranted by issue #84.
+World structures (`Map`, `Camera`, `Layer`, `Object`, `UI` and `Widget`) add and remove from themselves child structures, and enter and leave parent structures. The functions that do these actions are called "adders", "removers", "enterers" and "leavers", respectively. This section specifies the expected behavior of these functions, as warranted by issue #84.
 
-Since enterers and leavers (of child structure) simply call adders and removers (of parent structures) to do the actual adding and removing action. The end user can safely use both methods of adding and removing structures, and they may choose one solely on the basis of preference.
+Enterers and leavers (of child structures) call the adders and removers (of parent structures) to do the actual adding and removing. The library user may choose either directions based on preference, and expect similar behavior.
 
-The "given structure" is provided as an ID.
+The "given structure" is provided as a `KTech::ID<T>`.
 
 ### Add
 
@@ -158,53 +155,60 @@ The "given structure" is provided as an ID.
 
 ### Constructor
 
-When constructed, world structures are responsible for adding themselves to `Engine::Memory`, and for entering other world structors.
+When constructed, world structures are responsible for registering themselves at `Engine::Memory`, and sometimes also for entering other world structures.
 
-If the constructor accepts a parent structure to enter:
+If the constructor does not accept a parent structure to enter:
+
 - Add this structure to `Engine::Memory` (i.e. `engine.memory.container.Add(this);`).
 
-If the constructor doesn't accept a parent structure to enter;
-- Call the constructor that doesn't accept a parent.
+Otherwise:
+
+- Call the constructor that doesn't accept a parent to enter, if such overload exists.
 - Enter the given parent.
 
 ### Destructor
 
-When destructed, world structures are responsible for removing themselves to `Engine::Memory`, for leaving their parents, and for removing child structures.
+When destructed, world structures are responsible for removing themselves from `Engine::Memory`, and sometimes for leaving their parents and removing their child structures.
 
-- Call this `RemoveAll` function.
-- Call this leaver function.
-- Remove this from `Engine::Memory` (i.e. `engine.memory.container.Remove(m_id);`).
+- Call this `RemoveAll` function, if this can have child structures.
+- Call this `Leave` function, if this can have a parent structure.
+- Remove this from `Engine::Memory`.
 
 ## Engine components
 
 Make member variables of engine components public only if they should be normally used by the user.
 
-If an engine component becomes too big to be easily readable within 2 singular header and source files, split them within a new directory, similar to how `Input` has its own `engine/input/` directory.
+If an engine component becomes too big to be easily readable within 1 header and source files, split them into a new directory, like how `Input` has its own `engine/input/` directory.
 
 ## Other conventions about classes
 
-Use the `struct` keyword for a class that has no protected or private members. Otherwise, use the `class` keyword.
+If the class has only public members:
 
-Virtualize the destructors of world structures and of any class that is expected to be derived from, in order to avoid memory leaks.
+- Use `struct`.
+
+Otherwise:
+
+- Use `class`.
+
+Virtualize the destructors of world structures and of any class that is expected to be derived from.
 
 # Source and header files
 
 ## Inclusion
 
-In a header file that defines a KTech class, this is the following format for inclusion:
+In a header file that defines a KTech class, this is the order of include directives:
+
 - `#pragma once`
-- New line
 - `#define KTECH_DEFINITION`
-- `#include "path_to/ktech.hpp"` (normally `"../ktech.hpp"`)
+- `#include "path_to/ktech.hpp"`
 - `#undef KTECH_DEFINITION`
-- `#include` KTech dependencies by the following directory order, then by alphabetical order:
-    - From `utility/` directory
-    - From `basic/` directory
-    - From `world/` directory
-    - From `engine/` directory
-    - From `widgets/` directory
-- New line
-- `#include` external dependencies in alphabetical order
+- `#include` internal dependencies, ordered by directory:
+    - `utility/`
+    - `basic/`
+    - `world/`
+    - `engine/`
+    - `widgets/`
+- `#include` external dependencies
 
 For example:
 
@@ -214,32 +218,34 @@ For example:
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/cr.hpp"
+#include "../utility/id.hpp"
+#include "../basic/cell.hpp"
+#include "../basic/point.hpp"
+#include "../basic/upoint.hpp"
 
+#include <string>
 #include <vector>
 ```
 
 In a source file that defines class members, this is the following format for inclusion:
-- `#include` the class members' declarations (meaning, the class definition)
-- New line
-- `#include` KTech dependencies by the following directory order, then by alphabetical order:
-    - From `utility/` directory
-    - From `basic/` directory
-    - From `world/` directory
-    - From `engine/` directory
-    - From `widgets/` directory
-- New line
-- `#include` external dependencies in alphabetical order
+- `#include` the class definition (header file)
+- `#include` internal dependencies, ordered by directory:
+    - `utility/`
+    - `basic/`
+    - `world/`
+    - `engine/`
+    - `widgets/`
+- `#include` external dependencies
 
 For example:
 
 ```c++
-#include "io.hpp"
+#include "output.hpp"
 
+#include "../utility/internals.hpp"
 #include "../utility/keys.hpp"
 #include "../utility/rgbcolors.hpp"
 #include "../basic/cell.hpp"
-#include "../basic/cella.hpp"
 #include "../basic/upoint.hpp"
 #include "../engine/engine.hpp"
 
@@ -250,7 +256,7 @@ For example:
 
 Enumerations should typically be based on `uint8_t`, unless 1 byte isn't sufficient.
 
-The curly brackets of scopes should have their own line:
+Scope curly brackets should have their own line:
 
 ```cpp
 void Function()
