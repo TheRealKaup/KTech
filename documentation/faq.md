@@ -69,9 +69,11 @@ The "Debug" configuration (on KTech's end) enables debug symbols and intentional
 
 ## How to run the game examples?
 
-Note, the "widgetstest" game example is broken due to graphical bugs, for which the fix is a WIP (see issue #116).
+There are 2 game examples, "simpleplatform", which tests collision and various graphical features, and "widgetstest", which tests all the UI widgets available.
 
-To be written.
+Running the Premake script, as described in "[How to build KTech (with Premake)?](#how-to-build-ktech-with-premake)", will build these 2 game examples. The "widgetstest" binary (which will be outputted to `build/bin/widgetstest`) can be ran from anywhere, though the adjacent `build/bin/simpleplatform` binary should be ran from its source directory (`examples/simpleplatform/`), so it could load its texture files.
+
+For an example of a purposed UI program made with KTech, see [TextureCreator](https://github.com/TheRealKaup/TextureCreator).
 
 ## How does the licensing work?
 
