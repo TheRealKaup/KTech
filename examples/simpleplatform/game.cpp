@@ -433,5 +433,5 @@ int main()
 	}
 	KTech::Output::Log("<main()> End of function.", RGBColors::blue);
 
-	engine.output.outputAfterQuit.push_back(std::to_string(character.m_pos.y));
+	engine.output.outputOnQuit.push_back(std::to_string(character.m_pos.y));
 }

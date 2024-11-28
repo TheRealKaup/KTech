@@ -164,7 +164,7 @@ struct UITest
 
 	~UITest()
 	{
-		engine.output.outputAfterQuit.push_back(
+		engine.output.outputOnQuit.push_back(
 			"Results:\n" +
 			std::to_string(((IntField*)widgets[w_intfield])->m_number) + '\n' +
 			((StringField*)widgets[w_stringfield])->m_string + '\n' +
@@ -195,11 +195,13 @@ int main()
 			// Render, draw and print
 			ui.Render();
 			engine.output.Clear();
-			engine.output.Draw(ui.m_image, ui.m_res);
+			ui.Render();
 			engine.output.Print();
 		}
 		else if (engine.output.ShouldPrintThisTick())
+		{
 			engine.output.Print();
+		}
 
 		engine.time.WaitUntilNextTick();
 	}

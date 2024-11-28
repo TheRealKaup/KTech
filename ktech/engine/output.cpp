@@ -29,45 +29,6 @@
 
 #include <iostream>
 
-KTech::Output::Output(Engine* p_engine, KTech::UPoint p_imageResolution)
-	: engine(p_engine),
-	resolution(p_imageResolution),
-	m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),
-	m_stringImage(p_imageResolution.y * 3 + p_imageResolution.x * p_imageResolution.y * printSequenceLength, ' ')
-{
-#ifdef _WIN32
-	m_stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleMode(m_stdoutHandle, &m_oldMode);
-	SetConsoleMode(m_stdoutHandle, m_oldMode
-		| ENABLE_VIRTUAL_TERMINAL_PROCESSING // "Virtual processing"
-		| ENABLE_PROCESSED_OUTPUT // "Output processing"
-	);
-#endif
-
-#ifdef DEBUG
-	// Switch to alternative buffer (don't hide cursor for breaking with a debugger like GDB)
-	std::cout << "\033[?1049h";
-#else
-	// Switch to alternative buffer and hide cursor
-	std::cout << "\033[?1049h\033[?25l";
-#endif
-}
-
-KTech::Output::~Output()
-{
-	// Show cursor, and disable alternative buffer (return to previous terminal)
-	std::cout << "\033[?25h\033[?1049l" << std::flush;
-
-	for (std::string& out : outputAfterQuit)
-	{
-		std::cout << out;
-	}
-
-#ifdef _WIN32
-	SetConsoleMode(m_stdoutHandle, m_oldMode);
-#endif
-}
-
 void KTech::Output::Log(const std::string& p_text, RGB p_color)
 {
 	static uint32_t logIndex = 0;
@@ -90,7 +51,7 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 	std::cout << "he Free Software Foundation, either version 3 of the License, or\n";
 	std::cout << "any later version.\n\n";
 	// No warranty
-	std::cout << p_programName << " is distributed in the hope that it will breturn_e useful,\n";
+	std::cout << p_programName << " is distributed in the hope that it will be useful,\n";
 	std::cout << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n";
 	std::cout << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n";
 	std::cout << "GNU General Public License for more details.\n\n";
@@ -297,6 +258,45 @@ auto KTech::Output::ShouldPrintThisTick() const -> bool
 		return true;
 	}
 	return false;
+}
+
+KTech::Output::Output(Engine* p_engine, KTech::UPoint p_imageResolution)
+	: engine(p_engine),
+	resolution(p_imageResolution),
+	m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),
+	m_stringImage(p_imageResolution.y * 3 + p_imageResolution.x * p_imageResolution.y * printSequenceLength, ' ')
+{
+#ifdef _WIN32
+	m_stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleMode(m_stdoutHandle, &m_oldMode);
+	SetConsoleMode(m_stdoutHandle, m_oldMode
+		| ENABLE_VIRTUAL_TERMINAL_PROCESSING // "Virtual processing"
+		| ENABLE_PROCESSED_OUTPUT // "Output processing"
+	);
+#endif
+
+#ifdef DEBUG
+	// Switch to alternative buffer (don't hide cursor for breaking with a debugger like GDB)
+	std::cout << "\033[?1049h";
+#else
+	// Switch to alternative buffer and hide cursor
+	std::cout << "\033[?1049h\033[?25l";
+#endif
+}
+
+KTech::Output::~Output()
+{
+	// Show cursor, and disable alternative buffer (return to previous terminal)
+	std::cout << "\033[?25h\033[?1049l" << std::flush;
+
+	for (std::string& out : outputOnQuit)
+	{
+		std::cout << out;
+	}
+
+#ifdef _WIN32
+	SetConsoleMode(m_stdoutHandle, m_oldMode);
+#endif
 }
 
 void KTech::Output::PopulateForegroundColor(size_t& p_dst, const RGB& p_src)
