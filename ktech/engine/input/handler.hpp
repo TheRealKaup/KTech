@@ -20,20 +20,15 @@
 
 #pragma once
 
+#include <memory>
+
 #include "input.hpp"
 
 struct KTech::Input::Handler
 {
-	enum class Type : uint8_t
-	{
-		String,
-		Range
-	};
-
-	// const Type m_type;
 	const char m_start = '\0', m_end = '\0';
 	const std::string m_string;
-	std::vector<Callback*> m_callbacks;
+	std::vector<std::shared_ptr<Callback>> m_callbacks;
 
 	Handler(std::string input)
 		: m_string(std::move(input)) {}
@@ -41,5 +36,5 @@ struct KTech::Input::Handler
 	Handler(char key1, char key2)
 		: m_start(key1), m_end(key2) {}
 
-	void RemoveCallback(Callback* callback);
+	void RemoveCallbacksSetToBeDeleted();
 };

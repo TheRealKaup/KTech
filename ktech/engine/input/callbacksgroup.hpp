@@ -22,29 +22,32 @@
 
 #include "input.hpp"
 
-struct KTech::Input::CallbacksGroup
+class KTech::Input::CallbacksGroup
 {
-	enum class Status : uint8_t
-	{
-		disabled,
-		enabled,
-		removeDisabled, // Remove and then return status to disabled
-		removeEnabled, // Remove and then return status to enabled
-	};
+public:
+	Engine& engine;
 
-	std::vector<Callback*> m_callbacks;
-	Status m_status;
-	bool m_synced = true;
+	CallbacksGroup(Engine& engine, bool enabled = true);
+	~CallbacksGroup();
 
-	CallbacksGroup(bool enabled = true)
-		: m_status(enabled ? Status::enabled : Status::disabled) {}
-
-	void AddCallback(Callback* callback);
-
-	void DeleteCallbacks();
+	void RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback);
+	void RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback);
 
 	void Enable();
 	void Disable();
 
+private:
+	enum class Status : uint8_t
+	{
+		disabled,
+		enabled
+	};
+
+	std::vector<std::shared_ptr<Callback>> m_callbacks;
+	Status m_status;
+	bool m_synced = false;
+
 	void Update();
+
+	friend Input;
 };

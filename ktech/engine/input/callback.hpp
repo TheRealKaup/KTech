@@ -20,16 +20,23 @@
 
 #pragma once
 
+#include <utility>
+
 #include "input.hpp"
 
 struct KTech::Input::Callback
 {
-	bool enabled = true;
+	enum class Status : uint8_t
+	{
+		disabled,
+		enabled,
+		awaitingDeletion
+	};
+
+	Status status;
 	const std::function<bool()> ptr;
-	Handler* const parentHandler;
+	std::shared_ptr<Handler> const parentHandler;
 
-	Callback(const std::function<bool()>& callback, Handler* parentHandler)
-		: ptr(callback), parentHandler(parentHandler) {}
-
-	~Callback();
+	Callback(const std::function<bool()>& callback, std::shared_ptr<Handler> parentHandler)
+		: ptr(callback), parentHandler(std::move(parentHandler)) {}
 };

@@ -60,9 +60,9 @@ public:
 		// Default value
 		SetValue(defaultNum);
 		// Input handlers
-		m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback('0', '9', [this]() -> bool { return Insert(); }));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return Insert(); }));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return Insert(); }));
+		m_callbacksGroup.RegisterRangedCallback('0', '9', [this]() -> bool { return Insert(); });
+		m_callbacksGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return Insert(); });
+		m_callbacksGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return Insert(); });
 	}
 
 	void SetText(const std::string& text, bool withFrame)

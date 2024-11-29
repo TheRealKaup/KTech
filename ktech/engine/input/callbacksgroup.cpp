@@ -21,11 +21,35 @@
 #include "callbacksgroup.hpp"
 
 #include "callback.hpp"
+#include "../../engine/engine.hpp"
 
-void KTech::Input::CallbacksGroup::AddCallback(Callback* p_callback)
+KTech::Input::CallbacksGroup::CallbacksGroup(Engine& engine, bool enabled)
+	: engine(engine), m_status(enabled ? Status::enabled : Status::disabled)
 {
-	m_callbacks.push_back(p_callback);
-	p_callback->enabled = false;
+	engine.input.RegisterCallbacksGroup(this);
+}
+
+KTech::Input::CallbacksGroup::~CallbacksGroup()
+{
+	// Set callbacks for deletion
+	for (const std::shared_ptr<Callback>& callback : m_callbacks)
+	{
+		callback->status = Callback::Status::awaitingDeletion;
+	}
+	// Set this to be removed from memory
+	engine.input.SetCallbacksGroupToBeRemoved(this);
+}
+
+void KTech::Input::CallbacksGroup::RegisterCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback)
+{
+	m_callbacks.push_back(engine.input.CreateCallback(p_stringKey, p_callback));
+	m_synced = false;
+}
+
+void KTech::Input::CallbacksGroup::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback)
+{
+	m_callbacks.push_back(engine.input.CrateRangedCallback(p_key1, p_key2, p_callback));
+	m_synced = false;
 }
 
 void KTech::Input::CallbacksGroup::Enable()
@@ -40,64 +64,30 @@ void KTech::Input::CallbacksGroup::Disable()
 	m_synced = false;
 }
 
-void KTech::Input::CallbacksGroup::DeleteCallbacks()
-{
-	// Disable as soon as possible the callbacks (since the actual callbacks are probably deleted right after)
-	for (Callback* callback : m_callbacks)
-	{
-		callback->enabled = false;
-	}
-	// Then request to delete the callbacks
-	// (removeDisabled will set the group to be disabled later, removeEnabled will set to enabled)
-	m_status = (m_status == Status::disabled ? Status::removeDisabled : Status::removeEnabled);
-	m_synced = false;
-}
-
 void KTech::Input::CallbacksGroup::Update()
 {
+	if (m_synced)
+	{
+		return;
+	}
 	switch (m_status)
 	{
 		case Status::disabled:
 		{
 			// Disable the callbacks
-			for (Callback* callback : m_callbacks)
+			for (const std::shared_ptr<Callback>& callback : m_callbacks)
 			{
-				callback->enabled = false;
+				callback->status = Callback::Status::disabled;
 			}
 			break;
 		}
 		case Status::enabled:
 		{
 			// Enable the callbacks
-			for (Callback* callback : m_callbacks)
+			for (const std::shared_ptr<Callback>& callback : m_callbacks)
 			{
-				callback->enabled = true;
+				callback->status = Callback::Status::enabled;
 			}
-			break;
-		}
-		case Status::removeDisabled:
-		{
-			// Delete the callbacks from memory (which will automatically delete the callbacks from
-			// their parent handlers' callback vector)
-			for (Callback*& callback : m_callbacks)
-			{
-				delete callback;
-			}
-			// Clear the group's vectors
-			m_callbacks.clear();
-			// Disable the group as requested
-			m_status = CallbacksGroup::Status::disabled;
-			break;
-		}
-		case Status::removeEnabled:
-		{
-			// The same as ^ but enable the group afterwards
-			for (Callback* callback : m_callbacks)
-			{
-				delete callback;
-			}
-			m_callbacks.clear();
-			m_status = Status::enabled;
 			break;
 		}
 	}

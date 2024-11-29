@@ -25,7 +25,7 @@
 #include "../engine/engine.hpp"
 
 KTech::Widget::Widget(KTech::Engine& p_engine, KTech::Point p_position, std::string p_name)
-	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbacksGroup(p_engine.input.CreateCallbacksGroup(false))
+	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbacksGroup(engine, false)
 {
 	engine.memory.widgets.Add(this);
 }
@@ -42,7 +42,6 @@ KTech::Widget::~Widget()
 	LeaveUI();
 	LeaveWidget();
 	engine.memory.widgets.Remove(m_id);
-	m_callbacksGroup->DeleteCallbacks();
 }
 
 auto KTech::Widget::AddWidget(ID<Widget> p_widget) -> bool
@@ -142,7 +141,7 @@ auto KTech::Widget::LeaveUI() -> bool
 void KTech::Widget::Select()
 {
 	m_selected = true;
-	m_callbacksGroup->Enable();
+	m_callbacksGroup.Enable();
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
 		if (childWidget.oldSelected)
@@ -156,7 +155,7 @@ void KTech::Widget::Select()
 void KTech::Widget::Deselect()
 {
 	m_selected = false;
-	m_callbacksGroup->Disable();
+	m_callbacksGroup.Disable();
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
 		childWidget.oldSelected = engine.memory.widgets[childWidget.widget]->m_selected;

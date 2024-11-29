@@ -29,7 +29,7 @@
 #include <unistd.h>
 #endif
 
-KTech::Input::Input(Engine* p_engine)
+KTech::Input::Input(Engine& p_engine)
 	: engine(p_engine)
 {
 	// Set terminal attributes
@@ -79,54 +79,66 @@ KTech::Input::~Input()
 	m_inputLoop.detach();
 }
 
-auto KTech::Input::RegisterCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback) -> KTech::Input::Callback*
+auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 	{
 		return nullptr;
 	}
 	// If a handler already exists for this input, add the callback to the calls vector
-	for (Handler* stringHandler : m_stringHandlers)
+	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
 	{
 		if (stringHandler->m_string == p_stringKey)
 		{
-			stringHandler->m_callbacks.push_back(new Callback(p_callback, stringHandler));
+			stringHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, stringHandler));
 			return stringHandler->m_callbacks[stringHandler->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	m_stringHandlers.push_back(new Handler(p_stringKey));
+	m_stringHandlers.push_back(std::make_shared<Handler>(p_stringKey));
 	// And add a callback to it
-	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(new Callback(p_callback, m_stringHandlers[m_stringHandlers.size() - 1]));
+	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_stringHandlers[m_stringHandlers.size() - 1]));
 	return m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback of last handler
 }
 
-auto KTech::Input::RegisterRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback) -> KTech::Input::Callback*
+auto KTech::Input::CrateRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 	{
 		return nullptr;
 	}
 	// If a handler already exists for this input, add the callback to the calls vector
-	for (Handler* rangeHandler : m_rangeHandlers)
+	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
 	{
 		if (rangeHandler->m_start == p_key1 && rangeHandler->m_end == p_key2)
 		{
-			rangeHandler->m_callbacks.push_back(new Callback(p_callback, rangeHandler));
+			rangeHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, rangeHandler));
 			return rangeHandler->m_callbacks[rangeHandler->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	m_rangeHandlers.push_back(new Handler(p_key1, p_key2));
+	m_rangeHandlers.push_back(std::make_shared<Handler>(p_key1, p_key2));
 	// And add a callback to it
-	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(new Callback(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
+	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
 	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
 }
 
-auto KTech::Input::CreateCallbacksGroup(bool p_enabled) -> KTech::Input::CallbacksGroup*
+void KTech::Input::RegisterCallbacksGroup(CallbacksGroup* const p_callbacksGroup)
 {
-	m_groups.push_back(new CallbacksGroup(p_enabled));
-	return m_groups[m_groups.size() - 1];
+	m_groups.push_back(p_callbacksGroup);
+}
+
+void KTech::Input::SetCallbacksGroupToBeRemoved(CallbacksGroup* const p_callbacksGroup)
+{
+	for (CallbacksGroup*& group : m_groups)
+	{
+		if (group == p_callbacksGroup)
+		{
+			// Set group to `nullptr`; that will be noticed in `Input::Update()` and be removed.
+			group = nullptr;
+			return;
+		}
+	}
 }
 
 auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
@@ -161,7 +173,7 @@ auto KTech::Input::Between(char p_charKey1, char p_charKey2) const -> bool
 
 void KTech::Input::CallCallbacks()
 {
-	UpdateGroups();
+	Update();
 	// Protect `std::vector m_inputQueue`
 	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
 	// Call callbacks of triggered handlers
@@ -182,28 +194,43 @@ void KTech::Input::CallCallbacks()
 	m_inputQueue.clear();
 }
 
-void KTech::Input::UpdateGroups()
+void KTech::Input::Update()
 {
-	// Update groups' callbacks' `enabled` if `synced` is false
-	for (CallbacksGroup*& group : m_groups)
+	for (size_t i = 0; i < m_groups.size();)
 	{
-		if (!group->m_synced)
+		// Group was set to be removed by `SetCallbacksGroupToBeRemoved`
+		if (m_groups[i] == nullptr)
 		{
-			group->Update();
+			m_groups.erase(m_groups.begin() + i);
 		}
+		else
+		{
+			// Updates `Callback` statuses
+			m_groups[i]->Update();
+			i++;
+		}
+	}
+	// Delete any `Callback` that is awaiting deletion
+	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
+	{
+		stringHandler->RemoveCallbacksSetToBeDeleted();
+	}
+	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
+	{
+		rangeHandler->RemoveCallbacksSetToBeDeleted();
 	}
 }
 
 inline void KTech::Input::CallStringHandlers()
 {
-	for (Handler* stringHandler : m_stringHandlers) // Input matches handler's string
+	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers) // Input matches handler's string
 	{
 		if (input == stringHandler->m_string) // String matches
 		{
 			// Call callbacks
-			for (Callback* callback : stringHandler->m_callbacks)
+			for (const std::shared_ptr<Callback>& callback : stringHandler->m_callbacks)
 			{
-				if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
 				{
 					m_changedThisTick = true; // Render-on-demand
 				}
@@ -216,13 +243,13 @@ inline void KTech::Input::CallStringHandlers()
 
 void KTech::Input::CallRangeHandlers()
 {
-	for (Handler* rangeHandler : m_rangeHandlers) // Range handlers
+	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers) // Range handlers
 	{
 		if (rangeHandler->m_start <= input[0] && input[0] <= rangeHandler->m_end) // Input matches handler's range
 		{
-			for (Callback* callback: rangeHandler->m_callbacks) // Call callbacks
+			for (const std::shared_ptr<Callback>& callback: rangeHandler->m_callbacks) // Call callbacks
 			{
-				if (callback->enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
 				{
 					m_changedThisTick = true; // Render-on-demand
 				}
@@ -264,7 +291,7 @@ void KTech::Input::Get()
 
 void KTech::Input::Loop()
 {
-	while (engine->running)
+	while (engine.running)
 	{
 		// Get input
 		Get();
@@ -273,7 +300,7 @@ void KTech::Input::Loop()
 		if (m_inputQueue[m_inputQueue.size() - 1] == quitKey)
 		{
 			// Quit
-			engine->running = false;
+			engine.running = false;
 			break;
 		}
 	}

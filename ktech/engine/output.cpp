@@ -61,9 +61,9 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 
 	// Wait for user input
 	std::cout << "Read the legal notices, and then press the 'return' key (enter) to proceed..." << std::flush;
-	while (engine->input.input != Keys::return_ && engine->running) {}
+	while (engine.input.input != Keys::return_ && engine.running) {}
 
-	if (!engine->running)
+	if (!engine.running)
 	{
 		exit(0); // exit the thread completely to stop game loading prior to entering game loop
 	}
@@ -228,14 +228,14 @@ void KTech::Output::Print()
 
 auto KTech::Output::ShouldRenderThisTick() -> bool
 {
-	if (engine->input.m_changedThisTick
-		|| engine->memory.m_changedThisTick
-		|| engine->time.m_changedThisTick
-		|| engine->time.ticksCounter == 0)
+	if (engine.input.m_changedThisTick
+		|| engine.memory.m_changedThisTick
+		|| engine.time.m_changedThisTick
+		|| engine.time.ticksCounter == 0)
 	{
-		engine->input.m_changedThisTick = false;
-		engine->memory.m_changedThisTick = false;
-		engine->time.m_changedThisTick = false;
+		engine.input.m_changedThisTick = false;
+		engine.memory.m_changedThisTick = false;
+		engine.time.m_changedThisTick = false;
 		return true;
 	}
 	return false;
@@ -260,7 +260,7 @@ auto KTech::Output::ShouldPrintThisTick() const -> bool
 	return false;
 }
 
-KTech::Output::Output(Engine* p_engine, KTech::UPoint p_imageResolution)
+KTech::Output::Output(Engine& p_engine, KTech::UPoint p_imageResolution)
 	: engine(p_engine),
 	resolution(p_imageResolution),
 	m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),

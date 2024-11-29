@@ -33,27 +33,17 @@
 #else
 #include <termio.h>
 #endif
+#include <memory>
 #include <mutex>
 #include <thread>
 
 class KTech::Input
 {
 public:
-	struct Handler;
-	struct Callback;
 	class CallbacksGroup;
 
 	std::string input;
 	std::string quitKey{"\x03"};
-
-	// Prepares terminal, creates input loop thread
-	Input(Engine* engine);
-	// Resets terminal
-	~Input();
-
-	auto RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback) -> Callback*;
-	auto RegisterRangedCallback(char key1, char key2, const std::function<bool()>& callback) -> Callback*;
-	auto CreateCallbacksGroup(bool enabled = true) -> CallbacksGroup*;
 
 	[[nodiscard]] auto Is(const std::string& stringKey) const -> bool;
 	[[nodiscard]] auto Is(char charKey) const -> bool;
@@ -65,7 +55,10 @@ public:
  	void CallCallbacks();
 
 private:
-	Engine* const engine;
+	struct Handler;
+	struct Callback;
+
+	Engine& engine;
 #ifdef _WIN32
 	HANDLE m_stdinHandle;
 	DWORD m_oldMode;
@@ -74,17 +67,48 @@ private:
 #endif
 	bool m_changedThisTick = false;
 	std::thread m_inputLoop;
-	std::vector<Handler*> m_stringHandlers;
-	std::vector<Handler*> m_rangeHandlers;
-	std::vector<CallbacksGroup*> m_groups;
 	std::vector<std::string> m_inputQueue;
 	std::mutex m_inputQueueMutex;
+	// Handlers cannot be deleted; their callbacks can be deleted
+	std::vector<std::shared_ptr<Handler>> m_stringHandlers;
+	std::vector<std::shared_ptr<Handler>> m_rangeHandlers;
+	// Groups can be deleted
+	std::vector<CallbacksGroup*> m_groups;
 
-	void UpdateGroups();
+	Input(Engine& engine);
+	~Input();
+
+	/*
+		Create new `Callback` at the appropriate `Handler`.
+		If appropriate `Handler` doesn't exist, first creates a new one.
+
+		Registering `Callback`s (using this function) is indirect (the `Callback` is registered at its `Handler`, not at `Input`).
+		On the other hand, removing `Callback`s is direct, because `Callbacks` directly unregisters from its `Handler`.
+		This is why `Callback` has just the register function here.
+	*/
+	auto CreateCallback(const std::string& stringKey, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
+	auto CrateRangedCallback(char key1, char key2, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
+
+	/*
+		Register `CallbacksGroup`.
+
+		Unlike registering `Callback`s, registering and removing `CallbacksGroup`s is direct (the `CallbacksGroup` is registered at `Input`).
+		This is why `CallbacksGroup` has a register and a remove function here.
+	*/
+	void RegisterCallbacksGroup(CallbacksGroup* callbacksGroup);
+	/*
+		Since neither `Handler`, `Callback` nor `CallbacksGroup` are expected to be removed at any point, this function prepares to remove the given pointer from `m_groups`.
+
+		This function sets `nullptr` where the given `CallbacksGroup*` is given. `Input::Update` sees this and removes it from `m_groups`.
+	*/
+	void SetCallbacksGroupToBeRemoved(CallbacksGroup* callbacksGroup);
+
+	void Update();
 	void CallStringHandlers();
 	void CallRangeHandlers();
 	void Get();
 	void Loop();
 
+	friend class Engine;
 	friend class Output;
 };
