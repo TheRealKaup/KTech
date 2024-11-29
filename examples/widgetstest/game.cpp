@@ -195,11 +195,13 @@ int main()
 			// Render, draw and print
 			ui.Render();
 			engine.output.Clear();
-			engine.output.Draw(ui.m_image, ui.m_res);
+			ui.Draw();
 			engine.output.Print();
 		}
 		else if (engine.output.ShouldPrintThisTick())
+		{
 			engine.output.Print();
+		}
 
 		engine.time.WaitUntilNextTick();
 	}

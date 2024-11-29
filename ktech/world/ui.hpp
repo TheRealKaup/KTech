@@ -26,6 +26,7 @@
 #include "../utility/id.hpp"
 #include "../basic/cella.hpp"
 #include "../basic/rgba.hpp"
+#include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
 
 #include <limits>
@@ -58,9 +59,10 @@ public:
 	void Resize(UPoint resolution);
 
 	void Render();
+	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
 
 protected:
-	inline virtual bool OnTick() { return false; };
+	inline virtual auto OnTick() -> bool { return false; };
 
 	friend class KTech::Memory;
 

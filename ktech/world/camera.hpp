@@ -28,6 +28,7 @@
 #include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -55,6 +56,7 @@ public:
 
 	void Render(); // Will render the layers in `m_parentMap`
 	void Render(const std::vector<ID<Layer>>& layers);
+	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
 
 protected:
 	inline virtual auto OnTick() -> bool { return false; };
