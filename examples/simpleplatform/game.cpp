@@ -420,14 +420,16 @@ int main()
 			else
 			{
 				camera.Render(map.m_layers);
-				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0));
+				camera.Draw();
 			}
 			quitUI.Render();
-			engine.output.Draw(quitUI.m_image, quitUI.m_res);
+			quitUI.Draw();
 			engine.output.Print();
 		}
 		else if (engine.output.ShouldPrintThisTick())
+		{
 			engine.output.Print();
+		}
 		// KTech::Output::Log("<main()> WaitUntilNextTick()", RGBColors::blue);
 		engine.time.WaitUntilNextTick();
 	}

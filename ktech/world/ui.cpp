@@ -124,6 +124,11 @@ void KTech::UI::Render()
 	RenderForeground();
 }
 
+void KTech::UI::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
+{
+	return engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
+}
+
 inline void KTech::UI::RenderBackground()
 {
 	// RESET image to background

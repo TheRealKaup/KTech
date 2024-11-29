@@ -195,7 +195,7 @@ int main()
 			// Render, draw and print
 			ui.Render();
 			engine.output.Clear();
-			ui.Render();
+			ui.Draw();
 			engine.output.Print();
 		}
 		else if (engine.output.ShouldPrintThisTick())
