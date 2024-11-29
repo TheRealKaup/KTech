@@ -61,10 +61,10 @@ public:
 		// Input handlers
 		for (const KeyRange& keyRange : allowedCharacters)
 		{
-			m_callbacksGroup->AddCallback(engine.input.RegisterRangedCallback(keyRange.key1, keyRange.key2, [this]() -> bool { return this->Insert(); }));
+			m_callbacksGroup.RegisterRangedCallback(keyRange.key1, keyRange.key2, [this]() -> bool { return this->Insert(); });
 		}
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return this->Insert(); }));
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return this->Insert(); }));
+		m_callbacksGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return this->Insert(); });
+		m_callbacksGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return this->Insert(); });
 	}
 
 	void SetText(const std::string& text, bool withFrame)

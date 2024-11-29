@@ -38,6 +38,8 @@ struct Character : Object
 	ID<Object> box;
 	Animation jumpAnimation;
 
+	Input::CallbacksGroup callbacksGroup;
+
 	bool Jump()
 	{
 		if (onGround) {
@@ -122,7 +124,7 @@ struct Character : Object
 				Animation::Instruction(Animation::Instruction::Type::TextureMove, 1, Point(0, 1)),
 				Animation::Instruction(Animation::Instruction::Type::Delay, 2, Time::Measurement::ticks),
 				Animation::Instruction(Animation::Instruction::Type::TextureHide, 1),
-			})
+			}), callbacksGroup(engine, true)
 	{
 		KTech::Output::Log("<Character::Character()> Start of function...", RGBColors::red);
 		m_textures.resize(2);
@@ -141,21 +143,21 @@ struct Character : Object
 		m_colliders[1].Simple(KTech::UPoint(5, 5), 3, KTech::Point(-1, -1));
 
 		KTech::Output::Log("<Character::Character()> Registering callbacks", RGBColors::red);
-		engine.input.RegisterCallback("w", std::bind(&Character::Jump, this));
-		engine.input.RegisterCallback("W", std::bind(&Character::Jump, this));
-		engine.input.RegisterCallback(" ", std::bind(&Character::Jump, this));
-		engine.input.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this));
+		callbacksGroup.RegisterCallback("w", std::bind(&Character::Jump, this));
+		callbacksGroup.RegisterCallback("W", std::bind(&Character::Jump, this));
+		callbacksGroup.RegisterCallback(" ", std::bind(&Character::Jump, this));
+		callbacksGroup.RegisterCallback(KTech::Keys::up, std::bind(&Character::Jump, this));
 
-		engine.input.RegisterCallback("d", std::bind(&Character::Move, this, Point(1, 0)));
-		engine.input.RegisterCallback("D", std::bind(&Character::Move, this, Point(1, 0)));
-		engine.input.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, Point(1, 0)));
+		callbacksGroup.RegisterCallback("d", std::bind(&Character::Move, this, Point(1, 0)));
+		callbacksGroup.RegisterCallback("D", std::bind(&Character::Move, this, Point(1, 0)));
+		callbacksGroup.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, Point(1, 0)));
 
-		engine.input.RegisterCallback("a", std::bind(&Character::Move, this, Point(-1, 0)));
-		engine.input.RegisterCallback("A", std::bind(&Character::Move, this, Point(-1, 0)));
-		engine.input.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, Point(-1, 0)));
+		callbacksGroup.RegisterCallback("a", std::bind(&Character::Move, this, Point(-1, 0)));
+		callbacksGroup.RegisterCallback("A", std::bind(&Character::Move, this, Point(-1, 0)));
+		callbacksGroup.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, Point(-1, 0)));
 
-		engine.input.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this));
-		engine.input.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this));
+		callbacksGroup.RegisterCallback("f", std::bind(&Character::PushBoxToDifferentLayer, this));
+		callbacksGroup.RegisterCallback("F", std::bind(&Character::PushBoxToDifferentLayer, this));
 
 		KTech::Output::Log("<Character::Character()> Entering layer", RGBColors::red);
 		EnterLayer(layer);
@@ -241,6 +243,8 @@ struct QuitUI : UI
 {
 	Button m_quitButton;
 
+	Input::CallbacksGroup callbacksGroup;
+
 	bool Toggle()
 	{
 		if (m_quitButton.m_selected)
@@ -261,12 +265,12 @@ struct QuitUI : UI
 	}
 
 	QuitUI(Engine& engine)
-		: UI(engine, viewport), m_quitButton(engine, m_id, std::bind(&Engine::Quit, &engine), Keys::return_, Point(viewport.x / 2 - 3, viewport.y / 2 - 2), "Quit", true)
+		: UI(engine, viewport), m_quitButton(engine, m_id, std::bind(&Engine::Quit, &engine), Keys::return_, Point(viewport.x / 2 - 3, viewport.y / 2 - 2), "Quit", true), callbacksGroup(engine, true)
 	{
 		AddWidget(m_quitButton.m_id);
 		m_quitButton.Hide();
 		m_quitButton.Deselect();
-		engine.input.RegisterCallback(Keys::escape, std::bind(&QuitUI::Toggle, this));
+		callbacksGroup.RegisterCallback(Keys::escape, std::bind(&QuitUI::Toggle, this));
 	}
 };
 
@@ -371,8 +375,9 @@ int main()
 	house.m_textures.resize(1);
 	house.m_textures[0].File("assets/house.ktecht", { 0, 0 });
 
-	engine.input.RegisterCallback("m", TurnOnCharacterCamera);
-	engine.input.RegisterCallback("M", TurnOnCharacterCamera);
+	Input::CallbacksGroup callbacksGroup(engine, true);
+	callbacksGroup.RegisterCallback("m", TurnOnCharacterCamera);
+	callbacksGroup.RegisterCallback("M", TurnOnCharacterCamera);
 
 	KTech::Output::Log("<main()> Creating darkLayer", RGBColors::blue);
 	KTech::Layer darkLayer(engine, map.m_id);

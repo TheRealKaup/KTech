@@ -44,7 +44,7 @@ public:
 		// Texture
 		SetText(text, withFrame);
 		// Input handlers
-		m_callbacksGroup->AddCallback(engine.input.RegisterCallback(key, [this]() -> bool { return InsideOnPress(); }));
+		m_callbacksGroup.RegisterCallback(key, [this]() -> bool { return InsideOnPress(); });
 	}
 
 	virtual ~Button()

@@ -27,6 +27,7 @@
 #include "../basic/point.hpp"
 #include "../world/texture.hpp"
 #include "../engine/input/input.hpp"
+#include "../engine/input/callbacksgroup.hpp"
 
 // Widget is now a non-optional KTech standard
 class KTech::Widget
@@ -52,7 +53,7 @@ public:
 
 	Point m_pos;
 	std::vector<Texture> m_textures = {};
-	Input::CallbacksGroup* m_callbacksGroup;
+	Input::CallbacksGroup m_callbacksGroup;
 
 	Widget(Engine& engine, Point position = Point(0, 0), std::string name = "");
 	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), std::string name = "");

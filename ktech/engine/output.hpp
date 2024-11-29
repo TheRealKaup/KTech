@@ -42,9 +42,6 @@ public:
 	const UPoint resolution;
 	std::vector<std::string> outputAfterQuit;
 
-	Output(Engine* engine, UPoint imageResolution);
-	~Output();
-
 	static void Log(const std::string& text, RGB color);
 
 	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName) const;
@@ -61,7 +58,7 @@ public:
 	[[nodiscard]] auto ShouldPrintThisTick() const -> bool;
 
 private:
-	Engine* const engine;
+	Engine& engine;
 #if _WIN32
 	HANDLE m_stdoutHandle;
 	DWORD m_oldMode;
@@ -77,8 +74,13 @@ private:
 	std::string m_stringImage;
 	static constexpr size_t printSequenceLength = 39;
 
+	Output(Engine& engine, UPoint imageResolution);
+	~Output();
+
 	void PopulateForegroundColor(size_t& dst, const RGB& src);
 	void PopulateBackgroundColor(size_t& dst, const RGB& src);
 	void PopulateCharacter(size_t& dst, size_t src);
 	void PopulateEndOfLine(size_t& dst);
+
+	friend class Engine;
 };

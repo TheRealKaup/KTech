@@ -59,9 +59,6 @@ public:
 	int32_t ticksCounter = 0;
 	int16_t tpsLimit;
 
-	inline Time(Engine* const engine, int16_t ticksPerSecondLimit)
-		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
-
 	auto Invoke(const std::function<bool()>& callback, size_t time, Measurement timeMeasurement) -> Invocation*;
 	auto CancelInvocation(Invocation* invocation) -> bool;
 	void CallInvocations();
@@ -73,10 +70,14 @@ public:
 
 private:
 	bool m_changedThisTick = false;
-	Engine* const engine;
+	Engine& engine;
 	const TimePoint m_startTP;
 	TimePoint m_thisTickStartTP;
 	std::vector<Invocation*> m_invocations;
 
+	inline Time(Engine& engine, int16_t ticksPerSecondLimit)
+		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
+
 	friend class Output;
+	friend class Engine;
 };

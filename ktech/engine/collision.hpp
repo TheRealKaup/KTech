@@ -37,13 +37,10 @@ public:
 		{ CR::O, CR::O, CR::O } // Overlapping - 2
 	};
 
-	inline Collision(Engine* engine)
-		: engine(engine) {};
-
 	auto MoveObject(ID<Object>& object, Point direction) -> bool;
 
 private:
-	Engine* const engine;
+	Engine& engine;
 
 	struct CollisionData{
 		ID<Object> activeObject;
@@ -51,6 +48,9 @@ private:
 		size_t activeCollider;
 		size_t passiveCollider;
 	};
+
+	inline Collision(Engine& engine)
+		: engine(engine) {};
 
 	auto GetPotentialCollisionResult(uint8_t type1, uint8_t type2) -> CR;
 	// Warning: `position1` and `position2` override `collider1.m_rPos` and `collider2.m_rPos` respectively
@@ -64,4 +64,6 @@ private:
 		std::vector<CollisionData>& overlapData,
 		std::vector<CollisionData>& exitOverlapData);
 	static auto IsInPushData(std::vector<CollisionData>& pushData, ID<Object>& object) -> bool;
+
+	friend class Engine;
 };

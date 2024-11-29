@@ -19,14 +19,20 @@
 */
 
 #include "handler.hpp"
+#include "callback.hpp"
 
-void KTech::Input::Handler::RemoveCallback(Callback* p_callback)
+void KTech::Input::Handler::RemoveCallbacksSetToBeDeleted()
 {
-	for (size_t i = 0; i < m_callbacks.size(); i++)
+	for (size_t i = 0; i < m_callbacks.size();)
 	{
-		if (m_callbacks[i] == p_callback)
+		// `Callback`s which were set to `Callback::Status::awaitingDeletion` were set to be deleted by its `CallbacksGroup`
+		if (m_callbacks[i]->status == Callback::Status::awaitingDeletion)
 		{
 			m_callbacks.erase(m_callbacks.begin() + i);
+		}
+		else
+		{
+			i++;
 		}
 	}
 }

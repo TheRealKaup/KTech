@@ -42,7 +42,7 @@ public:
 	Time time;
 
 	inline Engine(UPoint imageSize, int16_t ticksPerSecondLimit = 24)
-		: collision(this), input(this), output(this, imageSize), time(this, ticksPerSecondLimit) {}
+		: collision(*this), input(*this), output(*this, imageSize), time(*this, ticksPerSecondLimit) {}
 
 	inline void Quit()
 	{
