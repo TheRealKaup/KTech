@@ -101,7 +101,7 @@ auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::fun
 	return m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback of last handler
 }
 
-auto KTech::Input::CrateRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
+auto KTech::Input::CrateRangedCallback(char p_start, char p_end, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 	{
@@ -110,14 +110,14 @@ auto KTech::Input::CrateRangedCallback(char p_key1, char p_key2, const std::func
 	// If a handler already exists for this input, add the callback to the calls vector
 	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
 	{
-		if (rangeHandler->m_start == p_key1 && rangeHandler->m_end == p_key2)
+		if (rangeHandler->m_start == p_start && rangeHandler->m_end == p_end)
 		{
 			rangeHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, rangeHandler));
 			return rangeHandler->m_callbacks[rangeHandler->m_callbacks.size() - 1]; // Last callback
 		}
 	}
 	// Otherwise, create a new handler
-	m_rangeHandlers.push_back(std::make_shared<Handler>(p_key1, p_key2));
+	m_rangeHandlers.push_back(std::make_shared<Handler>(p_start, p_end));
 	// And add a callback to it
 	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
 	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback

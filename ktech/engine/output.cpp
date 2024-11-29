@@ -29,6 +29,16 @@
 
 #include <iostream>
 
+/*!
+	Print colored log text to the terminal.
+
+	Simply `std::cout`'s and `std::flash`'s the given text. It has no unique functionality, and doesn't integrate with the output system.
+
+	This function is really only useful when no other printing is being done, because `Output::Print()` will print over the logged text in the terminal.
+
+	@param [in] text Text to print.
+	@param [in] color Color for the outputted text.
+*/
 void KTech::Output::Log(const std::string& p_text, RGB p_color)
 {
 	static uint32_t logIndex = 0;
@@ -36,6 +46,42 @@ void KTech::Output::Log(const std::string& p_text, RGB p_color)
 	logIndex++;
 }
 
+/*!
+	Print a copyright notice.
+
+	The GPLv3 requires your "interactive user interface" (your game) to display "Appropriate Legal Notices", which are defined in the following excerpt:
+
+	> An interactive user interface displays “Appropriate Legal Notices” to the extent that it includes a convenient and prominently visible feature that (1) displays an appropriate copyright notice, and (2) tells the user that there is no warranty for the work (except to the extent that warranties are provided), that licensees may convey the work under this License, and how to view a copy of this License. If the interface presents a list of user commands or options, such as a menu, a prominent item in the list meets this criterion.
+
+	You can use this function (or your own implementation) to just print everything that's needed (appropriate copyright notice, warranty disclaimer, copying, and viewing a copy of the license). This function simplifies this by putting your parameter values into a prepared template. If your warranty status differs from what this function prints, you should of course print this on your own.
+
+	If you want to have a "prominent item" in your menu to display Appropriate Legal Notices (whether in addition to or instead of printing at the start of your game), you can use the `AboutBox` widget to display the text, and `Switch` to hide and show it. This exact method is practiced in the "widgetstest" game example.
+
+	@param [in] title Title of your project (name and brief description).
+	@param [in] years Years where your project was released in.
+	@param [in] author Your name.
+	@param [in] programName Your project's name.
+
+	Something like this will be printed:
+
+	@code{.unparsed}
+	{title}
+	Copyright (C) {years} {author}
+
+	{programName} is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	he Free Software Foundation, either version 3 of the License, or
+	any later version.
+
+	{programName} is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program. If not, see <https://www.gnu.org/licenses/>.
+	@endcode
+*/
 void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::string& p_years, const std::string& p_author, const std::string& p_programName) const
 {
 	// Clear the terminal
@@ -69,11 +115,38 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 	}
 }
 
+/*!
+	Clear the image buffer.
+
+	Doesn't clear the terminal; that is done by `Output::Print()` just before printing the new image.
+
+	Use this function if you need to draw your image on a blank sheet. For example, if you simply draw a fully-opaque `Camera` image each frame, you can probably skip this part, because `Camera` images completely override old image buffer cells. However, if you are drawing a `UI` image, you will want to first call this function, because `UI` images don't always completely override old image buffer cells. This is because `Camera` images are `Cell`-based, while `UI` images are `CellA`-based.
+
+	It's recommended to use this function in conjunction with `Output::ShouldRenderThisTick()`.
+
+	@see `Output::ShouldRenderThisTick()`
+*/
 void KTech::Output::Clear()
 {
 	std::fill(m_image.begin(), m_image.end(), Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)));
 }
 
+/*!
+	Draw a `Cell`-based image .
+
+	This function is used for `Camera` images. It is supposed to completely override old image buffer cells, unless `alpha` is not set to max (255).
+
+	It's recommended to use this function in conjunction with `Output::ShouldRenderThisTick()`.
+
+	@param [in] sourceImage Image to draw.
+	@param [in] resolution Resolution of the given `sourceImage`.
+	@param [in] position Where to draw the image on the internal image buffer.
+	@param [in] start From where to draw `sourceImage`.
+	@param [in] end Until where to draw `sourceImage`.
+	@param [in] alpha Opacity to draw at.
+
+	@see `Output::ShouldRenderThisTick()`
+*/
 void KTech::Output::Draw(const std::vector<Cell>& p_sourceImage, UPoint p_resolution, Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
 	// Default the rectangle
@@ -118,6 +191,22 @@ void KTech::Output::Draw(const std::vector<Cell>& p_sourceImage, UPoint p_resolu
 	}
 }
 
+/*!
+	Draw a `CellA`-based image .
+
+	This function is used for `UI` images. It is supposed to draw over old image buffer cells rather than completely override them (like `Camera` images do). This behavior is desired so a `UI` image can be drawn like a heads-up display, for example, on top of a fully-opaque `Camera` image.
+
+	It's recommended to use this function in conjunction with `Output::ShouldRenderThisTick()`.
+
+	@param [in] sourceImage Image to draw.
+	@param [in] resolution Resolution of the given `sourceImage`.
+	@param [in] position Where to draw the image on the internal image buffer.
+	@param [in] start From where to draw `sourceImage`.
+	@param [in] end Until where to draw `sourceImage`.
+	@param [in] alpha Opacity to draw at.
+
+	@see `Output::ShouldRenderThisTick()`
+*/
 void KTech::Output::Draw(const std::vector<CellA>& p_sourceImage, UPoint p_resolution, Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
 	// Default the rectangle
@@ -158,6 +247,16 @@ void KTech::Output::Draw(const std::vector<CellA>& p_sourceImage, UPoint p_resol
 	}
 }
 
+
+/*!
+	Print the internal image buffer.
+
+	Call this function after preparing the image buffer using `Output::Clear()` and `Output::Draw()` in whatever way that fits your needs.
+
+	It's recommended to use this function in conjunction with `Output::ShouldRenderThisTick()` and `Output::ShouldPrintThisTick()`.
+
+	@see `Output::ShouldRenderThisTick()`, `Output::ShouldPrintThisTick()`
+*/
 void KTech::Output::Print()
 {
 	/*
@@ -226,6 +325,17 @@ void KTech::Output::Print()
 #endif
 }
 
+/*!
+	Check whether things changed and require a new render.
+
+	The `Input`, `Memory` and `Time` engine components remember whether any user callback function returned `true` throughout the last tick. If any did, it means something has changed (like the position of an `Object` or the appearance of a `Texture`). In that case, this function will return true. This allows to "render-on-demand", i.e., avoiding rendering when certainly nothing has changed.
+
+	For best performance, use this function in conjunction with `Output::ShouldRenderThisTick()` (there is an example at its documentation entry):
+
+	@return Whether you should render and draw again.
+
+	@see `Output::ShouldPrintThisTick()`
+*/
 auto KTech::Output::ShouldRenderThisTick() -> bool
 {
 	if (engine.input.m_changedThisTick
@@ -241,6 +351,32 @@ auto KTech::Output::ShouldRenderThisTick() -> bool
 	return false;
 }
 
+/*!
+	Check whether the terminal changed and requires a new print.
+
+	The `Output` engine component keeps track of the terminal size, because if it changes, the engine needs to adapt. If that happened, this function returns true, telling you that the image buffer should be printed again.
+
+	For best performance, use this function in conjunction with `Output::ShouldRenderThisTick()`. Here's an example:
+
+	@code{.cpp}
+	if (engine.output.ShouldRenderThisTick())
+	{
+		// Render, draw and print
+		ui.Render();
+		engine.output.Clear();
+		ui.Render();
+		engine.output.Print();
+	}
+	else if (engine.output.ShouldPrintThisTick())
+	{
+		// Just print
+		engine.output.Print();
+	}
+	@endcode
+
+	@return Whether you should render and draw again.
+	@see `Output::ShouldRenderThisTick()`
+*/
 auto KTech::Output::ShouldPrintThisTick() const -> bool
 {
 	winsize tempTerminalSize;

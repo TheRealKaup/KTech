@@ -33,7 +33,7 @@ struct KTech::Input::Callback
 		awaitingDeletion
 	};
 
-	Status status;
+	Status status = Status::disabled;
 	const std::function<bool()> ptr;
 	std::shared_ptr<Handler> const parentHandler;
 
