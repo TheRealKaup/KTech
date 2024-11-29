@@ -52,7 +52,7 @@ public:
 	[[nodiscard]] auto Is(char charKey) const -> bool;
 	[[nodiscard]] auto Bigger(char charKey) const -> bool;
 	[[nodiscard]] auto Smaller(char charKey) const -> bool;
-	[[nodiscard]] auto Between(char charKey1, char charKey2) const -> bool;
+	[[nodiscard]] auto Between(char start, char end) const -> bool;
 	[[nodiscard]] auto GetInt() const -> uint8_t;
 
  	void CallCallbacks();

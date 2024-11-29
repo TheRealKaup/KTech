@@ -29,6 +29,263 @@
 #include <unistd.h>
 #endif
 
+/*!
+	@var `Input::input`
+
+	Input for the last-called callback function.
+
+	Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbacksGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
+*/
+/*!
+	@var `Input::quitKey`
+
+	Input that if received, breaks the input loop and sets `Engine::running` to false.
+
+	By default, it's "\x03" (Ctrl+C), which is a common quit key among terminal applications. You may change it, but don't go Vim on your players.
+*/
+
+/*!
+	Checks if input equals given string.
+
+	@param stringKey String to compare with `Input::input`.
+
+	@return True if equal, otherwise false.
+*/
+auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
+{
+	return (input == p_stringKey);
+}
+
+/*!
+	Checks if input equals given character.
+
+	@param charKey Character to compare with `Input::input`.
+
+	@return True if equal (and `Input::input` is 1 character long), otherwise false.
+*/
+auto KTech::Input::Is(char p_charKey) const -> bool
+{
+	return input.length() == 1 && input[0] == p_charKey;
+}
+
+/*!
+	Get the first character of input as a 1-digit number.
+
+	@return The first character of `Input::input` subtracted by 48 (the character '0'). Can return a value that is not 1-digit-long, so unless only digit characters ('0'-'9') can call your function, you should consider confirming with `Input::Between()` and the arguments ('0', '9') that input is indeed a digit.
+
+	@see `Input::Between()`
+*/
+auto KTech::Input::GetInt() const -> uint8_t
+{
+	return input[0] - '0';
+}
+
+/*!
+	Checks if given character is bigger than input.
+
+	@param charKey Character to compare with `Input::input`.
+
+	@return True if bigger (and `Input::input` is 1 character long), otherwise false.
+*/
+auto KTech::Input::Bigger(char p_charKey) const -> bool
+{
+	return (input[0] >= p_charKey) && (input.length() == 1);
+}
+
+/*!
+	Checks if given character is smaller than input.
+
+	@param charKey Character to compare with `Input::input`.
+
+	@return True if smaller (and `Input::input` is 1 character long), otherwise false.
+*/
+auto KTech::Input::Smaller(char p_charKey) const -> bool
+{
+	return (input[0] <= p_charKey) && (input.length() == 1);
+}
+
+/*!
+	Checks if input is between range of characters.
+
+	@param start Start of (ASCII) character range.
+	@param end End of (ASCII) character range.
+
+	@return True if between range (and `Input::input` is 1 character long), otherwise false.
+*/
+auto KTech::Input::Between(char p_start, char p_end) const -> bool
+{
+	return (input[0] >= p_start) && (input[0] <= p_end) && (input.length() == 1);
+}
+
+/*!
+	Distribute accumulated inputs.
+
+	`Input` queues received inputs until this function is called. This very function is what calls your input callback functions.
+
+	Normally placed at the start of each game loop's iteration, with the other callback-calling functions of engine components (right now `Memory::CallOnTicks()` and `Time::CallInvocations()`, though this may change). For example:
+
+	@code{.cpp}
+	// Game loop
+	while (engine.running)
+	{
+		// Call various callback-functions
+		engine.input.CallCallbacks(); // <- Distribute inputs to input callback functions
+		engine.time.CallInvocations();
+		engine.memory.CallOnTicks();
+
+		// Graphics (render-on-demand)
+		if (engine.output.ShouldRenderThisTick())
+		{
+			map.Render();
+			Camera.Draw();
+			engine.output.Print();
+		}
+		else if (engine.output.ShouldPrintThisTick())
+		{
+			engine.output.Print();
+		}
+
+		engine.time.WaitUntilNextTick();
+	}
+	@endcode
+
+	@see `Memory::CallOnTicks()`
+	@see `Time::CallInvocations()`
+*/
+void KTech::Input::CallCallbacks()
+{
+	Update();
+	// Protect `std::vector m_inputQueue`
+	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
+	// Call callbacks of triggered handlers
+	for (std::string& queuedInput : m_inputQueue)
+	{
+		input = std::move(queuedInput);
+		if (input.length() == 1) // Can be both string/range handler
+		{
+			CallStringHandlers();
+			CallRangeHandlers();
+		}
+		else // Can only be string handler
+		{
+			CallStringHandlers();
+		}
+	}
+	// All callbacks of triggered handlers were called; clear trigger history
+	m_inputQueue.clear();
+}
+
+void KTech::Input::Update()
+{
+	for (size_t i = 0; i < m_groups.size();)
+	{
+		// Group was set to be removed by `SetCallbacksGroupToBeRemoved`
+		if (m_groups[i] == nullptr)
+		{
+			m_groups.erase(m_groups.begin() + i);
+		}
+		else
+		{
+			// Updates `Callback` statuses
+			m_groups[i]->Update();
+			i++;
+		}
+	}
+	// Delete any `Callback` that is awaiting deletion
+	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
+	{
+		stringHandler->RemoveCallbacksSetToBeDeleted();
+	}
+	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
+	{
+		rangeHandler->RemoveCallbacksSetToBeDeleted();
+	}
+}
+
+inline void KTech::Input::CallStringHandlers()
+{
+	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers) // Input matches handler's string
+	{
+		if (input == stringHandler->m_string) // String matches
+		{
+			// Call callbacks
+			for (const std::shared_ptr<Callback>& callback : stringHandler->m_callbacks)
+			{
+				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				{
+					m_changedThisTick = true; // Render-on-demand
+				}
+			}
+			// Break because there shouldn't be a similar handler
+			break;
+		}
+	}
+}
+
+void KTech::Input::CallRangeHandlers()
+{
+	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers) // Range handlers
+	{
+		if (rangeHandler->m_start <= input[0] && input[0] <= rangeHandler->m_end) // Input matches handler's range
+		{
+			for (const std::shared_ptr<Callback>& callback: rangeHandler->m_callbacks) // Call callbacks
+			{
+				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				{
+					m_changedThisTick = true; // Render-on-demand
+				}
+			}
+		}
+	}
+}
+
+void KTech::Input::Get()
+{
+	constexpr int maxCharacters = 7;
+#ifdef _WIN32
+	// Read
+	TCHAR tcharBuf[7];
+	memset(tcharBuf, 0, sizeof(tcharBuf));
+	LPDWORD nReadCharacters = 0;
+	ReadConsole(m_stdinHandle, tcharBuf, sizeof(tcharBuf) / sizeof(TCHAR), (LPDWORD)(&nReadCharacters), NULL);
+	// Convert `TCHAR` string to `char` string
+	std::string charBuf(static_cast<size_t>(nReadCharacters), '\0');
+	for (size_t i = 0; i < static_cast<size_t>(nReadCharacters); i++)
+	{
+		charBuf[i] = tcharBuf[i];
+	}
+	// Protect `std::vector m_inputQueue`
+	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
+	// Move to input history
+	m_inputQueue.push_back(std::move(charBuf));
+#else
+	// Read
+	std::string buf(maxCharacters, '\0');
+	buf.resize(read(0, buf.data(), buf.size()));
+	// Protect `std::vector m_inputQueue`
+	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
+	// Move to input history
+	m_inputQueue.push_back(std::move(buf));
+#endif
+}
+
+void KTech::Input::Loop()
+{
+	while (engine.running)
+	{
+		// Get input
+		Get();
+		// Protect `std::vector m_inputQueue`
+		std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
+		if (m_inputQueue[m_inputQueue.size() - 1] == quitKey)
+		{
+			// Quit
+			engine.running = false;
+			break;
+		}
+	}
+}
+
 KTech::Input::Input(Engine& p_engine)
 	: engine(p_engine)
 {
@@ -137,171 +394,6 @@ void KTech::Input::SetCallbacksGroupToBeRemoved(CallbacksGroup* const p_callback
 			// Set group to `nullptr`; that will be noticed in `Input::Update()` and be removed.
 			group = nullptr;
 			return;
-		}
-	}
-}
-
-auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
-{
-	return (input == p_stringKey);
-}
-
-auto KTech::Input::Is(char p_charKey) const -> bool
-{
-	return input.length() == 1 && input[0] == p_charKey;
-}
-
-auto KTech::Input::GetInt() const -> uint8_t
-{
-	return input[0] - '0';
-}
-
-auto KTech::Input::Bigger(char p_charKey) const -> bool
-{
-	return (input[0] >= p_charKey) && (input[1] == 0);
-}
-
-auto KTech::Input::Smaller(char p_charKey) const -> bool
-{
-	return (input[0] <= p_charKey) && (input[1] == 0);
-}
-
-auto KTech::Input::Between(char p_charKey1, char p_charKey2) const -> bool
-{
-	return (input[0] >= p_charKey1) && (input[0] <= p_charKey2) && (input[1] == 0);
-}
-
-void KTech::Input::CallCallbacks()
-{
-	Update();
-	// Protect `std::vector m_inputQueue`
-	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
-	// Call callbacks of triggered handlers
-	for (std::string& queuedInput : m_inputQueue)
-	{
-		input = std::move(queuedInput);
-		if (input.length() == 1) // Can be both string/range handler
-		{
-			CallStringHandlers();
-			CallRangeHandlers();
-		}
-		else // Can only be string handler
-		{
-			CallStringHandlers();
-		}
-	}
-	// All callbacks of triggered handlers were called; clear trigger history
-	m_inputQueue.clear();
-}
-
-void KTech::Input::Update()
-{
-	for (size_t i = 0; i < m_groups.size();)
-	{
-		// Group was set to be removed by `SetCallbacksGroupToBeRemoved`
-		if (m_groups[i] == nullptr)
-		{
-			m_groups.erase(m_groups.begin() + i);
-		}
-		else
-		{
-			// Updates `Callback` statuses
-			m_groups[i]->Update();
-			i++;
-		}
-	}
-	// Delete any `Callback` that is awaiting deletion
-	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
-	{
-		stringHandler->RemoveCallbacksSetToBeDeleted();
-	}
-	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
-	{
-		rangeHandler->RemoveCallbacksSetToBeDeleted();
-	}
-}
-
-inline void KTech::Input::CallStringHandlers()
-{
-	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers) // Input matches handler's string
-	{
-		if (input == stringHandler->m_string) // String matches
-		{
-			// Call callbacks
-			for (const std::shared_ptr<Callback>& callback : stringHandler->m_callbacks)
-			{
-				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
-				{
-					m_changedThisTick = true; // Render-on-demand
-				}
-			}
-			// Break because there shouldn't be a similar handler
-			break;
-		}
-	}
-}
-
-void KTech::Input::CallRangeHandlers()
-{
-	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers) // Range handlers
-	{
-		if (rangeHandler->m_start <= input[0] && input[0] <= rangeHandler->m_end) // Input matches handler's range
-		{
-			for (const std::shared_ptr<Callback>& callback: rangeHandler->m_callbacks) // Call callbacks
-			{
-				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
-				{
-					m_changedThisTick = true; // Render-on-demand
-				}
-			}
-		}
-	}
-}
-
-
-void KTech::Input::Get()
-{
-	constexpr int maxCharacters = 7;
-#ifdef _WIN32
-	// Read
-	TCHAR tcharBuf[7];
-	memset(tcharBuf, 0, sizeof(tcharBuf));
-	LPDWORD nReadCharacters = 0;
-	ReadConsole(m_stdinHandle, tcharBuf, sizeof(tcharBuf) / sizeof(TCHAR), (LPDWORD)(&nReadCharacters), NULL);
-	// Convert `TCHAR` string to `char` string
-	std::string charBuf(static_cast<size_t>(nReadCharacters), '\0');
-	for (size_t i = 0; i < static_cast<size_t>(nReadCharacters); i++)
-	{
-		charBuf[i] = tcharBuf[i];
-	}
-	// Protect `std::vector m_inputQueue`
-	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
-	// Move to input history
-	m_inputQueue.push_back(std::move(charBuf));
-#else
-	// Read
-	std::string buf(maxCharacters, '\0');
-	buf.resize(read(0, buf.data(), buf.size()));
-	// Protect `std::vector m_inputQueue`
-	std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
-	// Move to input history
-	m_inputQueue.push_back(std::move(buf));
-#endif
-}
-
-void KTech::Input::Loop()
-{
-	while (engine.running)
-	{
-		// Get input
-		Get();
-		// Protect `std::vector m_inputQueue`
-		std::lock_guard<std::mutex> lockGuard(m_inputQueueMutex);
-		if (m_inputQueue[m_inputQueue.size() - 1] == quitKey)
-		{
-			// Quit
-			engine.running = false;
-			break;
 		}
 	}
 }

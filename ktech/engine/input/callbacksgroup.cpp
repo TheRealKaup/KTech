@@ -54,13 +54,16 @@ KTech::Input::CallbacksGroup::~CallbacksGroup()
 /*!
 	Register a function to be called back when an input is received.
 
+	Input is received in escape sequences. `KTech::Keys` includes such values that you can give to the `stringKey` parameter.
+
 	If your function is a callback for different inputs, you can use `Input::input` from within your function to find out which input called it.
 
 	If the callbacks group is currently enabled, the new callback will be enabled as well only in the next tick. This behavior is explained in `CallbacksGroup::Enable()`'s documentation entry.
 
-	@param stringKey The specific key that when received calls your `callback` function.
-	@param callback Your callback function which returns `bool`. The return value is explained in `Output::ShouldRenderThisTick()`.
+	@param [in] stringKey Escape sequence that when received calls your `callback` function.
+	@param [in] callback Your callback function which returns `bool`. The return value is explained in `Output::ShouldRenderThisTick()`.
 
+	@see `KTech::Keys`
 	@see `Output::ShouldRenderThisTick()`
 */
 void KTech::Input::CallbacksGroup::RegisterCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback)
@@ -72,7 +75,7 @@ void KTech::Input::CallbacksGroup::RegisterCallback(const std::string& p_stringK
 /*!
 	Register a function to be called back when an input within a characters range is received.
 
-	Any input received within the range will call your callback function. Because it's a range, the inputs are limited in length to 1 character. However, using this registration function is mostly useful when 1 ASCII character inputs are needed. For example:
+	Any input received within the range will call your callback function. Because it's a range, the inputs are limited in length to 1 character. Anyway, this function is mostly useful when 1-character-long inputs are needed. For example:
 
 	@code{.cpp}
 	bool LogLetters()
@@ -91,9 +94,9 @@ void KTech::Input::CallbacksGroup::RegisterCallback(const std::string& p_stringK
 
 	If the callbacks group is currently enabled, the new callback will be enabled as well only in the next tick. This behavior is explained in `CallbacksGroup::Enable()`'s documentation entry.
 
-	@param start Start of characters range.
-	@param end End of characters range.
-	@param callback Your callback function which returns `bool`. The return value is explained in `Output::ShouldRenderThisTick()`.
+	@param [in] start Start of (ASCII) characters range.
+	@param [in] end End of (ASCII) characters range.
+	@param [in] callback Your callback function which returns `bool`. The return value is explained in `Output::ShouldRenderThisTick()`.
 
 	@see `CallbacksGroup::Enable()`
 	@see `Output::ShouldRenderThisTick()`
