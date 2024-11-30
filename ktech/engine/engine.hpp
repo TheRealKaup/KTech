@@ -30,22 +30,25 @@
 #include "output.hpp"
 #include "time.hpp"
 
+/*!
+	Complete engine containing all engine components.
+
+	You need an `Engine` instance to do nearly everything in KTech (including creating world structures). Normally, you should have 1 instance of this class in your game. Make sure you don't accidentally create duplicate instances, as those could lead to unexpected behavior, especially in the `Input` engine componenet.
+
+	However, the need for multiple instances of `Engine` in the same process is probable. For example, you might want 1 process managing multiple `Engine`s (that were made headless, or that their `Input` and `Output` componenets were redirected), each handling a lobby in a server. Who knows.
+*/
 class KTech::Engine
 {
 public:
 	bool running = true;
 
-	Collision collision;
-	Input input;
-	Memory memory;
-	Output output;
-	Time time;
+	Collision collision; //!< `Collision` engine component.
+	Input input; //!< `Input` engine component.
+	Memory memory; //!< `Memory` engine component.
+	Output output; //!< `Output` engine component.
+	Time time; //!< `Time` engine component.
 
-	inline Engine(UPoint imageSize, int16_t ticksPerSecondLimit = 24)
-		: collision(*this), input(*this), output(*this, imageSize), time(*this, ticksPerSecondLimit) {}
+	Engine(UPoint imageSize, int16_t ticksPerSecondLimit = 24);
 
-	inline void Quit()
-	{
-		running = false;
-	}
+	void Quit();
 };
