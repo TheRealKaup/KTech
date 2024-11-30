@@ -28,6 +28,26 @@
 #include "../world/ui.hpp"
 #include "../world/widget.hpp"
 
+/*!
+	Call the virtual `OnTick()` functions of all registered world structures.
+
+	Normally placed at the start of tick, with the other callback-calling functions of engine components. For example:
+
+	@code{.cpp}
+	// Game loop
+	while (engine.running)
+	{
+		// Call various callback-functions
+		engine.input.CallCallbacks();
+		engine.time.CallInvocations();
+		engine.memory.CallOnTicks(); // <- Call `OnTick()` functions of all world structures
+
+		// Graphics...
+	}
+	@endcode
+
+	This function was placed in `Memory`, because this engine component has the most direct access to all of the world structures. Although, this function could have been technically placed easily anywhere else.
+*/
 void KTech::Memory::CallOnTicks()
 {
 	for (UI* ui : uis.m_vec)
