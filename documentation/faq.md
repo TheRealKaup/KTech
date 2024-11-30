@@ -2,7 +2,7 @@
 
 This document contains answers for ~~frequently~~ potentially asked questions.
 
-- [How to build KTech?](#how-to-build-ktech-with-premake)
+- [How to build KTech (with Premake)?](#how-to-build-ktech-with-premake)
 - [How to build your own KTech game (with Premake)?](#how-to-build-your-own-ktech-game-with-premake)
 - [How to run the game examples?](#how-to-run-the-game-examples)
 - [How does the licensing work?](#how-does-the-licensing-work)
