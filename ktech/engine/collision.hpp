@@ -23,15 +23,24 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/cr.hpp"
 #include "../world/object.hpp"
 
 #include <vector>
 
+/*!
+	Engine component responsible for processing `Object` movement and collision.
+*/
 class KTech::Collision
 {
 public:
-	std::vector<std::vector<CR>> colliderTypes = {
+	enum class CR : uint8_t
+	{
+		B,	//!< Block; the moving collider can't move because the passive collider can't be moved.
+		P,	//!< Push; the moving collider can make way by moving the passive collider with it.
+		O	//!< Overlap; the moving collider can move into the passive collider.
+	};
+
+	std::vector<std::vector<CR>> colliderTypes{
 		{ CR::B, CR::P, CR::O }, // Unpushable - 0
 		{ CR::B, CR::P, CR::O }, // Pushable - 1
 		{ CR::O, CR::O, CR::O } // Overlapping - 2

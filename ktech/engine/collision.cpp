@@ -31,6 +31,61 @@
 #define OBJECTS engine.memory.objects
 #define LAYERS engine.memory.layers
 
+/*!
+	@var `Collision::CR`
+
+	Collision result.
+
+	There are 3 possible collision results: `CR::B` (block), `CR::P` (push), and `CR::O` (overlap).
+
+	@see `Collision::colliderTypes`
+*/
+/*!
+	@var `Collision::colliderTypes`
+
+	Matrix representing collider types and their potential collision results.
+
+	An `Object`'s `Collider` (each of `Object::m_colliders`) can have a distinct "collider type" (`Collider::m_type`). Collider types are defined in this 2D vector.
+
+	The index of each row or column is a collider type. The intersection between 2 collider types is their collision result (`Collision::CR`) if the row type was of the moving collider, and the column type was of the passive collider.
+
+	For example, here's how you should look at the default values:
+
+	| What if (row ↓) collides with (column →) | Type 0  | Type 1  | Type 2  |
+	|------------------------------------------|---------|---------|---------|
+	| Type 0                                   | Block   | Push    | Overlap |
+	| Type 1                                   | Block   | Push    | Overlap |
+	| Type 2                                   | Overlap | Overlap | Overlap |
+
+	Meaning, colliders of type 0 can't be pushed, colliders of type 1 can be pushed, and colliders of type 2 overlap with everything.
+
+	You can set this variable to fit your needs. This matrix should be a square so all available collider types have a defined collision result between them. If a row or a column is missing, the default collision result is `CR::O` (overlap).
+
+	@see `Collision::CR`
+	@see `Collider::m_type`
+*/
+
+/*!
+	Move an `Object` in relation to other `Object`s from the same `Layer`.
+
+	`Object::Move()` calls this function on itself.
+
+	This function processes all `Object`s in the `Layer` to judge whether the moving `Object` can move, or there are blocking `Collider`s. It creates a "movement tree", allowing `Object`s to be pushed one after another in a sequence. This function tries to form an optimal movement tree: it won't stop looking for a way to push all discovered blocking `Object`s, until there are no more `Object`s left to process (or a way was found).
+
+	Based on the final result, it can call back the following virtual `Object` functions (with the appropriate parameters):
+
+	- `Object::OnMove()` for `Object`s that moved (voluntarily or passively).
+	- `Object::OnPushed()` for `Object`s that were pushed by another `Object`.
+	- `Object::OnPush()` for `Object`s that pushed another `Object`.
+	- `Object::OnBlocked()` for `Object`s that were blocked by another `Object`.
+	- `Object::OnBlock()` for `Object`s that blocked another `Object`.
+	- `Object::OnOverlap()` for `Object`s that overlapped into another `Object`.
+	- `Object::OnOverlapExit()` for `Object`s that left from overlapping with another `Object`.
+	- `Object::OnOverlapped()` for `Object`s that were overlapped into by another `Object`.
+	- `Object::OnOverlappedExit()` for `Object`s that were left from overlapping by another `Object`.
+
+	@see `Object`
+*/
 auto KTech::Collision::MoveObject(ID<Object>& p_object, Point p_direction) -> bool
 {
 	std::vector<CollisionData> pushData;

@@ -60,7 +60,6 @@ namespace KTech
 	class Time;
 	class Engine;
 	// Defined in `utility/`
-	enum class CR : uint8_t;
 	template<class T>
 	struct ID;
 	template<class T>
@@ -91,7 +90,6 @@ namespace KTech
 #include "world/ui.hpp"
 
 #include "utility/cachingregistry.hpp"
-#include "utility/cr.hpp"
 #include "utility/id.hpp"
 #include "utility/keys.hpp"
 #include "utility/rgbcolors.hpp"

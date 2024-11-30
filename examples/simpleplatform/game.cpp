@@ -292,10 +292,10 @@ int main()
 
 	KTech::Output::Log("<main()> Creating collider types", RGBColors::blue);
 	engine.collision.colliderTypes = {
-		{ CR::B, CR::P, CR::P, CR::O }, // Heavy - 0
-		{ CR::B, CR::P, CR::P, CR::O }, // Normal - 1
-		{ CR::B, CR::B, CR::P, CR::O }, // Light - 2
-		{ CR::O, CR::O, CR::O, CR::O }  // Overlappable - 3
+		{ Collision::CR::B, Collision::CR::P, Collision::CR::P, Collision::CR::O }, // Heavy - 0
+		{ Collision::CR::B, Collision::CR::P, Collision::CR::P, Collision::CR::O }, // Normal - 1
+		{ Collision::CR::B, Collision::CR::B, Collision::CR::P, Collision::CR::O }, // Light - 2
+		{ Collision::CR::O, Collision::CR::O, Collision::CR::O, Collision::CR::O }  // Overlappable - 3
 	};
 
 	KTech::Output::Log("<main()> Creating map", RGBColors::blue);
