@@ -53,7 +53,7 @@
 	@param imageSize The size of the game's viewport.
 	@param ticksPerSecondLimit The rate at which your game loop should iterate.
 */
-KTech::Engine::Engine(UPoint imageSize, int16_t ticksPerSecondLimit)
+KTech::Engine::Engine(UPoint imageSize, size_t ticksPerSecondLimit)
 	: collision(*this), input(*this), output(*this, imageSize), time(*this, ticksPerSecondLimit) {}
 
 /*!

@@ -48,7 +48,7 @@ public:
 	Output output; //!< `Output` engine component.
 	Time time; //!< `Time` engine component.
 
-	Engine(UPoint imageSize, int16_t ticksPerSecondLimit = 24);
+	Engine(UPoint imageSize, size_t ticksPerSecondLimit = 24);
 
 	void Quit();
 };
