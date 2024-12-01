@@ -50,7 +50,6 @@ namespace KTech
 	class Map;
 	class Widget;
 	class UI;
-	class Animation;
 	// Engine and its components.
 	// Definitions in `engine/`
 	class Collision;
@@ -60,6 +59,7 @@ namespace KTech
 	class Time;
 	class Engine;
 	// Defined in `utility/`
+	class Animation;
 	template<class T>
 	struct ID;
 	template<class T>
@@ -79,7 +79,6 @@ namespace KTech
 #include "basic/cell.hpp"
 #include "basic/cella.hpp"
 
-#include "world/animation.hpp"
 #include "world/collider.hpp"
 #include "world/texture.hpp"
 #include "world/object.hpp"
@@ -89,6 +88,7 @@ namespace KTech
 #include "world/widget.hpp"
 #include "world/ui.hpp"
 
+#include "utility/animation.hpp"
 #include "utility/cachingregistry.hpp"
 #include "utility/id.hpp"
 #include "utility/keys.hpp"

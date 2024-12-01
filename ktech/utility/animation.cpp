@@ -20,12 +20,36 @@
 
 #include "animation.hpp"
 
+/*!
+	@fn `Animation::Animation`
+
+	@brief Construct an `Animation`, that will not play just yet.
+
+	To start playing the `Animation`, call `Animation::Play()`.
+
+	@param [in] engine Reference to parent engine.
+	@param [in] object The object to animate.
+	@param [in] instructions Vector of `Animation::Instruction`s, that `Animation::Play()` will interpret and "play".
+
+	@see `Animation::Play()`
+*/
+KTech::Animation::Animation(Engine& p_engine, ID<Object>& p_object, const std::vector<Instruction>& p_instructions)
+	: engine(p_engine), m_object(p_object), m_instructions(p_instructions) {}
+
+//! @brief Safely cancels invoked animation instructions.
 KTech::Animation::~Animation()
 {
 	Stop();
 }
 
-bool KTech::Animation::Play()
+/*!
+	@brief Play the `Animation`.
+
+	Calling this function again does not replay the `Animation`; to do so, call `Animation::Stop()`, and then recall this function.
+
+	This function interprets the instructions, acts upon them, `Time::Invoke()`s itself if there's a delay instruction, and continues interpreting instructions from there.
+*/
+auto KTech::Animation::Play() -> bool
 {
 	bool changedThisTick = false; // Render-on-demand
 	for (; m_i < m_instructions.size(); m_i++)
@@ -96,7 +120,7 @@ bool KTech::Animation::Play()
 			case Instruction::Type::Delay:
 			{
 				// Delay; invoke the next iteration
-				m_invocation = engine.time.Invoke(std::bind(&Animation::Play, this), m_instructions[m_i].intData, m_instructions[m_i].timeMeasurement);
+				m_invocation = engine.time.Invoke([this]() -> bool { return Play(); }, m_instructions[m_i].intData, m_instructions[m_i].timeMeasurement);
 				// Pause iterating
 				m_i++; // Don't reiterate this delay
 				return changedThisTick; // Don't set to true as delay changes nothing
@@ -106,7 +130,7 @@ bool KTech::Animation::Play()
 	return changedThisTick;
 }
 
-// Cancel invocations and prepares for a replay.
+//! @brief Stop animation by canceling the invoked instructions, and prepare for a re-`Play()`.
 void KTech::Animation::Stop()
 {
 	if (m_invocation != nullptr)
