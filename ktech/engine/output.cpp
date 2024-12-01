@@ -326,9 +326,11 @@ void KTech::Output::Print()
 }
 
 /*!
-	Check whether things changed and require a new render.
+	@brief Check whether things changed and require a new render.
 
-	The `Input`, `Memory` and `Time` engine components remember whether any user callback function returned `true` throughout the last tick. If any did, it means something has changed (like the position of an `Object` or the appearance of a `Texture`). In that case, this function will return true. This allows to "render-on-demand", i.e., avoiding rendering when certainly nothing has changed.
+	Various callback and virtual functions in KTech are expected to return a `bool` value (e.g. `OnTick()` virtual functions, and input callback functions registered at `CallbacksGroup::RegisterCallback()`). **They should return `true` if they changed something in the game's world, that might require the game to render a new frame. They should return `false` if they certainly did not change anything, meaning the game doesn't have to render a new frame.**
+
+	The `Input`, `Memory` and `Time` engine components remember whether any virtual or callback function returned `true` throughout the last tick. If any did, it means something has changed (like the position of an `Object` or the appearance of a `Texture`). In that case, this function will return true. This allows to "render-on-demand", i.e., avoiding rendering when certainly nothing has changed.
 
 	For best performance, use this function in conjunction with `Output::ShouldRenderThisTick()` (there is an example at its documentation entry):
 
