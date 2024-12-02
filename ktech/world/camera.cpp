@@ -192,6 +192,23 @@ void KTech::Camera::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t
 	return engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
 }
 
+/*!
+	@brief Virtual function called once each tick.
+
+	You can override this in your inherited class to add whatever functionality you want.
+
+	Called by `Memory::CallOnTicks()`.
+
+	@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
+
+	@see `Memory::CallOnTicks()`
+	@see `Output::ShouldRenderThisTick()`
+*/
+auto KTech::Camera::OnTick() -> bool
+{
+	return false;
+};
+
 inline void KTech::Camera::RenderBackground()
 {
 	// RESET image to background

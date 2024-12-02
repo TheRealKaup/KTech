@@ -64,19 +64,7 @@ public:
 	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
 
 protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		You can override this in your inherited class to add whatever functionality you want.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	inline virtual auto OnTick() -> bool { return false; };
+	virtual auto OnTick() -> bool;
 
 private:
 	inline void RenderBackground();
