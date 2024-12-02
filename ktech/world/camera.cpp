@@ -53,17 +53,16 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 
 	@param [in] engine Parent engine.
 	@param [in] parentMap Parent map to immediately enter.
-	@param [in] asActiveCamera Whether to set this `Camera` as the active one in the `Map`.
 	@param [in] position World position.
 	@param [in] resolution Image resolution.
 	@param [in] name String name.
 
 	@see `Map::m_activeCameraI`
 */
-KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_parentMap, bool p_asActiveCamera, Point p_position, UPoint p_resolution, const std::string& p_name)
+KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: Camera(p_engine, p_position, p_resolution)
 {
-	EnterMap(p_parentMap, p_asActiveCamera);
+	EnterMap(p_parentMap);
 }
 
 //! @brief Leave the parent map (if in one) and removed itself from `Memory`.
@@ -80,19 +79,18 @@ KTech::Camera::~Camera()
 	@brief Enter a parent `Map`.
 
 	@param map Parent map to enter.
-	@param asActiveCamera Whether to set this `Camera` as the active one in the `Map`.
 
 	@return True if joined given `Map`. False if already in given `Map`, given `Map` doesn't exist in `Memory`, or failed to join.
 
 	@see `Map::m_activeCameraI`
 */
-auto KTech::Camera::EnterMap(ID<Map>& p_map, bool p_asActiveCamera) -> bool
+auto KTech::Camera::EnterMap(ID<Map>& p_map) -> bool
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
 	{
 		return false;
 	}
-	return engine.memory.maps[p_map]->AddCamera(m_id, p_asActiveCamera);
+	return engine.memory.maps[p_map]->AddCamera(m_id);
 }
 
 /*!

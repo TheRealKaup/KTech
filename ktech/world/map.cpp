@@ -26,12 +26,21 @@
 #include "../engine/output.hpp"
 #include "../engine/engine.hpp"
 
+/*!
+	@fn Map::Map
+	@brief Construct a `Map`.
+	@param engine Parent `Engine`.
+	@param name String name.
+*/
 KTech::Map::Map(Engine& p_engine, std::string p_name)
 	: engine(p_engine), m_name(std::move(p_name))
 {
 	engine.memory.maps.Add(this);
 };
 
+/*!
+	@brief Remove all `Layer`s and `Camera`s, then remove itself from `Memory`.
+*/
 KTech::Map::~Map()
 {
 	Output::Log("<Map[" + m_name + "]::~Map()>", RGBColors::red);
@@ -40,6 +49,12 @@ KTech::Map::~Map()
 	engine.memory.maps.Remove(m_id);
 }
 
+/*!
+	@fn Map::AddLayer
+	@brief Add a `Layer`.
+	@param layer The `ID` of the `Layer` to add.
+	@return `true` if added the `Layer`. `false` if given `Layer` doesn't exist in `Memory`, or already in this `Map`.
+*/
 auto KTech::Map::AddLayer(ID<Layer>& p_layer) -> bool
 {
 	if (!engine.memory.layers.Exists(p_layer))
@@ -58,7 +73,13 @@ auto KTech::Map::AddLayer(ID<Layer>& p_layer) -> bool
 	return true;
 }
 
-auto KTech::Map::AddCamera(ID<Camera>& p_camera, bool p_asActiveCamera) -> bool
+/*!
+	@fn Map::AddCamera
+	@brief Add a `Camera`.
+	@param camera The `ID` of the `Camera` to add.
+	@return `true` if added the `Camera`. `false` if given `Camera` doesn't exist in `Memory`, or already in this `Map`.
+*/
+auto KTech::Map::AddCamera(ID<Camera>& p_camera) -> bool
 {
 	if (!engine.memory.cameras.Exists(p_camera))
 	{
@@ -73,13 +94,15 @@ auto KTech::Map::AddCamera(ID<Camera>& p_camera, bool p_asActiveCamera) -> bool
 	}
 	engine.memory.cameras[p_camera]->m_parentMap = m_id;
 	m_cameras.push_back(p_camera);
-	if (p_asActiveCamera)
-	{
-		m_activeCameraI = m_cameras.size() - 1;
-	}
 	return true;
 }
 
+/*!
+	@fn Map::RemoveLayer
+	@brief Remove a `Layer`.
+	@param layer The `ID` of the `Layer` to remove.
+	@return `true` if removed the `Layer`. `false` if the given `Layer` isn't contained by this `Map`.
+*/
 auto KTech::Map::RemoveLayer(ID<Layer>& p_layer) -> bool
 {
 	for (size_t i = 0; i < m_layers.size(); i++)
@@ -97,6 +120,12 @@ auto KTech::Map::RemoveLayer(ID<Layer>& p_layer) -> bool
 	return false;
 }
 
+/*!
+	@fn Map::RemoveCamera
+	@brief Remove a `Camera`.
+	@param camera The `ID` of the `Camera` to remove.
+	@return `true` if removed the `Camera`. `false` if the given `Camera` isn't contained by this `Map`.
+*/
 auto KTech::Map::RemoveCamera(ID<Camera>& p_camera) -> bool
 {
 	for (size_t i = 0; i < m_cameras.size(); i++)
@@ -114,7 +143,11 @@ auto KTech::Map::RemoveCamera(ID<Camera>& p_camera) -> bool
 	return false;
 }
 
-bool KTech::Map::RemoveAllLayers()
+/*!
+	@brief Remove all contained `Layer`s.
+	@return `true` if removed all `Layer`s. `false` if there are no `Layer`s in this `Map`.
+*/
+auto KTech::Map::RemoveAllLayers() -> bool
 {
 	if (m_layers.empty())
 	{
@@ -131,7 +164,10 @@ bool KTech::Map::RemoveAllLayers()
 	return true;
 }
 
-
+/*!
+	@brief Remove all contained `Camera`s.
+	@return `true` if removed all `Camera`s. `false` if there are no `Camera`s in this `Map`.
+*/
 auto KTech::Map::RemoveAllCameras() -> bool
 {
 	if (m_cameras.empty())
@@ -149,12 +185,19 @@ auto KTech::Map::RemoveAllCameras() -> bool
 	return true;
 }
 
-auto KTech::Map::Render() -> bool
+/*!
+	@brief Virtual function called once each tick.
+
+	You can override this in your inherited class to add whatever functionality you want.
+
+	Called by `Memory::CallOnTicks()`.
+
+	@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
+
+	@see `Memory::CallOnTicks()`
+	@see `Output::ShouldRenderThisTick()`
+*/
+auto KTech::Map::OnTick() -> bool
 {
-	if (m_activeCameraI >= 0 && m_activeCameraI < m_cameras.size())
-	{
-		engine.memory.cameras[m_cameras[m_activeCameraI]]->Render(m_layers);
-		return true;
-	}
 	return false;
-}
+};

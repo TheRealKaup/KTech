@@ -22,7 +22,7 @@ int main ()
 {
 	/*
 		Before initializing any game objects and such, we need a `KTech::Engine` class instance.
-		
+
 		The `Engine` class contains everything needed to manage a game and its world structures: input, output, collision, memory and time "engine components". Most of these engine components do their work completely on their own. They all initialize themselves when `Engine` is constructed and terminate when `Engine` is destructed, so you don't need to worry about them. Still, knowing about their existence comes in useful when looking for some engine function of variable you need, because virtually always, you are going to find it in one of the engine component classes.
 	*/
 
@@ -31,7 +31,7 @@ int main ()
 		KTech::UPoint(20, 20), // The game's image (or "viewport") size in terminal cells, which should ideally fit within the terminal's viewport.
 		24 // The ticks-per-second (TPS) limit; we'll cover this soon.
 	);
-	// You might find it convenient to instantiate `Engine` outside `main()`, especially when working on a larger-scale game. Feel free to do so; it doesn't matter to `Engine`. Beware, though, not to unintentionally create multiple `Engine` instances, as doing so would make some of the duplicate engine components fight each other and cause random and unexpected behavior. 
+	// You might find it convenient to instantiate `Engine` outside `main()`, especially when working on a larger-scale game. Feel free to do so; it doesn't matter to `Engine`. Beware, though, not to unintentionally create multiple `Engine` instances, as doing so would make some of the duplicate engine components fight each other and cause random and unexpected behavior.
 
 	/*
 		Now that we have an `Engine` instance, we can create world structures.
@@ -40,7 +40,7 @@ int main ()
 
 			Map              UI            `KTech::Map` stores `KTech::Layer`s and `KTech::Camera`s.
 			|_______         |             `KTech::Layer` stores `KTech::Object`s.
-			v      v         v             `KTech::UI` stores `KTech::Widget`s. 
+			v      v         v             `KTech::UI` stores `KTech::Widget`s.
 			Layer  Camera    Widget        `KTech::Widget` can store additional (nested) `KTech::Widget`s.
 			|                | ^
 			v                |_|
@@ -53,7 +53,7 @@ int main ()
 		engine, // `Engine` reference.
 		KTech::Point(5, 5) // Position the `Object` at X=5, Y=5.
 	);
-	
+
 	/*
 		World structures need this `Engine` reference to register themselves at its memory component, and access it later to communicate with other world structures. The memory engine component assigns world structures a serializable `KTech::ID` structure so they can store, access and call each other. You need not worry now about how `ID`s work, but know that you are going to use them a lot, and that they are the reason the first parameter of all world structure constructors is a required `Engine` reference.
 
@@ -62,7 +62,7 @@ int main ()
 
 
 		Our `Object` is empty, so let's give it `Texture`s.
-		
+
 		`Texture`s are 2D terminal bitmaps. Because they are terminal-apt, instead of the usual pixels you are familiar with, `Texture`s are composed of terminal cells, specifically, the `KTech::CellA` structure, which comprises a character, foreground (character) color and background color.
 
 		`Object`s store their `Texture`s as instances within a vector of `Texture`s by the name of `m_textures`. First we need to create blank `Texture`s by setting the vector to a size, and then draw on them.
@@ -78,7 +78,7 @@ int main ()
 			KTech::RGBA(255, 0, 255, 255), // Pink foreground color (the character's color).
 			KTech::RGBA(0, 255, 0, 255) // Blue background color (the cell's color behind the character).
 		),
-		KTech::Point(0, 0) // Position, relative to the `Texture`'s parent `Object`. Extremely useful when adding multiple `Texture`s to an `Object`. 
+		KTech::Point(0, 0) // Position, relative to the `Texture`'s parent `Object`. Extremely useful when adding multiple `Texture`s to an `Object`.
 	);
 
 	/*
@@ -87,7 +87,7 @@ int main ()
 
 
 		We've already came across a lot of KTech's "basic structures" (like `Point` and `CellA`). Let's quickly examine them all now before proceeding:
-		
+
 		- `KTech::Point` - 2D point made of signed integers. Usually represents a position.
 		- `KTech::UPoint` - like `Point` but made of unsigned integers (instead of signed integers). Usually represents a size.
 		- `KTech::RGB` - RGB (red, green, blue) color (24 bit depth).
@@ -111,14 +111,14 @@ int main ()
 
 	/*
 		Adding a child world structure to a parent world structure can be done in multiple ways:
-		
+
 		- From the child's constructor (if the parent was created first), e.g.:
 			`KTech::Object object1(engine, layer1.m_id);`
 		- Using the parent's "adder" function, e.g.:
 			`layer1.AddObject(object1.m_id);`
 		- Using the child's "enterer" functions, e.g.:
 			`object1.EnterLayer(layer1.m_id);`
-		
+
 		All methods result the same.
 
 
@@ -126,7 +126,7 @@ int main ()
 		`Layer`s and `Camera`s should be added to a `Map`. The option to have multiple `Layer`s with `Object`s in a `Map` means two major things:
 
 		- You can control the order `Object`s in a `Map` are rendered: `Layer`s are rendered in the order they were added to the `Map`, meaning `Object`s in a `Layer` added later will appear on top of `Object`s in a `Layer` added earlier.
-		- You can control which `Object`s can collide with each other by splitting them into `Layer`s. 
+		- You can control which `Object`s can collide with each other by splitting them into `Layer`s.
 
 		In a sense, `Layer`s are like physical "levels" or "floors" stacked on top of each other on the Z axis; `Object`s move on the X and Y axes so they can collide only with other `Object`s from the same Z level (i.e. `Layer`), while `Camera`s view the `Map` from the top of the Z axis so they can see all `Object`s from all `Layer`s.
 	*/
@@ -137,7 +137,6 @@ int main ()
 	KTech::Camera camera1(
 		engine,
 		map1.m_id, // Add `camera1` to `map1`.
-		true, // And do so as the "active" `Camera` in the `Map` (meaning the `Map` will use this `Camera` for rendering).
 		KTech::Point(0, 0), // Position the `Camera` at X=0, Y=0 (world's origin).
 		engine.output.resolution // `Engine::output` is the output engine component instance, and `Output::resolution` is the image size given to `Engine`'s constructor earlier.
 	);

@@ -23,7 +23,7 @@
 
 	When you come across something you don't know (that isn't about to be explained), pause, learn it, and only then come back; don't frustrate yourself and waste your time. I assume you know how to use the terminal and program C++ code, and that you cloned KTech's git repository to work on.
 
-	The tutorial is separated into chapters, each one is a C++ source file that usually contains a heavily-commented example of functional KTech code (this file, "1-introduction.cpp", is the very first chapter). You should read the tutorial linearly if you are new to KTech; literally read the individual files from top to bottom, and the chapters in an ascending order. 
+	The tutorial is separated into chapters, each one is a C++ source file that usually contains a heavily-commented example of functional KTech code (this file, "1-introduction.cpp", is the very first chapter). You should read the tutorial linearly if you are new to KTech; literally read the individual files from top to bottom, and the chapters in an ascending order.
 
 
 
@@ -34,7 +34,7 @@
 	First, generate build files. Ensure you have Premake installed on your system and run the following command from the root directory of your cloned repository ("gmake2" for GNU make files):
 		`$ premake5 gmake2`
 	Premake will read the "premake5.lua" configuration file present in the repository's root, which will in turn read the additional configuration files in KTech's and the tutorial's directories. The result is a directory named "build/" containing the build files for everything.
-	
+
 	Secondly, build. To generate binary files, run `make` on the GNU makefiles that were generated in the "build/" directory by Premake, as so:
 		`$ make -C build/`
 	`make` will build KTech as a static library, then this file and the following files in the tutorial as individual console applications. The result are executable binaries in "build/bin/".
@@ -47,7 +47,7 @@
 
 
 
-	As you can see below, this file literally contains C++ code. Continue reading linearly.	
+	As you can see below, this file literally contains C++ code. Continue reading linearly.
 */
 
 // "ktech/ktech.hpp" is KTech's main header file that you would normally include in your game. It will give you access to everything except the optional widgets (UI elements; we'll cover them later).
@@ -58,17 +58,17 @@ int main()
 {
 	// Create an engine instance; we'll dive deeper into this in the next chapter.
 	KTech::Engine engine(KTech::UPoint(9, 9), 24);
-	
+
 	// Everything in KTech is declared within the `KTech` namespace. You can declare a using-directive on it if you find it more convenient.
 	using namespace KTech;
 
 	/*
 		You can proceed to the next chapter.
-	*/	
+	*/
 
 	// Do a couple of other things that'll get explained later:
 	Map map(engine);
-	Camera camera(engine, map.m_id, true, Point(0, 0), engine.output.resolution);
+	Camera camera(engine, map.m_id, Point(0, 0), engine.output.resolution);
 	Layer layer(engine, map.m_id);
 	Object object(engine, layer.m_id, Point(2, 2));
 
@@ -93,7 +93,7 @@ int main()
 
 		if (engine.output.ShouldRenderThisTick())
 		{
-			map.Render();
+			camera.Render();
 			engine.output.Draw(camera.m_image, camera.m_res);
 			engine.output.Print();
 		}

@@ -314,7 +314,7 @@ int main()
 	camera.m_name = "camera";
 	KTech::Output::Log("<main()> Adding camera to map", RGBColors::blue);
 	// `Camera` to `ID<Camera>` cast overload
-	map.AddCamera(camera.m_id, true);
+	map.AddCamera(camera.m_id);
 
 	KTech::Object worldProps(engine, Point(1, 1), "worldProps");
 	worldProps.m_name = "worldProps";
@@ -397,7 +397,7 @@ int main()
 		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 
-		if (engine.output.ShouldRenderThisTick() && map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size())
+		if (engine.output.ShouldRenderThisTick())
 		{
 			if (charCamOn)
 			{
