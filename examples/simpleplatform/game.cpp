@@ -133,7 +133,7 @@ struct Character : Object
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
+			}, RGBA( 255, 255, 0, 255 ), RGBAColors::transparent, Point(0, 0)
 		);
 		m_textures[1].Simple(UPoint(3, 1), CellA('~', RGBAColors::gray, RGBA(255, 255, 255, 63)));
 		m_textures[1].m_active = false;
