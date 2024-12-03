@@ -32,7 +32,7 @@
 /*!
 	2D physical space for `Object`s.
 
-	`Object`s have a vector of these `Collider`s (`Object::m_colliders`), which serve as the representation of their physical space. These are used to process `Object` movement in `Collision::MoveObject()`.
+	`Object`s have a vector of these `Collider`s (`Object::m_colliders`), which represents their physical space. `Collider`s are used to process `Object` movement in `Collision::MoveObject()`.
 
 	Similarly to `Texture`, there are 2 forms of `Collider`s: "simple" and "complex".
 	- Simple colliders are just efficient filled rectangles, which take the least amount of processing and memory. So, you should prefer using simple `Collider`s.

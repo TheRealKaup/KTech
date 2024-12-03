@@ -32,15 +32,26 @@
 #include <string>
 #include <vector>
 
+/*!
+	A `CellA`-based sprite.
+
+	`Object`s and `Widget`s have a vector of these `Texture`s (`Object::m_textures` and `Widget::m_textures`, respectively), which represents their visual appearance. `Texture`s are used to render `Object`s and `Widget`s in `Camera::Render()` and `UI::Render()`, respectively.
+
+	Similarly to `Collider`, there are 2 forms of `Texture`s: "simple" and "complex".
+	- Simple `Texture`s are just efficient uniform rectangles, which take the least amount of processing and memory. So, you should prefer using simple `Texture`s.
+	- Complex `Texture`s are 2D bitmaps of `CellA`s which allow them to hold a detailed shape (in contrary to a uniform rectangle). This makes them the least efficient in terms of processing and memory. So, minimize your use of complex `Texture`s to when you need such detailed shapes.
+
+	`Texture` has various functions to design itself. These functions can be "chained", because they all return a self-reference. Also note that some of these functions have an override that accepts a new a relative position to set. Usually you will first call one of the overrides that sets a relative position, and then continue using the ones that don't to further design the `Texture`.
+*/
 struct KTech::Texture
 {
-	bool m_active = true;
+	bool m_active = true; //!< Activation status: `true` means enabled. `false` means disabled, and will be skipped in rendering.
 
-	bool m_simple;
-	CellA m_value;
-	Point m_rPos;
-	UPoint m_size;
-	std::vector<CellA> m_t;
+	bool m_simple; //!< `true` means simple, `false` means complex.
+	CellA m_value; //!< Uniform value (applies only to simple `Texture`s).
+	Point m_rPos; //!< Position relative to the parent `Object` or `Widget`.
+	UPoint m_size; //!< Rectangle size (used in both simple and complex `Texture`s).
+	std::vector<CellA> m_t; //!< 1D vector of the 2D bitmap (used only in complex `Texture`s).
 
 	auto Simple(UPoint size, CellA value) -> Texture&;
 	auto Simple(UPoint size, CellA value, Point relativePosition) -> Texture&;
@@ -50,7 +61,6 @@ struct KTech::Texture
 	auto File(const std::filesystem::path& filePath, Point relativePosition) -> Texture&;
 	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background) -> Texture&;
 	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition) -> Texture&;
-	// Creates "missing texture"
 	auto Null() -> Texture&;
 	auto Null(Point relativePosition) -> Texture&;
 
@@ -69,6 +79,5 @@ struct KTech::Texture
 	auto ReplaceCharacter(char oldValue, char newValue) -> Texture&;
 
 	void ExportToFile(const std::filesystem::path& filePath) const;
-	// For debugging
 	void Print();
 };
