@@ -28,17 +28,22 @@
 #include "collider.hpp"
 #include "texture.hpp"
 
+/*!
+	World structure that comprises `Texture`s and `Collider`s, and exists within `Layer`.
+
+	This and `Widget` are the most commonly inherited-from world structure. It differs from `Widget` because it can contain `Collider`s, while `Widget` is limited to `Texture`s. `Widget` also has some additional features which are useful for user-interfaces. You can conveniently make player-controlled classes based on `Object`, such as walking characters (see "simpleplatform" game example).
+*/
 class KTech::Object
 {
 public:
-	Engine& engine;
-	ID<Object> m_id;
-	std::string m_name;
-	ID<Layer> m_parentLayer;
+	Engine& engine; //!< Parent `Engine`.
+	ID<Object> m_id; //!< Personal `ID`.
+	std::string m_name; //!< String name.
+	ID<Layer> m_parentLayer; //!< Parent `Layer`.
 
-	Point m_pos;
-	std::vector<Texture> m_textures = {};
-	std::vector<Collider> m_colliders = {};
+	Point m_pos; //!< World position.
+	std::vector<Texture> m_textures = {}; //!< `Texture`s.
+	std::vector<Collider> m_colliders = {}; //!< `Collider`s.
 
 	Object(Engine& engine, Point position = Point(0, 0), std::string name = "");
 	Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), std::string name = "");
@@ -50,16 +55,16 @@ public:
 	auto Move(Point direction) -> bool;
 
 protected:
-	inline virtual auto OnTick() -> bool { return false; };
-	inline virtual void OnMove(Point direction) {};
-	inline virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) pushed this object.
-	inline virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object pushed a different object (`otherObject`)
-	inline virtual void OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) blocked this object
-	inline virtual void OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object blocked a different object (`otherObject`)
-	inline virtual void OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object entered an overlap with a different object (`otherObject`)
-	inline virtual void OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // This object exited an overlap with a different object (`otherObject`)
-	inline virtual void OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) entered an overlap with this object
-	inline virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {} // A different object (`otherObject`) exited an overlap with this object
+	virtual auto OnTick() -> bool;
+	virtual void OnMove(Point direction);
+	virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
+	virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	friend class KTech::Collision;
 	friend class KTech::Memory;
