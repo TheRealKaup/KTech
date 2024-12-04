@@ -27,7 +27,7 @@
 #include "rgba.hpp"
 #include "../utility/rgbacolors.hpp"
 
-//!< Like `CellA`, but with `RGBA` foreground and background colors, instead of `RGB`.
+//! Like `CellA`, but with `RGBA` foreground and background colors, instead of `RGB`.
 struct KTech::CellA
 {
 	RGBA f; //!< Foreground (character) color.
@@ -36,25 +36,25 @@ struct KTech::CellA
 
 	/*!
 		@brief Construct a `CellA`.
-		@param character ASCII character.
-		@param foreground Foreground (character) color.
-		@param background Background color.
+		@param [in] character ASCII character.
+		@param [in] foreground Foreground (character) color.
+		@param [in] background Background color.
 	*/
 	constexpr CellA(char character = ' ', RGBA foreground = RGBAColors::transparent, RGBA background = RGBAColors::transparent)
 		: c(character), f(foreground), b(background) {}
 
 	/*!
 		@brief Construct a `CellA` from a `Cell`.
-		@param cell Base `Cell`.
-		@param foregroundAlpha Alpha to add to the foreground (character) color.
-		@param backgroundAlpha Alpha to add to the background color.
+		@param [in] cell Base `Cell`.
+		@param [in] foregroundAlpha Alpha to add to the foreground (character) color.
+		@param [in] backgroundAlpha Alpha to add to the background color.
 	*/
 	constexpr CellA(Cell cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)
 		: c(cell.c), f(cell.f, foregroundAlpha), b(cell.b, backgroundAlpha) {}
 
 	/*!
 		@brief Compare 2 `CellA`s.
-		@param cellA The `CellA` to compare with this `CellA`.
+		@param [in] cellA The `CellA` to compare with this `CellA`.
 		@return `true`: the foreground colors, background colors, and characters are equal. `false`: they are unequal.
 	*/
 	constexpr auto operator==(const CellA& cellA) const -> bool

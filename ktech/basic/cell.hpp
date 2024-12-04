@@ -35,16 +35,16 @@ struct KTech::Cell
 
 	/*!
 		@brief Construct a `Cell`.
-		@param character ASCII character.
-		@param foreground Foreground (character) color.
-		@param background Background color.
+		@param [in] character ASCII character.
+		@param [in] foreground Foreground (character) color.
+		@param [in] background Background color.
 	*/
 	constexpr Cell(char character = ' ', RGB foreground = RGBColors::black, RGB background = RGBColors::black)
 		: c(character), f{foreground}, b(background) {}
 
 	/*!
 		@brief Compare 2 `Cell`s.
-		@param cell The `Cell` to compare with this `Cell`.
+		@param [in] cell The `Cell` to compare with this `Cell`.
 		@return `true`: the foreground colors, background colors, and characters are equal. `false`: they are unequal.
 	*/
 	constexpr auto operator==(const Cell& cell) const -> bool

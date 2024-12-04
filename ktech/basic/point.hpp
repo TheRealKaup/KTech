@@ -25,36 +25,62 @@
 #undef KTECH_DEFINITION
 #include "upoint.hpp"
 
+//! 2D vector, mostly used to store positions and directions.
 struct KTech::Point
 {
-	int32_t x, y;
+	int32_t x; //!< X axis (+ right, - left).
+	int32_t y; //!< Y axis (+ down, - up).
 
+	/*!
+		@brief Construct a `Point`.
+		@param [in] x X axis.
+		@param [in] y Y axis.
+	*/
 	constexpr Point(int32_t x = 0, int32_t y = 0)
 		: x(x), y(y) {}
 
+	/*!
+		@brief Construct a `Point` from a `UPoint`.
+		@param [in] uPoint Base `UPoint`.
+	*/
 	constexpr Point(const UPoint& uPoint)
 		: x(uPoint.x), y(uPoint.y) {}
 
+	/*!
+		@brief Compare 2 `Point`s.
+		@param [in] point The `Point` to compare with this `Point`.
+		@return `true`: the X and Y axes are equal. `false`: they are unequal.
+	*/
 	constexpr auto operator==(const Point& point) const -> bool
 	{
 		return (x == point.x) && (y == point.y);
 	}
 
-	constexpr auto operator!=(const Point& point) const -> bool
-	{
-		return !(*this == point);
-	}
-
+	/*!
+		@brief Add 2 `Point`s together.
+		@param [in] point The `Point` to add with this `Point`.
+		@return New `Point` with the sum of the 2 `Point`s.
+	*/
 	constexpr auto operator+(const Point& point) const -> Point
 	{
 		return {x + point.x, y + point.y};
 	}
 
+	/*!
+		@brief Subtract `Point` from another.
+		@param [in] point The `Point` to subtract from this `Point`.
+		@return New `Point` with the difference between the 2 `Point`s.
+	*/
 	constexpr auto operator-(const Point& point) const -> Point
 	{
 		return {x - point.x, y - point.y};
 	}
 
+	/*!
+		@brief Add a `Point` to this `Point`.
+		@param [in] point The `Point` to add to this `Point`.
+		@return Self-reference (for function chaining).
+	*/
 	constexpr auto operator+=(const Point& point) -> Point&
 	{
 		x += point.x;
@@ -62,6 +88,11 @@ struct KTech::Point
 		return *this;
 	}
 
+	/*!
+		@brief Subtract a `Point` from this `Point`.
+		@param [in] point The `Point` to subtract from this `Point`.
+		@return Self-reference (for function chaining).
+	*/
 	constexpr auto operator-=(const Point& point) -> Point&
 	{
 		x -= point.x;
