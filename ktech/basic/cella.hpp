@@ -27,25 +27,38 @@
 #include "rgba.hpp"
 #include "../utility/rgbacolors.hpp"
 
+//!< Like `CellA`, but with `RGBA` foreground and background colors, instead of `RGB`.
 struct KTech::CellA
 {
-	RGBA f;
-	RGBA b;
-	char c;
+	RGBA f; //!< Foreground (character) color.
+	RGBA b; //!< Background color.
+	char c; //!< ASCII character.
 
+	/*!
+		@brief Construct a `CellA`.
+		@param character ASCII character.
+		@param foreground Foreground (character) color.
+		@param background Background color.
+	*/
 	constexpr CellA(char character = ' ', RGBA foreground = RGBAColors::transparent, RGBA background = RGBAColors::transparent)
 		: c(character), f(foreground), b(background) {}
 
+	/*!
+		@brief Construct a `CellA` from a `Cell`.
+		@param cell Base `Cell`.
+		@param foregroundAlpha Alpha to add to the foreground (character) color.
+		@param backgroundAlpha Alpha to add to the background color.
+	*/
 	constexpr CellA(Cell cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)
 		: c(cell.c), f(cell.f, foregroundAlpha), b(cell.b, backgroundAlpha) {}
 
+	/*!
+		@brief Compare 2 `CellA`s.
+		@param cellA The `CellA` to compare with this `CellA`.
+		@return `true`: the foreground colors, background colors, and characters are equal. `false`: they are unequal.
+	*/
 	constexpr auto operator==(const CellA& cellA) const -> bool
 	{
 		return (c == cellA.c) && (f == cellA.f) && (b == cellA.b);
-	}
-
-	constexpr auto operator!=(const CellA& cellA) const -> bool
-	{
-		return !(*this == cellA);
 	}
 };
