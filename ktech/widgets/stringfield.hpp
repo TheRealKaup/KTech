@@ -40,17 +40,17 @@ public:
 	/*!
 		@brief Construct a `StringField`.
 
-		@param engine Parent `Engine`.
-		@param ui `KTech::UI` to immediately enter.
-		@param OnInsert Function to call when the user inserts or removes a digit.
-		@param allowedCharacters Vector of character pairs, representing the allowed characters (e.g. {StringField::charRange_all}, {{'a', 'c'}, {'x', 'z'}}).
-		@param position World position.
-		@param text Text to the left of the entered string.
-		@param maxChars Maximum allowed characters.
-		@param defaultString The default string (e.g. `"abc"`, `"  abc  "`).
-		@param withFrame Whether to add a frame around the text and entered string.
-		@param unselected Foreground (text and frame) color set when `StringField` is unselected.
-		@param selected Foreground color set when `StringField` is selected.
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] OnInsert Function to call when the user inserts or removes a digit.
+		@param [in] allowedCharacters Vector of character pairs, representing the allowed characters (e.g. {StringField::charRange_all}, {{'a', 'c'}, {'x', 'z'}}).
+		@param [in] position World position.
+		@param [in] text Text to the left of the entered string.
+		@param [in] maxChars Maximum allowed characters.
+		@param [in] defaultString The default string (e.g. `"abc"`, `"  abc  "`).
+		@param [in] withFrame Whether to add a frame around the text and entered string.
+		@param [in] unselected Foreground (text and frame) color set when `StringField` is unselected.
+		@param [in] selected Foreground color set when `StringField` is selected.
 	*/
 	StringField(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
@@ -80,8 +80,8 @@ public:
 	/*!
 		@brief Change the displayed text.
 
-		@param text Text to the left of the entered string.
-		@param withFrame Whether to add a frame around the text and entered string.
+		@param [in] text Text to the left of the entered string.
+		@param [in] withFrame Whether to add a frame around the text and entered string.
 	*/
 	void SetText(const std::string& text, bool withFrame)
 	{
@@ -110,7 +110,7 @@ public:
 
 	/*!
 		@brief Change the entered string.
-		@param value New string (e.g. `"abc"`, `"  abc   "`).
+		@param [in] value New string (e.g. `"abc"`, `"  abc   "`).
 	*/
 	void SetValue(const std::string& value)
 	{

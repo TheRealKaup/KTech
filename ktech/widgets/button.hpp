@@ -28,21 +28,21 @@
 class Button : public KTech::Widget
 {
 public:
-	std::function<void()> m_OnPress; //!< Function to call.
+	std::function<void()> m_OnPress; //!< Function to call when pressed.
 
 	/*!
 		@brief Construct a `Button`.
 
-		@param engine Parent `Engine`.
-		@param ui `KTech::UI` to immediately enter.
-		@param OnPress Callback function.
-		@param key Key needed to press the `Button` (when it is selected).
-		@param position World position.
-		@param text Text within button.
-		@param withFrame Whether to add a frame around the text.
-		@param unselected Foreground (text and frame) color set when `Button` is unselected.
-		@param selected Foreground color set when `Button` is selected.
-		@param down Foreground color set when `Button` is being pressed.
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] OnPress Callback function.
+		@param [in] key Key needed to press the `Button` (when it is selected).
+		@param [in] position World position.
+		@param [in] text Text within the `Button`.
+		@param [in] withFrame Whether to add a frame around the text.
+		@param [in] unselected Foreground (text and frame) color set when `Button` is unselected.
+		@param [in] selected Foreground color set when `Button` is selected.
+		@param [in] down Foreground color set when `Button` is being pressed.
 	*/
 	Button(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
@@ -74,8 +74,8 @@ public:
 	/*!
 		@brief Change the displayed text.
 
-		@param text Text within button.
-		@param withFrame Whether to add a frame around the text.
+		@param [in] text Text within the `Button`.
+		@param [in] withFrame Whether to add a frame around the text.
 	*/
 	void SetText(const std::string& text, bool withFrame)
 	{

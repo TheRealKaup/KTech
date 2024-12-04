@@ -31,12 +31,12 @@ public:
 	/*!
 		@brief Construct a `Frame`.
 
-		@param engine Parent `Engine`.
-		@param ui `KTech::UI` to immediately enter.
-		@param position World position.
-		@param size Frame's size.
-		@param unselected Foreground (text and frame) color set when `Frame` is unselected.
-		@param selected Foreground color set when `Frame` is selected.
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] position World position.
+		@param [in] size Frame's size.
+		@param [in] unselected Foreground (text and frame) color set when `Frame` is unselected.
+		@param [in] selected Foreground color set when `Frame` is selected.
 	*/
 	Frame(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
@@ -53,7 +53,7 @@ public:
 	/*!
 		@brief Resize the frame.
 
-		@param size New size.
+		@param [in] size New size.
 	*/
 	void SetSize(KTech::UPoint size)
 	{

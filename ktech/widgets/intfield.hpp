@@ -35,17 +35,17 @@ public:
 	/*!
 		@brief Construct an `IntField`.
 
-		@param engine Parent `Engine`.
-		@param ui `KTech::UI` to immediately enter.
-		@param OnInsert Function to call when the user inserts or removes a digit.
-		@param min Minimum number allowed.
-		@param max Maximum number allowed.
-		@param defaultNum String representing the default number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
-		@param position World position.
-		@param text Text to the left of the entered number.
-		@param withFrame Whether to add a frame around the text and entered number.
-		@param unselected Foreground (text and frame) color set when `IntField` is unselected.
-		@param selected Foreground color set when `IntField` is selected.
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] OnInsert Function to call when the user inserts or removes a digit.
+		@param [in] min Minimum number allowed.
+		@param [in] max Maximum number allowed.
+		@param [in] defaultNum String representing the default number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
+		@param [in] position World position.
+		@param [in] text Text to the left of the entered number.
+		@param [in] withFrame Whether to add a frame around the text and entered number.
+		@param [in] unselected Foreground (text and frame) color set when `IntField` is unselected.
+		@param [in] selected Foreground color set when `IntField` is selected.
 	*/
 	IntField(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
@@ -83,8 +83,8 @@ public:
 	/*!
 		@brief Change the displayed text.
 
-		@param text Text to the left of the entered number.
-		@param withFrame Whether to add a frame around the text and entered number.
+		@param [in] text Text to the left of the entered number.
+		@param [in] withFrame Whether to add a frame around the text and entered number.
 	*/
 	void SetText(const std::string& text, bool withFrame)
 	{
@@ -111,7 +111,7 @@ public:
 
 	/*!
 		@brief Change the entered number.
-		@param number String representing the new number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
+		@param [in] number String representing the new number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
 	*/
 	void SetValue(const std::string& number)
 	{

@@ -31,12 +31,12 @@ public:
 	/*!
 		@brief Construct an `AboutBox`.
 
-		@param engine Parent `Engine`.
-		@param ui `KTech::UI` to immediately enter.
-		@param position World position.
-		@param text Text to display.
-		@param foreground Foreground (text and frame) color.
-		@param background Background color.
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] position World position.
+		@param [in] text Text to display.
+		@param [in] foreground Foreground (text and frame) color.
+		@param [in] background Background color.
 	*/
 	AboutBox(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
@@ -53,7 +53,7 @@ public:
 	/*!
 		@brief Change the displayed text.
 
-		@param text Text to display.
+		@param [in] text Text to display.
 	*/
 	void SetText(const std::vector<std::string>& text)
 	{
