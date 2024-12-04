@@ -31,7 +31,7 @@
 /*!
 	World structure that comprises `Texture`s and `Collider`s, and exists within `Layer`.
 
-	This and `Widget` are the most commonly inherited-from world structure. It differs from `Widget` because it can contain `Collider`s, while `Widget` is limited to `Texture`s. `Widget` also has some additional features which are useful for user-interfaces. You can conveniently make player-controlled classes based on `Object`, such as walking characters (see "simpleplatform" game example).
+	This and `Widget` are the most commonly inherited-from world structures. It differs from `Widget` because it can contain `Collider`s, while `Widget` is limited to `Texture`s. `Widget` also has some additional features which are useful for user-interfaces. You can conveniently make player-controlled classes based on `Object`, such as walking characters (see "simpleplatform" game example).
 */
 class KTech::Object
 {
