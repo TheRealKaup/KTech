@@ -55,7 +55,7 @@ public:
 	};
 
 	Engine& engine; //!< Parent `Engine`.
-	ID<Widget> m_id; //!< Personal `ID`.
+	const ID<Widget> m_id{ID<Widget>::Unique()}; //!< Personal `ID`.
 	std::string m_name; //!< String name.
 	ID<UI> m_parentUI; //!< The `UI` containing this `Widget`.
 	ID<Widget> m_parentWidget = nullID<Widget>; //!< Undocumented because it's planned to change (see GitHub issue #106).
@@ -68,15 +68,15 @@ public:
 	Input::CallbacksGroup m_callbacksGroup; //!< Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
 
 	Widget(Engine& engine, Point position = Point(0, 0), std::string name = "");
-	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), std::string name = "");
+	Widget(Engine& engine, const ID<UI>& parentUI, Point position = Point(0, 0), std::string name = "");
 	virtual ~Widget();
 
-	auto AddWidget(ID<Widget> widget) -> bool;
-	auto RemoveWidget(ID<Widget> widget) -> bool;
+	auto AddWidget(const ID<Widget>& widget) -> bool;
+	auto RemoveWidget(const ID<Widget>& widget) -> bool;
 	auto RemoveAllWidgets() -> bool;
 
-	auto EnterWidget(ID<Widget> widget) -> bool;
-	auto EnterUI(ID<UI> ui) -> bool;
+	auto EnterWidget(const ID<Widget>& widget) -> bool;
+	auto EnterUI(const ID<UI>& ui) -> bool;
 	auto LeaveWidget() -> bool;
 	auto LeaveUI() -> bool;
 

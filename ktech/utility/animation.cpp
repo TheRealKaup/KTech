@@ -33,7 +33,7 @@
 
 	@see `Animation::Play()`
 */
-KTech::Animation::Animation(Engine& p_engine, ID<Object>& p_object, const std::vector<Instruction>& p_instructions)
+KTech::Animation::Animation(Engine& p_engine, const ID<Object>& p_object, const std::vector<Instruction>& p_instructions)
 	: engine(p_engine), m_object(p_object), m_instructions(p_instructions) {}
 
 //! @brief Safely cancels invoked animation instructions.

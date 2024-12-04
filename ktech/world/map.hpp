@@ -35,7 +35,7 @@ class KTech::Map
 {
 public:
 	Engine& engine; //!< Parent `Engine`.
-	ID<Map> m_id; //!< Personal `ID`.
+	const ID<Map> m_id{ID<Map>::Unique()}; //!< Personal `ID`.
 	std::string m_name; //!< String name.
 	std::vector<ID<Camera>> m_cameras = {}; //!< Contained `Camera`s
 	std::vector<ID<Layer>> m_layers = {}; //!< Contained `Layer`s
@@ -43,11 +43,11 @@ public:
 	Map(Engine& engine, std::string name = "");
 	virtual ~Map();
 
-	auto AddLayer(ID<Layer>& layer) -> bool;
-	auto AddCamera(ID<Camera>& camera) -> bool;
+	auto AddLayer(const ID<Layer>& layer) -> bool;
+	auto AddCamera(const ID<Camera>& camera) -> bool;
 
-	auto RemoveLayer(ID<Layer>& layer) -> bool;
-	auto RemoveCamera(ID<Camera>& camera) -> bool;
+	auto RemoveLayer(const ID<Layer>& layer) -> bool;
+	auto RemoveCamera(const ID<Camera>& camera) -> bool;
 	auto RemoveAllLayers() -> bool;
 	auto RemoveAllCameras() -> bool;
 

@@ -60,10 +60,10 @@ namespace KTech
 	class Engine;
 	// Defined in `utility/`
 	class Animation;
-	template<class T>
+	template<typename T>
 	struct ID;
-	template<class T>
-	constexpr ID<T> nullID = ID<T>(0, 0);
+	template<typename T>
+	constexpr ID<T> nullID;
 	template<typename T>
 	class CachingRegistry;
 	namespace RGBColors {}

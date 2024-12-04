@@ -45,7 +45,7 @@ KTech::Layer::Layer(Engine& p_engine, std::string p_name)
 	@param [in] parentMap `Map` to enter.
 	@param [in] name String name.
 */
-KTech::Layer::Layer(Engine& p_engine, ID<Map>& p_parentMap, std::string p_name)
+KTech::Layer::Layer(Engine& p_engine, const ID<Map>& p_parentMap, std::string p_name)
 	: Layer(p_engine, std::move(p_name))
 {
 	EnterMap(p_parentMap);
@@ -80,7 +80,7 @@ auto KTech::Layer::operator[](size_t p_index) -> ID<Object>&
 	@param [in] object The `Object` to add.
 	@return `true` if added the `Object`. `false` if `Object` doesn't exist in `Memory` or already contained by `Layer`.
 */
-auto KTech::Layer::AddObject(ID<Object>& p_object) -> bool
+auto KTech::Layer::AddObject(const ID<Object>& p_object) -> bool
 {
 	if (!engine.memory.objects.Exists(p_object))
 	{
@@ -104,7 +104,7 @@ auto KTech::Layer::AddObject(ID<Object>& p_object) -> bool
 	@param [in] object Reference to the `Object`'s `ID`.
 	@return `true` if removed. `false` if doesn't exist in `Memory`, or isn't in `Layer`.
 */
-auto KTech::Layer::RemoveObject(ID<Object>& p_object) -> bool
+auto KTech::Layer::RemoveObject(const ID<Object>& p_object) -> bool
 {
 	for (size_t i = 0; i < m_objects.size(); i++)
 	{
@@ -148,7 +148,7 @@ auto KTech::Layer::RemoveAllObjects() -> bool
 	@param [in] map The `Map` to enter.
 	@return `true` if entered `Map`. `false` if given `Map` doesn't exist in `Memory` or already the parent `Map`.
 */
-auto KTech::Layer::EnterMap(ID<Map>& p_map) -> bool
+auto KTech::Layer::EnterMap(const ID<Map>& p_map) -> bool
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
 	{

@@ -25,27 +25,27 @@
 #include "../engine/engine.hpp"
 
 /*!
-	@fn KTech::Widget::Widget(KTech::Engine& engine, KTech::Point position, std::string name)
+	@fn KTech::Widget::Widget(Engine& engine, Point position, std::string name)
 	@brief Construct a `Widget`.
 	@param engine Parent `Engine`.
 	@param position World position.
 	@param name String name.
 */
-KTech::Widget::Widget(KTech::Engine& p_engine, KTech::Point p_position, std::string p_name)
+KTech::Widget::Widget(Engine& p_engine, Point p_position, std::string p_name)
 	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbacksGroup(engine, false)
 {
 	engine.memory.widgets.Add(this);
 }
 
 /*!
-	@fn KTech::Widget::Widget(KTech::Engine& engine, KTech::ID<KTech::UI> parentUI, KTech::Point position, std::string name)
+	@fn KTech::Widget::Widget(Engine& engine, ID<KTechUI> parentUI, Point position, std::string name)
 	@brief Construct a `Widget` and immediately enter a `UI`.
 	@param engine Parent `Engine`.
 	@param parentUI The `UI` to enter.
 	@param position World position.
 	@param name String name.
 */
-KTech::Widget::Widget(KTech::Engine& p_engine, KTech::ID<KTech::UI> p_parentUI, KTech::Point p_position, std::string p_name)
+KTech::Widget::Widget(Engine& p_engine, const ID<UI>& p_parentUI, Point p_position, std::string p_name)
 	: Widget(p_engine, p_position, std::move(p_name))
 {
 	EnterUI(p_parentUI);
@@ -67,7 +67,7 @@ KTech::Widget::~Widget()
 /*!
 	@brief Undocumented due to planned changes (see GitHub issue #106).
 */
-auto KTech::Widget::AddWidget(ID<Widget> p_widget) -> bool
+auto KTech::Widget::AddWidget(const ID<Widget>& p_widget) -> bool
 {
 	if (!engine.memory.widgets.Exists(p_widget))
 	{
@@ -92,7 +92,7 @@ auto KTech::Widget::AddWidget(ID<Widget> p_widget) -> bool
 /*!
 	@brief Undocumented due to planned changes (see GitHub issue #106).
 */
-auto KTech::Widget::RemoveWidget(ID<Widget> p_widget) -> bool
+auto KTech::Widget::RemoveWidget(const ID<Widget>& p_widget) -> bool
 {
 	for (size_t i = 0; i < m_childWidgets.size(); i++)
 	{
@@ -132,7 +132,7 @@ auto KTech::Widget::RemoveAllWidgets() -> bool
 /*!
 	@brief Undocumented due to planned changes (see GitHub issue #106).
 */
-auto KTech::Widget::EnterWidget(ID<Widget> p_widget) -> bool
+auto KTech::Widget::EnterWidget(const ID<Widget>& p_widget) -> bool
 {
 	if (p_widget == m_parentWidget || p_widget == m_id || !engine.memory.widgets.Exists(p_widget))
 	{
@@ -160,7 +160,7 @@ auto KTech::Widget::LeaveWidget() -> bool
 	@param ui The `UI` to enter.
 	@return `true` if entered the given `UI`. `false` if the given `UI` is already the parent `UI`, doesn't exist in `Memory`, or failed to add this `Widget`.
 */
-auto KTech::Widget::EnterUI(ID<UI> p_ui) -> bool
+auto KTech::Widget::EnterUI(const ID<UI>& p_ui) -> bool
 {
 	if (p_ui == m_parentUI || !engine.memory.uis.Exists(p_ui))
 	{

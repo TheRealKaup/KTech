@@ -53,7 +53,7 @@ KTech::UI::~UI()
 	@param widget The `Widget` to add.
 	@return `true` if added `Widget`. `false` if `Widget` doesn't exist in `Memory` or already contained by this `UI`.
 */
-auto KTech::UI::AddWidget(ID<Widget>& p_widget) -> bool
+auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 {
 	if (!engine.memory.widgets.Exists(p_widget))
 	{
@@ -77,7 +77,7 @@ auto KTech::UI::AddWidget(ID<Widget>& p_widget) -> bool
 	@param widget The `Widget` to remove.
 	@return `true` if removed `Widget`. `false` if `Widget` is not contained by this `UI`.
 */
-auto KTech::UI::RemoveWidget(ID<Widget>& p_widget) -> bool
+auto KTech::UI::RemoveWidget(const ID<Widget>& p_widget) -> bool
 {
 	for (size_t i = 0; i < m_widgets.size(); i++)
 	{

@@ -46,7 +46,7 @@ class KTech::UI
 {
 public:
 	Engine& engine; //!< Parent `Engine`.
-	ID<UI> m_id; //!< Personal `ID`.
+	const ID<UI> m_id{ID<UI>::Unique()}; //!< Personal `ID`.
 	std::string m_name; //!< String name
 	std::vector<ID<Widget>> m_widgets; //!< Contained `Widget`s.
 
@@ -60,8 +60,8 @@ public:
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), std::string name = "");
 	virtual ~UI();
 
-	auto AddWidget(ID<Widget>& widget) -> bool;
-	auto RemoveWidget(ID<Widget>& widget) -> bool;
+	auto AddWidget(const ID<Widget>& widget) -> bool;
+	auto RemoveWidget(const ID<Widget>& widget) -> bool;
 	auto RemoveAllWidgets() -> bool;
 
 	void Resize(UPoint resolution);

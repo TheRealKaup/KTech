@@ -55,7 +55,7 @@ KTech::Map::~Map()
 	@param layer The `ID` of the `Layer` to add.
 	@return `true` if added the `Layer`. `false` if given `Layer` doesn't exist in `Memory`, or already in this `Map`.
 */
-auto KTech::Map::AddLayer(ID<Layer>& p_layer) -> bool
+auto KTech::Map::AddLayer(const ID<Layer>& p_layer) -> bool
 {
 	if (!engine.memory.layers.Exists(p_layer))
 	{
@@ -79,7 +79,7 @@ auto KTech::Map::AddLayer(ID<Layer>& p_layer) -> bool
 	@param camera The `ID` of the `Camera` to add.
 	@return `true` if added the `Camera`. `false` if given `Camera` doesn't exist in `Memory`, or already in this `Map`.
 */
-auto KTech::Map::AddCamera(ID<Camera>& p_camera) -> bool
+auto KTech::Map::AddCamera(const ID<Camera>& p_camera) -> bool
 {
 	if (!engine.memory.cameras.Exists(p_camera))
 	{
@@ -103,7 +103,7 @@ auto KTech::Map::AddCamera(ID<Camera>& p_camera) -> bool
 	@param layer The `ID` of the `Layer` to remove.
 	@return `true` if removed the `Layer`. `false` if the given `Layer` isn't contained by this `Map`.
 */
-auto KTech::Map::RemoveLayer(ID<Layer>& p_layer) -> bool
+auto KTech::Map::RemoveLayer(const ID<Layer>& p_layer) -> bool
 {
 	for (size_t i = 0; i < m_layers.size(); i++)
 	{
@@ -126,7 +126,7 @@ auto KTech::Map::RemoveLayer(ID<Layer>& p_layer) -> bool
 	@param camera The `ID` of the `Camera` to remove.
 	@return `true` if removed the `Camera`. `false` if the given `Camera` isn't contained by this `Map`.
 */
-auto KTech::Map::RemoveCamera(ID<Camera>& p_camera) -> bool
+auto KTech::Map::RemoveCamera(const ID<Camera>& p_camera) -> bool
 {
 	for (size_t i = 0; i < m_cameras.size(); i++)
 	{

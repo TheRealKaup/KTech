@@ -40,7 +40,7 @@ class KTech::Layer
 {
 public:
 	Engine& engine; //!< Parent `Engine`
-	ID<Layer> m_id; //!< Personal `ID`
+	const ID<Layer> m_id{ID<Layer>::Unique()}; //!< Personal `ID`.
 	std::string m_name; //!< String anme; could be useful in debugging.
 	ID<Map> m_parentMap; //!< Parent `Map`.
 	std::vector<ID<Object>> m_objects; //!< Contained `Object`s.
@@ -51,16 +51,16 @@ public:
 	RGBA m_brgba = RGBAColors::transparent; //!< Background color added by `Camera` after rendering contained `Object`s.
 
 	Layer(Engine& engine, std::string name = "");
-	Layer(Engine& engine, ID<Map>& parentMap, std::string name = "");
+	Layer(Engine& engine, const ID<Map>& parentMap, std::string name = "");
 	virtual ~Layer();
 
 	auto operator[](size_t index) -> ID<Object>&;
 
-	auto AddObject(ID<Object>& object) -> bool;
-	auto RemoveObject(ID<Object>& object) -> bool;
+	auto AddObject(const ID<Object>& object) -> bool;
+	auto RemoveObject(const ID<Object>& object) -> bool;
 	auto RemoveAllObjects() -> bool;
 
-	auto EnterMap(ID<Map>& map) -> bool;
+	auto EnterMap(const ID<Map>& map) -> bool;
 	auto LeaveMap() -> bool;
 
 protected:

@@ -73,7 +73,7 @@ public:
 
 	Engine& engine; //!< Parent `Engine`
 
-	Animation(Engine& engine, ID<Object>& object, const std::vector<Instruction>& instructions);
+	Animation(Engine& engine, const ID<Object>& object, const std::vector<Instruction>& instructions);
 	~Animation();
 
 	auto Play() -> bool;

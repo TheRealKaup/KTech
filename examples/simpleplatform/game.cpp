@@ -107,13 +107,13 @@ struct Character : Object
 		{
 			engine.output.Log("<Character::PushBoxToDifferentLayer()> Moving object to voidLayer", RGBColors::red);
 			engine.memory.objects[box]->EnterLayer(voidLayer);
-			box = ID<Object>(0, 0);
+			box = ID<Object>();
 			return true;
 		}
 		return false;
 	}
 
-	Character(Engine& engine, ID<Layer>& layer, ID<Layer>& voidLayer)
+	Character(Engine& engine, const ID<Layer>& layer, const ID<Layer>& voidLayer)
 		: Object(engine, Point(5, 2), "character"), voidLayer(voidLayer), cam(engine, KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 )),
 			jumpAnimation(engine, m_id, {
 				Animation::Instruction(Animation::Instruction::Type::TextureSetPosition, 1, Point(0, 3)),
@@ -230,7 +230,7 @@ struct AutoUpdatingText : Object
 		}
 	}
 
-	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text)
+	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, const ID<Layer>& layer, std::string text)
 		: Object(engine, pos), m_data(data)
 	{
 		EnterLayer(layer);

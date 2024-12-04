@@ -86,7 +86,7 @@
 
 	@see `Object`
 */
-auto KTech::Collision::MoveObject(ID<Object>& p_object, Point p_direction) -> bool
+auto KTech::Collision::MoveObject(const ID<Object>& p_object, Point p_direction) -> bool
 {
 	std::vector<CollisionData> pushData;
 	std::vector<CollisionData> blockData;
@@ -250,7 +250,7 @@ auto KTech::Collision::AreComplexCollidersOverlapping(const Collider& p_collider
 	return false;
 }
 
-void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObject, Point p_direction,
+void KTech::Collision::ExpandMovementTree(const ID<Object>& p_thisObject, Point p_direction,
 	std::vector<CollisionData>& p_pushData,
 	std::vector<CollisionData>& p_blockData,
 	std::vector<CollisionData>& p_overlapData,
@@ -348,7 +348,7 @@ void KTech::Collision::ExpandMovementTree(ID<Object>& p_thisObject, Point p_dire
 	}
 }
 
-auto KTech::Collision::IsInPushData(std::vector<CollisionData>& p_pushData, ID<Object>& p_object) -> bool
+auto KTech::Collision::IsInPushData(std::vector<CollisionData>& p_pushData, const ID<Object>& p_object) -> bool
 {
     return std::ranges::any_of(p_pushData,
 		[&p_object](const CollisionData& pushDatum)

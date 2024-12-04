@@ -37,7 +37,7 @@ class KTech::Object
 {
 public:
 	Engine& engine; //!< Parent `Engine`.
-	ID<Object> m_id; //!< Personal `ID`.
+	const ID<Object> m_id{ID<Object>::Unique()}; //!< Personal `ID`.
 	std::string m_name; //!< String name.
 	ID<Layer> m_parentLayer; //!< Parent `Layer`.
 
@@ -46,10 +46,10 @@ public:
 	std::vector<Collider> m_colliders = {}; //!< `Collider`s.
 
 	Object(Engine& engine, Point position = Point(0, 0), std::string name = "");
-	Object(Engine& engine, ID<Layer>& parentLayer, Point position = Point(0, 0), std::string name = "");
+	Object(Engine& engine, const ID<Layer>& parentLayer, Point position = Point(0, 0), std::string name = "");
 	virtual ~Object();
 
-	auto EnterLayer(ID<Layer>& layer) -> bool;
+	auto EnterLayer(const ID<Layer>& layer) -> bool;
 	auto LeaveLayer() -> bool;
 
 	auto Move(Point direction) -> bool;

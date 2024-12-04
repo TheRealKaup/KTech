@@ -39,7 +39,7 @@ struct Character : KTech::Object
 		camera.m_pos = m_pos + KTech::Point(-18, -8);
 	}
 
-	Character(KTech::Engine& engine, KTech::ID<KTech::Layer>& layer, KTech::ID<KTech::Map>& map, KTech::Point pos)
+	Character(KTech::Engine& engine, const KTech::ID<KTech::Layer>& layer, const KTech::ID<KTech::Map>& map, KTech::Point pos)
 		: Object(engine, layer, pos, "character"), // Inherit `Object::Object()`, since `Object` has no default constructor. The fourth name parameter can be useful for debugging if so interests you, though it bears no additional functionality.
 		camera(engine, KTech::Point(pos.x - 18, pos.y - 8), KTech::UPoint(40, 20)),  callbacksGroup(engine, true)
 	{

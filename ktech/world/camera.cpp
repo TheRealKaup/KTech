@@ -59,7 +59,7 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 
 	@see `Map::m_activeCameraI`
 */
-KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name)
+KTech::Camera::Camera(Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: Camera(p_engine, p_position, p_resolution)
 {
 	EnterMap(p_parentMap);
@@ -84,7 +84,7 @@ KTech::Camera::~Camera()
 
 	@see `Map::m_activeCameraI`
 */
-auto KTech::Camera::EnterMap(ID<Map>& p_map) -> bool
+auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
 	{
@@ -106,7 +106,7 @@ auto KTech::Camera::LeaveMap() -> bool
 	{
 		return engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
 	}
-	m_parentMap = nullID<Map>;
+	m_parentMap = ID<Map>();
 	return true;
 }
 

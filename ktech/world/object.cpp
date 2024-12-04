@@ -44,7 +44,7 @@ KTech::Object::Object(Engine& p_engine, Point p_position, std::string p_name)
 	@param position World position.
 	@param name String name.
 */
-KTech::Object::Object(Engine& p_engine, ID<Layer>& p_parentLayer, Point p_position, std::string p_name)
+KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_position, std::string p_name)
 	: Object(p_engine, p_position, std::move(p_name))
 {
 	EnterLayer(p_parentLayer);
@@ -63,7 +63,7 @@ KTech::Object::~Object()
 	@param layer The `Layer` to enter.
 	@return `true` if entered `Layer`. `false` if the given `Layer` is already the parent `Layer`, doesn't exist in `Memory`, or failed to add this `Object`.
 */
-auto KTech::Object::EnterLayer(ID<Layer>& p_layer) -> bool
+auto KTech::Object::EnterLayer(const ID<Layer>& p_layer) -> bool
 {
 	if (p_layer == m_parentLayer || !engine.memory.layers.Exists(p_layer))
 	{
