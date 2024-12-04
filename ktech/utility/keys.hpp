@@ -20,6 +20,11 @@
 
 #pragma once
 
+/*!
+	@brief Various terminal input keys and escape sequences.
+
+	Very useful for `CallbacksGroup::RegisterCallback()`.
+*/
 namespace KTech::Keys
 {
 	constexpr char const* up = "\x1b[A";
@@ -53,6 +58,7 @@ namespace KTech::Keys
 	constexpr char const* f12 = "\x1b[24~";
 	constexpr char const* tab = "\x09";
 
+	//! Inputs triggered with the "shift" modifier key.
 	namespace Shift
 	{
 		constexpr char const* return_ = "\x1bOM";
@@ -60,6 +66,7 @@ namespace KTech::Keys
 		constexpr char const* tab = "\x1b[Z";
 	}
 
+	//! Inputs triggered with the "control" modifier key.
 	namespace Ctrl
 	{
 		constexpr char const* up = "\33[1;5A";
@@ -74,6 +81,7 @@ namespace KTech::Keys
 		constexpr char const* backspace = "\x08";
 	}
 
+	//! Inputs triggered with the "alt" modifier key.
 	namespace Alt
 	{
 		constexpr char const* up = "\33[1;3A";
@@ -91,6 +99,7 @@ namespace KTech::Keys
 		constexpr char const* delete_ = "\x1b[3;3~";
 	}
 
+	//! Inputs triggered with the "contorl" and "alt" modifier key.
 	namespace CtrlAlt
 	{
 		constexpr char const* up = "\33[1;7A";
@@ -104,6 +113,7 @@ namespace KTech::Keys
 		constexpr char const* insert = "\x1b[2;7~";
 	}
 
+	//! Inputs triggered with the "contorl" and "shift" modifier key.
 	namespace CtrlShift
 	{
 		constexpr char const* up = "\33[1;6A";
