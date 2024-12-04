@@ -34,7 +34,7 @@ public:
 		@brief Construct a `Button`.
 
 		@param engine Parent `Engine`.
-		@param ui `UI` to immediately enter.
+		@param ui `KTech::UI` to immediately enter.
 		@param OnPress Callback function.
 		@param key Key needed to press the `Button` (when it is selected).
 		@param position World position.

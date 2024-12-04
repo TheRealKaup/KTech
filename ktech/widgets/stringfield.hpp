@@ -22,51 +22,67 @@
 
 #include "../ktech.hpp"
 
-struct KeyRange
-{
-	char key1, key2;
-	inline constexpr KeyRange(char key1, char key2) : key1(key1), key2(key2) {}
-};
-
-inline constexpr KeyRange keyrange_lower = KeyRange('a', 'z');
-inline constexpr KeyRange keyrange_upper = KeyRange('A', 'Z');
-inline constexpr KeyRange keyrange_numbers = KeyRange('0', '9');
-inline constexpr KeyRange keyrange_all = KeyRange(' ', '~');
-
+/*!
+	@brief Widget for entering a string.
+*/
 class StringField : public KTech::Widget
 {
 public:
-	std::string m_string;
+	static constexpr std::pair<char, char> charRange_lower{'a', 'z'}; //!< Range of all lower case letters.
+	static constexpr std::pair<char, char> charRange_upper{'A', 'Z'}; //!< Range of all upper case letters.
+	static constexpr std::pair<char, char> charRange_numbers{'0', '9'}; //!< Range of all digits.
+	static constexpr std::pair<char, char> charRange_all{' ', '~'}; //!< Range ofa all ASCII characters.
 
-	std::function<void()> m_OnInsert;
+	std::string m_string; //!< The entered string.
 
-	KTech::RGBA m_unselectedRGBA, m_selectedRGBA;
+	std::function<void()> m_OnInsert; //!< Function to call when the user inserts or removes a character.
 
+	/*!
+		@brief Construct a `StringField`.
+
+		@param engine Parent `Engine`.
+		@param ui `KTech::UI` to immediately enter.
+		@param OnInsert Function to call when the user inserts or removes a digit.
+		@param allowedCharacters Vector of character pairs, representing the allowed characters (e.g. {StringField::charRange_all}, {{'a', 'c'}, {'x', 'z'}}).
+		@param position World position.
+		@param text Text to the left of the entered string.
+		@param maxChars Maximum allowed characters.
+		@param defaultString The default string (e.g. `"abc"`, `"  abc  "`).
+		@param withFrame Whether to add a frame around the text and entered string.
+		@param unselected Foreground (text and frame) color set when `StringField` is unselected.
+		@param selected Foreground color set when `StringField` is selected.
+	*/
 	StringField(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnInsert = nullptr,
-		const std::vector<KeyRange>& allowedCharacters = {keyrange_all},
-		KTech::Point pos = { 0, 0 },
+		const std::vector<std::pair<char, char>>& allowedCharacters = {charRange_all},
+		KTech::Point position = { 0, 0 },
 		const std::string& text = "Value = ",
 		unsigned int maxChars = 8,
 		const std::string& defaultString = "String",
 		bool withFrame = false,
-		KTech::RGBA unselectedRGBA = KTech::RGBAColors::gray,
-		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
-		: Widget(engine, ui, pos), m_OnInsert(std::move(OnInsert)), m_maxChars(maxChars), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA), m_string(defaultString)
+		KTech::RGBA unselected = KTech::RGBAColors::gray,
+		KTech::RGBA selected = KTech::RGBAColors::white)
+		: Widget(engine, ui, position), m_OnInsert(std::move(OnInsert)), m_maxChars(maxChars), m_unselectedRGBA(unselected), m_selectedRGBA(selected), m_string(defaultString)
 	{
 		// Textures
 		SetText(text, withFrame);
 		SetValue(defaultString);
 		// Input handlers
-		for (const KeyRange& keyRange : allowedCharacters)
+		for (const std::pair<char, char>& charRange : allowedCharacters)
 		{
-			m_callbacksGroup.RegisterRangedCallback(keyRange.key1, keyRange.key2, [this]() -> bool { return this->Insert(); });
+			m_callbacksGroup.RegisterRangedCallback(charRange.first, charRange.second, [this]() -> bool { return this->Insert(); });
 		}
 		m_callbacksGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return this->Insert(); });
 		m_callbacksGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return this->Insert(); });
 	}
 
+	/*!
+		@brief Change the displayed text.
+
+		@param text Text to the left of the entered string.
+		@param withFrame Whether to add a frame around the text and entered string.
+	*/
 	void SetText(const std::string& text, bool withFrame)
 	{
 		KTech::RGBA tempRGBA = (m_selected ? m_selectedRGBA : m_unselectedRGBA);
@@ -92,6 +108,10 @@ public:
 		m_textures[ti_text].Write({text}, tempRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 	}
 
+	/*!
+		@brief Change the entered string.
+		@param value New string (e.g. `"abc"`, `"  abc   "`).
+	*/
 	void SetValue(const std::string& value)
 	{
 		m_string = value.substr(0, (m_string.size() > m_maxChars ? m_maxChars : m_string.size()));
@@ -99,7 +119,7 @@ public:
 		m_currentChar = m_string.length();
 	}
 
-protected:
+private:
 	enum TextureIndex : size_t
 	{
 		ti_input,
@@ -116,6 +136,7 @@ protected:
 		TEXTURES_SIZE_FRAMED
 	};
 
+	KTech::RGBA m_unselectedRGBA, m_selectedRGBA;
 	uint16_t m_currentChar = 0;
 	uint16_t m_maxChars;
 

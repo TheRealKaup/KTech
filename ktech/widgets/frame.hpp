@@ -32,11 +32,11 @@ public:
 		@brief Construct a `Frame`.
 
 		@param engine Parent `Engine`.
-		@param ui `UI` to immediately enter.
+		@param ui `KTech::UI` to immediately enter.
 		@param position World position.
 		@param size Frame's size.
-		@param unselected Foreground (text and frame) color set when `Button` is unselected.
-		@param selected Foreground color set when `Button` is selected.
+		@param unselected Foreground (text and frame) color set when `Frame` is unselected.
+		@param selected Foreground color set when `Frame` is selected.
 	*/
 	Frame(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,

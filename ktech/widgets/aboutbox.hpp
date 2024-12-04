@@ -32,7 +32,7 @@ public:
 		@brief Construct an `AboutBox`.
 
 		@param engine Parent `Engine`.
-		@param ui `UI` to immediately enter.
+		@param ui `KTech::UI` to immediately enter.
 		@param position World position.
 		@param text Text to display.
 		@param foreground Foreground (text and frame) color.

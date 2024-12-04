@@ -32,20 +32,20 @@ public:
 
 	std::function<void()> m_OnInsert; //!< Function to call when the user inserts or removes a digit.
 
-		/*!
-		@brief Construct a `Button`.
+	/*!
+		@brief Construct an `IntField`.
 
 		@param engine Parent `Engine`.
-		@param ui `UI` to immediately enter.
-		@param OnInsert Functionto call when the user inserts or removes a digit.
+		@param ui `KTech::UI` to immediately enter.
+		@param OnInsert Function to call when the user inserts or removes a digit.
 		@param min Minimum number allowed.
 		@param max Maximum number allowed.
 		@param defaultNum String representing the default number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
 		@param position World position.
 		@param text Text to the left of the entered number.
 		@param withFrame Whether to add a frame around the text and entered number.
-		@param unselected Foreground (text and frame) color set when `Button` is unselected.
-		@param selected Foreground color set when `Button` is selected.
+		@param unselected Foreground (text and frame) color set when `IntField` is unselected.
+		@param selected Foreground color set when `IntField` is selected.
 	*/
 	IntField(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
