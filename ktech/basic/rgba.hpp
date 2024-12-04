@@ -25,23 +25,36 @@
 #undef KTECH_DEFINITION
 #include "rgb.hpp"
 
-struct KTech::RGBA
+//! Like `RGB`, but also has an alpha channel representing transparency.
+struct KTech::RGBA : RGB
 {
-	uint8_t r, g, b, a;
+	uint8_t a; //!< Alpha channel.
 
+	/*!
+		@brief Construct an `RGBA` color.
+		@param [in] red Red primary color.
+		@param [in] green Green primary color.
+		@param [in] blue Blue primary color.
+		@param [in] alpha Alpha channel.
+	*/
 	constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 0)
-		: r(red), g(green), b(blue), a(alpha) {}
+		: RGB(red, green, blue), a(alpha) {}
 
+	/*!
+		@brief Construct an `RGBA` color from an `RGB` color.
+		@param [in] rgb `RGB` base.
+		@param [in] alpha Alpha channel.
+	*/
 	constexpr RGBA(RGB rgb, uint8_t alpha)
-		: r(rgb.r), g(rgb.g), b(rgb.b), a(alpha) {}
+		: RGB(rgb), a(alpha) {}
 
+	/*!
+		@brief Compare 2 `RGBA`s.
+		@param [in] rgba The `RGBA` to compare with this `RGBA`.
+		@return `true`: the alpha channel, red, green and blue primary colors are equal. `false`: they are unequal.
+	*/
 	constexpr auto operator==(const RGBA& rgba) const -> bool
 	{
 		return (r == rgba.r) && (g == rgba.g) && (b == rgba.b) && (a == rgba.a);
-	}
-
-	constexpr auto operator!=(const RGBA& rgba) const -> bool
-	{
-		return !(*this == rgba);
 	}
 };
