@@ -33,27 +33,35 @@
 #include <string>
 #include <vector>
 
-// Acts as a camera and a layer for `Widget`s. Image is compatible with `IO::Draw()`.
+/*!
+	World structure that contains and renders `Widget`s.
+
+	This class is like a combined `Layer` and `Camera`, but for `Widget`s.
+
+	Unlike how `Object`s are rendered, rendering `Widget`s doesn't involve multiple "layers" (`UI` is a single layer itself).
+
+	Also, `UI`'s image is `CellA`-based in contrary to `Camera`'s `Cell`-based image. The alpha channels maintain the total opacity of the rendered image. This allows `UI`'s image to be drawn like a HUD on top of `Camera`'s image in `Output::Draw()`.
+*/
 class KTech::UI
 {
 public:
-	Engine& engine;
-	ID<UI> m_id;
-	std::string m_name;
-	std::vector<ID<Widget>> m_widgets;
+	Engine& engine; //!< Parent `Engine`.
+	ID<UI> m_id; //!< Personal `ID`.
+	std::string m_name; //!< String name
+	std::vector<ID<Widget>> m_widgets; //!< Contained `Widget`s.
 
-	UPoint m_res;
-	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); // The background to render upon.
-	RGBA m_frgba = RGBA(0, 0, 0, 0);
-	RGBA m_brgba = RGBA(0, 0, 0, 0);
-	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();
-	std::vector<CellA> m_image;
+	UPoint m_res; //!< Image's resolution.
+	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); //!< The background to render upon.
+	uint8_t m_alpha = std::numeric_limits<uint8_t>::max(); //!< Opacity for all rendered `Widget`s.
+	RGBA m_frgba = RGBAColors::transparent; //!< Foreground color added after rendering `Widget`s.
+	RGBA m_brgba = RGBAColors::transparent; //!< Background color added after rendering `Widget`s.
+	std::vector<CellA> m_image; //!< `CellA`-based rendered image.
 
 	UI(Engine& engine, UPoint resolution = UPoint(10, 10), std::string name = "");
 	virtual ~UI();
 
-	auto AddWidget(ID<Widget> widget) -> bool;
-	auto RemoveWidget(ID<Widget> widget) -> bool;
+	auto AddWidget(ID<Widget>& widget) -> bool;
+	auto RemoveWidget(ID<Widget>& widget) -> bool;
 	auto RemoveAllWidgets() -> bool;
 
 	void Resize(UPoint resolution);
@@ -62,7 +70,7 @@ public:
 	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
 
 protected:
-	inline virtual auto OnTick() -> bool { return false; };
+	virtual auto OnTick() -> bool;
 
 	friend class KTech::Memory;
 
