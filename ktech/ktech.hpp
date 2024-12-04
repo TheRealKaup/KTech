@@ -65,7 +65,7 @@ namespace KTech
 	template<class T>
 	constexpr ID<T> nullID = ID<T>(0, 0);
 	template<typename T>
-	struct CachingRegistry;
+	class CachingRegistry;
 	namespace RGBColors {}
 	namespace RGBAColors {}
 	namespace Keys {}
