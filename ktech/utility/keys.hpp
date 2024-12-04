@@ -21,7 +21,7 @@
 #pragma once
 
 /*!
-	@brief Various terminal input keys and escape sequences.
+	@brief Various terminal input escape sequences.
 
 	Very useful for `CallbacksGroup::RegisterCallback()`.
 */
