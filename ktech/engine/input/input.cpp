@@ -31,21 +31,20 @@
 
 /*!
 	@var `Input::input`
-
-	Input for the last-called callback function.
+	@brief Input for the last-called callback function.
 
 	Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbacksGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
 */
 /*!
 	@var `Input::quitKey`
-
-	Input that if received, breaks the input loop and sets `Engine::running` to false.
+	@brief Input that if received, breaks the input loop and sets `Engine::running` to false.
 
 	By default, it's "\x03" (Ctrl+C), which is a common quit key among terminal applications. You may change it, but don't go Vim on your players.
 */
 
 /*!
-	Checks if input equals given string.
+	@fn auto KTech::Input::Is(const std::string &stringKey) const -> bool
+	@brief Checks if input equals given string.
 
 	@param stringKey String to compare with `Input::input`.
 
@@ -57,7 +56,8 @@ auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
 }
 
 /*!
-	Checks if input equals given character.
+	@fn auto KTech::Input::Is(char charKey) const -> bool
+	@brief Checks if input equals given character.
 
 	@param charKey Character to compare with `Input::input`.
 
@@ -69,7 +69,7 @@ auto KTech::Input::Is(char p_charKey) const -> bool
 }
 
 /*!
-	Get the first character of input as a 1-digit number.
+	@brief Get the first character of input as a 1-digit number.
 
 	@return The first character of `Input::input` subtracted by 48 (the character '0'). Can return a value that is not 1-digit-long, so unless only digit characters ('0'-'9') can call your function, you should consider confirming with `Input::Between()` and the arguments ('0', '9') that input is indeed a digit.
 
@@ -81,7 +81,8 @@ auto KTech::Input::GetInt() const -> uint8_t
 }
 
 /*!
-	Checks if given character is bigger than input.
+	@fn Input::Bigger(char charKey)
+	@brief Checks if given character is bigger than input.
 
 	@param charKey Character to compare with `Input::input`.
 
@@ -93,7 +94,8 @@ auto KTech::Input::Bigger(char p_charKey) const -> bool
 }
 
 /*!
-	Checks if given character is smaller than input.
+	@fn auto KTech::Input::Smaller(char charKey) const -> bool
+	@brief Checks if given character is smaller than input.
 
 	@param charKey Character to compare with `Input::input`.
 
@@ -105,7 +107,8 @@ auto KTech::Input::Smaller(char p_charKey) const -> bool
 }
 
 /*!
-	Checks if input is between range of characters.
+	@fn auto KTech::Input::Between(char start, char end) const -> bool
+	@brief Checks if input is between range of characters.
 
 	@param start Start of (ASCII) character range.
 	@param end End of (ASCII) character range.
@@ -118,7 +121,7 @@ auto KTech::Input::Between(char p_start, char p_end) const -> bool
 }
 
 /*!
-	Distribute accumulated inputs.
+	@brief Distribute accumulated inputs.
 
 	`Input` queues received inputs until this function is called. This very function is what calls your input callback functions.
 

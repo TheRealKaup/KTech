@@ -47,7 +47,7 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 }
 
 /*!
-	@fn `Camera::Camera(Engine &engine, ID< Map > &parentMap, bool asActiveCamera, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
+	@fn `Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
 
 	@brief Prepare `Camera` for rendering and immediately enter a `Map`.
 

@@ -46,7 +46,9 @@ auto KTech::Texture::Simple(UPoint p_size, CellA p_value) -> Texture&
 	@fn KTech::Texture::Simple(UPoint size, CellA value, Point relativePosition)
 	@brief Create a simple `Texture` (uniform rectangle), and set its relative position.
 	@param relativePosition Relative position to set.
-	@see KTech::Texture::Simple(UPoint size, CellA value)
+	@param size Rectangle's size.
+	@param value Rectangle's `CellA` value.
+	@return Self-reference for function chaining.
 */
 auto KTech::Texture::Simple(UPoint p_size, CellA p_value, Point p_relativePosition) -> Texture&
 {
@@ -79,8 +81,13 @@ auto KTech::Texture::Rectangle(UPoint p_size, CellA p_value) -> Texture&
 /*!
 	@fn KTech::Texture::Rectangle(UPoint size, CellA value, Point relativePosition)
 	@brief Create a complex `Texture` that is a uniform rectangle, and set its relative position.
+
 	@param relativePosition Relative position to set.
-	@see KTech::Texture::Rectangle(UPoint size, CellA value)
+	@param size Rectangle's size.
+	@param value Rectangle's uniform `CellA` value.
+	@return Self-reference for function chaining.
+
+	@see `KTech::Texture::Rectangle(UPoint size, CellA value)`
 */
 auto KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_relativePosition) -> Texture&
 {
@@ -126,8 +133,12 @@ auto KTech::Texture::File(const std::filesystem::path& p_filePath) -> Texture&
 /*!
 	@fn KTech::Texture::File(const std::filesystem::path& filePath, Point relativePosition)
 	@brief Import a complex `Texture` from file, and set its relative position.
+
 	@param relativePosition Relative position to set.
-	@see KTech::Texture::File(const std::filesystem::path& filePath)
+	@param filePath Path to the texture file (`.ktecht`).
+	@return Self-reference for function chaining.
+
+	@see `KTech::Texture::File(const std::filesystem::path& filePath)`
 */
 auto KTech::Texture::File(const std::filesystem::path& p_filePath, Point p_relativePosition) -> Texture&
 {
@@ -199,8 +210,13 @@ auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 /*!
 	@fn KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition)
 	@brief Write a complex `Texture` from a vector of strings, and set its relative position.
+
 	@param relativePosition Relative position to set.
-	@see KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background)
+	@param stringVector Vector of strings that will be converted into the `Texture`'s characters.
+	@param foreground Uniform foreground (character) color.
+	@param background Uniform background color.
+
+	@return Self-reference for function chaining.
 */
 auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background, Point p_relativePosition) -> Texture&
 {
@@ -228,8 +244,11 @@ auto KTech::Texture::Null() -> Texture&
 /*!
 	@fn KTech::Texture::Null(Point relativePosition)
 	@brief Create a complex `Texture` that represents a missing `Texture`, and set its relative position.
+
 	@param relativePosition Relative position to set.
-	@see KTech::Texture::Null()
+	@return Self-reference for function chaining.
+
+	@see `Texture::Null()`
 */
 auto KTech::Texture::Null(Point p_relativePosition) -> Texture&
 {
@@ -246,7 +265,6 @@ auto KTech::Texture::Null(Point p_relativePosition) -> Texture&
 
 	@param x X axis.
 	@param y Y axis.
-
 	@return The value of the 2D bitmap at the given location, by-reference.
 */
 auto KTech::Texture::operator()(size_t p_x, size_t p_y) -> CellA&

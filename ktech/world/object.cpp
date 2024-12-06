@@ -37,7 +37,7 @@ KTech::Object::Object(Engine& p_engine, Point p_position, std::string p_name)
 }
 
 /*!
-	@fn Object::Object(Engine& engine, ID<Layer>& parentLayer, Point position, std::string name)
+	@fn Object::Object(Engine& engine, const ID<Layer>& parentLayer, Point position, std::string name)
 	@brief Construct an `Object` and immediately enter a `Layer`.
 	@param engine Parent `Engine`.
 	@param parentLayer `Layer` to enter.

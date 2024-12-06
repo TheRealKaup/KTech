@@ -39,7 +39,7 @@ KTech::Layer::Layer(Engine& p_engine, std::string p_name)
 }
 
 /*!
-	@fn Layer::Layer(Engine& engine, ID<Map>& parentMap, std::string name)
+	@fn Layer::Layer(Engine& engine, const ID<Map>& parentMap, std::string name)
 	@brief Construct a `Layer` and immediately enter a `Map`.
 	@param [in] engine Parent `Engine`.
 	@param [in] parentMap `Map` to enter.

@@ -38,7 +38,7 @@ KTech::Widget::Widget(Engine& p_engine, Point p_position, std::string p_name)
 }
 
 /*!
-	@fn KTech::Widget::Widget(Engine& engine, ID<KTechUI> parentUI, Point position, std::string name)
+	@fn KTech::Widget::Widget(Engine& engine, const ID<UI>& parentUI, Point position = Point(0, 0), std::string name = "");
 	@brief Construct a `Widget` and immediately enter a `UI`.
 	@param engine Parent `Engine`.
 	@param parentUI The `UI` to enter.
