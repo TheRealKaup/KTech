@@ -85,19 +85,19 @@ auto main() -> int
 	/*
 		Let's look at the previous function's parameters in greater detail:
 
-		1. `Texture::Simple()` is one of `Texture` design functions. We'll explore all of them later in the tutorial.
+		1:	`Texture::Simple()` is one of `Texture` design functions. We'll explore all of them later in the tutorial.
 
-		2. 3 by 3 square, but it's worth noting that terminal cells (depending on the terminal's font) usually aren't square themselves (but more like narrow rectangles), so it's likely that this `Texture` won't end up being an exact square when printed.
+		2:	3 by 3 square, but it's worth noting that terminal cells (depending on the terminal's font) usually aren't square themselves (but more like narrow rectangles), so it's likely that this `Texture` won't end up being an exact square when printed.
 
-		3. As we've said, this "`CellA`" is the structure `Texture`s are based on. `Texture::Simple()` accepts a single `CellA` value, because it creates a uniform rectangle.
+		3:	As we've said, this "`CellA`" is the structure `Texture`s are based on. `Texture::Simple()` accepts a single `CellA` value, because it creates a uniform rectangle.
 
-		4. Character.
+		4:	Character.
 
-		5. Pink foreground color (the character's color).
+		5:	Pink foreground color (the character's color).
 
-		6. Blue background color (the cell's color behind the character). The `KTech::RGBAColors` namespace includes some predefined `RGBA` values.
+		6:	Blue background color (the cell's color behind the character). The `KTech::RGBAColors` namespace includes some predefined `RGBA` values.
 
-		7. Position, relative to the `Texture`'s parent `Object`. Extremely useful when adding multiple `Texture`s to an `Object`.
+		7:	Position, relative to the `Texture`'s parent `Object`. Extremely useful when adding multiple `Texture`s to an `Object`.
 
 		Don't forget the Doxygen API reference, which includes information on all function parameters and variables in KTech.
 	*/

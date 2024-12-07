@@ -18,3 +18,4 @@ The tutorial is separated into chapters, each one is a C++ source file that usua
 
 1. [Introduction](1-introduction.cpp): building and running.
 2. [World](2-world.cpp):
+3. [Game Loop](3-game_loop.cpp)
