@@ -38,7 +38,7 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 ## Documentation
 
 - [`faq.md`](documentation/faq.md) - answers to frequently asked questions **(includes detailed building instructions)**.
-- [`tutorial/`](documentation/tutorial/1-introduction.cpp) (work in progress) - comprehensive tutorial conveyed via code and practice.
+- [`tutorial/`](documentation/tutorial/tutorial.md) (work in progress) - comprehensive tutorial conveyed via code and practice.
 - [Doxygen](https://therealkaup.github.io/KTech/) - library reference, comprising concise information about each element (hosted in GitHub Pages).
 - [`COPYING`](COPYING) - the license which covers KTech (GPLv3-or-later).
 
