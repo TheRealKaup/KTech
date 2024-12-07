@@ -33,7 +33,7 @@ auto main() -> int
 	*/
 
 	// Engine
-	KTech::Engine engine{KTech::UPoint(20, 20), 24};
+	KTech::Engine engine{KTech::UPoint(15, 8), 24};
 
 	// Map
 	KTech::Map map{engine};
@@ -42,7 +42,7 @@ auto main() -> int
 	KTech::Layer layer{engine, map.m_id};
 
 	// Object: add it to `layer`
-	KTech::Object object{engine, layer.m_id, KTech::Point(5, 5)};
+	KTech::Object object{engine, layer.m_id, KTech::Point(5, 2)};
 	// Give `object` some `Texture`s.
 	object.m_textures.resize(2);
 	object.m_textures[0].Simple(
@@ -58,6 +58,8 @@ auto main() -> int
 
 	// Camera: add it to `Map`
 	KTech::Camera camera{engine, map.m_id, KTech::Point(0, 0), engine.output.resolution};
+	// Give the camera a background color (`Camera::m_background` is a `CellA`, and `CellA::b` is the `RGBA` background color).
+	camera.m_background.b = KTech::RGBAColors::blue;
 
 	/*
 		In KTech, you (the user) create your own game loop.
@@ -131,6 +133,9 @@ auto main() -> int
 		9: `Output::ShouldPrintThisTick()` answers the following question: "did the terminal change its size?" If it returns `true`, it means that the last image that was printed to the terminal got squashed or wasn't full, so we should print it again to display it correctly in the terminal.
 
 		10:	`Time::WaitUntilNextTick()` enters sleep (temporarily set the thread to an inactive state) for the duration of time that will make our game loop run at a consistent rate, also know as the "ticks per second" (TPS) rate. It's the value we specified previously in `Engine`'s constructor, 24. That means this game loop will iterate 24 times every second, which includes updating the game's state, rendering it (assuming it changes every tick), and printing it, 24 times every second.
-	}
+	*/
+
+	/*
+		You should build and run this source file (`build/bin/3-game_loop`) to see how it looks like. Then continue to the next chapter.
 	*/
 }

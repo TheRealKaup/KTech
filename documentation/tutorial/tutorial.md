@@ -16,6 +16,6 @@ It's recommended that you take a short look and keep in mind the [Doxygen API re
 
 The tutorial is separated into chapters, each one is a C++ source file that usually contains a heavily-commented example of functional KTech code. You should read the tutorial linearly if you are new to KTech; literally read the individual files from top to bottom, and the chapters in an ascending order.
 
-1. [Introduction](1-introduction.cpp): building and running.
-2. [World](2-world.cpp):
-3. [Game Loop](3-game_loop.cpp)
+1. [Introduction](1-introduction.cpp): building and running the tutorial's source files.
+2. [World](2-world.cpp): become familiar with basic world hierarchy (`Map`, `Layer`, `Object` and `Camera`).
+3. [Game Loop](3-game_loop.cpp): create a proper game loop that updates, renders and prints our world.
