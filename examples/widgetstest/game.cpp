@@ -138,7 +138,7 @@ struct UITest
 		widgets[w_showNotice] = new Switch(engine, ui, std::bind(&UITest::SetNotice, this), Keys::return_, Point(3, -1), "Show\1Notice", false, false);
 		widgets[w_button] = new Button(engine, ui, std::bind(&UITest::StartExitCountdown, this), Keys::return_, Point(2, 2), "Exit", true);
 		widgets[w_intfield] = new IntField(engine, ui, nullptr, 0, 999, "123", Point(2, 6), "Int = ", true);
-		widgets[w_stringfield] = new StringField(engine, ui, nullptr, {keyrange_all}, Point(2, 10), "String = ", 4, "Test", true);
+		widgets[w_stringfield] = new StringField(engine, ui, nullptr, {StringField::charRange_all}, Point(2, 10), "String = ", 4, "Test", true);
 		widgets[w_switch] = new Switch(engine, ui, nullptr, Keys::return_, Point(2, 14), "Switch", false, true);
 		widgets[w_notice] = new AboutBox(engine, ui, Point(1, 1),
 			{
