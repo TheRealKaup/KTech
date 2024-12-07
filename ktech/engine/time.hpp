@@ -27,55 +27,52 @@
 #include <chrono>
 #include <functional>
 
+/*!
+	Engine component responsible for game loop timing.
+
+	This engine component schedules ticks (game loop iterations). Its member variables, which hold various information on tick timing, are at your disposal. `Time` can also invoke your callback functions given a delay.
+*/
 class KTech::Time
 {
 public:
+	//! Time measurement.
 	enum class Measurement : uint8_t
 	{
 		ticks,
 		seconds,
-		milliseconds,
-		microseconds
+		milliseconds
 	};
 
-	struct TimePoint
+	//!	Class containing information on an invocation. @see `Time::Invoke`
+	class Invocation
 	{
-		std::chrono::high_resolution_clock::time_point chronoTimePoint;
-		TimePoint()
-			: chronoTimePoint(std::chrono::high_resolution_clock::now()) {}
-	};
-
-	struct Invocation
-	{
+	private:
 		std::function<bool()> callback;
 		size_t ticksLeft; // Current ticks left in this instance
 		inline Invocation(const std::function<bool()>& callback, size_t ticks)
 			: callback(callback), ticksLeft(ticks) {}
+		friend Time;
 	};
 
-	float tps;
-	float tpsPotential;
-	int32_t deltaTime;
-	int32_t ticksCounter = 0;
-	int16_t tpsLimit;
+	size_t tpsLimit; //!< Max ticks allowed to occur in a second. You set this value in `Engine::Engine()`, and you can change it whenever you want.
+	float tps; //!< Actual ticks per second. Corresponds to `Time::deltaTime`.
+	float tpsPotential; //!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
+	size_t deltaTime; //!< Duration of the last tick, in microseconds.
+	size_t ticksCounter = 0; //!< Total ticks since game started.
 
 	auto Invoke(const std::function<bool()>& callback, size_t time, Measurement timeMeasurement) -> Invocation*;
 	auto CancelInvocation(Invocation* invocation) -> bool;
 	void CallInvocations();
-
-	[[nodiscard]] auto GetDelta(const TimePoint& timePointA, const TimePoint& timePointB, Measurement timeMeasurement) const -> size_t;
-	auto GetInt(const TimePoint& timePoint, Measurement timeMeasurement) -> size_t;
 
 	void WaitUntilNextTick();
 
 private:
 	bool m_changedThisTick = false;
 	Engine& engine;
-	const TimePoint m_startTP;
-	TimePoint m_thisTickStartTP;
+	std::chrono::high_resolution_clock::time_point m_currentTickStart;
 	std::vector<Invocation*> m_invocations;
 
-	inline Time(Engine& engine, int16_t ticksPerSecondLimit)
+	inline Time(Engine& engine, size_t ticksPerSecondLimit)
 		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
 
 	friend class Output;

@@ -36,25 +36,27 @@
 #endif
 #include <vector>
 
+/*!
+	Engine component responsible for outputting rendered images.
+*/
 class KTech::Output
 {
 public:
-	const UPoint resolution;
-	std::vector<std::string> outputAfterQuit;
+	const UPoint resolution; //!< The size of the image buffer (viewport).
+	std::vector<std::string> outputOnQuit; //!< Vector of strings to print when the game quits (specifically, in `Output::~Output()`).
 
 	static void Log(const std::string& text, RGB color);
 
 	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName) const;
-	// Clears the in-engine image, not the terminal.
+
 	void Clear();
+
 	void Draw(const std::vector<Cell>& sourceImage, UPoint resolution, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
 	void Draw(const std::vector<CellA>& sourceImage, UPoint resolution, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+
 	void Print();
 
-	// If game loop is designed to render-on-demand, use this function to determine whether there is demand, that is, should the game loop
-	// render, draw and print.
-	auto ShouldRenderThisTick() -> bool;
-	// Returns true if the terminal resized this tick, which means the game loop should print even if it didn't render.
+	[[nodiscard]] auto ShouldRenderThisTick() -> bool;
 	[[nodiscard]] auto ShouldPrintThisTick() const -> bool;
 
 private:

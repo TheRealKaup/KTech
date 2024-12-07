@@ -37,6 +37,9 @@
 #include <mutex>
 #include <thread>
 
+/*!
+	Engine component responsible for distributing user input.
+*/
 class KTech::Input
 {
 public:
@@ -49,7 +52,7 @@ public:
 	[[nodiscard]] auto Is(char charKey) const -> bool;
 	[[nodiscard]] auto Bigger(char charKey) const -> bool;
 	[[nodiscard]] auto Smaller(char charKey) const -> bool;
-	[[nodiscard]] auto Between(char charKey1, char charKey2) const -> bool;
+	[[nodiscard]] auto Between(char start, char end) const -> bool;
 	[[nodiscard]] auto GetInt() const -> uint8_t;
 
  	void CallCallbacks();
@@ -87,7 +90,7 @@ private:
 		This is why `Callback` has just the register function here.
 	*/
 	auto CreateCallback(const std::string& stringKey, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
-	auto CrateRangedCallback(char key1, char key2, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
+	auto CrateRangedCallback(char start, char end, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
 
 	/*
 		Register `CallbacksGroup`.

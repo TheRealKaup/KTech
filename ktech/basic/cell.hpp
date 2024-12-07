@@ -26,22 +26,29 @@
 #include "rgb.hpp"
 #include "../utility/rgbcolors.hpp"
 
+//! Terminal cell comprising `RGB` foreground (character) color, `RGB` background color, and an ASCII character.
 struct KTech::Cell
 {
-	char c;
-	RGB f;
-	RGB b;
+	char c; //!< ASCII character.
+	RGB f; //!< Foreground (character) color.
+	RGB b; //!< Background color.
 
+	/*!
+		@brief Construct a `Cell`.
+		@param [in] character ASCII character.
+		@param [in] foreground Foreground (character) color.
+		@param [in] background Background color.
+	*/
 	constexpr Cell(char character = ' ', RGB foreground = RGBColors::black, RGB background = RGBColors::black)
 		: c(character), f{foreground}, b(background) {}
 
+	/*!
+		@brief Compare 2 `Cell`s.
+		@param [in] cell The `Cell` to compare with this `Cell`.
+		@return `true`: the foreground colors, background colors, and characters are equal. `false`: they are unequal.
+	*/
 	constexpr auto operator==(const Cell& cell) const -> bool
 	{
 		return (c == cell.c) && (f == cell.f) && (b == cell.b);
-	}
-
-	constexpr auto operator!=(const Cell& cell) const -> bool
-	{
-		return !(*this == cell);
 	}
 };

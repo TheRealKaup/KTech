@@ -23,21 +23,30 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/cr.hpp"
 #include "../world/object.hpp"
 
 #include <vector>
 
+/*!
+	Engine component responsible for processing `Object` movement and collision.
+*/
 class KTech::Collision
 {
 public:
-	std::vector<std::vector<CR>> colliderTypes = {
+	enum class CR : uint8_t
+	{
+		B,	//!< Block; the moving collider can't move because the passive collider can't be moved.
+		P,	//!< Push; the moving collider can make way by moving the passive collider with it.
+		O	//!< Overlap; the moving collider can move into the passive collider.
+	};
+
+	std::vector<std::vector<CR>> colliderTypes{
 		{ CR::B, CR::P, CR::O }, // Unpushable - 0
 		{ CR::B, CR::P, CR::O }, // Pushable - 1
 		{ CR::O, CR::O, CR::O } // Overlapping - 2
 	};
 
-	auto MoveObject(ID<Object>& object, Point direction) -> bool;
+	auto MoveObject(const ID<Object>& object, Point direction) -> bool;
 
 private:
 	Engine& engine;
@@ -58,12 +67,12 @@ private:
 	static auto AreSimpleCollidersOverlapping(const Collider& collider1, const Point& position1, const Collider& collider2, const Point& position2) -> bool;
 	static auto AreSimpleAndComplexCollidersOverlapping(const Collider& complex, const Point& complexPosition, const Collider& simple, const Point& simplePosition) -> bool;
 	static auto AreComplexCollidersOverlapping(const Collider& collider1, const Point& position1, const Collider& collider2, const Point& position2) -> bool;
-	void ExpandMovementTree(ID<Object>& thisObject, Point direction,
+	void ExpandMovementTree(const ID<Object>& thisObject, Point direction,
 		std::vector<CollisionData>& pushData,
 		std::vector<CollisionData>& blockData,
 		std::vector<CollisionData>& overlapData,
 		std::vector<CollisionData>& exitOverlapData);
-	static auto IsInPushData(std::vector<CollisionData>& pushData, ID<Object>& object) -> bool;
+	static auto IsInPushData(std::vector<CollisionData>& pushData, const ID<Object>& object) -> bool;
 
 	friend class Engine;
 };

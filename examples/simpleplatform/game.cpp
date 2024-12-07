@@ -107,13 +107,13 @@ struct Character : Object
 		{
 			engine.output.Log("<Character::PushBoxToDifferentLayer()> Moving object to voidLayer", RGBColors::red);
 			engine.memory.objects[box]->EnterLayer(voidLayer);
-			box = ID<Object>(0, 0);
+			box = ID<Object>();
 			return true;
 		}
 		return false;
 	}
 
-	Character(Engine& engine, ID<Layer>& layer, ID<Layer>& voidLayer)
+	Character(Engine& engine, const ID<Layer>& layer, const ID<Layer>& voidLayer)
 		: Object(engine, Point(5, 2), "character"), voidLayer(voidLayer), cam(engine, KTech::Point( 0, 0 ), KTech::UPoint( 15, 15 )),
 			jumpAnimation(engine, m_id, {
 				Animation::Instruction(Animation::Instruction::Type::TextureSetPosition, 1, Point(0, 3)),
@@ -133,7 +133,7 @@ struct Character : Object
 				" O ",
 				"/|\\",
 				"/ \\"
-			}, { 255, 255, 0, 255 }, { 0, 0, 0, 0 }, { 0, 0 }
+			}, RGBA( 255, 255, 0, 255 ), RGBAColors::transparent, Point(0, 0)
 		);
 		m_textures[1].Simple(UPoint(3, 1), CellA('~', RGBAColors::gray, RGBA(255, 255, 255, 63)));
 		m_textures[1].m_active = false;
@@ -230,7 +230,7 @@ struct AutoUpdatingText : Object
 		}
 	}
 
-	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, ID<Layer>& layer, std::string text)
+	AutoUpdatingText(Engine& engine, float* data, KTech::Point pos, const ID<Layer>& layer, std::string text)
 		: Object(engine, pos), m_data(data)
 	{
 		EnterLayer(layer);
@@ -292,10 +292,10 @@ int main()
 
 	KTech::Output::Log("<main()> Creating collider types", RGBColors::blue);
 	engine.collision.colliderTypes = {
-		{ CR::B, CR::P, CR::P, CR::O }, // Heavy - 0
-		{ CR::B, CR::P, CR::P, CR::O }, // Normal - 1
-		{ CR::B, CR::B, CR::P, CR::O }, // Light - 2
-		{ CR::O, CR::O, CR::O, CR::O }  // Overlappable - 3
+		{ Collision::CR::B, Collision::CR::P, Collision::CR::P, Collision::CR::O }, // Heavy - 0
+		{ Collision::CR::B, Collision::CR::P, Collision::CR::P, Collision::CR::O }, // Normal - 1
+		{ Collision::CR::B, Collision::CR::B, Collision::CR::P, Collision::CR::O }, // Light - 2
+		{ Collision::CR::O, Collision::CR::O, Collision::CR::O, Collision::CR::O }  // Overlappable - 3
 	};
 
 	KTech::Output::Log("<main()> Creating map", RGBColors::blue);
@@ -314,7 +314,7 @@ int main()
 	camera.m_name = "camera";
 	KTech::Output::Log("<main()> Adding camera to map", RGBColors::blue);
 	// `Camera` to `ID<Camera>` cast overload
-	map.AddCamera(camera.m_id, true);
+	map.AddCamera(camera.m_id);
 
 	KTech::Object worldProps(engine, Point(1, 1), "worldProps");
 	worldProps.m_name = "worldProps";
@@ -397,7 +397,7 @@ int main()
 		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 
-		if (engine.output.ShouldRenderThisTick() && map.m_activeCameraI != -1 && map.m_activeCameraI < map.m_cameras.size())
+		if (engine.output.ShouldRenderThisTick())
 		{
 			if (charCamOn)
 			{
@@ -440,5 +440,5 @@ int main()
 	}
 	KTech::Output::Log("<main()> End of function.", RGBColors::blue);
 
-	engine.output.outputAfterQuit.push_back(std::to_string(character.m_pos.y));
+	engine.output.outputOnQuit.push_back(std::to_string(character.m_pos.y));
 }

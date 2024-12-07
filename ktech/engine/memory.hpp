@@ -25,15 +25,22 @@
 #undef KTECH_DEFINITION
 #include "../utility/cachingregistry.hpp"
 
+/*!
+	Engine component responsible for registering all world structures.
+
+	This engine component contains a `CachingRegistry` for each world structure. World structures automatically add themselves to their corresponding `CachingRegistry` here. This way world structures can refer and get access to each other in a serializable way, using their `ID`s (in contrary to a memory addresses, which aren't serializable nor safe in terms of memory). This is why world structures need an `Engine` reference (and is indeed a non-optional parameter in all of their constructors); they must have access to this place to integrate with everything else.
+
+	@see `CachingRegistry` to learn about accessing world structures using their `ID`.
+*/
 class KTech::Memory
 {
 public:
-	CachingRegistry<Object> objects;
-	CachingRegistry<Layer> layers;
-	CachingRegistry<Camera> cameras;
-	CachingRegistry<Map> maps;
-	CachingRegistry<Widget> widgets;
-	CachingRegistry<UI> uis;
+	CachingRegistry<Object> objects; //!< `Object`s registry.
+	CachingRegistry<Layer> layers; //!< `Layer`s registry.
+	CachingRegistry<Camera> cameras; //!< `Camera`s registry.
+	CachingRegistry<Map> maps; //!< `Map`s registry.
+	CachingRegistry<Widget> widgets; //!< `Widget`s registry.
+	CachingRegistry<UI> uis; //!< `UI`s registry.
 
 	void CallOnTicks();
 

@@ -22,28 +22,43 @@
 
 #include "../ktech.hpp"
 
+/*!
+	@brief Widget for entering a number.
+*/
 class IntField : public KTech::Widget
 {
 public:
-	size_t m_number = 0;
-	size_t m_visibleNumber = 0;
+	size_t m_number = 0; //!< The entered number adjusted to given maximum and minimum limits.
 
-	std::function<void()> m_OnInsert;
+	std::function<void()> m_OnInsert; //!< Function to call when the user inserts or removes a digit.
 
-	KTech::RGBA m_unselectedRGBA, m_selectedRGBA;
+	/*!
+		@brief Construct an `IntField`.
 
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] OnInsert Function to call when the user inserts or removes a digit.
+		@param [in] min Minimum number allowed.
+		@param [in] max Maximum number allowed.
+		@param [in] defaultNum String representing the default number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
+		@param [in] position World position.
+		@param [in] text Text to the left of the entered number.
+		@param [in] withFrame Whether to add a frame around the text and entered number.
+		@param [in] unselected Foreground (text and frame) color set when `IntField` is unselected.
+		@param [in] selected Foreground color set when `IntField` is selected.
+	*/
 	IntField(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnInsert,
 		size_t min,
 		size_t max,
 		const std::string& defaultNum = "0",
-		KTech::Point pos = {0, 0},
+		KTech::Point position = {0, 0},
 		const std::string& text = "Value = ",
 		bool withFrame = false,
-		KTech::RGBA unselectedRGBA = KTech::RGBAColors::gray,
-		KTech::RGBA selectedRGBA = KTech::RGBAColors::white)
-		: Widget(engine, ui, pos), m_OnInsert(std::move(OnInsert)), m_min(min), m_max(max), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA)
+		KTech::RGBA unselected = KTech::RGBAColors::gray,
+		KTech::RGBA selected = KTech::RGBAColors::white)
+		: Widget(engine, ui, position), m_OnInsert(std::move(OnInsert)), m_min(min), m_max(max), m_unselectedRGBA(unselected), m_selectedRGBA(selected)
 	{
 		// Find max allowed digits
 		for (size_t i = 1; max / i > 0; i *= 10)
@@ -65,6 +80,12 @@ public:
 		m_callbacksGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return Insert(); });
 	}
 
+	/*!
+		@brief Change the displayed text.
+
+		@param [in] text Text to the left of the entered number.
+		@param [in] withFrame Whether to add a frame around the text and entered number.
+	*/
 	void SetText(const std::string& text, bool withFrame)
 	{
 		KTech::RGBA tempRGBA = (m_selected ? m_selectedRGBA : m_unselectedRGBA);
@@ -88,6 +109,10 @@ public:
 		m_textures[ti_text].Write({text}, tempRGBA, KTech::RGBAColors::transparent, KTech::Point(1, 1));
 	}
 
+	/*!
+		@brief Change the entered number.
+		@param [in] number String representing the new number (e.g. `"255"`, `"001"`, or `"1"`; meaningless 0s remain).
+	*/
 	void SetValue(const std::string& number)
 	{
 		m_currentDigit = 0;
@@ -104,7 +129,7 @@ public:
 		m_visibleNumber = m_number;
 	}
 
-protected:
+private:
 	enum TextureIndex : size_t
 	{
 		ti_input,
@@ -121,6 +146,8 @@ protected:
 		TEXTURES_SIZE_FRAMED
 	};
 
+	KTech::RGBA m_unselectedRGBA, m_selectedRGBA;
+	size_t m_visibleNumber = 0;
 	uint32_t m_min, m_max;
 	uint8_t m_maxDigits = 0, m_minDigits = 0;
 	uint8_t m_currentDigit = 0;

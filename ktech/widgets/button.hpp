@@ -22,24 +22,39 @@
 
 #include "../ktech.hpp"
 
+/*!
+	@brief Widget that calls a callback function when pressed.
+*/
 class Button : public KTech::Widget
 {
 public:
-	std::function<void()> m_OnPress;
+	std::function<void()> m_OnPress; //!< Function to call when pressed.
 
-	KTech::RGBA m_unselectedRGBA, m_selectedRGBA, m_downRGBA;
+	/*!
+		@brief Construct a `Button`.
 
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] OnPress Callback function.
+		@param [in] key Key needed to press the `Button` (when it is selected).
+		@param [in] position World position.
+		@param [in] text Text within the `Button`.
+		@param [in] withFrame Whether to add a frame around the text.
+		@param [in] unselected Foreground (text and frame) color set when `Button` is unselected.
+		@param [in] selected Foreground color set when `Button` is selected.
+		@param [in] down Foreground color set when `Button` is being pressed.
+	*/
 	Button(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnPress,
 		const std::string& key = KTech::Keys::return_,
-		KTech::Point pos = KTech::Point(0, 0),
+		KTech::Point position = KTech::Point(0, 0),
 		const std::string& text = "Button",
 		bool withFrame = false,
-		KTech::RGBA unselectedRGBA = KTech::RGBAColors::gray,
-		KTech::RGBA selectedRGBA = KTech::RGBAColors::white,
-		KTech::RGBA downRGBA = KTech::RGBAColors::Widgets::buttonDownBlue)
-		: Widget(engine, ui, pos), m_OnPress(std::move(OnPress)), m_unselectedRGBA(unselectedRGBA), m_selectedRGBA(selectedRGBA), m_downRGBA(downRGBA)
+		KTech::RGBA unselected = KTech::RGBAColors::gray,
+		KTech::RGBA selected = KTech::RGBAColors::white,
+		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue)
+		: Widget(engine, ui, position), m_OnPress(std::move(OnPress)), m_unselectedRGBA(unselected), m_selectedRGBA(selected), m_downRGBA(down)
 	{
 		// Texture
 		SetText(text, withFrame);
@@ -47,7 +62,8 @@ public:
 		m_callbacksGroup.RegisterCallback(key, [this]() -> bool { return InsideOnPress(); });
 	}
 
-	virtual ~Button()
+	//! Cancel invocations
+	~Button()
 	{
 		if (m_downInvocation != nullptr)
 		{
@@ -55,6 +71,12 @@ public:
 		}
 	}
 
+	/*!
+		@brief Change the displayed text.
+
+		@param [in] text Text within the `Button`.
+		@param [in] withFrame Whether to add a frame around the text.
+	*/
 	void SetText(const std::string& text, bool withFrame)
 	{
 		KTech::RGBA tempColor;
@@ -91,7 +113,7 @@ public:
 		m_textures[ti_text].Write({text}, tempColor, KTech::RGBAColors::transparent, KTech::Point(1, 1));
 	}
 
-protected:
+private:
 	enum TextureIndex : size_t
 	{
 		ti_text,
@@ -107,6 +129,7 @@ protected:
 		TEXTURES_SIZE_FRAMED
 	};
 
+	KTech::RGBA m_unselectedRGBA, m_selectedRGBA, m_downRGBA;
 	static constexpr size_t pressLength = 100;
 	KTech::Time::Invocation* m_downInvocation = nullptr;
 

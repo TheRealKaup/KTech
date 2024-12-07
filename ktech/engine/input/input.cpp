@@ -29,148 +29,132 @@
 #include <unistd.h>
 #endif
 
-KTech::Input::Input(Engine& p_engine)
-	: engine(p_engine)
-{
-	// Set terminal attributes
-#ifdef _WIN32
-	m_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
-	GetConsoleMode(m_stdinHandle, &m_oldMode);
-	SetConsoleMode(m_stdinHandle,
-		// Enable:
-		(m_oldMode
-		| ENABLE_VIRTUAL_TERMINAL_INPUT // Receive input as escape sequences
-		| ENABLE_EXTENDED_FLAGS) // Needed to disable selecting text (because it pauses output)
-		// Disable:
-		& ~(ENABLE_ECHO_INPUT // Echo
-		| ENABLE_LINE_INPUT // Canonical mode
-		| ENABLE_PROCESSED_INPUT // System handling of signals (e.g. Ctrl+C)
-		| ENABLE_MOUSE_INPUT // Inputs regarding the mouse
-		| ENABLE_WINDOW_INPUT // Input regarding the window
-		| ENABLE_QUICK_EDIT_MODE) // Selecting text
-	);
-	SetConsoleCP(20127); // us-ascii code page (list of code pages: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
-#else
-	tcgetattr(0, &m_oldTerminalAttributes);
-	termios terminalAttributes = m_oldTerminalAttributes;
-	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
-	terminalAttributes.c_lflag &= ~ECHO; // Disable echo
-	terminalAttributes.c_lflag &= ~ISIG; // Disable signals
-	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
-	terminalAttributes.c_cc[VTIME] = 0;
-	tcsetattr(0, TCSANOW, &terminalAttributes);
-#endif
+/*!
+	@var `Input::input`
+	@brief Input for the last-called callback function.
 
-	// Create the input loop
-	m_inputLoop = std::thread([this]() { this->Loop(); });
-}
+	Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbacksGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
+*/
+/*!
+	@var `Input::quitKey`
+	@brief Input that if received, breaks the input loop and sets `Engine::running` to false.
 
-KTech::Input::~Input()
-{
-	// Return to the old terminal attributes
-#if _WIN32
-	SetConsoleMode(m_stdinHandle, m_oldMode);
-#else
-	tcsetattr(0, TCSANOW, &m_oldTerminalAttributes);
-#endif
+	By default, it's "\x03" (Ctrl+C), which is a common quit key among terminal applications. You may change it, but don't go Vim on your players.
+*/
 
-	// Detach so in the case that the game quit regardless of player input,
-	// the input loop thread would end.
-	m_inputLoop.detach();
-}
+/*!
+	@fn auto KTech::Input::Is(const std::string &stringKey) const -> bool
+	@brief Checks if input equals given string.
 
-auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
-{
-	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
-	{
-		return nullptr;
-	}
-	// If a handler already exists for this input, add the callback to the calls vector
-	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
-	{
-		if (stringHandler->m_string == p_stringKey)
-		{
-			stringHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, stringHandler));
-			return stringHandler->m_callbacks[stringHandler->m_callbacks.size() - 1]; // Last callback
-		}
-	}
-	// Otherwise, create a new handler
-	m_stringHandlers.push_back(std::make_shared<Handler>(p_stringKey));
-	// And add a callback to it
-	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_stringHandlers[m_stringHandlers.size() - 1]));
-	return m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback of last handler
-}
+	@param stringKey String to compare with `Input::input`.
 
-auto KTech::Input::CrateRangedCallback(char p_key1, char p_key2, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
-{
-	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
-	{
-		return nullptr;
-	}
-	// If a handler already exists for this input, add the callback to the calls vector
-	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
-	{
-		if (rangeHandler->m_start == p_key1 && rangeHandler->m_end == p_key2)
-		{
-			rangeHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, rangeHandler));
-			return rangeHandler->m_callbacks[rangeHandler->m_callbacks.size() - 1]; // Last callback
-		}
-	}
-	// Otherwise, create a new handler
-	m_rangeHandlers.push_back(std::make_shared<Handler>(p_key1, p_key2));
-	// And add a callback to it
-	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
-	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
-}
-
-void KTech::Input::RegisterCallbacksGroup(CallbacksGroup* const p_callbacksGroup)
-{
-	m_groups.push_back(p_callbacksGroup);
-}
-
-void KTech::Input::SetCallbacksGroupToBeRemoved(CallbacksGroup* const p_callbacksGroup)
-{
-	for (CallbacksGroup*& group : m_groups)
-	{
-		if (group == p_callbacksGroup)
-		{
-			// Set group to `nullptr`; that will be noticed in `Input::Update()` and be removed.
-			group = nullptr;
-			return;
-		}
-	}
-}
-
+	@return True if equal, otherwise false.
+*/
 auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
 {
 	return (input == p_stringKey);
 }
 
+/*!
+	@fn auto KTech::Input::Is(char charKey) const -> bool
+	@brief Checks if input equals given character.
+
+	@param charKey Character to compare with `Input::input`.
+
+	@return True if equal (and `Input::input` is 1 character long), otherwise false.
+*/
 auto KTech::Input::Is(char p_charKey) const -> bool
 {
 	return input.length() == 1 && input[0] == p_charKey;
 }
 
+/*!
+	@brief Get the first character of input as a 1-digit number.
+
+	@return The first character of `Input::input` subtracted by 48 (the character '0'). Can return a value that is not 1-digit-long, so unless only digit characters ('0'-'9') can call your function, you should consider confirming with `Input::Between()` and the arguments ('0', '9') that input is indeed a digit.
+
+	@see `Input::Between()`
+*/
 auto KTech::Input::GetInt() const -> uint8_t
 {
 	return input[0] - '0';
 }
 
+/*!
+	@fn Input::Bigger(char charKey)
+	@brief Checks if given character is bigger than input.
+
+	@param charKey Character to compare with `Input::input`.
+
+	@return True if bigger (and `Input::input` is 1 character long), otherwise false.
+*/
 auto KTech::Input::Bigger(char p_charKey) const -> bool
 {
-	return (input[0] >= p_charKey) && (input[1] == 0);
+	return (input[0] >= p_charKey) && (input.length() == 1);
 }
 
+/*!
+	@fn auto KTech::Input::Smaller(char charKey) const -> bool
+	@brief Checks if given character is smaller than input.
+
+	@param charKey Character to compare with `Input::input`.
+
+	@return True if smaller (and `Input::input` is 1 character long), otherwise false.
+*/
 auto KTech::Input::Smaller(char p_charKey) const -> bool
 {
-	return (input[0] <= p_charKey) && (input[1] == 0);
+	return (input[0] <= p_charKey) && (input.length() == 1);
 }
 
-auto KTech::Input::Between(char p_charKey1, char p_charKey2) const -> bool
+/*!
+	@fn auto KTech::Input::Between(char start, char end) const -> bool
+	@brief Checks if input is between range of characters.
+
+	@param start Start of (ASCII) character range.
+	@param end End of (ASCII) character range.
+
+	@return True if between range (and `Input::input` is 1 character long), otherwise false.
+*/
+auto KTech::Input::Between(char p_start, char p_end) const -> bool
 {
-	return (input[0] >= p_charKey1) && (input[0] <= p_charKey2) && (input[1] == 0);
+	return (input[0] >= p_start) && (input[0] <= p_end) && (input.length() == 1);
 }
 
+/*!
+	@brief Distribute accumulated inputs.
+
+	`Input` queues received inputs until this function is called. This very function is what calls your input callback functions.
+
+	Normally placed at the start of each game loop's iteration, with the other callback-calling functions of engine components (right now `Memory::CallOnTicks()` and `Time::CallInvocations()`, though this may change). For example:
+
+	@code{.cpp}
+	// Game loop
+	while (engine.running)
+	{
+		// Call various callback-functions
+		engine.input.CallCallbacks(); // <- Distribute inputs to input callback functions
+		engine.time.CallInvocations();
+		engine.memory.CallOnTicks();
+
+		// Graphics (render-on-demand)
+		if (engine.output.ShouldRenderThisTick())
+		{
+			map.Render();
+			Camera.Draw();
+			engine.output.Print();
+		}
+		else if (engine.output.ShouldPrintThisTick())
+		{
+			engine.output.Print();
+		}
+
+		engine.time.WaitUntilNextTick();
+	}
+	@endcode
+
+	@see `Memory::CallOnTicks()`
+	@see `Time::CallInvocations()`
+*/
 void KTech::Input::CallCallbacks()
 {
 	Update();
@@ -258,7 +242,6 @@ void KTech::Input::CallRangeHandlers()
 	}
 }
 
-
 void KTech::Input::Get()
 {
 	constexpr int maxCharacters = 7;
@@ -302,6 +285,118 @@ void KTech::Input::Loop()
 			// Quit
 			engine.running = false;
 			break;
+		}
+	}
+}
+
+KTech::Input::Input(Engine& p_engine)
+	: engine(p_engine)
+{
+	// Set terminal attributes
+#ifdef _WIN32
+	m_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
+	GetConsoleMode(m_stdinHandle, &m_oldMode);
+	SetConsoleMode(m_stdinHandle,
+		// Enable:
+		(m_oldMode
+		| ENABLE_VIRTUAL_TERMINAL_INPUT // Receive input as escape sequences
+		| ENABLE_EXTENDED_FLAGS) // Needed to disable selecting text (because it pauses output)
+		// Disable:
+		& ~(ENABLE_ECHO_INPUT // Echo
+		| ENABLE_LINE_INPUT // Canonical mode
+		| ENABLE_PROCESSED_INPUT // System handling of signals (e.g. Ctrl+C)
+		| ENABLE_MOUSE_INPUT // Inputs regarding the mouse
+		| ENABLE_WINDOW_INPUT // Input regarding the window
+		| ENABLE_QUICK_EDIT_MODE) // Selecting text
+	);
+	SetConsoleCP(20127); // us-ascii code page (list of code pages: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
+#else
+	tcgetattr(0, &m_oldTerminalAttributes);
+	termios terminalAttributes = m_oldTerminalAttributes;
+	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
+	terminalAttributes.c_lflag &= ~ECHO; // Disable echo
+	terminalAttributes.c_lflag &= ~ISIG; // Disable signals
+	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
+	terminalAttributes.c_cc[VTIME] = 0;
+	tcsetattr(0, TCSANOW, &terminalAttributes);
+#endif
+
+	// Create the input loop
+	m_inputLoop = std::thread([this]() { this->Loop(); });
+}
+
+KTech::Input::~Input()
+{
+	// Return to the old terminal attributes
+#if _WIN32
+	SetConsoleMode(m_stdinHandle, m_oldMode);
+#else
+	tcsetattr(0, TCSANOW, &m_oldTerminalAttributes);
+#endif
+
+	// Detach so in the case that the game quit regardless of player input,
+	// the input loop thread would end.
+	m_inputLoop.detach();
+}
+
+auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
+{
+	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
+	{
+		return nullptr;
+	}
+	// If a handler already exists for this input, add the callback to the calls vector
+	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
+	{
+		if (stringHandler->m_string == p_stringKey)
+		{
+			stringHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, stringHandler));
+			return stringHandler->m_callbacks[stringHandler->m_callbacks.size() - 1]; // Last callback
+		}
+	}
+	// Otherwise, create a new handler
+	m_stringHandlers.push_back(std::make_shared<Handler>(p_stringKey));
+	// And add a callback to it
+	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_stringHandlers[m_stringHandlers.size() - 1]));
+	return m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback of last handler
+}
+
+auto KTech::Input::CrateRangedCallback(char p_start, char p_end, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
+{
+	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
+	{
+		return nullptr;
+	}
+	// If a handler already exists for this input, add the callback to the calls vector
+	for (const std::shared_ptr<Handler>& rangeHandler : m_rangeHandlers)
+	{
+		if (rangeHandler->m_start == p_start && rangeHandler->m_end == p_end)
+		{
+			rangeHandler->m_callbacks.push_back(std::make_shared<Callback>(p_callback, rangeHandler));
+			return rangeHandler->m_callbacks[rangeHandler->m_callbacks.size() - 1]; // Last callback
+		}
+	}
+	// Otherwise, create a new handler
+	m_rangeHandlers.push_back(std::make_shared<Handler>(p_start, p_end));
+	// And add a callback to it
+	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
+	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
+}
+
+void KTech::Input::RegisterCallbacksGroup(CallbacksGroup* const p_callbacksGroup)
+{
+	m_groups.push_back(p_callbacksGroup);
+}
+
+void KTech::Input::SetCallbacksGroupToBeRemoved(CallbacksGroup* const p_callbacksGroup)
+{
+	for (CallbacksGroup*& group : m_groups)
+	{
+		if (group == p_callbacksGroup)
+		{
+			// Set group to `nullptr`; that will be noticed in `Input::Update()` and be removed.
+			group = nullptr;
+			return;
 		}
 	}
 }

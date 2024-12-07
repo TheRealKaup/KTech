@@ -22,23 +22,39 @@
 
 #include "../ktech.hpp"
 
+/*!
+	@brief Widget that displays framed text.
+*/
 class AboutBox : public KTech::Widget
 {
 public:
-	KTech::RGBA m_foregroundRGBA, m_backgroundRGBA;
+	/*!
+		@brief Construct an `AboutBox`.
 
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] position World position.
+		@param [in] text Text to display.
+		@param [in] foreground Foreground (text and frame) color.
+		@param [in] background Background color.
+	*/
 	AboutBox(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
-		KTech::Point pos,
+		KTech::Point position,
 		const std::vector<std::string>& text,
-		KTech::RGBA foregroundRGBA = KTech::RGBAColors::black,
-		KTech::RGBA backgroundRGBA = KTech::RGBAColors::gray)
-		: Widget(engine, ui, pos), m_foregroundRGBA(foregroundRGBA), m_backgroundRGBA(backgroundRGBA)
+		KTech::RGBA foreground = KTech::RGBAColors::black,
+		KTech::RGBA background = KTech::RGBAColors::gray)
+		: Widget(engine, ui, position), m_foregroundRGBA(foreground), m_backgroundRGBA(background)
 	{
 		// Texture
 		SetText(text);
 	}
 
+	/*!
+		@brief Change the displayed text.
+
+		@param [in] text Text to display.
+	*/
 	void SetText(const std::vector<std::string>& text)
 	{
 		m_textures.resize(TEXTURES_SIZE);
@@ -55,7 +71,7 @@ public:
 		m_textures[ti_rightFrame].Simple(KTech::UPoint(1, m_textures[0].m_size.y), KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 1));
 	}
 
-protected:
+private:
 	enum TextureIndex : size_t
 	{
 		ti_text,
@@ -69,4 +85,6 @@ protected:
 		ti_rightFrame,
 		TEXTURES_SIZE
 	};
+
+	KTech::RGBA m_foregroundRGBA, m_backgroundRGBA;
 };

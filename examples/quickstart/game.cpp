@@ -39,7 +39,7 @@ struct Character : KTech::Object
 		camera.m_pos = m_pos + KTech::Point(-18, -8);
 	}
 
-	Character(KTech::Engine& engine, KTech::ID<KTech::Layer>& layer, KTech::ID<KTech::Map>& map, KTech::Point pos)
+	Character(KTech::Engine& engine, const KTech::ID<KTech::Layer>& layer, const KTech::ID<KTech::Map>& map, KTech::Point pos)
 		: Object(engine, layer, pos, "character"), // Inherit `Object::Object()`, since `Object` has no default constructor. The fourth name parameter can be useful for debugging if so interests you, though it bears no additional functionality.
 		camera(engine, KTech::Point(pos.x - 18, pos.y - 8), KTech::UPoint(40, 20)),  callbacksGroup(engine, true)
 	{
@@ -71,7 +71,7 @@ struct Character : KTech::Object
 
 		camera.m_background.b = KTech::RGB(180, 230, 240);
 		// Add `camera` to `map`. World structures communicate with each other using their `ID`s (the `m_id` member). The second parameter sets `camera` to be active one in `map`.
-		camera.EnterMap(map, true);
+		camera.EnterMap(map);
 
 		// Challenge: currently there is nothing for the character instance to be pushed by (which is allowed by collider type we set a moment ago). So, copy this class, change its keybindings and create an instance of it along with the original character (but pass it a different initial position). Now you have two characters controlled by different sets of keys; try making them push each other.
 
@@ -164,8 +164,7 @@ int main()
 		// Render-on-demand (when things have changed).
 		if (engine.output.ShouldRenderThisTick()) // `Output::ShouldRenderThisTick()` reports whether the game changed.
 		{
-			// `map` will render using the active camera.
-			map.Render();
+			character.camera.Render();
 			/*
 			Alternatively, you could write:
 			- `camera.Render();`, which will renders the layers of its parent map.

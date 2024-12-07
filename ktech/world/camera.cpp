@@ -29,6 +29,16 @@
 #include "../engine/output.hpp"
 #include "../engine/engine.hpp"
 
+/*!
+	@fn `Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
+
+	@brief Prepare `Camera` for rendering.
+
+	@param [in] engine Parent engine.
+	@param [in] position World position.
+	@param [in] resolution Image resolution.
+	@param [in] name String name.
+*/
 KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: engine(p_engine), m_pos(p_position), m_res(p_resolution)
 {
@@ -36,47 +46,86 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 	m_image.resize(m_res.y * m_res.x);
 }
 
-KTech::Camera::Camera(Engine& p_engine, ID<Map>& p_parentMap, bool p_asActiveCamera, Point p_position, UPoint p_resolution, const std::string& p_name)
+/*!
+	@fn `Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
+
+	@brief Prepare `Camera` for rendering and immediately enter a `Map`.
+
+	@param [in] engine Parent engine.
+	@param [in] parentMap Parent map to immediately enter.
+	@param [in] position World position.
+	@param [in] resolution Image resolution.
+	@param [in] name String name.
+
+	@see `Map::m_activeCameraI`
+*/
+KTech::Camera::Camera(Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: Camera(p_engine, p_position, p_resolution)
 {
-	EnterMap(p_parentMap, p_asActiveCamera);
+	EnterMap(p_parentMap);
 }
 
+//! @brief Leave the parent map (if in one) and removed itself from `Memory`.
 KTech::Camera::~Camera()
 {
 	Output::Log("<Camera[" + m_name + "]::~Camera()>", RGBColors::red);
-	if (engine.memory.maps.Exists(m_parentMap))
-	{
-		engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
-	}
+	LeaveMap();
 	engine.memory.cameras.Remove(m_id);
 }
 
-auto KTech::Camera::EnterMap(ID<Map>& p_map, bool p_asActiveCamera) -> bool
+/*!
+	@fn Camera::EnterMap
+
+	@brief Enter a parent `Map`.
+
+	@param map Parent map to enter.
+
+	@return True if joined given `Map`. False if already in given `Map`, given `Map` doesn't exist in `Memory`, or failed to join.
+
+	@see `Map::m_activeCameraI`
+*/
+auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
 	{
 		return false;
 	}
-	return engine.memory.maps[p_map]->AddCamera(m_id, p_asActiveCamera);
+	return engine.memory.maps[p_map]->AddCamera(m_id);
 }
 
+/*!
+	@brief Leave the parent `Map`.
+
+	@return True if left `Camera::m_parentMap`. False if doesn't have a parent `Map`, given `Map` doesn't exist in `Memory`, or failed to leave.
+
+	@see `Map::m_activeCameraI`
+*/
 auto KTech::Camera::LeaveMap() -> bool
 {
 	if (engine.memory.maps.Exists(m_parentMap))
 	{
 		return engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
 	}
-	m_parentMap = nullID<Map>;
+	m_parentMap = ID<Map>();
 	return true;
 }
 
+/*!
+	@fn Camera::Resize
+
+	@brief Resize the image resolution (or "size").
+
+	@param resolution The new resolution.
+*/
 void KTech::Camera::Resize(UPoint p_resolution)
 {
 	m_res = p_resolution;
 	m_image.resize(m_res.y * m_res.x);
 }
 
+/*!
+	@brief Render all `Object`s of all `Layer`s of the parent `Map`.
+*/
 void KTech::Camera::Render()
 {
 	if (engine.memory.maps.Exists(m_parentMap))
@@ -85,6 +134,13 @@ void KTech::Camera::Render()
 	}
 }
 
+/*!
+	@fn Camera::Render(const std::vector<ID<Layer>>& layers)
+
+	@brief Render all `Object`s of the given `Layer`s.
+
+	@param layers The `Layer`s containing the `Object`s to render.
+*/
 void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 {
 	RenderBackground();
@@ -120,10 +176,36 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 	}
 }
 
+/*!
+	@fn Camera::Draw
+
+	@brief Draw the rendered image (`Camera::m_image`) to `Output` so it can be printed to the terminal.
+
+	This function redirects to `Output::Draw()` and passes the given parameters verbatim.
+
+	@see `Output::Draw()` for parameters explanation.
+*/
 void KTech::Camera::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
 	return engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
 }
+
+/*!
+	@brief Virtual function called once each tick.
+
+	You can override this in your inherited class to add whatever functionality you want.
+
+	Called by `Memory::CallOnTicks()`.
+
+	@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
+
+	@see `Memory::CallOnTicks()`
+	@see `Output::ShouldRenderThisTick()`
+*/
+auto KTech::Camera::OnTick() -> bool
+{
+	return false;
+};
 
 inline void KTech::Camera::RenderBackground()
 {

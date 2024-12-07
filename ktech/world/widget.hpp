@@ -29,10 +29,22 @@
 #include "../engine/input/input.hpp"
 #include "../engine/input/callbacksgroup.hpp"
 
-// Widget is now a non-optional KTech standard
+/*!
+	World structure that comprises `Texture`s, behaves as a user interface element, and exists within `UI`.
+
+	This and `Object` are the most commonly inherited-from world structures. `Widget` differs from `Object` because it can only contain `Texture`s, while `Object` can also have `Collider`s (which are useless in user interfaces). `Widget` has functionality intended for user interfaces, which is utilized by the optional widgets in the `ktech/widgets/` directory.
+
+	@see `AboutBox`
+	@see `Button`
+	@see `Frame`
+	@see `IntField`
+	@see `StringField`
+	@see `Switch`
+*/
 class KTech::Widget
 {
 public:
+	//! This class is undocumented because it's planned to change (see GitHub issue #106).
 	struct ChildWidget
 	{
 		ID<Widget> widget;
@@ -42,29 +54,29 @@ public:
 			: widget(widget), oldSelected(currentSelected), oldShown(currentShown) {}
 	};
 
-	Engine& engine;
-	ID<Widget> m_id;
-	std::string m_name;
-	ID<UI> m_parentUI;
-	ID<Widget> m_parentWidget = nullID<Widget>;
-	std::vector<ChildWidget> m_childWidgets;
-	bool m_selected = false;
-	bool m_shown = true;
+	Engine& engine; //!< Parent `Engine`.
+	const ID<Widget> m_id{ID<Widget>::Unique()}; //!< Personal `ID`.
+	std::string m_name; //!< String name.
+	ID<UI> m_parentUI; //!< The `UI` containing this `Widget`.
+	ID<Widget> m_parentWidget = nullID<Widget>; //!< Undocumented because it's planned to change (see GitHub issue #106).
+	std::vector<ChildWidget> m_childWidgets; //!< Undocumented because it's planned to change (see GitHub issue #106).
+	bool m_selected = false; //!< `true`: player input reaches the `Widget`. `false`: player input doesn't.
+	bool m_shown = true; //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
 
-	Point m_pos;
-	std::vector<Texture> m_textures = {};
-	Input::CallbacksGroup m_callbacksGroup;
+	Point m_pos; //!< World position.
+	std::vector<Texture> m_textures = {}; //!< Comprising `Texture`s.
+	Input::CallbacksGroup m_callbacksGroup; //!< Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
 
 	Widget(Engine& engine, Point position = Point(0, 0), std::string name = "");
-	Widget(Engine& engine, ID<UI> parentUI, Point position = Point(0, 0), std::string name = "");
+	Widget(Engine& engine, const ID<UI>& parentUI, Point position = Point(0, 0), std::string name = "");
 	virtual ~Widget();
 
-	auto AddWidget(ID<Widget> widget) -> bool;
-	auto RemoveWidget(ID<Widget> widget) -> bool;
+	auto AddWidget(const ID<Widget>& widget) -> bool;
+	auto RemoveWidget(const ID<Widget>& widget) -> bool;
 	auto RemoveAllWidgets() -> bool;
 
-	auto EnterWidget(ID<Widget> widget) -> bool;
-	auto EnterUI(ID<UI> ui) -> bool;
+	auto EnterWidget(const ID<Widget>& widget) -> bool;
+	auto EnterUI(const ID<UI>& ui) -> bool;
 	auto LeaveWidget() -> bool;
 	auto LeaveUI() -> bool;
 
@@ -74,12 +86,11 @@ public:
 	void Hide();
 
 protected:
-	inline virtual auto OnTick() -> bool { return false; };
-
-	inline virtual void OnSelect () {}
-	inline virtual void OnDeselect () {}
-	inline virtual void OnShow () {}
-	inline virtual void OnHide () {}
+	virtual auto OnTick() -> bool;
+	virtual void OnSelect();
+	virtual void OnDeselect();
+	virtual void OnShow();
+	virtual void OnHide();
 
 	friend class KTech::Memory;
 };

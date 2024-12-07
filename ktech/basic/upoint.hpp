@@ -24,44 +24,71 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
+//! Unsigned 2D vector, mostly used to store sizes and 2D indexes.
 struct KTech::UPoint
 {
-	uint32_t x, y;
+	uint32_t x; //!< X axis.
+	uint32_t y; //!< Y axis.
 
+	/*!
+		@brief Construct a `UPoint`.
+		@param [in] x X axis.
+		@param [in] y Y axis.
+	*/
 	constexpr UPoint(uint32_t x = 0, uint32_t y = 0)
 		: x(x), y(y) {}
 
-	constexpr auto operator==(const UPoint& point) const -> bool
+	/*!
+		@brief Compare 2 `UPoint`s.
+		@param [in] uPoint The `UPoint` to compare with this `UPoint`.
+		@return `true`: the X and Y axes are equal. `false`: they are unequal.
+	*/
+	constexpr auto operator==(const UPoint& uPoint) const -> bool
 	{
-		return (x == point.x) && (y == point.y);
+		return (x == uPoint.x) && (y == uPoint.y);
 	}
 
-	constexpr auto operator!=(const UPoint& point) const -> bool
+	/*!
+		@brief Add 2 `UPoint`s together.
+		@param [in] uPoint The `UPoint` to add with this `UPoint`.
+		@return New `UPoint` with the sum of the 2 `UPoint`s.
+	*/
+	constexpr auto operator+(const UPoint& uPoint) const -> UPoint
 	{
-		return !(*this == point);
+		return {x + uPoint.x, y + uPoint.y};
 	}
 
-	constexpr auto operator+(const UPoint& point) const -> UPoint
+	/*!
+		@brief Subtract `UPoint` from another.
+		@param [in] uPoint The `UPoint` to subtract from this `UPoint`.
+		@return New `UPoint` with the difference between the 2 `UPoint`s.
+	*/
+	constexpr auto operator-(const UPoint& uPoint) const -> UPoint
 	{
-		return {x + point.x, y + point.y};
+		return {x - uPoint.x, y - uPoint.y};
 	}
 
-	constexpr auto operator-(const UPoint& point) const -> UPoint
+	/*!
+		@brief Add a `UPoint` to this `UPoint`.
+		@param [in] uPoint The `UPoint` to add to this `UPoint`.
+		@return Self-reference (for function chaining).
+	*/
+	constexpr auto operator+=(const UPoint& uPoint) -> UPoint&
 	{
-		return {x - point.x, y - point.y};
-	}
-
-	constexpr auto operator+=(const UPoint& point) -> UPoint&
-	{
-		x += point.x;
-		y += point.y;
+		x += uPoint.x;
+		y += uPoint.y;
 		return *this;
 	}
 
-	constexpr auto operator-=(const UPoint& point) -> UPoint&
+	/*!
+		@brief Subtract a `UPoint` from this `UPoint`.
+		@param [in] uPoint The `UPoint` to subtract from this `UPoint`.
+		@return Self-reference (for function chaining).
+	*/
+	constexpr auto operator-=(const UPoint& uPoint) -> UPoint&
 	{
-		x -= point.x;
-		y -= point.y;
+		x -= uPoint.x;
+		y -= uPoint.y;
 		return *this;
 	}
 };

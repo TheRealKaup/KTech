@@ -22,29 +22,47 @@
 
 #include "../ktech.hpp"
 
+/*!
+	@brief Widget that toggles a value and calls a callback function when pressed.
+*/
 class Switch : public KTech::Widget
 {
 public:
-	bool m_on = false;
+	bool m_on = false; //!< Toggled value.
 
-	std::function<void()> m_OnPress;
+	std::function<void()> m_OnPress; //!< Function to call when pressed.
 
-	KTech::RGBA m_unselectedOffRGBA, m_selectedOffRGBA, m_unselectedOnRGBA, m_selectedOnRGBA, m_downRGBA;
+	/*!
+		@brief Construct a `Switch`.
 
+		@param [in] engine Parent `Engine`.
+		@param [in] ui `KTech::UI` to immediately enter.
+		@param [in] OnPress Callback function.
+		@param [in] key Key needed to press the `Switch` (when it is selected).
+		@param [in] position World position.
+		@param [in] text Text within the `Switch`.
+		@param [in] on Whether the `Switch` is on or off by default.
+		@param [in] withFrame Whether to add a frame around the text.
+		@param [in] unselectedOff Foreground (text and frame) color set when `Switch` is unselected and off.
+		@param [in] selectedOff Foreground color set when `Switch` is selected and off.
+		@param [in] unselectedOn Foreground color set when `Switch` is unselected and on.
+		@param [in] selectedOn Foreground color set when `Switch` is selected and on.
+		@param [in] down Foreground color set when `Switch` is being pressed.
+	*/
 	Switch(KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnPress,
 		const std::string& key = KTech::Keys::return_,
-		KTech::Point pos = { 0, 0 },
+		KTech::Point position = { 0, 0 },
 		const std::string& text = "Switch",
 		bool on = false,
 		bool withFrame = false,
-		KTech::RGBA unselectedOffRGBA = KTech::RGBAColors::gray,
-		KTech::RGBA selectedOffRGBA = KTech::RGBAColors::white,
-		KTech::RGBA unselectedOnRGBA = KTech::RGBAColors::Widgets::switchUnselectedOnGreen,
-		KTech::RGBA selectedOnRGBA = KTech::RGBAColors::Widgets::switchSelectedOnGreen,
-		KTech::RGBA downRGBA = KTech::RGBAColors::Widgets::buttonDownBlue)
-		: Widget(engine, ui, pos), m_OnPress(std::move(OnPress)), m_on(on), m_unselectedOffRGBA(unselectedOffRGBA), m_selectedOffRGBA(selectedOffRGBA), m_unselectedOnRGBA(unselectedOnRGBA), m_selectedOnRGBA(selectedOnRGBA), m_downRGBA(downRGBA)
+		KTech::RGBA unselectedOff = KTech::RGBAColors::gray,
+		KTech::RGBA selectedOff = KTech::RGBAColors::white,
+		KTech::RGBA unselectedOn = KTech::RGBAColors::Widgets::switchUnselectedOnGreen,
+		KTech::RGBA selectedOn = KTech::RGBAColors::Widgets::switchSelectedOnGreen,
+		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue)
+		: Widget(engine, ui, position), m_OnPress(std::move(OnPress)), m_on(on), m_unselectedOffRGBA(unselectedOff), m_selectedOffRGBA(selectedOff), m_unselectedOnRGBA(unselectedOn), m_selectedOnRGBA(selectedOn), m_downRGBA(down)
 	{
 		// Textures
 		SetText(text, withFrame);
@@ -52,6 +70,7 @@ public:
 		m_callbacksGroup.RegisterCallback(key, [this]() -> bool { return this->OnPress(); });
 	}
 
+	//! Cancel invocations
 	virtual ~Switch()
 	{
 		if (m_downInvocation == nullptr)
@@ -60,6 +79,12 @@ public:
 		}
 	}
 
+	/*!
+		@brief Change the displayed text.
+
+		@param [in] text Text within the `Switch`.
+		@param [in] withFrame Whether to add a frame around the text.
+	*/
 	void SetText(const std::string& text, bool withFrame)
 	{
 		KTech::RGBA tempRGBA;
@@ -105,13 +130,17 @@ public:
 		m_textures[ti_text].Write({text}, tempRGBA, KTech::RGBA(0, 0, 0, 0), KTech::Point(1, 1));
 	}
 
+	/*!
+		@brief Set the toggled value.
+		@param [in] value On or off.
+	*/
 	void SetValue(bool value)
 	{
 		m_on = value;
 		RemovePressColor();
 	}
 
-protected:
+private:
 	enum TextureIndex : size_t
 	{
 		ti_text,
@@ -127,6 +156,7 @@ protected:
 		TEXTURES_SIZE_FRAMED
 	};
 
+	KTech::RGBA m_unselectedOffRGBA, m_selectedOffRGBA, m_unselectedOnRGBA, m_selectedOnRGBA, m_downRGBA;
 	static constexpr size_t pressLength = 100;
 	KTech::Time::Invocation* m_downInvocation = nullptr;
 

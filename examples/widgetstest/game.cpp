@@ -166,7 +166,7 @@ struct UITest
 
 	~UITest()
 	{
-		engine.output.outputAfterQuit.push_back(
+		engine.output.outputOnQuit.push_back(
 			"Results:\n" +
 			std::to_string(((IntField*)widgets[w_intfield])->m_number) + '\n' +
 			((StringField*)widgets[w_stringfield])->m_string + '\n' +

@@ -27,6 +27,13 @@
 #include <iostream>
 #include <limits>
 
+/*!
+	@fn KTech::Texture::Simple(UPoint size, CellA value)
+	@brief Create a simple `Texture` (uniform rectangle).
+	@param size Rectangle's size.
+	@param value Rectangle's `CellA` value.
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Simple(UPoint p_size, CellA p_value) -> Texture&
 {
 	m_simple = true;
@@ -35,12 +42,30 @@ auto KTech::Texture::Simple(UPoint p_size, CellA p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::Simple(UPoint size, CellA value, Point relativePosition)
+	@brief Create a simple `Texture` (uniform rectangle), and set its relative position.
+	@param relativePosition Relative position to set.
+	@param size Rectangle's size.
+	@param value Rectangle's `CellA` value.
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Simple(UPoint p_size, CellA p_value, Point p_relativePosition) -> Texture&
 {
 	m_rPos = p_relativePosition;
 	return Simple(p_size, p_value);
 }
 
+/*!
+	@fn KTech::Texture::Rectangle(UPoint size, CellA value)
+	@brief Create a complex `Texture` that is a uniform rectangle.
+
+	Even though a simple `Texture` (created using `Texture::Simple()`) is capable of the same result at first glance, you can use this function to create a base for further modifications.
+
+	@param size Rectangle's size.
+	@param value Rectangle's uniform `CellA` value.
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Rectangle(UPoint p_size, CellA p_value) -> Texture&
 {
 	m_simple = false;
@@ -53,12 +78,35 @@ auto KTech::Texture::Rectangle(UPoint p_size, CellA p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::Rectangle(UPoint size, CellA value, Point relativePosition)
+	@brief Create a complex `Texture` that is a uniform rectangle, and set its relative position.
+
+	@param relativePosition Relative position to set.
+	@param size Rectangle's size.
+	@param value Rectangle's uniform `CellA` value.
+	@return Self-reference for function chaining.
+
+	@see `KTech::Texture::Rectangle(UPoint size, CellA value)`
+*/
 auto KTech::Texture::Rectangle(UPoint p_size, CellA p_value, Point p_relativePosition) -> Texture&
 {
 	m_rPos = p_relativePosition;
 	return Rectangle(p_size, p_value);
 }
 
+/*!
+	@fn KTech::Texture::File(const std::filesystem::path& filePath)
+	@brief Import a complex `Texture` from file.
+
+	Such files can be created with <a href="https://github.com/TheRealKaup/TextureCreator">TextureCreator</a>, or with `Texture::Export()`.
+
+	@param filePath Path to the texture file (`.ktecht`).
+
+	@see <a href="https://github.com/TheRealKaup/TextureCreator">TextureCreator</a>
+	@see `Texture::Export()`
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::File(const std::filesystem::path& p_filePath) -> Texture&
 {
 	m_simple = false;
@@ -82,12 +130,44 @@ auto KTech::Texture::File(const std::filesystem::path& p_filePath) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::File(const std::filesystem::path& filePath, Point relativePosition)
+	@brief Import a complex `Texture` from file, and set its relative position.
+
+	@param relativePosition Relative position to set.
+	@param filePath Path to the texture file (`.ktecht`).
+	@return Self-reference for function chaining.
+
+	@see `KTech::Texture::File(const std::filesystem::path& filePath)`
+*/
 auto KTech::Texture::File(const std::filesystem::path& p_filePath, Point p_relativePosition) -> Texture&
 {
 	m_rPos = p_relativePosition;
 	return File(p_filePath);
 }
 
+/*!
+	@fn KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background)
+	@brief Write a complex `Texture` from a vector of strings.
+
+	Creates a complex `Texture` with different characters but uniform foreground and background colors. For example:
+
+	@code{.cpp}
+	m_textures[0].Write(
+		{
+			" O ",
+			"/|\\",
+			"/ \\"
+		}, RGBA( 255, 255, 0, 255 ), RGBAColors::transparent, Point(0, 0)
+	);
+	@endcode
+
+	@param stringVector Vector of strings that will be converted into the `Texture`'s characters.
+	@param foreground Uniform foreground (character) color.
+	@param background Uniform background color.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background) -> Texture&
 {
 	m_simple = false;
@@ -127,12 +207,30 @@ auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition)
+	@brief Write a complex `Texture` from a vector of strings, and set its relative position.
+
+	@param relativePosition Relative position to set.
+	@param stringVector Vector of strings that will be converted into the `Texture`'s characters.
+	@param foreground Uniform foreground (character) color.
+	@param background Uniform background color.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background, Point p_relativePosition) -> Texture&
 {
 	m_rPos = p_relativePosition;
 	return Write(p_stringVector, p_foreground, p_background);
 }
 
+/*!
+	@brief Create a complex `Texture` that represents a missing `Texture`.
+
+	Used by `Texture::File()` if it failed to open or read the given file.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Null() -> Texture&
 {
 	Resize(UPoint(2, 2));
@@ -143,22 +241,63 @@ auto KTech::Texture::Null() -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::Null(Point relativePosition)
+	@brief Create a complex `Texture` that represents a missing `Texture`, and set its relative position.
+
+	@param relativePosition Relative position to set.
+	@return Self-reference for function chaining.
+
+	@see `Texture::Null()`
+*/
 auto KTech::Texture::Null(Point p_relativePosition) -> Texture&
 {
 	m_rPos = p_relativePosition;
 	return Null();
 }
 
-auto KTech::Texture::operator()(size_t x, size_t y) -> CellA&
+/*!
+	@fn KTech::Texture::operator()(size_t x, size_t y)
+
+	@brief Get a value from the 2D bitmap by-reference (complex `Texture`s only).
+
+	Useful if you don't want to convert the 2D position into the corresponding index on the bitmap vector (`Texture::m_t`).
+
+	@param x X axis.
+	@param y Y axis.
+	@return The value of the 2D bitmap at the given location, by-reference.
+*/
+auto KTech::Texture::operator()(size_t p_x, size_t p_y) -> CellA&
 {
-	return m_t[m_size.x * y + x];
+	return m_t[m_size.x * p_y + p_x];
 }
 
+/*!
+	@fn KTech::Texture::operator()(size_t x, size_t y) const
+
+	@brief Get a value from the 2D bitmap by-reference (complex `Texture`s only).
+
+	Useful if you don't want to convert the 2D position into the corresponding index on the bitmap vector (`Texture::m_t`).
+
+	@param x X axis.
+	@param y Y axis.
+
+	@return The value of the 2D bitmap at the given location, by-const-reference.
+*/
 auto KTech::Texture::operator()(size_t x, size_t y) const -> const CellA&
 {
 	return m_t[m_size.x * y + x];
 }
 
+/*!
+	@fn KTech::Texture::Resize(UPoint size, CellA newValue)
+	@brief Resize the `Texture` (whether simple or complex).
+
+	@param size The new size.
+	@param newValue Value for new cells.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::Resize(UPoint p_size, CellA p_newValue) -> Texture&
 {
 	if (m_simple)
@@ -186,6 +325,14 @@ auto KTech::Texture::Resize(UPoint p_size, CellA p_newValue) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetCell(CellA value)
+	@brief Set all cell values (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetCell(CellA p_value) -> Texture&
 {
 	if (m_simple)
@@ -202,6 +349,14 @@ auto KTech::Texture::SetCell(CellA p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetForeground(RGB value)
+	@brief Set all foreground colors (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetForeground(RGBA p_value) -> Texture&
 {
 	if (m_simple)
@@ -218,6 +373,14 @@ auto KTech::Texture::SetForeground(RGBA p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetBackground(RGB value)
+	@brief Set all background colors (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetBackground(RGBA p_value) -> Texture&
 {
 	if (m_simple)
@@ -234,6 +397,14 @@ auto KTech::Texture::SetBackground(RGBA p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetCharacter(char value)
+	@brief Set all characters (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetCharacter(char p_value) -> Texture&
 {
 	if (m_simple)
@@ -250,6 +421,14 @@ auto KTech::Texture::SetCharacter(char p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetForegroundAlpha(uint8_t value)
+	@brief Set all foreground alpha channels (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetForegroundAlpha(uint8_t p_value) -> Texture&
 {
 	if (m_simple)
@@ -266,6 +445,14 @@ auto KTech::Texture::SetForegroundAlpha(uint8_t p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetBackgroundAlpha(uint8_t value)
+	@brief Set all background alpha channels (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetBackgroundAlpha(uint8_t p_value) -> Texture&
 {
 	if (m_simple)
@@ -282,6 +469,14 @@ auto KTech::Texture::SetBackgroundAlpha(uint8_t p_value) -> Texture&
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::SetAlpha(uint8_t value)
+	@brief Set all alpha channels (whether simple or complex).
+
+	@param value New value.
+
+	@return Self-reference for function chaining.
+*/
 auto KTech::Texture::SetAlpha(uint8_t p_value) -> Texture&
 {
 	if (m_simple)
@@ -300,28 +495,43 @@ auto KTech::Texture::SetAlpha(uint8_t p_value) -> Texture&
 	return *this;
 }
 
-auto KTech::Texture::ReplaceCharacter(char oldValue, char newValue) -> Texture&
+/*!
+	@fn KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
+	@brief Replace all instances of a character (whether simple or complex).
+
+	@param oldValue Character to replace.
+	@param newValue Character replacement.
+
+	@return Self-reference for function chaining.
+*/
+auto KTech::Texture::ReplaceCharacter(char p_oldValue, char p_newValue) -> Texture&
 {
 	if (m_simple)
 	{
-		if (m_value.c == oldValue)
+		if (m_value.c == p_oldValue)
 		{
-			m_value.c = newValue;
+			m_value.c = p_newValue;
 		}
 	}
 	else
 	{
 		for (CellA& cell : m_t)
 		{
-			if (cell.c == oldValue)
+			if (cell.c == p_oldValue)
 			{
-				cell.c = newValue;
+				cell.c = p_newValue;
 			}
 		}
 	}
 	return *this;
 }
 
+/*!
+	@fn KTech::Texture::ExportToFile(const std::filesystem::path& filePath)
+	@brief Export `Texture` to a file (complex `Texture`s only).
+
+	@param filePath Path to output the texture file (`.ktecht`).
+*/
 void KTech::Texture::ExportToFile(const std::filesystem::path& p_filePath) const
 {
 	// Create/open file
@@ -337,6 +547,11 @@ void KTech::Texture::ExportToFile(const std::filesystem::path& p_filePath) const
 	}
 }
 
+/*!
+	@brief Print the `Texture` to the terminal (complex `Texture`s only).
+
+	Can be useful in debugging.
+*/
 void KTech::Texture::Print()
 {
 	for (size_t i = 0; i < m_t.size();)

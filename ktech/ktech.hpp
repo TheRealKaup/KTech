@@ -50,7 +50,6 @@ namespace KTech
 	class Map;
 	class Widget;
 	class UI;
-	class Animation;
 	// Engine and its components.
 	// Definitions in `engine/`
 	class Collision;
@@ -60,13 +59,13 @@ namespace KTech
 	class Time;
 	class Engine;
 	// Defined in `utility/`
-	enum class CR : uint8_t;
-	template<class T>
-	struct ID;
-	template<class T>
-	constexpr ID<T> nullID = ID<T>(0, 0);
+	class Animation;
 	template<typename T>
-	struct CachingRegistry;
+	struct ID;
+	template<typename T>
+	constexpr ID<T> nullID;
+	template<typename T>
+	class CachingRegistry;
 	namespace RGBColors {}
 	namespace RGBAColors {}
 	namespace Keys {}
@@ -80,7 +79,6 @@ namespace KTech
 #include "basic/cell.hpp"
 #include "basic/cella.hpp"
 
-#include "world/animation.hpp"
 #include "world/collider.hpp"
 #include "world/texture.hpp"
 #include "world/object.hpp"
@@ -90,8 +88,8 @@ namespace KTech
 #include "world/widget.hpp"
 #include "world/ui.hpp"
 
+#include "utility/animation.hpp"
 #include "utility/cachingregistry.hpp"
-#include "utility/cr.hpp"
 #include "utility/id.hpp"
 #include "utility/keys.hpp"
 #include "utility/rgbcolors.hpp"

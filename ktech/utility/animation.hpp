@@ -24,12 +24,18 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
-#include "object.hpp"
+#include "../world/object.hpp"
 #include "../engine/engine.hpp"
 
+/*!
+	@brief Wrapper for animating an `Object`s and its `Texture`s.
+
+	`Animation` contains a vector of `Animation::Instruction`s, which it can play (`Animation::Play()`), stop (`Animation::Stop()`), and play again. This wrapper, which behaves like an instruction interpreter, saves you from writing something bonkers like an `Object`-inherited class that goes through an awkward sequence of `Time::Invoke()`'d member functions to animate its `Texture`s.
+*/
 class KTech::Animation
 {
 public:
+	//! A single animation instruction. This class is undocumented because it's planned to change (see GitHub issue #126).
 	struct Instruction
 	{
 		enum class Type : uint8_t
@@ -65,19 +71,15 @@ public:
 			: type(type), intData(time), timeMeasurement(timeMeasurement) {}
 	};
 
-	Engine& engine;
+	Engine& engine; //!< Parent `Engine`
 
-	inline Animation(Engine& engine, ID<Object>& object, const std::vector<Instruction>& instructions)
-		: engine(engine), m_object(object), m_instructions(instructions) {}
+	Animation(Engine& engine, const ID<Object>& object, const std::vector<Instruction>& instructions);
+	~Animation();
 
-	virtual ~Animation();
-
-	// Iterates instructions and invokes itself on delay. Will not replay the animation; to do so, call `Animation::Stop()` before calling this again.
-	bool Play();
-	// Cancel invocations and prepares for a replay.
+	auto Play() -> bool;
 	void Stop();
 
-protected:
+private:
 	ID<Object> m_object;
 	std::vector<Instruction> m_instructions;
 	size_t m_i = 0;
