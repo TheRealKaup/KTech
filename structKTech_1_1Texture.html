@@ -183,11 +183,11 @@ std::vector&lt; <a class="el" href="structKTech_1_1CellA.html">CellA</a> &gt;&#1
 <tr class="separator:a78174bcc7e84a23320851abb04a5eb39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >A <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>-based sprite.</p>
+<div class="textblock"><p >A <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>-based sprite.</p>
 <p ><code><a class="el" href="classKTech_1_1Object.html">Object</a></code>s and <code><a class="el" href="classKTech_1_1Widget.html">Widget</a></code>s have a vector of these <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s (<code><a class="el" href="classKTech_1_1Object.html#a726b648f16402211fa34fc550c04e831" title="Textures.">Object::m_textures</a></code> and <code><a class="el" href="classKTech_1_1Widget.html#a1d05690aa1137cd4050a8ae393941cdb" title="Comprising Textures.">Widget::m_textures</a></code>, respectively), which represents their visual appearance. <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s are used to render <code><a class="el" href="classKTech_1_1Object.html">Object</a></code>s and <code><a class="el" href="classKTech_1_1Widget.html">Widget</a></code>s in <code><a class="el" href="classKTech_1_1Camera.html#aa0e0ccd88254f3fef33ab33ff48acc9f" title="Render all Objects of all Layers of the parent Map.">Camera::Render()</a></code> and <code><a class="el" href="classKTech_1_1UI.html#a4b759b51ee05ca80932592b68f1c7737" title="Render all contained Widgets.">UI::Render()</a></code>, respectively.</p>
 <p >Similarly to <code><a class="el" href="structKTech_1_1Collider.html">Collider</a></code>, there are 2 forms of <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s: "simple" and "complex".</p><ul>
 <li>Simple <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s are just efficient uniform rectangles, which take the least amount of processing and memory. So, you should prefer using simple <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s.</li>
-<li>Complex <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s are 2D bitmaps of <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>s which allow them to hold a detailed shape (in contrary to a uniform rectangle). This makes them the least efficient in terms of processing and memory. So, minimize your use of complex <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s to when you need such detailed shapes.</li>
+<li>Complex <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s are 2D bitmaps of <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>s which allow them to hold a detailed shape (in contrary to a uniform rectangle). This makes them the least efficient in terms of processing and memory. So, minimize your use of complex <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>s to when you need such detailed shapes.</li>
 </ul>
 <p ><code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code> has various functions to design itself. These functions can be "chained", because they all return a self-reference. Also note that some of these functions have an override that accepts a new a relative position to set. Usually you will first call one of the overrides that sets a relative position, and then continue using the ones that don't to further design the <code><a class="el" href="structKTech_1_1Texture.html">Texture</a></code>. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
@@ -465,7 +465,7 @@ std::vector&lt; <a class="el" href="structKTech_1_1CellA.html">CellA</a> &gt;&#1
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size</td><td>Rectangle's size. </td></tr>
-    <tr><td class="paramname">value</td><td>Rectangle's uniform <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
+    <tr><td class="paramname">value</td><td>Rectangle's uniform <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
   </table>
   </dd>
 </dl>
@@ -510,7 +510,7 @@ std::vector&lt; <a class="el" href="structKTech_1_1CellA.html">CellA</a> &gt;&#1
   <table class="params">
     <tr><td class="paramname">relativePosition</td><td>Relative position to set. </td></tr>
     <tr><td class="paramname">size</td><td>Rectangle's size. </td></tr>
-    <tr><td class="paramname">value</td><td>Rectangle's uniform <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
+    <tr><td class="paramname">value</td><td>Rectangle's uniform <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
   </table>
   </dd>
 </dl>
@@ -814,7 +814,7 @@ std::vector&lt; <a class="el" href="structKTech_1_1CellA.html">CellA</a> &gt;&#1
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size</td><td>Rectangle's size. </td></tr>
-    <tr><td class="paramname">value</td><td>Rectangle's <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
+    <tr><td class="paramname">value</td><td>Rectangle's <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
   </table>
   </dd>
 </dl>
@@ -859,7 +859,7 @@ std::vector&lt; <a class="el" href="structKTech_1_1CellA.html">CellA</a> &gt;&#1
   <table class="params">
     <tr><td class="paramname">relativePosition</td><td>Relative position to set. </td></tr>
     <tr><td class="paramname">size</td><td>Rectangle's size. </td></tr>
-    <tr><td class="paramname">value</td><td>Rectangle's <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
+    <tr><td class="paramname">value</td><td>Rectangle's <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> value. </td></tr>
   </table>
   </dd>
 </dl>

@@ -81,7 +81,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Like <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>, but with <code><a class="el" href="structKTech_1_1RGBA.html" title="Like RGB, but also has an alpha channel representing transparency.">RGBA</a></code> foreground and background colors, instead of <code><a class="el" href="structKTech_1_1RGB.html" title="24-bit color, able of representing 16,777,216 (2^24) different colors.">RGB</a></code>.  
+<p>Like <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>, but with <code><a class="el" href="structKTech_1_1RGBA.html" title="Like RGB, but also has an alpha channel representing transparency.">RGBA</a></code> foreground and background colors, instead of <code><a class="el" href="structKTech_1_1RGB.html" title="24-bit color, able of representing 16,777,216 (2^24) different colors.">RGB</a></code>.  
  <a href="structKTech_1_1CellA.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="cella_8hpp_source.html">cella.hpp</a>&gt;</code></p>
@@ -89,13 +89,13 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4d9e9d59874e2e459737541aed332f60"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structKTech_1_1CellA.html#a4d9e9d59874e2e459737541aed332f60">CellA</a> (char character=' ', <a class="el" href="structKTech_1_1RGBA.html">RGBA</a> foreground=RGBAColors::transparent, <a class="el" href="structKTech_1_1RGBA.html">RGBA</a> background=RGBAColors::transparent)</td></tr>
-<tr class="memdesc:a4d9e9d59874e2e459737541aed332f60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>.  <a href="structKTech_1_1CellA.html#a4d9e9d59874e2e459737541aed332f60">More...</a><br /></td></tr>
+<tr class="memdesc:a4d9e9d59874e2e459737541aed332f60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>.  <a href="structKTech_1_1CellA.html#a4d9e9d59874e2e459737541aed332f60">More...</a><br /></td></tr>
 <tr class="separator:a4d9e9d59874e2e459737541aed332f60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f211dac521bfef71839043e9a286992"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structKTech_1_1CellA.html#a0f211dac521bfef71839043e9a286992">CellA</a> (<a class="el" href="structKTech_1_1Cell.html">Cell</a> cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)</td></tr>
-<tr class="memdesc:a0f211dac521bfef71839043e9a286992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> from a <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>.  <a href="structKTech_1_1CellA.html#a0f211dac521bfef71839043e9a286992">More...</a><br /></td></tr>
+<tr class="memdesc:a0f211dac521bfef71839043e9a286992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> from a <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>.  <a href="structKTech_1_1CellA.html#a0f211dac521bfef71839043e9a286992">More...</a><br /></td></tr>
 <tr class="separator:a0f211dac521bfef71839043e9a286992"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab95824ec5f7ff978303d549251039b00"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structKTech_1_1CellA.html#ab95824ec5f7ff978303d549251039b00">operator==</a> (const <a class="el" href="structKTech_1_1CellA.html">CellA</a> &amp;cellA) const -&gt; bool</td></tr>
-<tr class="memdesc:ab95824ec5f7ff978303d549251039b00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare 2 <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>s.  <a href="structKTech_1_1CellA.html#ab95824ec5f7ff978303d549251039b00">More...</a><br /></td></tr>
+<tr class="memdesc:ab95824ec5f7ff978303d549251039b00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare 2 <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>s.  <a href="structKTech_1_1CellA.html#ab95824ec5f7ff978303d549251039b00">More...</a><br /></td></tr>
 <tr class="separator:ab95824ec5f7ff978303d549251039b00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -114,7 +114,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
 <tr class="separator:ad6f730fcd920a6e844c6f5c504e6f0d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Like <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>, but with <code><a class="el" href="structKTech_1_1RGBA.html" title="Like RGB, but also has an alpha channel representing transparency.">RGBA</a></code> foreground and background colors, instead of <code><a class="el" href="structKTech_1_1RGB.html" title="24-bit color, able of representing 16,777,216 (2^24) different colors.">RGB</a></code>. </p>
+<div class="textblock"><p >Like <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>, but with <code><a class="el" href="structKTech_1_1RGBA.html" title="Like RGB, but also has an alpha channel representing transparency.">RGBA</a></code> foreground and background colors, instead of <code><a class="el" href="structKTech_1_1RGB.html" title="24-bit color, able of representing 16,777,216 (2^24) different colors.">RGB</a></code>. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4d9e9d59874e2e459737541aed332f60" name="a4d9e9d59874e2e459737541aed332f60"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4d9e9d59874e2e459737541aed332f60">&#9670;&#160;</a></span>CellA() <span class="overload">[1/2]</span></h2>
@@ -156,7 +156,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>. </p>
+<p>Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">character</td><td>ASCII character. </td></tr>
@@ -208,7 +208,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> from a <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>. </p>
+<p>Construct a <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> from a <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">cell</td><td>Base <code><a class="el" href="structKTech_1_1Cell.html" title="Terminal cell comprising RGB foreground (character) color, RGB background color, and an ASCII charact...">Cell</a></code>. </td></tr>
@@ -246,10 +246,10 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Compare 2 <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>s. </p>
+<p>Compare 2 <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>s. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">cellA</td><td>The <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> to compare with this <code><a class="el" href="structKTech_1_1CellA.html" title="Like CellA, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cellA</td><td>The <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code> to compare with this <code><a class="el" href="structKTech_1_1CellA.html" title="Like Cell, but with RGBA foreground and background colors, instead of RGB.">CellA</a></code>. </td></tr>
   </table>
   </dd>
 </dl>
