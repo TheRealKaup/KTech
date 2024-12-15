@@ -57,7 +57,7 @@ public:
 	size_t tpsLimit; //!< Max ticks allowed to occur in a second. You set this value in `Engine::Engine()`, and you can change it whenever you want.
 	float tps; //!< Actual ticks per second. Corresponds to `Time::deltaTime`.
 	float tpsPotential; //!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
-	size_t deltaTime; //!< Duration of the last tick, in microseconds.
+	long deltaTime; //!< Duration of the last tick, in microseconds.
 	size_t ticksCounter = 0; //!< Total ticks since game started.
 
 	auto Invoke(const std::function<bool()>& callback, size_t time, Measurement timeMeasurement) -> Invocation*;

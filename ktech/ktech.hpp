@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace KTech
 {
 	// Basic structures.
@@ -70,6 +68,13 @@ namespace KTech
 	namespace RGBAColors {}
 	namespace Keys {}
 }
+
+#include <cstdint>
+#ifdef _WIN32
+#include <Windows.h>
+#undef RGB
+#undef max
+#endif
 
 #ifndef KTECH_DEFINITION // See `documentation/faq.md#`
 #include "basic/point.hpp"

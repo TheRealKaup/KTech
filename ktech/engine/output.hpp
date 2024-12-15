@@ -30,7 +30,6 @@
 #include <string>
 #ifdef _WIN32
 #include <Windows.h>
-#undef RGB
 #else
 #include <termio.h>
 #endif
