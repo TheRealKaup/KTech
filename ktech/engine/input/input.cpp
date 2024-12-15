@@ -249,11 +249,11 @@ void KTech::Input::Get()
 	// Read
 	TCHAR tcharBuf[7];
 	memset(tcharBuf, 0, sizeof(tcharBuf));
-	LPDWORD nReadCharacters = 0;
-	ReadConsole(m_stdinHandle, tcharBuf, sizeof(tcharBuf) / sizeof(TCHAR), (LPDWORD)(&nReadCharacters), NULL);
+	DWORD nReadCharacters = 0;
+	ReadConsole(m_stdinHandle, tcharBuf, sizeof(tcharBuf) / sizeof(TCHAR), &nReadCharacters, NULL);
 	// Convert `TCHAR` string to `char` string
-	std::string charBuf(static_cast<size_t>(nReadCharacters), '\0');
-	for (size_t i = 0; i < static_cast<size_t>(nReadCharacters); i++)
+	std::string charBuf(nReadCharacters, '\0');
+	for (size_t i = 0; i < nReadCharacters; i++)
 	{
 		charBuf[i] = tcharBuf[i];
 	}
