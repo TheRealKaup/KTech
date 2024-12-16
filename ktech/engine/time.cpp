@@ -167,14 +167,20 @@ void KTech::Time::CallInvocations()
 */
 void KTech::Time::WaitUntilNextTick()
 {
-	// Calculate `tpsPotential`
+	// Calculate delta of current tick (`deltaTime`)
 	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_currentTickStart).count();
+	// Calculate `tpsPotential`
 	tpsPotential = 1000000.0F / deltaTime;
-	// Sleep according to `tpsLimit`
-	std::this_thread::sleep_for(std::chrono::microseconds(1000000 / tpsLimit - deltaTime));
+	// Calculate sleep duration according to `tpsLimit`
+	auto sleepDuration = std::chrono::microseconds(1000000 / tpsLimit) - std::chrono::microseconds(deltaTime);
+	// Sleep only if needed
+	if (sleepDuration.count() > 0) {
+		std::this_thread::sleep_for(sleepDuration);
+	}
 	// Calculate (actual) `tps`
 	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_currentTickStart).count();
 	tps = 1000000.0F / deltaTime;
-	m_currentTickStart = std::chrono::high_resolution_clock::now();
+	// Set `m_currentTickStart` to now
 	ticksCounter++;
+	m_currentTickStart = std::chrono::high_resolution_clock::now();
 }

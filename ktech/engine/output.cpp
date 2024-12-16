@@ -387,7 +387,7 @@ auto KTech::Output::ShouldPrintThisTick() const -> bool
 {
 	winsize tempTerminalSize;
 #ifdef _WIN32
-	GetConsoleScreenBufferInfo(m_stdoutHandle, &m_csbi);
+	GetConsoleScreenBufferInfo(m_stdoutHandle, PCONSOLE_SCREEN_BUFFER_INFO(&m_csbi));
 	tempTerminalSize.ws_col = m_csbi.srWindow.Right - m_csbi.srWindow.Left + 1;
 	tempTerminalSize.ws_row = m_csbi.srWindow.Bottom - m_csbi.srWindow.Top + 1;
 #else
