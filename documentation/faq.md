@@ -7,7 +7,11 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 - [How to run the game examples?](#how-to-run-the-game-examples)
 - [How does the licensing work?](#how-does-the-licensing-work)
 - [Is KTech Stable?](#is-ktech-stable)
-- [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
+- [Why are `Collider`What is the Git workflow here?
+
+- `master` branch includes only commits that are to be tagged for releases.
+- `develop` branch include not fully refined feature updates.
+- `topic/*` branches include feature updates.s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
 - [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
 - [How does the file system work?](#how-does-the-file-system-work)
 - [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
@@ -15,6 +19,7 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 - [Will there be a software development kit?](#will-there-be-a-software-development-kit)
 - [Is KTech GPU-accelerated?](#is-ktech-gpu-accelerated)
 - [Why is the library named "KTech"?](#why-is-the-library-named-ktech)
+- [What is the Git workflow here?](#what-is-the-git-workflow-here)
 
 # Q&A
 
@@ -208,3 +213,22 @@ This would be simpler if the namespace and the `#include` directives were separa
 ## Why is the library named "KTech"?
 
 Originally I called it KCGE, which meant "Kaup's Console Game Engine". As part of opening its codebase, I renamed it to KTech. The 'K' remained, and with "Tech" concatenated, this project truly is an AliExpress brand. It's corny and retro, and I think it's fitting.
+
+## What is the Git workflow here?
+
+The branches are as follows:
+
+- `master`
+	- Includes only commits that are to be tagged as releases.
+- `develop`
+	- Includes new features.
+	- Merged into `master` when it fulfills a GitHub milestone and is stable (in the form of a major or minor release).
+- `topic/*`
+	- Includes branches with new features
+	- Merged into `develop` when needed.
+- `hotfix/*`
+	- Includes branches with fixes.
+	- Merged into `master` as quickly as possible (in the form of a patch release).
+	- Merged into `develop` if needed.
+
+As of December 2024, this workflow was implemented here quite recently. So, I myself have to get used to it, and it might change.
