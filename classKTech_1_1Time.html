@@ -120,16 +120,16 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>tpsLimit</b></td></
 <tr class="separator:a5a5d097c152cf26a0a70720be2a44c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacfce4b68eb1fb70ccf0ebda0200a81e"><td class="memItemLeft" align="right" valign="top"><a id="aacfce4b68eb1fb70ccf0ebda0200a81e" name="aacfce4b68eb1fb70ccf0ebda0200a81e"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>tps</b></td></tr>
-<tr class="memdesc:aacfce4b68eb1fb70ccf0ebda0200a81e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Actual ticks per second. Corresponds to <code><a class="el" href="classKTech_1_1Time.html#ac40b0a4b2e66aaa9355ddaf39591a520" title="Duration of the last tick, in microseconds.">Time::deltaTime</a></code>. <br /></td></tr>
+<tr class="memdesc:aacfce4b68eb1fb70ccf0ebda0200a81e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Actual ticks per second. Corresponds to <code><a class="el" href="classKTech_1_1Time.html#af3e711af015fa64296707ccde48ff81d" title="Duration of the last tick, in microseconds.">Time::deltaTime</a></code>. <br /></td></tr>
 <tr class="separator:aacfce4b68eb1fb70ccf0ebda0200a81e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d4db19fd005ad3d10d034139061f3ad"><td class="memItemLeft" align="right" valign="top"><a id="a4d4db19fd005ad3d10d034139061f3ad" name="a4d4db19fd005ad3d10d034139061f3ad"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>tpsPotential</b></td></tr>
 <tr class="memdesc:a4d4db19fd005ad3d10d034139061f3ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ticks per second if it wasn't limited by <code><a class="el" href="classKTech_1_1Time.html#a5a5d097c152cf26a0a70720be2a44c9f" title="Max ticks allowed to occur in a second. You set this value in Engine::Engine(), and you can change it...">Time::tpsLimit</a></code>. <br /></td></tr>
 <tr class="separator:a4d4db19fd005ad3d10d034139061f3ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac40b0a4b2e66aaa9355ddaf39591a520"><td class="memItemLeft" align="right" valign="top"><a id="ac40b0a4b2e66aaa9355ddaf39591a520" name="ac40b0a4b2e66aaa9355ddaf39591a520"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>deltaTime</b></td></tr>
-<tr class="memdesc:ac40b0a4b2e66aaa9355ddaf39591a520"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duration of the last tick, in microseconds. <br /></td></tr>
-<tr class="separator:ac40b0a4b2e66aaa9355ddaf39591a520"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3e711af015fa64296707ccde48ff81d"><td class="memItemLeft" align="right" valign="top"><a id="af3e711af015fa64296707ccde48ff81d" name="af3e711af015fa64296707ccde48ff81d"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>deltaTime</b></td></tr>
+<tr class="memdesc:af3e711af015fa64296707ccde48ff81d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duration of the last tick, in microseconds. <br /></td></tr>
+<tr class="separator:af3e711af015fa64296707ccde48ff81d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80cc0d55184510191feb2406dee30f2f"><td class="memItemLeft" align="right" valign="top"><a id="a80cc0d55184510191feb2406dee30f2f" name="a80cc0d55184510191feb2406dee30f2f"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>ticksCounter</b> = 0</td></tr>
 <tr class="memdesc:a80cc0d55184510191feb2406dee30f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total ticks since game started. <br /></td></tr>
@@ -278,7 +278,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Engine</b></td></tr>
       </table>
 </div><div class="memdoc">
 <p >Sleeps and returns when the next tick should start.</p>
-<p >Calculates how long to sleep (based on how long the current tick is, and <code><a class="el" href="classKTech_1_1Time.html#a5a5d097c152cf26a0a70720be2a44c9f" title="Max ticks allowed to occur in a second. You set this value in Engine::Engine(), and you can change it...">Time::tpsLimit</a></code>). It enters sleep and returns when the following tick should occur. This function also updates <code><a class="el" href="classKTech_1_1Time.html#a4d4db19fd005ad3d10d034139061f3ad" title="Ticks per second if it wasn&#39;t limited by Time::tpsLimit.">Time::tpsPotential</a></code>, <code><a class="el" href="classKTech_1_1Time.html#ac40b0a4b2e66aaa9355ddaf39591a520" title="Duration of the last tick, in microseconds.">Time::deltaTime</a></code>, <code><a class="el" href="classKTech_1_1Time.html#aacfce4b68eb1fb70ccf0ebda0200a81e" title="Actual ticks per second. Corresponds to Time::deltaTime.">Time::tps</a></code>, and <code><a class="el" href="classKTech_1_1Time.html#a80cc0d55184510191feb2406dee30f2f" title="Total ticks since game started.">Time::ticksCounter</a></code>.</p>
+<p >Calculates how long to sleep (based on how long the current tick is, and <code><a class="el" href="classKTech_1_1Time.html#a5a5d097c152cf26a0a70720be2a44c9f" title="Max ticks allowed to occur in a second. You set this value in Engine::Engine(), and you can change it...">Time::tpsLimit</a></code>). It enters sleep and returns when the following tick should occur. This function also updates <code><a class="el" href="classKTech_1_1Time.html#a4d4db19fd005ad3d10d034139061f3ad" title="Ticks per second if it wasn&#39;t limited by Time::tpsLimit.">Time::tpsPotential</a></code>, <code><a class="el" href="classKTech_1_1Time.html#af3e711af015fa64296707ccde48ff81d" title="Duration of the last tick, in microseconds.">Time::deltaTime</a></code>, <code><a class="el" href="classKTech_1_1Time.html#aacfce4b68eb1fb70ccf0ebda0200a81e" title="Actual ticks per second. Corresponds to Time::deltaTime.">Time::tps</a></code>, and <code><a class="el" href="classKTech_1_1Time.html#a80cc0d55184510191feb2406dee30f2f" title="Total ticks since game started.">Time::ticksCounter</a></code>.</p>
 <p >Normally placed at the end of your game loop:</p>
 <div class="fragment"><div class="line"><span class="comment">// Game loop</span></div>
 <div class="line"><span class="keywordflow">while</span> (engine.<a class="code hl_variable" href="classKTech_1_1Engine.html#af96b0705c25719c1caea610ef32a5427">running</a>)</div>
@@ -292,7 +292,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Engine</b></td></tr>
 <dd>
 <code><a class="el" href="classKTech_1_1Time.html#a4d4db19fd005ad3d10d034139061f3ad" title="Ticks per second if it wasn&#39;t limited by Time::tpsLimit.">Time::tpsPotential</a></code> </dd>
 <dd>
-<code><a class="el" href="classKTech_1_1Time.html#ac40b0a4b2e66aaa9355ddaf39591a520" title="Duration of the last tick, in microseconds.">Time::deltaTime</a></code> </dd>
+<code><a class="el" href="classKTech_1_1Time.html#af3e711af015fa64296707ccde48ff81d" title="Duration of the last tick, in microseconds.">Time::deltaTime</a></code> </dd>
 <dd>
 <code><a class="el" href="classKTech_1_1Time.html#aacfce4b68eb1fb70ccf0ebda0200a81e" title="Actual ticks per second. Corresponds to Time::deltaTime.">Time::tps</a></code> </dd>
 <dd>
