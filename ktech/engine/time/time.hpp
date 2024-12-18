@@ -25,7 +25,6 @@
 #undef KTECH_DEFINITION
 
 #include <chrono>
-#include <functional>
 
 /*!
 	@brief Engine component responsible for game loop timing.
@@ -47,9 +46,9 @@ public:
 	struct Invocation;
 
 	unsigned long tpsLimit; //!< Max ticks allowed to occur in a second. You set this value in `Engine::Engine()`, and you can change it whenever you want.
-	float tps; //!< Actual ticks per second. Corresponds to `Time::deltaTime`.
-	float tpsPotential; //!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
-	long deltaTime; //!< Duration of the last tick, in microseconds.
+	float tps = 0; //!< Actual ticks per second. Corresponds to `Time::deltaTime`.
+	float tpsPotential = 0; //!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
+	long deltaTime = 0; //!< Duration of the last tick, in microseconds.
 	unsigned long ticksCounter = 0; //!< Total ticks since game started.
 
 	void CallInvocations();
