@@ -54,21 +54,17 @@ public:
 		KTech::RGBA unselected = KTech::RGBAColors::gray,
 		KTech::RGBA selected = KTech::RGBAColors::white,
 		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue)
-		: Widget(engine, ui, position), m_OnPress(std::move(OnPress)), m_unselectedRGBA(unselected), m_selectedRGBA(selected), m_downRGBA(down)
+		: Widget(engine, ui, position),
+		m_OnPress(std::move(OnPress)),
+		m_unselectedRGBA(unselected),
+		m_selectedRGBA(selected),
+		m_downRGBA(down),
+		m_downInvocation(engine, [this]() -> bool { return RemovePressColor(); })
 	{
 		// Texture
 		SetText(text, withFrame);
 		// Input handlers
 		m_callbacksGroup.RegisterCallback(key, [this]() -> bool { return InsideOnPress(); });
-	}
-
-	//! Cancel invocations
-	~Button()
-	{
-		if (m_downInvocation != nullptr)
-		{
-			engine.time.CancelInvocation(m_downInvocation);
-		}
 	}
 
 	/*!
@@ -80,7 +76,7 @@ public:
 	void SetText(const std::string& text, bool withFrame)
 	{
 		KTech::RGBA tempColor;
-		if (m_downInvocation != nullptr) // The button is down as it is invoked to remove down color
+		if (m_downInvocation.m_active) // The button is down as it is invoked to remove down color
 		{
 			tempColor = m_downRGBA;
 		}
@@ -131,7 +127,7 @@ private:
 
 	KTech::RGBA m_unselectedRGBA, m_selectedRGBA, m_downRGBA;
 	static constexpr size_t pressLength = 100;
-	KTech::Time::Invocation* m_downInvocation = nullptr;
+	KTech::Time::Invocation m_downInvocation;
 
 	void OnSelect() override
 	{
@@ -175,7 +171,6 @@ private:
 				texture.SetForeground(m_unselectedRGBA);
 			}
 		}
-		m_downInvocation = nullptr;
 		return true;
 	}
 
@@ -185,7 +180,7 @@ private:
 		{
 			texture.SetForeground(m_downRGBA);
 		}
-		m_downInvocation = engine.time.Invoke([this]() -> bool { return RemovePressColor(); }, pressLength, KTech::Time::Measurement::milliseconds);
+		m_downInvocation.Invoke(pressLength, KTech::Time::Measurement::milliseconds);
 		if (m_OnPress)
 		{
 			m_OnPress();
