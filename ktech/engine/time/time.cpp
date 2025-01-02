@@ -56,6 +56,12 @@ void KTech::Time::CallInvocations()
 	// NOLINTNEXTLINE(modernize-loop-convert) // Avoid iterator invalidation (`Invocation::Advance()` can insert into `m_invocations`).
 	for (size_t i = 0; i < m_invocations.size(); i++)
 	{
+		// SKIP invocations deleted meanwhile
+		if (m_invocations[i] == nullptr)
+		{
+			continue;
+		}
+
 		if (m_invocations[i]->m_active)
 		{
 			// ADVANCE invocation:
