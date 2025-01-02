@@ -326,7 +326,7 @@ int main()
 	KTech::Output::Log("<main()> Loading assets/land.ktecht", RGBColors::blue);
 	worldProps.m_textures[2].File("assets/land.ktecht", Point(0, 3));
 	worldProps.m_colliders.resize(1);
-	worldProps.m_colliders[0].ByTextureBackground(worldProps.m_textures[2], 1, 0);
+	worldProps.m_colliders[0].ByTextureBackground(worldProps.m_textures[2], 0, 1);
 	layer.AddObject(worldProps.m_id);
 
 	KTech::Output::Log("<main()> Creating frame", RGBColors::blue);

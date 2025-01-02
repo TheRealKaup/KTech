@@ -98,8 +98,15 @@ void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint
 	}
 }
 
-//! @brief This function is undocumented because it's planned to change (see GitHub issue #128).
-void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_type)
+/*!
+	@fn Collider::ByTextureCharacter
+	@brief Construct a `Collider` based on a `Texture`'s character values.
+
+	@param texture The base `Texture`.
+	@param type Collider type, as defiend in `Collision::colliderTypes`.
+	@param excludedCharacters Cells with this character will not be turned on.
+*/
+void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_type, char p_excludedCharacter)
 {
     m_simple = false;
     m_type = p_type;
@@ -111,12 +118,43 @@ void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_typ
 	// Read from texture
 	for (size_t i = 0; i < m_c.size(); i++)
 	{
-		m_c[i] = (p_texture.m_t[i].c != ' ');
+		m_c[i] = (p_texture.m_t[i].c != p_excludedCharacter);
 	}
 }
 
-//! @brief This function is undocumented because it's planned to change (see GitHub issue #128).
-void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_alphaThreshold, uint8_t p_type)
+/*!
+	@fn Collider::ByTextureBackground
+	@brief Construct a `Collider` based on a `Texture`'s background values.
+
+	@param texture The base `Texture`.
+	@param type Collider type, as defiend in `Collision::colliderTypes`.
+	@param alphaThreshold Cells with background alpha => this value will be turned on.
+*/
+void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_type, uint8_t p_alphaThreshold)
+{
+    m_simple = false;
+    m_type = p_type;
+    m_rPos = p_texture.m_rPos;
+	// Get size
+	m_size = p_texture.m_size;
+	// Apply size
+	m_c.resize(p_texture.m_t.size());
+	// Read from texture
+	for (size_t i = 0; i < m_c.size(); i++)
+	{
+		m_c[i] = (p_texture.m_t[i].b.a >= p_alphaThreshold);
+	}
+}
+
+/*!
+	@fn Collider::ByTextureForeground
+	@brief Construct a `Collider` based on a `Texture`'s foreground values.
+
+	@param texture The base `Texture`.
+	@param type Collider type, as defiend in `Collision::colliderTypes`.
+	@param alphaThreshold Cells with foreground alpha => this value will be turned on.
+*/
+void KTech::Collider::ByTextureForeground(const Texture& p_texture, uint8_t p_type, uint8_t p_alphaThreshold)
 {
     m_simple = false;
     m_type = p_type;
