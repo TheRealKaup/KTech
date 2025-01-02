@@ -59,20 +59,27 @@ struct UITest
 	ID<UI> ui;
 	Input::CallbacksGroup callbacksGroup;
 
-	Time::Invocation* countdownInvocation;
+	Time::Invocation countdownInvocation;
 
 	uint8_t countdown;
 	// Countdown iteration
 	bool Countdown()
 	{
+		engine.output.outputOnQuit.push_back(
+			"\nduration: " + std::to_string(countdownInvocation.m_duration)
+			+ "\ntime passed: " + std::to_string(countdownInvocation.m_timePassed) + "\n"
+		);
+
 		if (countdown > 0)
 		{
 			countdown--;
 			((Button*)widgets[w_button])->SetText("Exiting in " + std::to_string(countdown), true);
-			countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
+			countdownInvocation.Invoke(1, Time::Measurement::seconds);
 		}
 		else
+		{
 			Quit();
+		}
 		return true;
 	}
 
@@ -80,7 +87,7 @@ struct UITest
 	{
 		((Button*)widgets[w_button])->SetText("Exit", true);
 		((Button*)widgets[w_button])->m_OnPress = std::bind(&UITest::StartExitCountdown, this);
-		engine.time.CancelInvocation(countdownInvocation);
+		countdownInvocation.Cancel();
 
 		((IntField*)widgets[w_intfield])->SetValue("789");
 		((StringField*)widgets[w_stringfield])->SetValue("abcd");
@@ -94,7 +101,7 @@ struct UITest
 		countdown = 3;
 		// Invoke countdown
 		engine.output.Log("(GAME) <UI::StartExitCountdown()> Invoke", RGBColors::orange);
-		countdownInvocation = engine.time.Invoke(std::bind(&UITest::Countdown, this), 1, Time::Measurement::seconds);
+		countdownInvocation.Invoke(1, Time::Measurement::seconds);
 	}
 
 	bool MoveUp()
@@ -132,7 +139,7 @@ struct UITest
 	}
 
 	UITest(ID<UI> ui)
-		: ui(ui), callbacksGroup(engine, true)
+		: ui(ui), callbacksGroup(engine, true), countdownInvocation(engine, [this] { return Countdown(); })
 	{
 		widgets[w_frame] = new Frame(engine, ui, Point(0, 0), UPoint(19, 19));
 		widgets[w_showNotice] = new Switch(engine, ui, std::bind(&UITest::SetNotice, this), Keys::return_, Point(3, -1), "Show\1Notice", false, false);

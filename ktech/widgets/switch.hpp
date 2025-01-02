@@ -62,21 +62,20 @@ public:
 		KTech::RGBA unselectedOn = KTech::RGBAColors::Widgets::switchUnselectedOnGreen,
 		KTech::RGBA selectedOn = KTech::RGBAColors::Widgets::switchSelectedOnGreen,
 		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue)
-		: Widget(engine, ui, position), m_OnPress(std::move(OnPress)), m_on(on), m_unselectedOffRGBA(unselectedOff), m_selectedOffRGBA(selectedOff), m_unselectedOnRGBA(unselectedOn), m_selectedOnRGBA(selectedOn), m_downRGBA(down)
+		: Widget(engine, ui, position),
+		m_OnPress(std::move(OnPress)),
+		m_on(on),
+		m_unselectedOffRGBA(unselectedOff),
+		m_selectedOffRGBA(selectedOff),
+		m_unselectedOnRGBA(unselectedOn),
+		m_selectedOnRGBA(selectedOn),
+		m_downRGBA(down),
+		m_downInvocation(engine, [this]() -> bool { return RemovePressColor(); })
 	{
 		// Textures
 		SetText(text, withFrame);
 		// Input handlers
 		m_callbacksGroup.RegisterCallback(key, [this]() -> bool { return this->OnPress(); });
-	}
-
-	//! Cancel invocations
-	virtual ~Switch()
-	{
-		if (m_downInvocation == nullptr)
-		{
-			engine.time.CancelInvocation(m_downInvocation);
-		}
 	}
 
 	/*!
@@ -158,7 +157,7 @@ private:
 
 	KTech::RGBA m_unselectedOffRGBA, m_selectedOffRGBA, m_unselectedOnRGBA, m_selectedOnRGBA, m_downRGBA;
 	static constexpr size_t pressLength = 100;
-	KTech::Time::Invocation* m_downInvocation = nullptr;
+	KTech::Time::Invocation m_downInvocation;
 
 	void OnSelect() override
 	{
@@ -179,7 +178,7 @@ private:
 			texture.SetForeground(m_downRGBA);
 		}
 
-		engine.time.Invoke([this]() -> bool { return RemovePressColor(); }, pressLength, KTech::Time::Measurement::milliseconds);
+		m_downInvocation.Invoke(pressLength, KTech::Time::Measurement::milliseconds);
 
 		if (m_OnPress)
 		{
@@ -261,7 +260,6 @@ private:
 				}
 			}
 		}
-		m_downInvocation = nullptr;
 		return true;
 	}
 };

@@ -26,6 +26,7 @@
 
 #include "../world/object.hpp"
 #include "../engine/engine.hpp"
+#include "../engine/time/invocation.hpp"
 
 /*!
 	@brief Wrapper for animating an `Object`s and its `Texture`s.
@@ -83,5 +84,5 @@ private:
 	ID<Object> m_object;
 	std::vector<Instruction> m_instructions;
 	size_t m_i = 0;
-	Time::Invocation* m_invocation = nullptr;
+	Time::Invocation m_invocation;
 };

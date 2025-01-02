@@ -34,7 +34,7 @@
 	@see `Animation::Play()`
 */
 KTech::Animation::Animation(Engine& p_engine, const ID<Object>& p_object, const std::vector<Instruction>& p_instructions)
-	: engine(p_engine), m_object(p_object), m_instructions(p_instructions) {}
+	: engine(p_engine), m_object(p_object), m_instructions(p_instructions), m_invocation(engine, [this]() -> bool { return Play(); }) {}
 
 //! @brief Safely cancels invoked animation instructions.
 KTech::Animation::~Animation()
@@ -120,7 +120,7 @@ auto KTech::Animation::Play() -> bool
 			case Instruction::Type::Delay:
 			{
 				// Delay; invoke the next iteration
-				m_invocation = engine.time.Invoke([this]() -> bool { return Play(); }, m_instructions[m_i].intData, m_instructions[m_i].timeMeasurement);
+				m_invocation.Invoke(m_instructions[m_i].intData, m_instructions[m_i].timeMeasurement);
 				// Pause iterating
 				m_i++; // Don't reiterate this delay
 				return changedThisTick; // Don't set to true as delay changes nothing
@@ -133,9 +133,6 @@ auto KTech::Animation::Play() -> bool
 //! @brief Stop animation by canceling the invoked instructions, and prepare for a re-`Play()`.
 void KTech::Animation::Stop()
 {
-	if (m_invocation != nullptr)
-	{
-		engine.time.CancelInvocation(m_invocation);
-	}
+	m_invocation.Cancel();
 	m_i = 0;
 }
