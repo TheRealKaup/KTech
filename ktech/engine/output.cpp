@@ -1,6 +1,6 @@
 ﻿/*
 	KTech, Kaup's C++ 2D terminal game engine library.
-	Copyright (C) 2023-2024 Ethan Kaufman (AKA Kaup)
+	Copyright (C) 2023-2025 Ethan Kaufman (AKA Kaup)
 
 	This file is part of KTech.
 
