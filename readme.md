@@ -66,7 +66,7 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 ## Interrelated Projects
 
-### netset
+### [netset](https://github.com/TheRealKaup/netset-core)
 
 A KTech game in active development. The player is a freelance hacker that gets jobs from the darknet. The game involves a networking simulation and a story line. The gameplay consists of searching for information, analyzing it and converting it into new information, until the goal is reached.
 
