@@ -75,7 +75,8 @@ PROJECT_ICON           =
 # entered, it will be relative to the location where Doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       =
+# modified
+OUTPUT_DIRECTORY       = build/doxygen/
 
 # If the CREATE_SUBDIRS tag is set to YES then Doxygen will create up to 4096
 # sub-directories (in 2 levels) under the output directory of each output format
@@ -86,7 +87,8 @@ OUTPUT_DIRECTORY       =
 # control the number of sub-directories.
 # The default value is: NO.
 
-CREATE_SUBDIRS         = NO
+# modified
+CREATE_SUBDIRS         = YES
 
 # Controls the number of sub-directories that will be created when
 # CREATE_SUBDIRS tag is set to YES. Level 0 represents 16 directories, and every
@@ -967,7 +969,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 # modified
-INPUT                  = ../../ktech/ mainpage.md
+INPUT                  = ktech/ documentation/doxygen/mainpage.md
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1049,6 +1051,7 @@ EXCLUDE_PATTERNS       =
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # ANamespace::AClass, ANamespace::*Test
 
+# modified
 EXCLUDE_SYMBOLS        = Input::Callback Input::Handler Animation::Instruction Widget::ChildWidget
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
@@ -1062,6 +1065,7 @@ EXAMPLE_PATH           =
 # *.h) to filter out the source-files in the directories. If left blank all
 # files are included.
 
+# modified
 EXAMPLE_PATTERNS       =*
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
@@ -1069,6 +1073,7 @@ EXAMPLE_PATTERNS       =*
 # irrespective of the value of the RECURSIVE tag.
 # The default value is: NO.
 
+# modified
 EXAMPLE_RECURSIVE      = YES
 
 # The IMAGE_PATH tag can be used to specify one or more files or directories
@@ -1136,7 +1141,8 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the Doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = mainpage.md
+# modified
+USE_MDFILE_AS_MAINPAGE = documentation/doxygen/mainpage.md
 
 # The Fortran standard specifies that for fixed formatted Fortran code all
 # characters from position 72 are to be considered as comment. A common

@@ -16,15 +16,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: mattnotmitt/doxygen-action@v1.9.5
+      - name: Create directory
+        run: mkdir -p build/doxygen/html/
+
+      - uses: mattnotmitt/doxygen-action@v1.9.8
         with:
-          working-directory: 'documentation/doxygen/'
-          doxyfile-path: 'doxyfile'
+          doxyfile-path: 'documentation/doxygen/doxyfile'
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: documentation/doxygen/html/
+          publish_dir: build/doxygen/html/
           publish_branch: gh-pages
