@@ -19,7 +19,7 @@ jobs:
       - name: Create directory
         run: mkdir -p build/doxygen/html/
 
-      - uses: mattnotmitt/doxygen-action@v1.9.8
+      - uses: mattnotmitt/doxygen-action@v1.12.0
         with:
           doxyfile-path: 'documentation/doxygen/doxyfile'
 
