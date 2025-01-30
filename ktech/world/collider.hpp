@@ -30,7 +30,7 @@
 #include <vector>
 
 /*!
-	2D physical space for `Object`s.
+	@brief 2D physical space for `Object`s.
 
 	`Object`s have a vector of these `Collider`s (`Object::m_colliders`), which represents their physical space. `Collider`s are used to process `Object` movement in `Collision::MoveObject()`.
 

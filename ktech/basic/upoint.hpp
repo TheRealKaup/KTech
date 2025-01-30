@@ -24,7 +24,7 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
-//! Unsigned 2D vector, mostly used to store sizes and 2D indexes.
+//! @brief Unsigned 2D vector, mostly used to store sizes and 2D indexes.
 struct KTech::UPoint
 {
 	uint32_t x; //!< X axis.

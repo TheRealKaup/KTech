@@ -25,7 +25,7 @@
 #undef KTECH_DEFINITION
 #include "rgb.hpp"
 
-//! Like `RGB`, but also has an alpha channel representing transparency.
+//! @brief Like `RGB`, but also has an alpha channel representing transparency.
 struct KTech::RGBA : RGB
 {
 	uint8_t a; //!< Alpha channel.

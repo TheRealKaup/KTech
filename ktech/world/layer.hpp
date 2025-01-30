@@ -32,7 +32,7 @@
 #include <vector>
 
 /*!
-	World structure that contains `Object`s, and exists within `Map`.
+	@brief World structure that contains `Object`s, and exists within `Map`.
 
 	Separates `Object`s in collision (only `Object`s from the same `Layer` can collide), and orders `Object`s in rendering (`Object`s in the first `Layer` added to a `Map` will be covered by `Object`s from the following `Layer`, and so on).
 */

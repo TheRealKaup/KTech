@@ -34,7 +34,7 @@
 #include <vector>
 
 /*!
-	World structure that contains and renders `Widget`s.
+	@brief World structure that contains and renders `Widget`s.
 
 	This class is like a combined `Layer` and `Camera`, but for `Widget`s.
 

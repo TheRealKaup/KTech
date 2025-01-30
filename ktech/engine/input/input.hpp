@@ -38,7 +38,7 @@
 #include <thread>
 
 /*!
-	Engine component responsible for distributing user input.
+	@brief Engine component responsible for distributing user input.
 */
 class KTech::Input
 {

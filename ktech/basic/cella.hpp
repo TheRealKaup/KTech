@@ -27,7 +27,7 @@
 #include "rgba.hpp"
 #include "../utility/rgbacolors.hpp"
 
-//! Like `Cell`, but with `RGBA` foreground and background colors, instead of `RGB`.
+//! @brief Like `Cell`, but with `RGBA` foreground and background colors, instead of `RGB`.
 struct KTech::CellA
 {
 	RGBA f; //!< Foreground (character) color.

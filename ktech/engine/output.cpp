@@ -118,7 +118,7 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 }
 
 /*!
-	Clear the image buffer.
+	@brief Clear the image buffer.
 
 	Doesn't clear the terminal; that is done by `Output::Print()` just before printing the new image.
 
@@ -358,7 +358,7 @@ auto KTech::Output::ShouldRenderThisTick() -> bool
 }
 
 /*!
-	Check whether the terminal changed and requires a new print.
+	@brief Check whether the terminal changed and requires a new print.
 
 	The `Output` engine component keeps track of the terminal size, because if it changes, the engine needs to adapt. If that happened, this function returns true, telling you that the image buffer should be printed again.
 

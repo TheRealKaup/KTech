@@ -24,7 +24,7 @@
 #include "../../engine/engine.hpp"
 
 /*!
-	Register a new `CallbacksGroup` at `Input`.
+	@brief Register a new `CallbacksGroup` at `Input`.
 
 	@param [in] engine Parent engine.
 	@param [in] enabled Will set registered callbacks to this value by default.
@@ -36,7 +36,7 @@ KTech::Input::CallbacksGroup::CallbacksGroup(Engine& engine, bool enabled)
 }
 
 /*!
-	Remove `CallbacksGroup` and its callback functions from `Input`.
+	@brief Remove `CallbacksGroup` and its callback functions from `Input`.
 
 	Deconstructing a `CallbacksGroup` also means all of its input callback functions will be permanently deregistered. This is good, because you can create a `CallbacksGroup` instance in your class (like a moving character inherited from `Object`), register member functions as input callbacks, and not worry later about your character deconstructing while still having member functions registered and potentially called (because the `CallbacksGroup` and its callback functions are deconstructed with it).
 */
@@ -110,7 +110,7 @@ void KTech::Input::CallbacksGroup::RegisterRangedCallback(char p_start, char p_e
 }
 
 /*!
-	Enable registered callback functions.
+	@brief Enable registered callback functions.
 
 	The callbacks will be enabled only in next tick. This way, for example, you don't have to worry about a sequence where:
 
@@ -128,7 +128,7 @@ void KTech::Input::CallbacksGroup::Enable()
 }
 
 /*!
-	Disable registered callback functions.
+	@brief Disable registered callback functions.
 
 	The callbacks will be disabled only in the next tick. This behavior is explained in `CallbacksGroup::Enable()`'s documentation entry.
 

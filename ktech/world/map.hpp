@@ -29,7 +29,7 @@
 #include <vector>
 
 /*!
-	World structure that contains `Layer`s and `Camera`s.
+	@brief World structure that contains `Layer`s and `Camera`s.
 */
 class KTech::Map
 {

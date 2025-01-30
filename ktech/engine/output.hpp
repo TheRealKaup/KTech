@@ -36,7 +36,7 @@
 #include <vector>
 
 /*!
-	Engine component responsible for outputting rendered images.
+	@brief Engine component responsible for outputting rendered images.
 */
 class KTech::Output
 {

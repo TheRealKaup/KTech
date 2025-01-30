@@ -33,7 +33,7 @@
 #include <vector>
 
 /*!
-	A `CellA`-based sprite.
+	@brief A `CellA`-based sprite.
 
 	`Object`s and `Widget`s have a vector of these `Texture`s (`Object::m_textures` and `Widget::m_textures`, respectively), which represents their visual appearance. `Texture`s are used to render `Object`s and `Widget`s in `Camera::Render()` and `UI::Render()`, respectively.
 

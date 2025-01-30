@@ -28,7 +28,7 @@
 #include <vector>
 
 /*!
-	Engine component responsible for processing `Object` movement and collision.
+	@brief Engine component responsible for processing `Object` movement and collision.
 */
 class KTech::Collision
 {

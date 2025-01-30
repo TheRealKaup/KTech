@@ -30,7 +30,7 @@
 #include "../engine/input/callbacksgroup.hpp"
 
 /*!
-	World structure that comprises `Texture`s, behaves as a user interface element, and exists within `UI`.
+	@brief World structure that comprises `Texture`s, behaves as a user interface element, and exists within `UI`.
 
 	This and `Object` are the most commonly inherited-from world structures. `Widget` differs from `Object` because it can only contain `Texture`s, while `Object` can also have `Collider`s (which are useless in user interfaces). `Widget` has functionality intended for user interfaces, which is utilized by the optional widgets in the `ktech/widgets/` directory.
 

@@ -29,7 +29,7 @@
 #include "../world/widget.hpp"
 
 /*!
-	Call the virtual `OnTick()` functions of all registered world structures.
+	@brief Call the virtual `OnTick()` functions of all registered world structures.
 
 	Normally placed at the start of tick, with the other callback-calling functions of engine components. For example:
 

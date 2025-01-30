@@ -23,7 +23,7 @@
 #include "input.hpp"
 
 /*!
-	Input callbacks creator and manager.
+	@brief Input callbacks creator and manager.
 
 	Through this class you can register functions to get called back when certain inputs are received from the terminal (`CallbacksGroup::RegisterCallback()` and `CallbacksGroup::RegisterRangedCallback()`). You can also temporarily activate and deactivate your callbacks so they happen only when you want (`CallbacksGroup::Enable()` and `CallbacksGroup::Disable()`).
 

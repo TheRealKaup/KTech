@@ -31,7 +31,7 @@
 #include "time/time.hpp"
 
 /*!
-	Complete engine containing all engine components.
+	@brief Complete engine containing all engine components.
 
 	You need an `Engine` instance to do nearly everything in KTech (including creating world structures). Normally, you should have 1 instance of this class in your game. Make sure you don't accidentally create duplicate instances, as those could lead to unexpected behavior, especially in the `Input` engine componenet.
 

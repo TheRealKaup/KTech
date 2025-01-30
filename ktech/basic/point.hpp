@@ -25,7 +25,7 @@
 #undef KTECH_DEFINITION
 #include "upoint.hpp"
 
-//! 2D vector, mostly used to store positions and directions.
+//! @brief 2D vector, mostly used to store positions and directions.
 struct KTech::Point
 {
 	int32_t x; //!< X axis (+ right, - left).

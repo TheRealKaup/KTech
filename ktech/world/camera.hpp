@@ -33,7 +33,7 @@
 #include <vector>
 
 /*!
-	World structure that renders `Object`s of `Layer`s, and exists within `Map`.
+	@brief World structure that renders `Object`s of `Layer`s, and exists within `Map`.
 
 	`Camera` is able to render a `Cell`-based image (`Camera::Render()`), which can be drawn to `Output`'s image buffer (`Camera::Draw()` or `Output::Draw()`), and printed to the terminal (`Output::Print()`).
 */

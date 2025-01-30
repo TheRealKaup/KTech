@@ -26,7 +26,7 @@
 #include "rgb.hpp"
 #include "../utility/rgbcolors.hpp"
 
-//! Terminal cell comprising `RGB` foreground (character) color, `RGB` background color, and an ASCII character.
+//! @brief Terminal cell comprising `RGB` foreground (character) color, `RGB` background color, and an ASCII character.
 struct KTech::Cell
 {
 	char c; //!< ASCII character.

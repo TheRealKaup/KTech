@@ -23,7 +23,7 @@
 /*!
 	@var Engine::running
 
-	States whether the game loop should be running or not.
+	@brief States whether the game loop should be running or not.
 
 	Your game loop should continue iterating as long as this variable is true, and should exit if it's false. For example:
 
@@ -39,7 +39,7 @@
 */
 
 /*!
-	Construct the engine components.
+	@brief Construct the engine components.
 
 	The engine components are your game's dependencies. For example, without `Memory`, you don't have anywhere to register your world structures at.
 
@@ -57,7 +57,7 @@ KTech::Engine::Engine(UPoint imageSize, size_t ticksPerSecondLimit)
 	: collision(*this), input(*this), output(*this, imageSize), time(*this, ticksPerSecondLimit) {}
 
 /*!
-	Set `Engine::running` to false.
+	@brief Set `Engine::running` to false.
 
 	Simply sets `Engine::running` to false (signifying the game loop should break). Use this if you need a function to do this operation (e.g., to provide as a callback function), and don't want to write one yourself.
 */

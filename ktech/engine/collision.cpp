@@ -34,7 +34,7 @@
 /*!
 	@var `Collision::CR`
 
-	Collision result.
+	@brief Collision result.
 
 	There are 3 possible collision results: `CR::B` (block), `CR::P` (push), and `CR::O` (overlap).
 
@@ -43,7 +43,7 @@
 /*!
 	@var `Collision::colliderTypes`
 
-	Matrix representing collider types and their potential collision results.
+	@brief Matrix representing collider types and their potential collision results.
 
 	An `Object`'s `Collider` (each of `Object::m_colliders`) can have a distinct "collider type" (`Collider::m_type`). Collider types are defined in this 2D vector.
 
@@ -66,7 +66,7 @@
 */
 
 /*!
-	Move an `Object` in relation to other `Object`s from the same `Layer`.
+	@brief Move an `Object` in relation to other `Object`s from the same `Layer`.
 
 	`Object::Move()` calls this function on itself.
 
