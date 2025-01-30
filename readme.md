@@ -70,7 +70,7 @@ The code for this one is in [examples/simpleplatform/game.cpp](examples/simplepl
 
 A KTech game in active development. The player is a freelance hacker that gets jobs from the darknet. The game involves a networking simulation and a story line. The gameplay consists of searching for information, analyzing it and converting it into new information, until the goal is reached.
 
-Here's a screenshot of the game, from 9.10.2023 (d/m/y):
+Here's a screenshot of the game, from 9.10.2023 (d.m.y):
 
 <img src="https://github.com/TheRealKaup/TheRealKaup/blob/main/netset-9.10.2023.png" alt="netset screenshot from 9.10.2023" max-height="500"/>
 
