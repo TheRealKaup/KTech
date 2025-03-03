@@ -79,5 +79,5 @@ struct KTech::Texture
 	auto ReplaceCharacter(char oldValue, char newValue) -> Texture&;
 
 	void ExportToFile(const std::filesystem::path& filePath) const;
-	void Print();
+	void Print() const;
 };

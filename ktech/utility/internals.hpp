@@ -138,15 +138,15 @@ static inline void DrawBakedToRGBA(KTech::RGBA& p_dst, const KTech::RGBA& p_src)
 
 static inline auto GetThirdDigit(uint8_t uint8) -> char
 {
-	return uint8 / 100 + '0';
+	return (uint8 / 100) + '0';
 }
 
 static inline auto GetSecondDigit(uint8_t uint8) -> char
 {
-	return (uint8 % 100) / 10 + '0';
+	return ((uint8 % 100) / 10) + '0';
 }
 
 static inline auto GetFirstDigit(uint8_t uint8) -> char
 {
-	return uint8 % 10 + '0';
+	return (uint8 % 10) + '0';
 }

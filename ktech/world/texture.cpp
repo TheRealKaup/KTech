@@ -22,6 +22,7 @@
 
 #include "../utility/rgbacolors.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <filesystem>
 #include <iostream>
@@ -175,10 +176,7 @@ auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 	size_t maxX = 0;
 	for (const std::string& row : p_stringVector)
 	{
-		if (row.size() > maxX)
-		{
-			maxX = row.size();
-		}
+		maxX = std::max(row.size(), maxX);
 	}
 	// Apply size
 	Resize(UPoint(maxX, p_stringVector.size()));
@@ -269,7 +267,7 @@ auto KTech::Texture::Null(Point p_relativePosition) -> Texture&
 */
 auto KTech::Texture::operator()(size_t p_x, size_t p_y) -> CellA&
 {
-	return m_t[m_size.x * p_y + p_x];
+	return m_t[(m_size.x * p_y) + p_x];
 }
 
 /*!
@@ -286,7 +284,7 @@ auto KTech::Texture::operator()(size_t p_x, size_t p_y) -> CellA&
 */
 auto KTech::Texture::operator()(size_t x, size_t y) const -> const CellA&
 {
-	return m_t[m_size.x * y + x];
+	return m_t[(m_size.x * y) + x];
 }
 
 /*!
@@ -314,7 +312,7 @@ auto KTech::Texture::Resize(UPoint p_size, CellA p_newValue) -> Texture&
 		{
 			for (size_t y = 0; y < p_size.y; y++)
 			{
-				newT[p_size.x * y + x] = (x < m_size.x && y < m_size.y) ? m_t[m_size.x * y + x] : p_newValue;
+				newT[(p_size.x * y) + x] = (x < m_size.x && y < m_size.y) ? m_t[(m_size.x * y) + x] : p_newValue;
 			}
 		}
 		// Update size
@@ -552,27 +550,57 @@ void KTech::Texture::ExportToFile(const std::filesystem::path& p_filePath) const
 
 	Can be useful in debugging.
 */
-void KTech::Texture::Print()
+void KTech::Texture::Print() const
 {
-	for (size_t i = 0; i < m_t.size();)
+	if (m_simple)
 	{
-		for (size_t x = 0; x < m_size.x; x++, i++)
+		std::string cellString = "\033[38;2;"
+			+ std::to_string(m_value.f.r * m_value.f.a / std::numeric_limits<uint8_t>::max())
+			+ ';'
+			+ std::to_string(m_value.f.g * m_value.f.a / std::numeric_limits<uint8_t>::max())
+			+ ';'
+			+ std::to_string(m_value.f.b * m_value.f.a / std::numeric_limits<uint8_t>::max())
+			+ "m\033[48;2;"
+			+ std::to_string(m_value.b.r * m_value.b.a / std::numeric_limits<uint8_t>::max())
+			+ ';'
+			+ std::to_string(m_value.b.g * m_value.b.a / std::numeric_limits<uint8_t>::max())
+			+ ';'
+			+ std::to_string(m_value.b.b * m_value.b.a / std::numeric_limits<uint8_t>::max())
+			+ 'm'
+			+ (' ' <= m_value.c && m_value.c <= '~' ? m_value.c : ' ');
+
+		for (size_t x = 0; x < m_size.x; x++)
 		{
-			std::cout << "\033[38;2;"
-				<< std::to_string(m_t[i].f.r * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
-				<< ';'
-				<< std::to_string(m_t[i].f.g * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
-				<< ';'
-				<< std::to_string(m_t[i].f.b * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
-				<< "m\033[48;2;"
-				<< std::to_string(m_t[i].b.r * m_t[i].b.a / std::numeric_limits<uint8_t>::max())
-				<< ';'
-				<< std::to_string(m_t[i].b.g * m_t[i].b.a / std::numeric_limits<uint8_t>::max())
-				<< ';'
-				<< std::to_string(m_t[i].b.b * m_t[i].b.a / std::numeric_limits<uint8_t>::max())
-				<< 'm'
-				<< (' ' <= m_t[i].c && m_t[i].c <= '~' ? m_t[i].c : ' ');
+			for (size_t y = 0; y < m_size.y; y++)
+			{
+				std::cout << cellString;
+			}
+			std::cout << "\033[m\n";
 		}
-		std::cout << "\033[m\n";
 	}
+	else
+	{
+		for (size_t i = 0; i < m_t.size();)
+		{
+			for (size_t x = 0; x < m_size.x; x++, i++)
+			{
+				std::cout << "\033[38;2;"
+				<< std::to_string(m_t[i].f.r * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
+					<< ';'
+					<< std::to_string(m_t[i].f.g * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
+					<< ';'
+					<< std::to_string(m_t[i].f.b * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
+					<< "m\033[48;2;"
+					<< std::to_string(m_t[i].b.r * m_t[i].b.a / std::numeric_limits<uint8_t>::max())
+					<< ';'
+					<< std::to_string(m_t[i].b.g * m_t[i].b.a / std::numeric_limits<uint8_t>::max())
+					<< ';'
+					<< std::to_string(m_t[i].b.b * m_t[i].b.a / std::numeric_limits<uint8_t>::max())
+					<< 'm'
+					<< (' ' <= m_t[i].c && m_t[i].c <= '~' ? m_t[i].c : ' ');
+			}
+			std::cout << "\033[m\n";
+		}
+	}
+	std::cout << std::flush;
 }

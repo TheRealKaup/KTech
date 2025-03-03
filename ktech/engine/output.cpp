@@ -168,27 +168,27 @@ void KTech::Output::Draw(const std::vector<Cell>& p_sourceImage, UPoint p_resolu
 		for (size_t xDst = (p_position.x < 0 ? 0 : p_position.x), xSrc = p_start.x; xDst < resolution.x && xSrc < p_end.x; xDst++, xSrc++)
 		{
 			// DRAW character
-			m_image[resolution.x * yDst + xDst].c = p_sourceImage[p_resolution.x * ySrc + xSrc].c;
+			m_image[(resolution.x * yDst) + xDst].c = p_sourceImage[(p_resolution.x * ySrc) + xSrc].c;
 
 			// DRAW foreground
 			RGBA tempRGBA;
-			if (BakeRGBA(tempRGBA, RGBA(p_sourceImage[p_resolution.x * ySrc + xSrc].f, p_alpha)))
+			if (BakeRGBA(tempRGBA, RGBA(p_sourceImage[(p_resolution.x * ySrc) + xSrc].f, p_alpha)))
 			{
-				DrawBakedToRGB(m_image[resolution.x * yDst + xDst].f, tempRGBA); // Draw given color if alpha isn't 0
+				DrawBakedToRGB(m_image[(resolution.x * yDst) + xDst].f, tempRGBA); // Draw given color if alpha isn't 0
 			}
 			else
 			{
-				m_image[resolution.x * yDst + xDst].f = RGB(0, 0, 0); // Draw black directly if alpha is 0
+				m_image[(resolution.x * yDst) + xDst].f = RGB(0, 0, 0); // Draw black directly if alpha is 0
 			}
 
 			// DRAW foreground
-			if (BakeRGBA(tempRGBA, RGBA(p_sourceImage[p_resolution.x * ySrc + xSrc].b, p_alpha)))
+			if (BakeRGBA(tempRGBA, RGBA(p_sourceImage[(p_resolution.x * ySrc) + xSrc].b, p_alpha)))
 			{
-				DrawBakedToRGB(m_image[resolution.x * yDst + xDst].b, tempRGBA); // Draw given color if alpha isn't 0
+				DrawBakedToRGB(m_image[(resolution.x * yDst) + xDst].b, tempRGBA); // Draw given color if alpha isn't 0
 			}
 			else
 			{
-				m_image[resolution.x * yDst + xDst].b = RGB(0, 0, 0); // Draw black directly if alpha is 0
+				m_image[(resolution.x * yDst) + xDst].b = RGB(0, 0, 0); // Draw black directly if alpha is 0
 			}
 		}
 	}
@@ -229,23 +229,23 @@ void KTech::Output::Draw(const std::vector<CellA>& p_sourceImage, UPoint p_resol
 		for (size_t xDst = (p_position.x < 0 ? 0 : p_position.x), xSrc = p_start.x; xDst < resolution.x && xSrc < p_end.x; xDst++, xSrc++)
 		{
 			// DRAW character
-			char charToDraw = p_sourceImage[p_resolution.x * ySrc + xSrc].c;
+			char charToDraw = p_sourceImage[(p_resolution.x * ySrc) + xSrc].c;
 			if (DetermineCharacter(charToDraw))
 			{
-				m_image[resolution.x * yDst + xDst].c = charToDraw;
+				m_image[(resolution.x * yDst) + xDst].c = charToDraw;
 			}
 
 			// DRAW foreground
 			RGBA tempRGBA;
-			if (BakeRGBAWith(tempRGBA, p_sourceImage[p_resolution.x * ySrc + xSrc].f, p_alpha))
+			if (BakeRGBAWith(tempRGBA, p_sourceImage[(p_resolution.x * ySrc) + xSrc].f, p_alpha))
 			{
-				DrawBakedToRGB(m_image[resolution.x * yDst + xDst].f, tempRGBA);
+				DrawBakedToRGB(m_image[(resolution.x * yDst) + xDst].f, tempRGBA);
 			}
 
 			// DRAW background
-			if (BakeRGBAWith(tempRGBA, p_sourceImage[p_resolution.x * ySrc + xSrc].b, p_alpha))
+			if (BakeRGBAWith(tempRGBA, p_sourceImage[(p_resolution.x * ySrc) + xSrc].b, p_alpha))
 			{
-				DrawBakedToRGB(m_image[resolution.x * yDst + xDst].b, tempRGBA);
+				DrawBakedToRGB(m_image[(resolution.x * yDst) + xDst].b, tempRGBA);
 			}
 		}
 	}
@@ -289,7 +289,8 @@ void KTech::Output::Print()
 	// "&& printRequests == 1" - stop working on a print if there is a newer print request
 	for (size_t y = 0; y < resolution.y && y < m_terminalSize.ws_row; y++)
 	{
-		if (y != 0) {
+		if (y != 0)
+		{
 			m_stringImage[l] = '\n';
 			l++;
 		}
@@ -304,19 +305,19 @@ void KTech::Output::Print()
 		for (size_t x = 1; x < resolution.x && x < m_terminalSize.ws_col; x++)
 		{
 			// foreground
-			if (m_image[resolution.x * y + x].c != ' ' && m_image[resolution.x * y + x].f != foreground)
+			if (m_image[(resolution.x * y) + x].c != ' ' && m_image[(resolution.x * y) + x].f != foreground)
 			{
-				foreground = m_image[resolution.x * y + x].f;
+				foreground = m_image[(resolution.x * y) + x].f;
 				PopulateForegroundColor(l, foreground);
 			}
 			// background
-			if (m_image[resolution.x * y + x].b != background)
+			if (m_image[(resolution.x * y) + x].b != background)
 			{
-				background = m_image[resolution.x * y + x].b;
+				background = m_image[(resolution.x * y) + x].b;
 				PopulateBackgroundColor(l, background);
 			}
 			// Character
-			PopulateCharacter(l, resolution.x * y + x);
+			PopulateCharacter(l, (resolution.x * y) + x);
 		}
 		PopulateEndOfLine(l);
 	}

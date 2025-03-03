@@ -319,12 +319,12 @@ int main()
 	KTech::Object worldProps(engine, Point(1, 1), "worldProps");
 	worldProps.m_name = "worldProps";
 	worldProps.m_textures.resize(3);
-	KTech::Output::Log("<main()> Loading assets/sky.ktecht", RGBColors::blue);
-	worldProps.m_textures[0].File("assets/sky.ktecht", Point(0, 0));
-	KTech::Output::Log("<main()> Loading assets/house.ktecht", RGBColors::blue);
-	worldProps.m_textures[1].File("assets/house.ktecht", Point(18, 14));
-	KTech::Output::Log("<main()> Loading assets/land.ktecht", RGBColors::blue);
-	worldProps.m_textures[2].File("assets/land.ktecht", Point(0, 3));
+	KTech::Output::Log("<main()> Loading examples/simpleplatform/assets/sky.ktecht", RGBColors::blue);
+	worldProps.m_textures[0].File("examples/simpleplatform/assets/sky.ktecht", Point(0, 0));
+	KTech::Output::Log("<main()> Loading examples/simpleplatform/assets/house.ktecht", RGBColors::blue);
+	worldProps.m_textures[1].File("examples/simpleplatform/assets/house.ktecht", Point(18, 14));
+	KTech::Output::Log("<main()> Loading examples/simpleplatform/assets/land.ktecht", RGBColors::blue);
+	worldProps.m_textures[2].File("examples/simpleplatform/assets/land.ktecht", Point(0, 3));
 	worldProps.m_colliders.resize(1);
 	worldProps.m_colliders[0].ByTextureBackground(worldProps.m_textures[2], 0, 1);
 	layer.AddObject(worldProps.m_id);
@@ -373,7 +373,7 @@ int main()
 	layer.AddObject(house.m_id);
 
 	house.m_textures.resize(1);
-	house.m_textures[0].File("assets/house.ktecht", { 0, 0 });
+	house.m_textures[0].File("examples/simpleplatform/assets/house.ktecht", { 0, 0 });
 
 	Input::CallbacksGroup callbacksGroup(engine, true);
 	callbacksGroup.RegisterCallback("m", TurnOnCharacterCamera);
@@ -440,5 +440,5 @@ int main()
 	}
 	KTech::Output::Log("<main()> End of function.", RGBColors::blue);
 
-	engine.output.outputOnQuit.push_back(std::to_string(character.m_pos.y));
+	engine.output.outputOnQuit.push_back("character.m_pos.y: " + std::to_string(character.m_pos.y) + "\n");
 }

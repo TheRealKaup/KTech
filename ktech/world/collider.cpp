@@ -104,7 +104,7 @@ void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint
 
 	@param texture The base `Texture`.
 	@param type Collider type, as defiend in `Collision::colliderTypes`.
-	@param excludedCharacters Cells with this character will not be turned on.
+	@param excludedCharacter Cells with this character will not be turned on.
 */
 void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_type, char p_excludedCharacter)
 {
