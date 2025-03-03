@@ -78,7 +78,7 @@ private:
 	// Groups can be deleted
 	std::vector<CallbacksGroup*> m_groups;
 
-	Input(Engine& engine);
+	Input(Engine& engine, bool noGameLoopMode);
 	~Input();
 
 	/*

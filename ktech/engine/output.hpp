@@ -75,7 +75,7 @@ private:
 	std::string m_stringImage;
 	static constexpr size_t printSequenceLength = 39;
 
-	Output(Engine& engine, UPoint imageResolution);
+	Output(Engine& engine, UPoint imageResolution, bool noGameLoopMode);
 	~Output();
 
 	void PopulateForegroundColor(size_t& dst, const RGB& src);

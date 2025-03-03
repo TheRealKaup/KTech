@@ -289,10 +289,16 @@ void KTech::Input::Loop()
 	}
 }
 
-KTech::Input::Input(Engine& p_engine)
+KTech::Input::Input(Engine& p_engine, bool p_noGameLoopMode)
 	: engine(p_engine)
 {
-	// Set terminal attributes
+	if (p_noGameLoopMode)
+	{
+		// DON'T INITIALIZE because no-game-loop mode requires no input terminal settings and thread.
+		return;
+	}
+
+	// SET terminal attributes
 #ifdef _WIN32
 	m_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
 	GetConsoleMode(m_stdinHandle, &m_oldMode);
@@ -321,12 +327,17 @@ KTech::Input::Input(Engine& p_engine)
 	tcsetattr(0, TCSANOW, &terminalAttributes);
 #endif
 
-	// Create the input loop
+	// START the input loop thread
 	m_inputLoop = std::thread([this]() { this->Loop(); });
 }
 
 KTech::Input::~Input()
 {
+	if (engine.noGameLoopMode)
+	{
+		return;
+	}
+
 	// Return to the old terminal attributes
 #if _WIN32
 	SetConsoleMode(m_stdinHandle, m_oldMode);

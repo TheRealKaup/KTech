@@ -41,6 +41,7 @@ class KTech::Engine
 {
 public:
 	bool running = true;
+	const bool noGameLoopMode;
 
 	Collision collision; //!< `Collision` engine component.
 	Input input; //!< `Input` engine component.
@@ -48,7 +49,7 @@ public:
 	Output output; //!< `Output` engine component.
 	Time time; //!< `Time` engine component.
 
-	Engine(UPoint imageSize, size_t ticksPerSecondLimit = 24);
+	Engine(UPoint imageSize, size_t ticksPerSecondLimit = 24, bool noGameLoopMode = false);
 
 	void Quit();
 };

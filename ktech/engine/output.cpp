@@ -320,13 +320,21 @@ void KTech::Output::Print()
 		}
 		PopulateEndOfLine(l);
 	}
-	// Move cursor to top-left corner ("ESC[H") and print
-#if defined(_WIN32) && !defined(DEBUG)
-	// Hide cursor ("ESC[?25l") since it always reappears on resize due to a Windows console bug
-	std::cout << "\033[H\033[?25l" << m_stringImage.substr(0, l) << std::flush;
-#else
-	std::cout << "\033[H" << m_stringImage.substr(0, l) << std::flush;
-#endif
+	if (engine.noGameLoopMode)
+	{
+		// PRINT while moving the cursor to the next line (no-game-loop mode).
+		std::cout << m_stringImage.substr(0, l) << "\n" << std::flush;
+	}
+	else
+	{
+		// RESET cursor by moving it to the top-left corner ("\033[H")
+		#if defined(_WIN32) && !defined(DEBUG)
+		// Hide cursor ("ESC[?25l") since it always reappears on resize due to a Windows console bug
+		std::cout << "\033[H\033[?25l" << m_stringImage.substr(0, l) << std::flush;
+		#else
+		std::cout << "\033[H" << m_stringImage.substr(0, l) << std::flush;
+		#endif
+	}
 }
 
 /*!
@@ -402,34 +410,41 @@ auto KTech::Output::ShouldPrintThisTick() const -> bool
 	return false;
 }
 
-KTech::Output::Output(Engine& p_engine, KTech::UPoint p_imageResolution)
+KTech::Output::Output(Engine& p_engine, KTech::UPoint p_imageResolution, bool p_noGameLoopMode)
 	: engine(p_engine),
 	resolution(p_imageResolution),
 	m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),
-	m_stringImage(p_imageResolution.y * 3 + p_imageResolution.x * p_imageResolution.y * printSequenceLength, ' ')
+	m_stringImage((p_imageResolution.y * 3) + (p_imageResolution.x * p_imageResolution.y * printSequenceLength), ' ')
 {
-#ifdef _WIN32
+	#ifdef _WIN32
 	m_stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleMode(m_stdoutHandle, &m_oldMode);
 	SetConsoleMode(m_stdoutHandle, m_oldMode
 		| ENABLE_VIRTUAL_TERMINAL_PROCESSING // "Virtual processing"
 		| ENABLE_PROCESSED_OUTPUT // "Output processing"
 	);
-#endif
+	#endif
 
-#ifdef DEBUG
-	// Switch to alternative buffer (don't hide cursor for breaking with a debugger like GDB)
-	std::cout << "\033[?1049h";
-#else
-	// Switch to alternative buffer and hide cursor
-	std::cout << "\033[?1049h\033[?25l";
-#endif
+	if (p_noGameLoopMode)
+	{
+		// KEEP shell-like behavior in no-game-loop mode
+		return;
+	}
+	// SWITCH to alternative buffer and RESET cursor
+	std::cout << "\033[?1049h\033[H";
+	#ifndef DEBUG // DON'T HIDE cursor in debug build for breaking with debuggers
+	// HIDE cursor in release build
+	std::cout << "\033[?25l";
+	#endif
 }
 
 KTech::Output::~Output()
 {
-	// Show cursor, and disable alternative buffer (return to previous terminal)
-	std::cout << "\033[?25h\033[?1049l" << std::flush;
+	if (!engine.noGameLoopMode) // DON'T disable what isn't enabled in no-game-loop mode
+	{
+		// SHOW cursor and DISABLE alternative buffer (return to previous terminal)
+		std::cout << "\033[?25h\033[?1049l" << std::flush;
+	}
 
 	for (std::string& out : outputOnQuit)
 	{
