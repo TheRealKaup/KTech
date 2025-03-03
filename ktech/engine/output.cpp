@@ -342,16 +342,24 @@ void KTech::Output::Print()
 
 	Various callback and virtual functions in KTech are expected to return a `bool` value (e.g. `OnTick()` virtual functions, and input callback functions registered at `CallbacksGroup::RegisterCallback()`). **They should return `true` if they changed something in the game's world, that might require the game to render a new frame. They should return `false` if they certainly did not change anything, meaning the game doesn't have to render a new frame.**
 
-	The `Input`, `Memory` and `Time` engine components remember whether any virtual or callback function returned `true` throughout the last tick. If any did, it means something has changed (like the position of an `Object` or the appearance of a `Texture`). In that case, this function will return true. This allows to "render-on-demand", i.e., avoiding rendering when certainly nothing has changed.
+	The `Input`, `Memory` and `Time` engine components remember whether any virtual or callback function returned `true` throughout the last tick. If any did, it means something has changed (like the position of an `Object` or the appearance of a `Texture`). In that case, this function will return true. This allows to "render on demand", i.e., avoid rendering when certainly nothing has changed.
 
-	For best performance, use this function in conjunction with `Output::ShouldRenderThisTick()` (there is an example at its documentation entry):
+	For best performance, use this function in conjunction with `Output::ShouldRenderThisTick()` (there is an example at its documentation entry).
+
+	When no-game-loop mode is enabled, this function always returns true.
 
 	@return Whether you should render and draw again.
 
 	@see `Output::ShouldPrintThisTick()`
+	@see `Engine::noGameLoopMode`
 */
 auto KTech::Output::ShouldRenderThisTick() -> bool
 {
+	if (engine.noGameLoopMode)
+	{
+		// ALWAYS RETURN true if no-game-loop mode is enabled.
+		return true;
+	}
 	if (engine.input.m_changedThisTick
 		|| engine.memory.m_changedThisTick
 		|| engine.time.m_changedThisTick
@@ -368,7 +376,7 @@ auto KTech::Output::ShouldRenderThisTick() -> bool
 /*!
 	@brief Check whether the terminal changed and requires a new print.
 
-	The `Output` engine component keeps track of the terminal size, because if it changes, the engine needs to adapt. If that happened, this function returns true, telling you that the image buffer should be printed again.
+	The `Output` engine component keeps track of the terminal size, because if it changes, the printed image needs to adapt. If that happened, this function returns true, telling you that the image buffer should be printed again.
 
 	For best performance, use this function in conjunction with `Output::ShouldRenderThisTick()`. Here's an example:
 
@@ -388,11 +396,20 @@ auto KTech::Output::ShouldRenderThisTick() -> bool
 	}
 	@endcode
 
-	@return Whether you should render and draw again.
+	When no-game-loop mode is enabled, this function always returns true.
+
+	@return Whether you should print again.
+
 	@see `Output::ShouldRenderThisTick()`
+	@see `Engine::noGameLoopMode`
 */
 auto KTech::Output::ShouldPrintThisTick() const -> bool
 {
+	if (engine.noGameLoopMode)
+	{
+		// ALWAYS RETURN true if no-game-loop mode is enabled.
+		return true;
+	}
 	winsize tempTerminalSize;
 #ifdef _WIN32
 	GetConsoleScreenBufferInfo(m_stdoutHandle, PCONSOLE_SCREEN_BUFFER_INFO(&m_csbi));

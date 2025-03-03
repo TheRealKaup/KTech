@@ -31,7 +31,6 @@
 
 /*!
 	@fn `Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
-
 	@brief Prepare `Camera` for rendering.
 
 	@param [in] engine Parent engine.
@@ -48,7 +47,6 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 
 /*!
 	@fn `Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
-
 	@brief Prepare `Camera` for rendering and immediately enter a `Map`.
 
 	@param [in] engine Parent engine.
@@ -75,7 +73,6 @@ KTech::Camera::~Camera()
 
 /*!
 	@fn Camera::EnterMap
-
 	@brief Enter a parent `Map`.
 
 	@param map Parent map to enter.
@@ -112,7 +109,6 @@ auto KTech::Camera::LeaveMap() -> bool
 
 /*!
 	@fn Camera::Resize
-
 	@brief Resize the image resolution (or "size").
 
 	@param resolution The new resolution.
@@ -136,7 +132,6 @@ void KTech::Camera::Render()
 
 /*!
 	@fn Camera::Render(const std::vector<ID<Layer>>& layers)
-
 	@brief Render all `Object`s of the given `Layer`s.
 
 	@param layers The `Layer`s containing the `Object`s to render.
@@ -178,7 +173,6 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 
 /*!
 	@fn Camera::Draw
-
 	@brief Draw the rendered image (`Camera::m_image`) to `Output` so it can be printed to the terminal.
 
 	This function redirects to `Output::Draw()` and passes the given parameters verbatim.
@@ -188,6 +182,35 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 void KTech::Camera::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
 	return engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
+}
+
+/*!
+	@brief Shortcut for `Camera::Render()`, `Camera::Draw()` and `Output::Print()`.
+
+	This function calls the above functions with respect to "render on demand" (by checking `Output::ShouldRenderThisTick()` and `Output::ShouldPrintThisTick()`). So, you can use this function in your game loop to avoid boilerplate code while still maintaining good performance, unless you want more functionality in your graphics portion of your game loop. This function is especially convenient for testing in no-game-loop mode.
+
+	@see `Camera::Render()`
+	@see `Camera::Draw()`
+	@see `Output::Print()`
+	@see `Engine::noGameLoopMode`
+	@see [Tutorial chapter 5](https://github.com/TheRealKaup/KTech/blob/master/documentation/tutorial/tutorial.md#chapters): no-game-loop mode example that uses this function
+*/
+void KTech::Camera::RenderDrawPrint()
+{
+	if (engine.output.ShouldRenderThisTick())
+	{
+		// RENDER `Layer`s of parent `Map`
+		Render();
+		// DRAW the rendered image to `Output`'s image
+		Draw();
+		// PRINT the drawn `Output` image
+		engine.output.Print();
+	}
+	else if (engine.output.ShouldPrintThisTick())
+	{
+		// PRINT the drawn `Output` image
+		engine.output.Print();
+	}
 }
 
 /*!

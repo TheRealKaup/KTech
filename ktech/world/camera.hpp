@@ -62,6 +62,7 @@ public:
 	void Render();
 	void Render(const std::vector<ID<Layer>>& layers);
 	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+	void RenderDrawPrint();
 
 protected:
 	virtual auto OnTick() -> bool;

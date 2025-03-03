@@ -173,6 +173,37 @@ void KTech::UI::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_a
 }
 
 /*!
+	@brief Shortcut for `UI::Render()`, `Output::Clear()`, `UI::Draw()` and `Output::Print()`.
+
+	This function calls the above functions with respect to "render on demand" (by checking `Output::ShouldRenderThisTick()` and `Output::ShouldPrintThisTick()`). So, you can use this function in your game loop to avoid boilerplate code while still maintaining good performance, unless you want more functionality in your graphics portion of your game loop. This function is especially convenient for testing in no-game-loop mode.
+
+	@see `UI::Render()`
+	@see `Output::Clear()`
+	@see `UI::Draw()`
+	@see `Output::Print()`
+	@see `Engine::noGameLoopMode`
+*/
+void KTech::UI::RenderClearDrawPrint()
+{
+	if (engine.output.ShouldRenderThisTick())
+	{
+		// RENDER `Layer`s of parent `Map`
+		Render();
+		// CLEAR the previous `Output` image.
+		engine.output.Clear();
+		// DRAW the rendered image to `Output`'s image
+		Draw();
+		// PRINT the drawn `Output` image
+		engine.output.Print();
+	}
+	else if (engine.output.ShouldPrintThisTick())
+	{
+		// PRINT the drawn `Output` image
+		engine.output.Print();
+	}
+}
+
+/*!
 	@brief Virtual function called once each tick.
 
 	You can override this in your inherited class to add whatever functionality you want.
