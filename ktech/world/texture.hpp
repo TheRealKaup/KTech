@@ -29,6 +29,7 @@
 #include "../basic/cella.hpp"
 
 #include <filesystem>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -69,14 +70,7 @@ struct KTech::Texture
 
 	// `newValue` - only fills the new cells.
 	auto Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0))) -> Texture&;
-	auto SetCell(CellA value) -> Texture&;
-	auto SetForeground(RGBA value) -> Texture&;
-	auto SetBackground(RGBA value) -> Texture&;
-	auto SetCharacter(char value) -> Texture&;
-	auto SetForegroundAlpha(uint8_t value) -> Texture&;
-	auto SetBackgroundAlpha(uint8_t value) -> Texture&;
-	auto SetAlpha(uint8_t value) -> Texture&;
-	auto ReplaceCharacter(char oldValue, char newValue) -> Texture&;
+	auto Transform(const std::function<void(CellA&)>& operation, UPoint from = UPoint(0, 0), UPoint to = UPoint(0, 0)) -> Texture&;
 
 	void ExportToFile(const std::filesystem::path& filePath) const;
 	void Print() const;

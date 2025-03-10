@@ -288,11 +288,11 @@ auto KTech::Texture::operator()(size_t x, size_t y) const -> const CellA&
 }
 
 /*!
-	@fn KTech::Texture::Resize(UPoint size, CellA newValue)
+	@fn KTech::Texture::Resize
 	@brief Resize the `Texture` (whether simple or complex).
 
 	@param size The new size.
-	@param newValue Value for new cells.
+	@param newValue Value for new cells. Does not affect simple `Texture`s.
 
 	@return Self-reference for function chaining.
 */
@@ -301,226 +301,79 @@ auto KTech::Texture::Resize(UPoint p_size, CellA p_newValue) -> Texture&
 	if (m_simple)
 	{
 		m_size = p_size;
-		m_value = p_newValue;
 	}
 	else
 	{
-		// New vector
+		// CREATE new vector
 		std::vector<CellA> newT(p_size.x * p_size.y);
-		// Copy
-		for (size_t x = 0; x < p_size.x; x++)
+		// COPY
+		for (size_t y = 0; y < p_size.y; y++)
 		{
-			for (size_t y = 0; y < p_size.y; y++)
+			for (size_t x = 0; x < p_size.x; x++)
 			{
 				newT[(p_size.x * y) + x] = (x < m_size.x && y < m_size.y) ? m_t[(m_size.x * y) + x] : p_newValue;
 			}
 		}
-		// Update size
+		// UPDATE size
 		m_size = p_size;
-		// Set to new vector
-		m_t = newT;
+		// MOVE new vector
+		m_t = std::move(newT);
 	}
 	return *this;
 }
 
 /*!
-	@fn KTech::Texture::SetCell(CellA value)
-	@brief Set all cell values (whether simple or complex).
+	@fn KTech::Texture::Transform
+	@brief Transform the `Texture` using a operation callback function (whether simple or complex).
 
-	@param value New value.
+	@param[in] operation	Callback function that receives a `CellA` (old value) and returns a `CellA` (new value).
+	@param[in] from 		Top-left corner of area to transform. Default: (0, 0).
+	@param[in] to 			Bottom-right corner of area to transform. Default: size of `Texture`.
 
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::SetCell(CellA p_value) -> Texture&
-{
-	if (m_simple)
-	{
-		m_value = p_value;
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			cell = p_value;
-		}
-	}
-	return *this;
-}
+	Example that reverses the background colors of a `Texture`:
 
-/*!
-	@fn KTech::Texture::SetForeground(RGB value)
-	@brief Set all foreground colors (whether simple or complex).
-
-	@param value New value.
+	\code{.cpp}
+	Example missing!
+	\endcode
 
 	@return Self-reference for function chaining.
 */
-auto KTech::Texture::SetForeground(RGBA p_value) -> Texture&
+auto KTech::Texture::Transform(const std::function<void(CellA&)>& p_operation, UPoint p_from, UPoint p_to) -> Texture&
 {
 	if (m_simple)
 	{
-		m_value.f = p_value;
+		// CALL operation once with `m_value`
+		p_operation(m_value);
+		// RETURN self-reference
+		return *this;
+	}
+
+	if (p_to == UPoint(0, 0))
+	{
+		// DEFAULT bottom-right corner
+		p_to = m_size;
 	}
 	else
 	{
-		for (CellA& cell : m_t)
+		// LIMIT bottom-right corner
+		p_to.x = std::min(p_to.x, m_size.x);
+		p_to.y = std::min(p_to.y, m_size.y);
+	}
+	if (p_from.x >= p_to.x || p_from.y >= p_to.y)
+	{
+		// RETURN self-reference because top-left corner is out of range.
+		return *this;
+	}
+
+	for (UPoint pos{p_from}; pos.y < p_to.y; pos.y++)
+	{
+		for (pos.x = p_from.x; pos.x < p_to.x; pos.x++)
 		{
-			cell.f = p_value;
+			// CALL operation with each cell in the range
+			p_operation(m_t[(pos.y * m_size.x) + pos.x]);
 		}
 	}
-	return *this;
-}
-
-/*!
-	@fn KTech::Texture::SetBackground(RGB value)
-	@brief Set all background colors (whether simple or complex).
-
-	@param value New value.
-
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::SetBackground(RGBA p_value) -> Texture&
-{
-	if (m_simple)
-	{
-		m_value.b = p_value;
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			cell.b = p_value;
-		}
-	}
-	return *this;
-}
-
-/*!
-	@fn KTech::Texture::SetCharacter(char value)
-	@brief Set all characters (whether simple or complex).
-
-	@param value New value.
-
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::SetCharacter(char p_value) -> Texture&
-{
-	if (m_simple)
-	{
-		m_value.c = p_value;
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			cell.c = p_value;
-		}
-	}
-	return *this;
-}
-
-/*!
-	@fn KTech::Texture::SetForegroundAlpha(uint8_t value)
-	@brief Set all foreground alpha channels (whether simple or complex).
-
-	@param value New value.
-
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::SetForegroundAlpha(uint8_t p_value) -> Texture&
-{
-	if (m_simple)
-	{
-		m_value.f.a = p_value;
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			cell.f.a = p_value;
-		}
-	}
-	return *this;
-}
-
-/*!
-	@fn KTech::Texture::SetBackgroundAlpha(uint8_t value)
-	@brief Set all background alpha channels (whether simple or complex).
-
-	@param value New value.
-
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::SetBackgroundAlpha(uint8_t p_value) -> Texture&
-{
-	if (m_simple)
-	{
-		m_value.b.a = p_value;
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			cell.b.a = p_value;
-		}
-	}
-	return *this;
-}
-
-/*!
-	@fn KTech::Texture::SetAlpha(uint8_t value)
-	@brief Set all alpha channels (whether simple or complex).
-
-	@param value New value.
-
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::SetAlpha(uint8_t p_value) -> Texture&
-{
-	if (m_simple)
-	{
-		m_value.f.a = p_value;
-		m_value.b.a = p_value;
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			cell.f.a = p_value;
-			cell.b.a = p_value;
-		}
-	}
-	return *this;
-}
-
-/*!
-	@fn KTech::Texture::ReplaceCharacter(char oldValue, char newValue)
-	@brief Replace all instances of a character (whether simple or complex).
-
-	@param oldValue Character to replace.
-	@param newValue Character replacement.
-
-	@return Self-reference for function chaining.
-*/
-auto KTech::Texture::ReplaceCharacter(char p_oldValue, char p_newValue) -> Texture&
-{
-	if (m_simple)
-	{
-		if (m_value.c == p_oldValue)
-		{
-			m_value.c = p_newValue;
-		}
-	}
-	else
-	{
-		for (CellA& cell : m_t)
-		{
-			if (cell.c == p_oldValue)
-			{
-				cell.c = p_newValue;
-			}
-		}
-	}
+	// RETURN self-reference
 	return *this;
 }
 

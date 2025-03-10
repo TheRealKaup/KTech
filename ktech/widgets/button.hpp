@@ -143,7 +143,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.SetForeground(m_selectedRGBA);
+			texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedRGBA; });
 		}
 	}
 
@@ -151,7 +151,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.SetForeground(m_unselectedRGBA);
+			texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedRGBA; });
 		}
 	}
 
@@ -161,14 +161,14 @@ private:
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.SetForeground(m_selectedRGBA);
+				texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedRGBA; });
 			}
 		}
 		else
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.SetForeground(m_unselectedRGBA);
+				texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedRGBA; });
 			}
 		}
 		return true;
@@ -178,7 +178,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.SetForeground(m_downRGBA);
+			texture.Transform([&](KTech::CellA& cell){ cell.f = m_downRGBA; });
 		}
 		m_downInvocation.Invoke(pressLength, KTech::Time::Measurement::milliseconds);
 		if (m_OnPress)

@@ -344,9 +344,8 @@ int main()
 			"'F' to throw a gravity box off the layer.",
 			"'M' to turn on following camera.",
 			"'ESC' to toggle menu."
-		}, RGBAColors::black, RGBAColors::transparent, Point(2, 2));
-	frame.m_textures[4].Resize(frame.m_textures[4].m_size, CellA());
-	frame.m_textures[4].SetBackground(RGBA(255, 255, 255, 100));
+		}, RGBAColors::black, RGBAColors::transparent, Point(2, 2))
+		.Transform([](KTech::CellA& cell){ cell.b = RGBA(255, 255, 255, 100); });
 	frame.m_colliders.resize(4);
 	frame.m_colliders[0].Simple(KTech::UPoint(viewport.x, 1), 0, KTech::Point(0, 0));
 	frame.m_colliders[1].Simple(KTech::UPoint(1, viewport.y), 0, KTech::Point(0, 0));
@@ -358,7 +357,7 @@ int main()
 	Character character(engine, layer.m_id, voidLayer.m_id);
 	character.m_name = "character";
 	map.AddCamera(character.cam.m_id);
-
+std::function<void(int&)> func = [](int){};
 	KTech::Output::Log("<main()> Creating GravityBoxes", RGBColors::blue);
 	GravityBox gbA(engine, layer.m_id, Point(10, 5), 1);
 	gbA.m_name = "gbA";

@@ -59,8 +59,8 @@ public:
 	{
 		m_textures.resize(TEXTURES_SIZE);
 		m_textures[ti_text].Write(text, m_foregroundRGBA, m_backgroundRGBA, KTech::Point(1, 1))
-			.ReplaceCharacter(' ', '\0')
-			.SetBackground(m_backgroundRGBA);
+			.Transform([](KTech::CellA& cell){ if (cell.c == ' ') cell.c = '\0'; })
+			.Transform([&](KTech::CellA& cell){ cell.b = m_backgroundRGBA; });
 		m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0));
 		m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(m_textures[0].m_size.x + 1, 0));
 		m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, m_textures[0].m_size.y + 1));

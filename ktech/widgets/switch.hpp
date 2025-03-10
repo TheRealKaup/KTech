@@ -175,7 +175,7 @@ private:
 
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.SetForeground(m_downRGBA);
+			texture.Transform([&](KTech::CellA& cell){ cell.f = m_downRGBA; });
 		}
 
 		m_downInvocation.Invoke(pressLength, KTech::Time::Measurement::milliseconds);
@@ -194,14 +194,14 @@ private:
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.SetForeground(m_selectedOnRGBA);
+				texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOnRGBA; });
 			}
 		}
 		else
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.SetForeground(m_selectedOffRGBA);
+				texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOffRGBA; });
 			}
 		}
 	}
@@ -212,14 +212,14 @@ private:
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.SetForeground(m_unselectedOnRGBA);
+				texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOnRGBA; });
 			}
 		}
 		else
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.SetForeground(m_unselectedOffRGBA);
+				texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOffRGBA; });
 			}
 		}
 	}
@@ -232,14 +232,14 @@ private:
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.SetForeground(m_selectedOnRGBA);
+					texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOnRGBA; });
 				}
 			}
 			else
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.SetForeground(m_selectedOffRGBA);
+					texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOffRGBA; });
 				}
 			}
 		}
@@ -249,14 +249,14 @@ private:
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.SetForeground(m_unselectedOnRGBA);
+					texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOnRGBA; });
 				}
 			}
 			else
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.SetForeground(m_unselectedOffRGBA);
+					texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOffRGBA; });
 				}
 			}
 		}

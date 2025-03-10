@@ -30,7 +30,7 @@
 #include "../engine/engine.hpp"
 
 /*!
-	@fn `Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
+	@fn Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
 	@brief Prepare `Camera` for rendering.
 
 	@param [in] engine Parent engine.
@@ -46,7 +46,7 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 }
 
 /*!
-	@fn `Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")`
+	@fn Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
 	@brief Prepare `Camera` for rendering and immediately enter a `Map`.
 
 	@param [in] engine Parent engine.
