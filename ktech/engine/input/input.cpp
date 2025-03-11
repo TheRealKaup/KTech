@@ -21,10 +21,11 @@
 #include "input.hpp"
 
 #include "callback.hpp"
-#include "callbacksgroup.hpp"
+#include "callbackgroup.hpp"
 #include "handler.hpp"
 #include "../engine.hpp"
 
+#include <algorithm>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
@@ -33,7 +34,7 @@
 	@var `Input::input`
 	@brief Input for the last-called callback function.
 
-	Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbacksGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
+	Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbackGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
 */
 /*!
 	@var `Input::quitKey`
@@ -164,14 +165,10 @@ void KTech::Input::CallCallbacks()
 	for (std::string& queuedInput : m_inputQueue)
 	{
 		input = std::move(queuedInput);
-		if (input.length() == 1) // Can be both string/range handler
+		CallStringHandlers();
+		if (input.length() == 1) // Can be a range handler as well
 		{
-			CallStringHandlers();
 			CallRangeHandlers();
-		}
-		else // Can only be string handler
-		{
-			CallStringHandlers();
 		}
 	}
 	// All callbacks of triggered handlers were called; clear trigger history
@@ -180,20 +177,20 @@ void KTech::Input::CallCallbacks()
 
 void KTech::Input::Update()
 {
-	for (size_t i = 0; i < m_groups.size();)
-	{
-		// Group was set to be removed by `SetCallbacksGroupToBeRemoved`
-		if (m_groups[i] == nullptr)
+	m_groups.erase(std::ranges::begin(std::ranges::remove_if(m_groups,
+		[](CallbackGroup* group)
 		{
-			m_groups.erase(m_groups.begin() + i);
-		}
-		else
-		{
+			// ERASE-REMOVE groups that were set to be removed by `SetCallbackGroupToBeRemoved()`
+			if (group == nullptr)
+			{
+				return true;
+			}
 			// Updates `Callback` statuses
-			m_groups[i]->Update();
-			i++;
+			group->Update();
+			return false;
 		}
-	}
+		)), std::ranges::end(m_groups)
+	);
 	// Delete any `Callback` that is awaiting deletion
 	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
 	{
@@ -394,16 +391,16 @@ auto KTech::Input::CrateRangedCallback(char p_start, char p_end, const std::func
 	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
 }
 
-void KTech::Input::RegisterCallbacksGroup(CallbacksGroup* const p_callbacksGroup)
+void KTech::Input::RegisterCallbackGroup(CallbackGroup* const p_callbackGroup)
 {
-	m_groups.push_back(p_callbacksGroup);
+	m_groups.push_back(p_callbackGroup);
 }
 
-void KTech::Input::SetCallbacksGroupToBeRemoved(CallbacksGroup* const p_callbacksGroup)
+void KTech::Input::SetCallbackGroupToBeRemoved(CallbackGroup* const p_callbackGroup)
 {
-	for (CallbacksGroup*& group : m_groups)
+	for (CallbackGroup*& group : m_groups)
 	{
-		if (group == p_callbacksGroup)
+		if (group == p_callbackGroup)
 		{
 			// Set group to `nullptr`; that will be noticed in `Input::Update()` and be removed.
 			group = nullptr;

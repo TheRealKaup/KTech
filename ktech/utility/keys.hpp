@@ -23,7 +23,7 @@
 /*!
 	@brief Various terminal input escape sequences.
 
-	Very useful for `CallbacksGroup::RegisterCallback()`.
+	Very useful for `CallbackGroup::RegisterCallback()`.
 */
 namespace KTech::Keys
 {

@@ -57,7 +57,7 @@ struct UITest
 	size_t currentWidget = w_intfield;
 
 	ID<UI> ui;
-	Input::CallbacksGroup callbacksGroup;
+	Input::CallbackGroup callbackGroup;
 
 	Time::Invocation countdownInvocation;
 
@@ -139,7 +139,7 @@ struct UITest
 	}
 
 	UITest(ID<UI> ui)
-		: ui(ui), callbacksGroup(engine, true), countdownInvocation(engine, [this] { return Countdown(); })
+		: ui(ui), callbackGroup(engine, true), countdownInvocation(engine, [this] { return Countdown(); })
 	{
 		widgets[w_frame] = new Frame(engine, ui, Point(0, 0), UPoint(19, 19));
 		widgets[w_showNotice] = new Switch(engine, ui, std::bind(&UITest::SetNotice, this), Keys::return_, Point(3, -1), "Show\1Notice", false, false);
@@ -167,8 +167,8 @@ struct UITest
 		SetNotice();
 		widgets[currentWidget]->Select();
 
-		callbacksGroup.RegisterCallback(Keys::Shift::tab, std::bind(&UITest::MoveUp, this));
-		callbacksGroup.RegisterCallback(Keys::tab, std::bind(&UITest::MoveDown, this));
+		callbackGroup.RegisterCallback(Keys::Shift::tab, std::bind(&UITest::MoveUp, this));
+		callbackGroup.RegisterCallback(Keys::tab, std::bind(&UITest::MoveDown, this));
 	}
 
 	~UITest()

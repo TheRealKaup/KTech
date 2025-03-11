@@ -71,10 +71,10 @@ public:
 		// Input handlers
 		for (const std::pair<char, char>& charRange : allowedCharacters)
 		{
-			m_callbacksGroup.RegisterRangedCallback(charRange.first, charRange.second, [this]() -> bool { return this->Insert(); });
+			m_callbackGroup.RegisterRangedCallback(charRange.first, charRange.second, [this]() -> bool { return this->Insert(); });
 		}
-		m_callbacksGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return this->Insert(); });
-		m_callbacksGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return this->Insert(); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return this->Insert(); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return this->Insert(); });
 	}
 
 	/*!

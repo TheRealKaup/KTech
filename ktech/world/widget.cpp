@@ -21,7 +21,7 @@
 #include "widget.hpp"
 
 #include "ui.hpp"
-#include "../engine/input/callbacksgroup.hpp"
+#include "../engine/input/callbackgroup.hpp"
 #include "../engine/engine.hpp"
 
 /*!
@@ -32,7 +32,7 @@
 	@param name String name.
 */
 KTech::Widget::Widget(Engine& p_engine, Point p_position, std::string p_name)
-	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbacksGroup(engine, false)
+	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbackGroup(engine, false)
 {
 	engine.memory.widgets.Add(this);
 }
@@ -193,7 +193,7 @@ auto KTech::Widget::LeaveUI() -> bool
 void KTech::Widget::Select()
 {
 	m_selected = true;
-	m_callbacksGroup.Enable();
+	m_callbackGroup.Enable();
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
 		if (childWidget.oldSelected)
@@ -214,7 +214,7 @@ void KTech::Widget::Select()
 void KTech::Widget::Deselect()
 {
 	m_selected = false;
-	m_callbacksGroup.Disable();
+	m_callbackGroup.Disable();
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
 		childWidget.oldSelected = engine.memory.widgets[childWidget.widget]->m_selected;

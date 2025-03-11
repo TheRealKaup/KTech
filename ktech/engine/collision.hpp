@@ -72,7 +72,6 @@ private:
 		std::vector<CollisionData>& blockData,
 		std::vector<CollisionData>& overlapData,
 		std::vector<CollisionData>& exitOverlapData);
-	static auto IsInPushData(std::vector<CollisionData>& pushData, const ID<Object>& object) -> bool;
 
 	friend class Engine;
 };

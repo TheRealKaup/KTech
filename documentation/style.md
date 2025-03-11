@@ -268,3 +268,5 @@ void Function() { // Bad
 
 }
 ```
+
+Remember to use `[[deprecated("reason")]]`. This helps elucidate that a function is deprecated, about to be changed/fixed (and for that is also missing documentation).

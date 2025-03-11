@@ -75,7 +75,7 @@ public:
 		// Textures
 		SetText(text, withFrame);
 		// Input handlers
-		m_callbacksGroup.RegisterCallback(key, [this]() -> bool { return this->OnPress(); });
+		m_callbackGroup.RegisterCallback(key, [this]() -> bool { return this->OnPress(); });
 	}
 
 	/*!

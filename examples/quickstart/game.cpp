@@ -32,7 +32,7 @@ struct Character : KTech::Object
 	// Set `camera`'s background to a blue color so we have a sky.
 	// `Camera::m_background` is of type `Cell`, meaning you can give the background a character (`Cell:c`) and a foreground color (`Cell::f`) as well. Here, though, we only set the background value (`Cell::b`).
 
-	KTech::Input::CallbacksGroup callbacksGroup;
+	KTech::Input::CallbackGroup callbackGroup;
 
 	void OnMove(KTech::Point dir) override
 	{
@@ -41,7 +41,7 @@ struct Character : KTech::Object
 
 	Character(KTech::Engine& engine, const KTech::ID<KTech::Layer>& layer, const KTech::ID<KTech::Map>& map, KTech::Point pos)
 		: Object(engine, layer, pos, "character"), // Inherit `Object::Object()`, since `Object` has no default constructor. The fourth name parameter can be useful for debugging if so interests you, though it bears no additional functionality.
-		camera(engine, KTech::Point(pos.x - 18, pos.y - 8), KTech::UPoint(40, 20)),  callbacksGroup(engine, true)
+		camera(engine, KTech::Point(pos.x - 18, pos.y - 8), KTech::UPoint(40, 20)),  callbackGroup(engine, true)
 	{
 		// Add a singular texture.
 		m_textures.resize(1);
@@ -58,16 +58,16 @@ struct Character : KTech::Object
 		m_colliders[0].ByTextureCharacter(m_textures[0], 1 /*Can push and be pushed by default.*/);
 
 		// Register input callback functions to make the character movable by pressing keys.
-		callbacksGroup.RegisterCallback( // Move down
+		callbackGroup.RegisterCallback( // Move down
 			KTech::Keys::down, // The triggering key. The `KTech::Keys` namespace includes a variety of different key values (in the form of escape sequences).
 			std::bind( // We'll have to `std::bind` the callback function because it's a non-static member.
 				&Character::Move, // Pointer to the callback function, `Object::Move()`, which requests `Collision` to move this object.
 				this, // Bind this object to the function.
 				KTech::Point(0, 1) // `Move()` has one `Point` parameter which represents where to attempt moving relatively (direction), so bind +1 on the Y axis (which means down) to it.
 			));
-		callbacksGroup.RegisterCallback(KTech::Keys::up, std::bind(&Character::Move, this, KTech::Point(0, -1))); // Move up.
-		callbacksGroup.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, KTech::Point(1, 0))); // Move right.
-		callbacksGroup.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, KTech::Point(-1, 0))); // Move left.
+		callbackGroup.RegisterCallback(KTech::Keys::up, std::bind(&Character::Move, this, KTech::Point(0, -1))); // Move up.
+		callbackGroup.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, KTech::Point(1, 0))); // Move right.
+		callbackGroup.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, KTech::Point(-1, 0))); // Move left.
 
 		camera.m_background.b = KTech::RGB(180, 230, 240);
 		// Add `camera` to `map`. World structures communicate with each other using their `ID`s (the `m_id` member). The second parameter sets `camera` to be active one in `map`.

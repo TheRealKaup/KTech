@@ -140,14 +140,14 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 {
 	RenderBackground();
 
-	for (size_t l = 0; l < p_layers.size(); l++)
+	for (const KTech::ID<KTech::Layer>& layerID : p_layers)
 	{
-		KTech::Layer* layer = engine.memory.layers[p_layers[l]];
+		KTech::Layer* layer = engine.memory.layers[layerID];
 		if (layer->m_visible)
 		{
-			for (size_t o = 0; o < layer->m_objects.size(); o++)
+			for (const KTech::ID<KTech::Object>& ObjectID : layer->m_objects)
 			{
-				KTech::Object* object = engine.memory.objects[layer->m_objects[o]];
+				KTech::Object* object = engine.memory.objects[ObjectID];
 				for (KTech::Texture& texture : object->m_textures)
 				{
 					if (texture.m_active)
@@ -233,10 +233,7 @@ auto KTech::Camera::OnTick() -> bool
 inline void KTech::Camera::RenderBackground()
 {
 	// RESET image to background
-	for (auto & cell : m_image)
-	{
-		cell = m_background;
-	}
+	std::ranges::fill(m_image, m_background);
 }
 
 inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, Texture& p_texture)
@@ -344,24 +341,18 @@ inline void KTech::Camera::RenderForeground(const RGBA& p_frgba, const RGBA& p_b
 	RGBA tempRGBA;
 	if (BakeRGBA(tempRGBA, p_frgba))
 	{
-		for (size_t y = 0; y < m_res.y; y++) // ITERATE
+		for (Cell& cell : m_image)
 		{
-			for (size_t x = 0; x < m_res.x; x++)
-			{
-				DrawBakedToRGB(m_image[m_res.x * y + x].f, tempRGBA);
-			}
+			DrawBakedToRGB(cell.f, tempRGBA);
 		}
 	}
 
 	// DRAW background color
 	if (BakeRGBA(tempRGBA, p_brgba))
 	{
-		for (size_t y = 0; y < m_res.y; y++) // ITERATE
+		for (Cell& cell : m_image)
 		{
-			for (size_t x = 0; x < m_res.x; x++)
-			{
-				DrawBakedToRGB(m_image[m_res.x * y + x].b, tempRGBA);
-			}
+			DrawBakedToRGB(cell.b, tempRGBA);
 		}
 	}
 }

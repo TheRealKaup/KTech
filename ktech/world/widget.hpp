@@ -27,7 +27,7 @@
 #include "../basic/point.hpp"
 #include "../world/texture.hpp"
 #include "../engine/input/input.hpp"
-#include "../engine/input/callbacksgroup.hpp"
+#include "../engine/input/callbackgroup.hpp"
 
 /*!
 	@brief World structure that comprises `Texture`s, behaves as a user interface element, and exists within `UI`.
@@ -65,7 +65,7 @@ public:
 
 	Point m_pos; //!< World position.
 	std::vector<Texture> m_textures = {}; //!< Comprising `Texture`s.
-	Input::CallbacksGroup m_callbacksGroup; //!< Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
+	Input::CallbackGroup m_callbackGroup; //!< Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
 
 	Widget(Engine& engine, Point position = Point(0, 0), std::string name = "");
 	Widget(Engine& engine, const ID<UI>& parentUI, Point position = Point(0, 0), std::string name = "");

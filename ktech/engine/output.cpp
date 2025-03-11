@@ -130,7 +130,7 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 */
 void KTech::Output::Clear()
 {
-	std::fill(m_image.begin(), m_image.end(), Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)));
+	std::ranges::fill(m_image.begin(), m_image.end(), Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)));
 }
 
 /*!
@@ -341,7 +341,7 @@ void KTech::Output::Print()
 /*!
 	@brief Check whether things changed and require a new render.
 
-	Various callback and virtual functions in KTech are expected to return a `bool` value (e.g. `OnTick()` virtual functions, and input callback functions registered at `CallbacksGroup::RegisterCallback()`). **They should return `true` if they changed something in the game's world, that might require the game to render a new frame. They should return `false` if they certainly did not change anything, meaning the game doesn't have to render a new frame.**
+	Various callback and virtual functions in KTech are expected to return a `bool` value (e.g. `OnTick()` virtual functions, and input callback functions registered at `CallbackGroup::RegisterCallback()`). **They should return `true` if they changed something in the game's world, that might require the game to render a new frame. They should return `false` if they certainly did not change anything, meaning the game doesn't have to render a new frame.**
 
 	The `Input`, `Memory` and `Time` engine components remember whether any virtual or callback function returned `true` throughout the last tick. If any did, it means something has changed (like the position of an `Object` or the appearance of a `Texture`). In that case, this function will return true. This allows to "render on demand", i.e., avoid rendering when certainly nothing has changed.
 

@@ -25,15 +25,15 @@
 /*!
 	@brief Input callbacks creator and manager.
 
-	Through this class you can register functions to get called back when certain inputs are received from the terminal (`CallbacksGroup::RegisterCallback()` and `CallbacksGroup::RegisterRangedCallback()`). You can also temporarily activate and deactivate your callbacks so they happen only when you want (`CallbacksGroup::Enable()` and `CallbacksGroup::Disable()`).
+	Through this class you can register functions to get called back when certain inputs are received from the terminal (`CallbackGroup::RegisterCallback()` and `CallbackGroup::RegisterRangedCallback()`). You can also temporarily activate and deactivate your callbacks so they happen only when you want (`CallbackGroup::Enable()` and `CallbackGroup::Disable()`).
 
 	This class is basically a wrapper for a couple of internal classes and functions which are not individually documented. The way this wrapper works assures callback functions don't go into action immediately (otherwise there's unexpected behavior), and aren't removed while being processed somewhere else.
 */
-class KTech::Input::CallbacksGroup
+class KTech::Input::CallbackGroup
 {
 public:
-	CallbacksGroup(Engine& engine, bool enabled = true);
-	~CallbacksGroup();
+	CallbackGroup(Engine& engine, bool enabled = true);
+	~CallbackGroup();
 
 	void RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback);
 	void RegisterRangedCallback(char start, char end, const std::function<bool()>& callback);

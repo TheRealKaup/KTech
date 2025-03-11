@@ -21,6 +21,7 @@
 #include "time.hpp"
 #include "invocation.hpp"
 
+#include <algorithm>
 #include <thread>
 
 /*!
@@ -50,7 +51,7 @@
 void KTech::Time::CallInvocations()
 {
 	// ERASE-REMOVE `Invocation`s which were set to `nullptr` by `Time::DeregisterInvocation()` (which was called by `Invocation::~Invocation()`).
-	m_invocations.erase(std::remove(m_invocations.begin(), m_invocations.end(), nullptr), m_invocations.end());
+	m_invocations.erase(std::ranges::begin(std::ranges::remove(m_invocations, nullptr)), m_invocations.end());
 
 	// ADVANCE all invocations:
 	// NOLINTNEXTLINE(modernize-loop-convert) // Avoid iterator invalidation (`Invocation::Advance()` can insert into `m_invocations`).

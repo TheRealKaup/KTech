@@ -27,11 +27,11 @@ class Character : KTech::Object
 {
 private:
 	/*
-		This peculiar `CallbacksGroup` class manages our input callback functions. We give it our functions, and through it we can easily manage them afterwards (something we will test further in another chapter). The only way to assign a function to an input in KTech is by doing so through a `CallbacksGroup` instance (even if your group will comprise only 1 callback function).
+		This peculiar `CallbackGroup` class manages our input callback functions. We give it our functions, and through it we can easily manage them afterwards (something we will test further in another chapter). The only way to assign a function to an input in KTech is by doing so through a `CallbackGroup` instance (even if your group will comprise only 1 callback function).
 
-		This is necessary for memory safety, because `CallbacksGroup` binds the life cycle of our input callback functions to the lifetime of the `Object` to which the functions belong (i.e., it's a RAII wrapper). This avoid dangling pointers when our `Character` destructs, because then the `CallbacksGroup` also gets destructed, and in its destructor, it makes sure that `Character`'s member input callback functions won't be called by the input engine component anymore.
+		This is necessary for memory safety, because `CallbackGroup` binds the life cycle of our input callback functions to the lifetime of the `Object` to which the functions belong (i.e., it's a RAII wrapper). This avoid dangling pointers when our `Character` destructs, because then the `CallbackGroup` also gets destructed, and in its destructor, it makes sure that `Character`'s member input callback functions won't be called by the input engine component anymore.
 	*/
-	KTech::Input::CallbacksGroup m_callbacksGroup;
+	KTech::Input::CallbackGroup m_callbackGroup;
 
 public:
 	/*
@@ -41,9 +41,9 @@ public:
 	*/
 	Character(KTech::Engine& engine, KTech::ID<KTech::Layer> parentLayer, KTech::Point position)
 		: Object(engine, parentLayer, position),
-		// `CallbacksGroup`'s constructor also wants an engine reference.
+		// `CallbackGroup`'s constructor also wants an engine reference.
 		// The second `bool` parameter states whether to activate its input callback functions right of the bat.
-		m_callbacksGroup(engine, true)
+		m_callbackGroup(engine, true)
 	{
 		// A single `Texture` will suffice.
 		m_textures.resize(1);
@@ -60,7 +60,7 @@ public:
 		);
 
 		/*
-			`CallbacksGroup::RegisterCallback()` is the function that assigns our input callback function an actual input.
+			`CallbackGroup::RegisterCallback()` is the function that assigns our input callback function an actual input.
 
 			The first parameter is an input value. You can find various input values in the `KTech::Keys` namespace. Inputs are received in what's called "ANSI escape sequences", and they might seem unusual. That's just how the input engine component gets player inputs from the terminal.
 
@@ -74,10 +74,10 @@ public:
 
 			In this case, though, because `Object` has no `Collider`s and there are no other `Object`s in the parent `Layer`, our `Object` (i.e. `Character`) will always succeed to move. But still, you get the point.
 		*/
-		m_callbacksGroup.RegisterCallback(KTech::Keys::up, 		[this] { return Move(KTech::Point(0, -1)); });
-		m_callbacksGroup.RegisterCallback(KTech::Keys::left, 	[this] { return Move(KTech::Point(-1, 0)); });
-		m_callbacksGroup.RegisterCallback(KTech::Keys::down, 	[this] { return Move(KTech::Point(0, 1)); });
-		m_callbacksGroup.RegisterCallback(KTech::Keys::right, 	[this] { return Move(KTech::Point(1, 0)); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::up, 		[this] { return Move(KTech::Point(0, -1)); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::left, 	[this] { return Move(KTech::Point(-1, 0)); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::down, 	[this] { return Move(KTech::Point(0, 1)); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::right, 	[this] { return Move(KTech::Point(1, 0)); });
 		/*
 			`Object::Move()` asks for a "direction" parameter. Coordinates are in accordance with terminal printing (from left to right, from top to bottom). So:
 
@@ -93,9 +93,9 @@ public:
 	/*
 		And that's it. There are many comments here, but overall, this is a pretty simple class. The only things we ourselves added to `Object` are:
 
-		- `CallbacksGroup`.
+		- `CallbackGroup`.
 		- Constructor that initializes `Object::m_textures`.
-		- Constructor that registers movement input callback functions through the `CallbacksGroup`.
+		- Constructor that registers movement input callback functions through the `CallbackGroup`.
 
 		We instantiate our `Character` in `main()`, like any other world structure. Don't forget to try to build and run this small example (`./build/bin/4-input`).
 	*/

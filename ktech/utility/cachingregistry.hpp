@@ -119,8 +119,7 @@ private:
 
 	// Returns the valid index of the ID.
 	// If the UUID is missing, return the size of the array making the index invalid.
-	// Fixes the ID if outdated.
-	auto IDToIndex(ID<T>& id) -> size_t
+	auto IDToIndex(const ID<T>& id) -> size_t
 	{
 		if (!m_vec.empty())
 		{
@@ -138,27 +137,6 @@ private:
 			}
 		}
 		id.m_i = 0;
-		return m_vec.size();
-	}
-
-	// Returns the valid index of the ID.
-	// If the UUID is missing, return the size of the array making the index invalid.
-	auto IDToIndex(const ID<T>& id) -> size_t
-	{
-		if (!m_vec.empty())
-		{
-			for (size_t i = (id.m_i < m_vec.size() ? id.m_i : m_vec.size() - 1);; i--)
-			{
-				if (m_vec[i]->m_id == id)
-				{
-					return i;
-				}
-				if (i == 0)
-				{
-					break;
-				}
-			}
-		}
 		return m_vec.size();
 	}
 

@@ -259,7 +259,7 @@ void KTech::Collision::ExpandMovementTree(const ID<Object>& p_thisObject, Point 
 	for (ID<Object>& otherObject : LAYERS[OBJECTS[p_thisObject]->m_parentLayer]->m_objects) // Other objects
 	{
 		if (otherObject == p_thisObject
-			|| IsInPushData(p_pushData, otherObject)) // Filter out pushed/pushing objects (leaving objects outside the movement tree and objects from `blockingObjects`)
+			|| std::ranges::any_of(p_pushData, [&](const CollisionData& pushDatum){ return otherObject == pushDatum.activeObject || otherObject == pushDatum.passiveObject; })) // Filter out pushed/pushing objects (leaving objects outside the movement tree and objects from `blockingObjects`)
 		{
 			continue;
 		}
@@ -346,14 +346,4 @@ void KTech::Collision::ExpandMovementTree(const ID<Object>& p_thisObject, Point 
 			p_pushData.push_back({p_thisObject, otherObject, otherColliderI, colliderI});
 		}
 	}
-}
-
-auto KTech::Collision::IsInPushData(std::vector<CollisionData>& p_pushData, const ID<Object>& p_object) -> bool
-{
-    return std::ranges::any_of(p_pushData,
-		[&p_object](const CollisionData& pushDatum)
-		{
-        	return p_object == pushDatum.activeObject || p_object == pushDatum.passiveObject;
-    	}
-	);
 }

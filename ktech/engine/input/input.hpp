@@ -43,7 +43,7 @@
 class KTech::Input
 {
 public:
-	class CallbacksGroup;
+	class CallbackGroup;
 
 	std::string input;
 	std::string quitKey{"\x03"};
@@ -76,7 +76,7 @@ private:
 	std::vector<std::shared_ptr<Handler>> m_stringHandlers;
 	std::vector<std::shared_ptr<Handler>> m_rangeHandlers;
 	// Groups can be deleted
-	std::vector<CallbacksGroup*> m_groups;
+	std::vector<CallbackGroup*> m_groups;
 
 	Input(Engine& engine, bool noGameLoopMode);
 	~Input();
@@ -93,18 +93,18 @@ private:
 	auto CrateRangedCallback(char start, char end, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
 
 	/*
-		Register `CallbacksGroup`.
+		Register `CallbackGroup`.
 
-		Unlike registering `Callback`s, registering and removing `CallbacksGroup`s is direct (the `CallbacksGroup` is registered at `Input`).
-		This is why `CallbacksGroup` has a register and a remove function here.
+		Unlike registering `Callback`s, registering and removing `CallbackGroup`s is direct (the `CallbackGroup` is registered at `Input`).
+		This is why `CallbackGroup` has a register and a remove function here.
 	*/
-	void RegisterCallbacksGroup(CallbacksGroup* callbacksGroup);
+	void RegisterCallbackGroup(CallbackGroup* callbackGroup);
 	/*
-		Since neither `Handler`, `Callback` nor `CallbacksGroup` are expected to be removed at any point, this function prepares to remove the given pointer from `m_groups`.
+		Since neither `Handler`, `Callback` nor `CallbackGroup` are expected to be removed at any point, this function prepares to remove the given pointer from `m_groups`.
 
-		This function sets `nullptr` where the given `CallbacksGroup*` is given. `Input::Update` sees this and removes it from `m_groups`.
+		This function sets `nullptr` where the given `CallbackGroup*` is given. `Input::Update` sees this and removes it from `m_groups`.
 	*/
-	void SetCallbacksGroupToBeRemoved(CallbacksGroup* callbacksGroup);
+	void SetCallbackGroupToBeRemoved(CallbackGroup* callbackGroup);
 
 	void Update();
 	void CallStringHandlers();

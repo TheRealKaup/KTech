@@ -21,18 +21,15 @@
 #include "handler.hpp"
 #include "callback.hpp"
 
+#include <algorithm>
+
 void KTech::Input::Handler::RemoveCallbacksSetToBeDeleted()
 {
-	for (size_t i = 0; i < m_callbacks.size();)
-	{
-		// `Callback`s which were set to `Callback::Status::awaitingDeletion` were set to be deleted by its `CallbacksGroup`
-		if (m_callbacks[i]->status == Callback::Status::awaitingDeletion)
+	// ERASE-REMOVE `Callback`s which were set to `Callback::Status::awaitingDeletion` by its `CallbackGroup`
+	m_callbacks.erase(std::ranges::begin(std::ranges::remove_if(m_callbacks,
+		[](const std::shared_ptr<Callback>& callback)
 		{
-			m_callbacks.erase(m_callbacks.begin() + i);
-		}
-		else
-		{
-			i++;
-		}
-	}
+			return callback->status == Callback::Status::awaitingDeletion;
+		})), std::ranges::end(m_callbacks)
+	);
 }

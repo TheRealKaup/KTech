@@ -75,9 +75,9 @@ public:
 		// Default value
 		SetValue(defaultNum);
 		// Input handlers
-		m_callbacksGroup.RegisterRangedCallback('0', '9', [this]() -> bool { return Insert(); });
-		m_callbacksGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return Insert(); });
-		m_callbacksGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return Insert(); });
+		m_callbackGroup.RegisterRangedCallback('0', '9', [this]() -> bool { return Insert(); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::backspace, [this]() -> bool { return Insert(); });
+		m_callbackGroup.RegisterCallback(KTech::Keys::delete_, [this]() -> bool { return Insert(); });
 	}
 
 	/*!
