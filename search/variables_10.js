@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['x_0',['x',['../structKTech_1_1Point.html#a664ab82865e3a58bc38a01a020ec66b7',1,'KTech::Point::x()'],['../structKTech_1_1UPoint.html#abc0dfe443664df51999d0609177e036f',1,'KTech::UPoint::x()']]]
+  ['widgets_0',['widgets',['../d2/dcf/classKTech_1_1Memory.html#a2cebb932c01db03fba55981025f4ec1d',1,'KTech::Memory']]]
 ];

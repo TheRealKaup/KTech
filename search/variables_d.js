@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['tickscounter_0',['ticksCounter',['../classKTech_1_1Time.html#a80cc0d55184510191feb2406dee30f2f',1,'KTech::Time']]],
-  ['time_1',['time',['../classKTech_1_1Engine.html#a89eaa21a0a5e12ec8383c721b7427840',1,'KTech::Engine']]],
-  ['tps_2',['tps',['../classKTech_1_1Time.html#aacfce4b68eb1fb70ccf0ebda0200a81e',1,'KTech::Time']]],
-  ['tpslimit_3',['tpsLimit',['../classKTech_1_1Time.html#a5a5d097c152cf26a0a70720be2a44c9f',1,'KTech::Time']]],
-  ['tpspotential_4',['tpsPotential',['../classKTech_1_1Time.html#a4d4db19fd005ad3d10d034139061f3ad',1,'KTech::Time']]]
+  ['r_0',['r',['../d7/d38/structKTech_1_1RGB.html#a60323ac97a6398907cc4cb0e39004242',1,'KTech::RGB']]],
+  ['resolution_1',['resolution',['../d4/de4/classKTech_1_1Output.html#a0134e64401e18ce29e685233f9ee0524',1,'KTech::Output']]],
+  ['running_2',['running',['../da/d0d/classKTech_1_1Engine.html#a69a36e8bcb864e4f16857cada0f93f12',1,'KTech::Engine']]]
 ];
