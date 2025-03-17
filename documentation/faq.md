@@ -7,17 +7,14 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 - [How to run the game examples?](#how-to-run-the-game-examples)
 - [How does the licensing work?](#how-does-the-licensing-work)
 - [Is KTech Stable?](#is-ktech-stable)
-- [Why are `Collider`What is the Git workflow here?
-
-- `master` branch includes only commits that are to be tagged for releases.
-- `develop` branch include not fully refined feature updates.
-- `topic/*` branches include feature updates.s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
+- [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
 - [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
 - [How does the file system work?](#how-does-the-file-system-work)
 - [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
 - [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
 - [Will there be a software development kit?](#will-there-be-a-software-development-kit)
 - [Is KTech GPU-accelerated?](#is-ktech-gpu-accelerated)
+- [What is the `KTECH_DEFINITION` macro?](#what-is-the-ktech_definition-macro)
 - [Why is the library named "KTech"?](#why-is-the-library-named-ktech)
 - [What is the Git workflow here?](#what-is-the-git-workflow-here)
 
