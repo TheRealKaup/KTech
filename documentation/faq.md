@@ -25,9 +25,11 @@ This document contains answers for ~~frequently~~ potentially asked questions.
 
 ## How to build KTech (with Premake)?
 
+Important: The Windows port is deprecated. See GitHub issue #149. At the moment, only GNU/Linux support exists. Running KTech on top of WSL should be possible.
+
 KTech uses **Premake** to configure and generate build files, because it has [fine documentation](https://premake.github.io/docs/) and is configured with the normal scripting language Lua, unlike CMake with its counterintuitive documentation and odd scripting language.
 
-To generate the build files for KTech and the game examples in the `examples/` directory, ensure Premake is installed on your system and run the command `premake5 [action]` from the Git repository's root (e.g. `premake5 gmake2` to generate GNU Makefiles).
+To generate the build files for KTech, the game examples in the `examples/` directory, and the tutorial chapters in `documentation/tutorial/`, ensure Premake is installed on your system and run the command `premake5 gmake2` from the Git repository's root to generate GNU Makefiles.
 
 To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to the directory `build/bin/`.
 
@@ -66,17 +68,17 @@ project "ktechgame" -- the name of your game (doesn't matter to KTech)
 		symbols "On" -- turn on symbols if you want to debug
 ```
 
-To generate the build files for KTech and your game, ensure Premake is installed on your system and run the command `premake5 [action]` from the directory your `premake5.lua` script is in (e.g. `premake5 gmake2` to generate GNU Makefiles).
+To generate the build files for KTech and your game, ensure Premake is installed on your system and run the command `premake5 gmake2` from the directory your `premake5.lua` script is in, in order to generate GNU Makefiles.
 
 To then generate binary files with GNU Make, run the command `make -C build/`, and they will be outputted to `build/bin/`.
 
-The "Debug" configuration (on KTech's end) enables debug symbols and intentionally doesn't hide the terminal cursor to improve GDB using experience. The "Release" configuration leaves debug symbols disabled and hides the terminal cursor.
+The "Debug" configuration, on KTech's end, enables debug symbols and intentionally doesn't hide the terminal cursor to improve GDB usage. The "Release" configuration leaves debug symbols disabled and hides the terminal cursor.
 
 ## How to run the game examples?
 
-There are 2 game examples, "simpleplatform", which tests collision and various graphical features, and "widgetstest", which tests all the UI widgets available.
+There are 3 game examples: "simpleplatform", which tests collision and various graphical features,"widgetstest", which tests all the UI widgets available, and "quickstart", which is a heavily documented program, although it's outdated and you should instead be looking at [the tutorial](../readme.md#documentation).
 
-Running the Premake script, as described in "[How to build KTech (with Premake)?](#how-to-build-ktech-with-premake)", will build these 2 game examples. The "widgetstest" binary (which will be outputted to `build/bin/widgetstest`) can be ran from anywhere, though the adjacent `build/bin/simpleplatform` binary should be ran from its source directory (`examples/simpleplatform/`), so it could load its texture files.
+Running the Premake script, as described in "[How to build KTech (with Premake)?](#how-to-build-ktech-with-premake)", will build these game examples. They can be run from anywhere except `build/bin/simpleplatform`, which should executed from the Git repository's root so it can load its assets (using the command: `./build/bin/simpleplatform`).
 
 For an example of a purposed UI program made with KTech, see [TextureCreator](https://github.com/TheRealKaup/TextureCreator).
 

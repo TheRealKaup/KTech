@@ -21,7 +21,7 @@
 
 	Within this directory there's an additional file named "premake5.lua" - it is the configuration file for the command line tool Premake that KTech uses to generate build files. This particular configuration file will generate the build files for the entire tutorial and all its chapters at once. I will not teach you how to use Premake as it already has a fine documentation at https://premake.github.io/docs/, though knowing how to script it is not needed right now; we just want to run the configuration file we already have.
 
-	Here I assume you are running GNU/Linux. Comprehensive instructions for Windows and Visual Studio don't exist yet.
+	KTech only supports GNU/Linux. Windows support was deprecated, but running on WSL should work.
 
 	First, generate build files. Ensure you have Premake installed on your system and run the following command from the root directory of your cloned repository ("gmake2" for GNU make files):
 
