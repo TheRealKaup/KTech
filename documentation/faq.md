@@ -218,7 +218,7 @@ Originally I called it KCGE, which meant "Kaup's Console Game Engine". As part o
 The branches are as follows:
 
 - `master`
-	- Includes only commits that are to be tagged as releases.
+	- Includes commits that were already released (to GitHub releases), and sometimes unreleased commits that fix small issues in any of the markdown documentation files.
 - `develop`
 	- Includes new features.
 	- Merged into `master` when it fulfills a GitHub milestone and is stable (in the form of a major or minor release).
