@@ -1,5 +1,6 @@
 # *KTech*, Kaup's C++ Terminal Game Engine
 
+- [Development Notice](#development-notice)
 - [Introduction](#introduction) - general explanation of what KTech is.
 - [Documentation](#documentation) - links to the project's documentation.
 - [Building](documentation/faq.md#how-to-build-ktech-with-premake) - detailed building instructions.
@@ -10,6 +11,14 @@
 - [Contact Information](#contact-information) - how to contact the developer.
 
 ![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.png)
+
+---
+
+## Development Notice
+
+From: 18-4-2025.
+
+Right before finalizing `StateMachine`, releasing KTech v1.2.0, and starting to work on netset, another long-term software project climbed up my priority list. I have a very limiting time frame, so I had to stop working on KTech for the present. **KTech and netset are not abandoned**, and I'm continuing to work on netset's script.
 
 ---
 
