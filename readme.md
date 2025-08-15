@@ -20,6 +20,10 @@ From: 18-4-2025.
 
 Right before finalizing `StateMachine`, releasing KTech v1.2.0, and starting to work on netset, another long-term software project climbed up my priority list. I have a very limiting time frame, so I had to stop working on KTech for the present. **KTech and netset are not abandoned**, and I'm continuing to work on netset's script.
 
+From: 8-15-2025.
+
+Development will return in late October 2025, in partial capacity.
+
 ---
 
 ## Introduction
