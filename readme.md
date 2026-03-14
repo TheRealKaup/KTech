@@ -24,6 +24,12 @@ From: 15-8-2025.
 
 Development will return in late October 2025, in partial capacity.
 
+From: 14-3-2026.
+
+That was a lie. I unforunately couldn't gather the time and energy to work on KTech and netset, and I doubt I will return to these projects in the near future. I am plenty motivated to return, however, I am working on other things right now, and when I do return, I will be a much better developer and project manager.
+
+netset's script still sees infrequent progress. For example, I worked on it today a little. The script is slowly maturing, and I am trying to improve my writing skills. It's very important to me that netset tells a good narrative.
+
 ---
 
 ## Introduction
