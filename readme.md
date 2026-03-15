@@ -30,6 +30,10 @@ That was a lie. I unforunately couldn't gather the time and energy to work on KT
 
 netset's script still sees infrequent progress. For example, I worked on it today a little. The script is slowly maturing, and I am trying to improve my writing skills. It's very important to me that netset tells a good narrative.
 
+From 15-3-2-2026.
+
+I decided to do a small experiment. I will resume development for a short while, focusing on simple tasks like https://github.com/TheRealKaup/KTech/issues/152 and https://github.com/TheRealKaup/KTech/issues/153.
+
 ---
 
 ## Introduction
