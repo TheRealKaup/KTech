@@ -31,7 +31,7 @@
 #include <Windows.h>
 #undef RGB
 #else
-#include <termio.h>
+#include <termios.h>
 #endif
 #include <memory>
 #include <mutex>

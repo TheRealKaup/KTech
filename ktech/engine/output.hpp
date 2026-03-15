@@ -31,7 +31,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
-#include <termio.h>
+#include <sys/ioctl.h>
 #endif
 #include <vector>
 

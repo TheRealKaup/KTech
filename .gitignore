@@ -4,6 +4,4 @@ build/
 
 premake5.exe
 
-.vscode/
-
 documentation/doxygen/html
