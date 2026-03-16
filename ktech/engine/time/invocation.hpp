@@ -72,9 +72,62 @@ struct KTech::Time::Invocation
 	long m_timePassed = 0; //!< How much time (in microseconds) actually passed since invocation started until now (if active), or until invocation ended (if inactive).
 	long m_duration = 0; //!< How much time (in microseconds) should pass before your function gets called (if active), or 0 (if inactive).
 
+	/*!
+		@brief Construct an `Invocation`.
+
+		@param engine Parent `Engine`.
+		@param callback Your callback function. It should return a `bool` explained in `Output::ShouldRenderThisTick()`.
+
+		@see `Output::ShouldRenderThisTick()`
+	*/
 	Invocation(Engine& engine, const std::function<bool()>& callback);
+
+	/*!
+		@brief Safely deregister invocation from `Time`.
+	*/
 	~Invocation();
 
+	/*!
+		@brief Invoke your callback function.
+
+		Can be invoked once at a time. Meaning, invoking while already invoked will restart the current invocation (rather than ). For example:
+
+		@code{.cpp}
+		Engine engine;
+
+		void Loop()
+		{
+			// Invoke this function after a second:
+			static Invocation invocation{engine, Loop, 1, Measurement::seconds};
+			invocation.Invoke();
+
+			// Print when the game quits how many times this function was called:
+			static unsigned int counter = 0;
+			engine.output.outputOnQuit.push_back(std::to_string(++counter));
+		}
+
+		int main()
+		{
+			// Call `Loop()` twice:
+			Loop();
+			Loop();
+		}
+
+		// Expected `outputOnQuit`:
+		// 1
+		// 2
+		// 3
+		@endcode
+
+		@param time Duration to wait for before calling your function.
+		@param measurement The time measurement for your given `time`.
+
+		@see `Time::Measurement`
+	*/
 	void Invoke(long time, Measurement measurement);
+
+	/*!
+		@brief Cancel the current invocation.
+	*/
 	void Cancel();
 };

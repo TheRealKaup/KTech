@@ -51,7 +51,57 @@ public:
 	long deltaTime = 0; //!< Duration of the last tick, in microseconds.
 	unsigned long ticksCounter = 0; //!< Total ticks since game started.
 
+	/*!
+		@fn `Time::CallInvocations`
+
+		@brief Call callback functions of finished `Invocation`s.
+
+		Progresses all `Invocation`s by `Time::deltaTime`, and calls those which waited their time.
+
+		Normally placed at the start of your game loop, among the other callback-calling functions. For example:
+
+		@code{.cpp}
+		// Game loop
+		while (engine.running)
+		{
+			// Call various callback-functions
+			engine.input.CallCallbacks();
+			engine.time.CallInvocations(); // <- Call due invocations.
+			engine.memory.CallOnTicks();
+
+			// Graphics...
+		}
+		@endcode
+
+		@see `Time::Invoke()`
+	*/
 	void CallInvocations();
+
+	/*!
+		@fn `Time::WaitUntilNextTick`
+
+		@brief Sleeps and returns when the next tick should start.
+
+		Calculates how long to sleep (based on how long the current tick is, and `Time::tpsLimit`). It enters sleep and returns when the following tick should occur. This function also updates `Time::tpsPotential`, `Time::deltaTime`, `Time::tps`, and `Time::ticksCounter`.
+
+		Normally placed at the end of your game loop:
+
+		@code{.cpp}
+		// Game loop
+		while (engine.running)
+		{
+			// Call various callback-functions...
+			// Graphics...
+			engine.time.WaitUntilNextTick();
+		}
+		@endcode
+
+		@see `Time::tpsLimit`
+		@see `Time::tpsPotential`
+		@see `Time::deltaTime`
+		@see `Time::tps`
+		@see `Time::ticksCounter`
+	*/
 	void WaitUntilNextTick();
 
 private:
@@ -60,7 +110,7 @@ private:
 	std::chrono::steady_clock::time_point m_currentTickStart;
 	std::vector<Invocation*> m_invocations;
 
-	inline Time(Engine& engine, unsigned long ticksPerSecondLimit)
+	Time(Engine& engine, unsigned long ticksPerSecondLimit)
 		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
 
 	[[nodiscard]] auto TimeToMicroseconds(long p_time, Measurement p_measurement) const -> long;

@@ -30,132 +30,36 @@
 #include <unistd.h>
 #endif
 
-/*!
-	@var `Input::input`
-	@brief Input for the last-called callback function.
-
-	Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbackGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
-*/
-/*!
-	@var `Input::quitKey`
-	@brief Input that if received, breaks the input loop and sets `Engine::running` to false.
-
-	By default, it's "\x03" (Ctrl+C), which is a common quit key among terminal applications. You may change it, but don't go Vim on your players.
-*/
-
-/*!
-	@fn auto KTech::Input::Is(const std::string &stringKey) const -> bool
-	@brief Checks if input equals given string.
-
-	@param stringKey String to compare with `Input::input`.
-
-	@return True if equal, otherwise false.
-*/
 auto KTech::Input::Is(const std::string& p_stringKey) const -> bool
 {
 	return (input == p_stringKey);
 }
 
-/*!
-	@fn auto KTech::Input::Is(char charKey) const -> bool
-	@brief Checks if input equals given character.
-
-	@param charKey Character to compare with `Input::input`.
-
-	@return True if equal (and `Input::input` is 1 character long), otherwise false.
-*/
 auto KTech::Input::Is(char p_charKey) const -> bool
 {
 	return input.length() == 1 && input[0] == p_charKey;
 }
 
-/*!
-	@brief Get the first character of input as a 1-digit number.
-
-	@return The first character of `Input::input` subtracted by 48 (the character '0'). Can return a value that is not 1-digit-long, so unless only digit characters ('0'-'9') can call your function, you should consider confirming with `Input::Between()` and the arguments ('0', '9') that input is indeed a digit.
-
-	@see `Input::Between()`
-*/
 auto KTech::Input::GetInt() const -> uint8_t
 {
 	return input[0] - '0';
 }
 
-/*!
-	@fn Input::Bigger(char charKey)
-	@brief Checks if given character is bigger than input.
-
-	@param charKey Character to compare with `Input::input`.
-
-	@return True if bigger (and `Input::input` is 1 character long), otherwise false.
-*/
 auto KTech::Input::Bigger(char p_charKey) const -> bool
 {
 	return (input[0] >= p_charKey) && (input.length() == 1);
 }
 
-/*!
-	@fn auto KTech::Input::Smaller(char charKey) const -> bool
-	@brief Checks if given character is smaller than input.
-
-	@param charKey Character to compare with `Input::input`.
-
-	@return True if smaller (and `Input::input` is 1 character long), otherwise false.
-*/
 auto KTech::Input::Smaller(char p_charKey) const -> bool
 {
 	return (input[0] <= p_charKey) && (input.length() == 1);
 }
 
-/*!
-	@fn auto KTech::Input::Between(char start, char end) const -> bool
-	@brief Checks if input is between range of characters.
-
-	@param start Start of (ASCII) character range.
-	@param end End of (ASCII) character range.
-
-	@return True if between range (and `Input::input` is 1 character long), otherwise false.
-*/
 auto KTech::Input::Between(char p_start, char p_end) const -> bool
 {
 	return (input[0] >= p_start) && (input[0] <= p_end) && (input.length() == 1);
 }
 
-/*!
-	@brief Distribute accumulated inputs.
-
-	`Input` queues received inputs until this function is called. This very function is what calls your input callback functions.
-
-	Normally placed at the start of each game loop's iteration, with the other callback-calling functions of engine components (right now `Memory::CallOnTicks()` and `Time::CallInvocations()`, though this may change). For example:
-
-	@code{.cpp}
-	// Game loop
-	while (engine.running)
-	{
-		// Call various callback-functions
-		engine.input.CallCallbacks(); // <- Distribute inputs to input callback functions
-		engine.time.CallInvocations();
-		engine.memory.CallOnTicks();
-
-		// Graphics (render-on-demand)
-		if (engine.output.ShouldRenderThisTick())
-		{
-			map.Render();
-			Camera.Draw();
-			engine.output.Print();
-		}
-		else if (engine.output.ShouldPrintThisTick())
-		{
-			engine.output.Print();
-		}
-
-		engine.time.WaitUntilNextTick();
-	}
-	@endcode
-
-	@see `Memory::CallOnTicks()`
-	@see `Time::CallInvocations()`
-*/
 void KTech::Input::CallCallbacks()
 {
 	Update();

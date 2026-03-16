@@ -24,30 +24,6 @@
 #include <algorithm>
 #include <thread>
 
-/*!
-	@fn `Time::CallInvocations`
-
-	@brief Call callback functions of finished `Invocation`s.
-
-	Progresses all `Invocation`s by `Time::deltaTime`, and calls those which waited their time.
-
-	Normally placed at the start of your game loop, among the other callback-calling functions. For example:
-
-	@code{.cpp}
-	// Game loop
-	while (engine.running)
-	{
-		// Call various callback-functions
-		engine.input.CallCallbacks();
-		engine.time.CallInvocations(); // <- Call due invocations.
-		engine.memory.CallOnTicks();
-
-		// Graphics...
-	}
-	@endcode
-
-	@see `Time::Invoke()`
-*/
 void KTech::Time::CallInvocations()
 {
 	// ERASE-REMOVE `Invocation`s which were set to `nullptr` by `Time::DeregisterInvocation()` (which was called by `Invocation::~Invocation()`).
@@ -83,31 +59,6 @@ void KTech::Time::CallInvocations()
 	}
 }
 
-/*!
-	@fn `Time::WaitUntilNextTick`
-
-	@brief Sleeps and returns when the next tick should start.
-
-	Calculates how long to sleep (based on how long the current tick is, and `Time::tpsLimit`). It enters sleep and returns when the following tick should occur. This function also updates `Time::tpsPotential`, `Time::deltaTime`, `Time::tps`, and `Time::ticksCounter`.
-
-	Normally placed at the end of your game loop:
-
-	@code{.cpp}
-	// Game loop
-	while (engine.running)
-	{
-		// Call various callback-functions...
-		// Graphics...
-		engine.time.WaitUntilNextTick();
-	}
-	@endcode
-
-	@see `Time::tpsLimit`
-	@see `Time::tpsPotential`
-	@see `Time::deltaTime`
-	@see `Time::tps`
-	@see `Time::ticksCounter`
-*/
 void KTech::Time::WaitUntilNextTick()
 {
 	// Calculate delta of current tick (`deltaTime`)
