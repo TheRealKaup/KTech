@@ -22,15 +22,6 @@
 
 #include "texture.hpp"
 
-/*!
-	@fn `Collider::Simple`
-
-	@brief Construct a simple `Collider` (filled rectangle).
-
-	@param size Rectangle size.
-	@param type Collider type, as defiend in `Collision::colliderTypes`.
-	@param relativePosition Relative position to the parent Object.
-*/
 void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_relativePosition)
 {
     m_simple = true;
@@ -39,39 +30,6 @@ void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_relativePosi
     m_size = p_size;
 }
 
-/*!
-	@fn `Collider::Write`
-
-	@brief Construct a complex `Collider` (2D bitmap).
-
-	@param stringVector The 2D bitmap representation in a vector of `std::string`s. If a character is a space (' '), the collider will not exist in the corresponding part of the resulting bitmap. Otherwise, the collider will exist there.
-	@param type Collider type, as defiend in `Collision::colliderTypes`.
-	@param relativePosition Relative position to the parent Object.
-
-	Example:
-
-	@code{.cpp}
-	Collider::Write(
-		{
-			" # ",
-			"###",
-			"# #"
-		}, 1, Point(0, 0)
-	);
-	@endcode
-
-	Will construct a `Collider` that corresponds to the `Texture`:
-
-	@code{.cpp}
-	Texture::Write(
-		{
-			" O ",
-			"/|\\",
-			"/ \\"
-		}, RGBA( 255, 255, 0, 255 ), RGBAColors::transparent, Point(0, 0)
-	);
-	@endcode
-*/
 void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint8_t p_type, Point p_relativePosition)
 {
     m_simple = false;
@@ -98,14 +56,6 @@ void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint
 	}
 }
 
-/*!
-	@fn Collider::ByTextureCharacter
-	@brief Construct a `Collider` based on a `Texture`'s character values.
-
-	@param texture The base `Texture`.
-	@param type Collider type, as defiend in `Collision::colliderTypes`.
-	@param excludedCharacter Cells with this character will not be turned on.
-*/
 void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_type, char p_excludedCharacter)
 {
     m_simple = false;
@@ -122,14 +72,6 @@ void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_typ
 	}
 }
 
-/*!
-	@fn Collider::ByTextureBackground
-	@brief Construct a `Collider` based on a `Texture`'s background values.
-
-	@param texture The base `Texture`.
-	@param type Collider type, as defiend in `Collision::colliderTypes`.
-	@param alphaThreshold Cells with background alpha => this value will be turned on.
-*/
 void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_type, uint8_t p_alphaThreshold)
 {
     m_simple = false;
@@ -146,14 +88,6 @@ void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_ty
 	}
 }
 
-/*!
-	@fn Collider::ByTextureForeground
-	@brief Construct a `Collider` based on a `Texture`'s foreground values.
-
-	@param texture The base `Texture`.
-	@param type Collider type, as defiend in `Collision::colliderTypes`.
-	@param alphaThreshold Cells with foreground alpha => this value will be turned on.
-*/
 void KTech::Collider::ByTextureForeground(const Texture& p_texture, uint8_t p_type, uint8_t p_alphaThreshold)
 {
     m_simple = false;
@@ -170,19 +104,7 @@ void KTech::Collider::ByTextureForeground(const Texture& p_texture, uint8_t p_ty
 	}
 }
 
-/*!
-	@fn Collider::operator()(size_t x, size_t y)
-
-	@brief Get a value from the 2D bitmap by-value (complex `Collider`s only).
-
-	Useful if you don't want to convert the 2D position to the corresponding index in the bitmap vector (`Collider::m_c`).
-
-	@param x X axis.
-	@param y Y axis.
-
-	@return The value of the 2D bitmap at the given location, by-value (not by-reference!)
-*/
 auto KTech::Collider::operator()(size_t p_x, size_t p_y) const -> bool
 {
-	return m_c[m_size.x * p_y + p_x];
+	return m_c[(m_size.x * p_y) + p_x];
 }

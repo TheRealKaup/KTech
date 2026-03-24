@@ -20,35 +20,14 @@
 
 #include "animation.hpp"
 
-/*!
-	@fn `Animation::Animation`
-
-	@brief Construct an `Animation`, that will not play just yet.
-
-	To start playing the `Animation`, call `Animation::Play()`.
-
-	@param [in] engine Reference to parent engine.
-	@param [in] object The object to animate.
-	@param [in] instructions Vector of `Animation::Instruction`s, that `Animation::Play()` will interpret and "play".
-
-	@see `Animation::Play()`
-*/
 KTech::Animation::Animation(Engine& p_engine, const ID<Object>& p_object, const std::vector<Instruction>& p_instructions)
 	: engine(p_engine), m_object(p_object), m_instructions(p_instructions), m_invocation(engine, [this]() -> bool { return Play(); }) {}
 
-//! @brief Safely cancels invoked animation instructions.
 KTech::Animation::~Animation()
 {
 	Stop();
 }
 
-/*!
-	@brief Play the `Animation`.
-
-	Calling this function again does not replay the `Animation`; to do so, call `Animation::Stop()`, and then recall this function.
-
-	This function interprets the instructions, acts upon them, `Time::Invoke()`s itself if there's a delay instruction, and continues interpreting instructions from there.
-*/
 auto KTech::Animation::Play() -> bool
 {
 	bool changedThisTick = false; // Render-on-demand
@@ -130,7 +109,6 @@ auto KTech::Animation::Play() -> bool
 	return changedThisTick;
 }
 
-//! @brief Stop animation by canceling the invoked instructions, and prepare for a re-`Play()`.
 void KTech::Animation::Stop()
 {
 	m_invocation.Cancel();

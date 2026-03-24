@@ -37,21 +37,79 @@ public:
 	Engine& engine; //!< Parent `Engine`.
 	const ID<Map> m_id{ID<Map>::Unique()}; //!< Personal `ID`.
 	std::string m_name; //!< String name.
-	std::vector<ID<Camera>> m_cameras = {}; //!< Contained `Camera`s
-	std::vector<ID<Layer>> m_layers = {}; //!< Contained `Layer`s
+	std::vector<ID<Camera>> m_cameras; //!< Contained `Camera`s
+	std::vector<ID<Layer>> m_layers; //!< Contained `Layer`s
 
+	/*!
+		@fn Map::Map
+		@brief Construct a `Map`.
+		@param engine Parent `Engine`.
+		@param name String name.
+	*/
 	Map(Engine& engine, std::string name = "");
+
+	/*!
+		@brief Remove all `Layer`s and `Camera`s, then remove itself from `Memory`.
+	*/
 	virtual ~Map();
 
+	/*!
+		@fn Map::AddLayer
+		@brief Add a `Layer`.
+		@param layer The `ID` of the `Layer` to add.
+		@return `true` if added the `Layer`. `false` if given `Layer` doesn't exist in `Memory`, or already in this `Map`.
+	*/
 	auto AddLayer(const ID<Layer>& layer) -> bool;
+
+	/*!
+		@fn Map::AddCamera
+		@brief Add a `Camera`.
+		@param camera The `ID` of the `Camera` to add.
+		@return `true` if added the `Camera`. `false` if given `Camera` doesn't exist in `Memory`, or already in this `Map`.
+	*/
 	auto AddCamera(const ID<Camera>& camera) -> bool;
 
+	/*!
+		@fn Map::RemoveLayer
+		@brief Remove a `Layer`.
+		@param layer The `ID` of the `Layer` to remove.
+		@return `true` if removed the `Layer`. `false` if the given `Layer` isn't contained by this `Map`.
+	*/
 	auto RemoveLayer(const ID<Layer>& layer) -> bool;
+
+	/*!
+		@fn Map::RemoveCamera
+		@brief Remove a `Camera`.
+		@param camera The `ID` of the `Camera` to remove.
+		@return `true` if removed the `Camera`. `false` if the given `Camera` isn't contained by this `Map`.
+	*/
 	auto RemoveCamera(const ID<Camera>& camera) -> bool;
+
+	/*!
+		@brief Remove all contained `Layer`s.
+		@return `true` if removed all `Layer`s. `false` if there are no `Layer`s in this `Map`.
+	*/
 	auto RemoveAllLayers() -> bool;
+
+	/*!
+		@brief Remove all contained `Camera`s.
+		@return `true` if removed all `Camera`s. `false` if there are no `Camera`s in this `Map`.
+	*/
 	auto RemoveAllCameras() -> bool;
 
 protected:
+	/*!
+		@brief Virtual function called once each tick.
+
+		You can override this in your inherited class to add whatever functionality you want.
+
+		Called by `Memory::CallOnTicks()`.
+
+		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
+
+		@see `Memory::CallOnTicks()`
+		@see `Output::ShouldRenderThisTick()`
+	*/
 	virtual auto OnTick() -> bool;
 
 	friend class KTech::Memory;

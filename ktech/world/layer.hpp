@@ -50,20 +50,86 @@ public:
 	RGBA m_frgba = RGBAColors::transparent; //!< Foreground color added by `Camera` after rendering contained `Object`s.
 	RGBA m_brgba = RGBAColors::transparent; //!< Background color added by `Camera` after rendering contained `Object`s.
 
+	/*!
+		@fn Layer::Layer(Engine& engine, std::string name)
+		@brief Construct a `Layer`.
+		@param [in] engine Parent `Engine`.
+		@param [in] name String name.
+	*/
 	Layer(Engine& engine, std::string name = "");
+
+	/*!
+		@fn Layer::Layer(Engine& engine, const ID<Map>& parentMap, std::string name)
+		@brief Construct a `Layer` and immediately enter a `Map`.
+		@param [in] engine Parent `Engine`.
+		@param [in] parentMap `Map` to enter.
+		@param [in] name String name.
+	*/
 	Layer(Engine& engine, const ID<Map>& parentMap, std::string name = "");
+
+	/*!
+		@brief Destruct a `Layer`.
+
+		Removes all contained `Object`s, leaves parent `Map` (if in one), and removes itself from `Memory`.
+	*/
 	virtual ~Layer();
 
+	/*!
+		@fn Layer::operator[](size_t index)
+		@brief Retrieve `Object` `ID` at given index.
+		@return Reference to the `ID<Object>` at the given index.
+	*/
 	auto operator[](size_t index) -> ID<Object>&;
 
+	/*!
+		@fn Layer::AddObject(ID<Object>& object)
+		@brief Add an `Object`.
+		@param [in] object The `Object` to add.
+		@return `true` if added the `Object`. `false` if `Object` doesn't exist in `Memory` or already contained by `Layer`.
+	*/
 	auto AddObject(const ID<Object>& object) -> bool;
+
+	/*!
+		@fn Layer::RemoveObject(ID<Object>& object)
+		@brief Remove an `Object`.
+		@param [in] object Reference to the `Object`'s `ID`.
+		@return `true` if removed. `false` if doesn't exist in `Memory`, or isn't in `Layer`.
+	*/
 	auto RemoveObject(const ID<Object>& object) -> bool;
+
+	/*!
+		@brief Remove all contained `Object`s.
+		@return `true` if removed all `Object`s. `false` if there are no `Object`s in `Layer`.
+	*/
 	auto RemoveAllObjects() -> bool;
 
+	/*!
+		@fn Layer::EnterMap
+		@brief Enter a `Map`.
+		@param [in] map The `Map` to enter.
+		@return `true` if entered `Map`. `false` if given `Map` doesn't exist in `Memory` or already the parent `Map`.
+	*/
 	auto EnterMap(const ID<Map>& map) -> bool;
+
+	/*!
+		@brief Leave parent `Map`.
+		@return `true` if left parent `Map` (`Layer::m_parentMap`). `false` if there's no parent `Map`, or the parent `Map` doesn't exist in `Memory`.
+	*/
 	auto LeaveMap() -> bool;
 
 protected:
+	/*!
+		@brief Virtual function called once each tick.
+
+		You can override this in your inherited class to add whatever functionality you want.
+
+		Called by `Memory::CallOnTicks()`.
+
+		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
+
+		@see `Memory::CallOnTicks()`
+		@see `Output::ShouldRenderThisTick()`
+	*/
 	virtual auto OnTick() -> bool;
 
 	friend class KTech::Memory;

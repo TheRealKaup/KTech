@@ -29,14 +29,16 @@
 #include "../engine/time/invocation.hpp"
 
 /*!
-	@brief Wrapper for animating an `Object`s and its `Texture`s.
+	@brief Wrapper for animating an `Object` and its `Texture`s.
 
 	`Animation` contains a vector of `Animation::Instruction`s, which it can play (`Animation::Play()`), stop (`Animation::Stop()`), and play again. This wrapper, which behaves like an instruction interpreter, saves you from writing something bonkers like an `Object`-inherited class that goes through an awkward sequence of `Time::Invoke()`'d member functions to animate its `Texture`s.
 */
 class KTech::Animation
 {
 public:
-	//! A single animation instruction. This class is undocumented because it's planned to change (see GitHub issue #126).
+	/*!
+		@brief A single animation instruction. This class is undocumented because it's planned to change (see GitHub issue #126).
+	*/
 	struct Instruction
 	{
 		enum class Type : uint8_t
@@ -60,24 +62,52 @@ public:
 		};
 
 		// TextureSet, TextureSetPosition, TextureShow, TextureHide
-		inline Instruction(Type type, size_t textureIndex, Point pointData = Point(0, 0))
+		Instruction(Type type, size_t textureIndex, Point pointData = Point(0, 0))
 			: type(type), intData(textureIndex), pointData(pointData) {}
 
 		// ParentSetPosition, ParentMove
-		inline Instruction(Type type, Point pointData)
+		Instruction(Type type, Point pointData)
 			: type(type), pointData(pointData) {}
 
 		// Delay
-		inline Instruction(Type type, size_t time, Time::Measurement timeMeasurement)
+		Instruction(Type type, size_t time, Time::Measurement timeMeasurement)
 			: type(type), intData(time), timeMeasurement(timeMeasurement) {}
 	};
 
 	Engine& engine; //!< Parent `Engine`
 
+	/*!
+		@fn `Animation::Animation`
+
+		@brief Construct an `Animation`, that will not play just yet.
+
+		To start playing the `Animation`, call `Animation::Play()`.
+
+		@param [in] engine Reference to parent engine.
+		@param [in] object The object to animate.
+		@param [in] instructions Vector of `Animation::Instruction`s, that `Animation::Play()` will interpret and "play".
+
+		@see `Animation::Play()`
+	*/
 	Animation(Engine& engine, const ID<Object>& object, const std::vector<Instruction>& instructions);
+
+	/*!
+		@brief Safely cancels invoked animation instructions.
+	*/
 	~Animation();
 
+	/*!
+		@brief Play the `Animation`.
+
+		Calling this function again does not replay the `Animation`; to do so, call `Animation::Stop()`, and then recall this function.
+
+		This function interprets the instructions, acts upon them, `Time::Invoke()`s itself if there's a delay instruction, and continues interpreting instructions from there.
+	*/
 	auto Play() -> bool;
+
+	/*!
+		@brief Stop animation by canceling the invoked instructions, and prepare for a re-`Play()`.
+	*/
 	void Stop();
 
 private:

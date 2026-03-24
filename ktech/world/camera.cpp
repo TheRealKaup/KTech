@@ -29,15 +29,6 @@
 #include "../engine/output.hpp"
 #include "../engine/engine.hpp"
 
-/*!
-	@fn Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
-	@brief Prepare `Camera` for rendering.
-
-	@param [in] engine Parent engine.
-	@param [in] position World position.
-	@param [in] resolution Image resolution.
-	@param [in] name String name.
-*/
 KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: engine(p_engine), m_pos(p_position), m_res(p_resolution)
 {
@@ -45,25 +36,12 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 	m_image.resize(m_res.y * m_res.x);
 }
 
-/*!
-	@fn Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
-	@brief Prepare `Camera` for rendering and immediately enter a `Map`.
-
-	@param [in] engine Parent engine.
-	@param [in] parentMap Parent map to immediately enter.
-	@param [in] position World position.
-	@param [in] resolution Image resolution.
-	@param [in] name String name.
-
-	@see `Map::m_activeCameraI`
-*/
 KTech::Camera::Camera(Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: Camera(p_engine, p_position, p_resolution)
 {
 	EnterMap(p_parentMap);
 }
 
-//! @brief Leave the parent map (if in one) and removed itself from `Memory`.
 KTech::Camera::~Camera()
 {
 	Output::Log("<Camera[" + m_name + "]::~Camera()>", RGBColors::red);
@@ -71,16 +49,6 @@ KTech::Camera::~Camera()
 	engine.memory.cameras.Remove(m_id);
 }
 
-/*!
-	@fn Camera::EnterMap
-	@brief Enter a parent `Map`.
-
-	@param map Parent map to enter.
-
-	@return True if joined given `Map`. False if already in given `Map`, given `Map` doesn't exist in `Memory`, or failed to join.
-
-	@see `Map::m_activeCameraI`
-*/
 auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
 {
 	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
@@ -90,13 +58,6 @@ auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
 	return engine.memory.maps[p_map]->AddCamera(m_id);
 }
 
-/*!
-	@brief Leave the parent `Map`.
-
-	@return True if left `Camera::m_parentMap`. False if doesn't have a parent `Map`, given `Map` doesn't exist in `Memory`, or failed to leave.
-
-	@see `Map::m_activeCameraI`
-*/
 auto KTech::Camera::LeaveMap() -> bool
 {
 	if (engine.memory.maps.Exists(m_parentMap))
@@ -107,21 +68,12 @@ auto KTech::Camera::LeaveMap() -> bool
 	return true;
 }
 
-/*!
-	@fn Camera::Resize
-	@brief Resize the image resolution (or "size").
-
-	@param resolution The new resolution.
-*/
 void KTech::Camera::Resize(UPoint p_resolution)
 {
 	m_res = p_resolution;
 	m_image.resize(m_res.y * m_res.x);
 }
 
-/*!
-	@brief Render all `Object`s of all `Layer`s of the parent `Map`.
-*/
 void KTech::Camera::Render()
 {
 	if (engine.memory.maps.Exists(m_parentMap))
@@ -130,12 +82,6 @@ void KTech::Camera::Render()
 	}
 }
 
-/*!
-	@fn Camera::Render(const std::vector<ID<Layer>>& layers)
-	@brief Render all `Object`s of the given `Layer`s.
-
-	@param layers The `Layer`s containing the `Object`s to render.
-*/
 void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 {
 	RenderBackground();
@@ -171,30 +117,11 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 	}
 }
 
-/*!
-	@fn Camera::Draw
-	@brief Draw the rendered image (`Camera::m_image`) to `Output` so it can be printed to the terminal.
-
-	This function redirects to `Output::Draw()` and passes the given parameters verbatim.
-
-	@see `Output::Draw()` for parameters explanation.
-*/
 void KTech::Camera::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
-	return engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
+	engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
 }
 
-/*!
-	@brief Shortcut for `Camera::Render()`, `Camera::Draw()` and `Output::Print()`.
-
-	This function calls the above functions with respect to "render on demand" (by checking `Output::ShouldRenderThisTick()` and `Output::ShouldPrintThisTick()`). So, you can use this function in your game loop to avoid boilerplate code while still maintaining good performance, unless you want more functionality in your graphics portion of your game loop. This function is especially convenient for testing in no-game-loop mode.
-
-	@see `Camera::Render()`
-	@see `Camera::Draw()`
-	@see `Output::Print()`
-	@see `Engine::noGameLoopMode`
-	@see [Tutorial chapter 5](https://github.com/TheRealKaup/KTech/blob/master/documentation/tutorial/tutorial.md#chapters): no-game-loop mode example that uses this function
-*/
 void KTech::Camera::RenderDrawPrint()
 {
 	if (engine.output.ShouldRenderThisTick())
@@ -213,18 +140,6 @@ void KTech::Camera::RenderDrawPrint()
 	}
 }
 
-/*!
-	@brief Virtual function called once each tick.
-
-	You can override this in your inherited class to add whatever functionality you want.
-
-	Called by `Memory::CallOnTicks()`.
-
-	@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-	@see `Memory::CallOnTicks()`
-	@see `Output::ShouldRenderThisTick()`
-*/
 auto KTech::Camera::OnTick() -> bool
 {
 	return false;
@@ -259,7 +174,7 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 		{
 			for (size_t x = start.x; x < end.x; x++)
 			{
-				m_image[m_res.x * y + x].c = charToDraw;
+				m_image[(m_res.x * y) + x].c = charToDraw;
 			}
 		}
 	}
@@ -272,7 +187,7 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 		{
 			for (size_t x = start.x; x < end.x; x++)
 			{
-				DrawBakedToRGB(m_image[m_res.x * y + x].f, tempRGBA);
+				DrawBakedToRGB(m_image[(m_res.x * y) + x].f, tempRGBA);
 			}
 		}
 	}
@@ -284,7 +199,7 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 		{
 			for (size_t x = start.x; x < end.x; x++)
 			{
-				DrawBakedToRGB(m_image[m_res.x * y + x].b, tempRGBA);
+				DrawBakedToRGB(m_image[(m_res.x * y) + x].b, tempRGBA);
 			}
 		}
 	}
@@ -316,20 +231,20 @@ inline void KTech::Camera::RenderComplex(uint8_t p_layerAlpha, Object* p_object,
 			char charToDraw = p_texture(srcX, srcY).c;
 			if (DetermineCharacter(charToDraw))
 			{
-				m_image[m_res.x * dstY + dstX].c = charToDraw;
+				m_image[(m_res.x * dstY) + dstX].c = charToDraw;
 			}
 
 			// DRAW foreground color
 			RGBA tempRGBA;
 			if (BakeRGBAWith(tempRGBA, p_texture(srcX, srcY).f, p_layerAlpha))
 			{
-				DrawBakedToRGB(m_image[m_res.x * dstY + dstX].f, tempRGBA);
+				DrawBakedToRGB(m_image[(m_res.x * dstY) + dstX].f, tempRGBA);
 			}
 
 			// DRAW background color
 			if (BakeRGBAWith(tempRGBA, p_texture(srcX, srcY).b, p_layerAlpha))
 			{
-				DrawBakedToRGB(m_image[m_res.x * dstY + dstX].b, tempRGBA);
+				DrawBakedToRGB(m_image[(m_res.x * dstY) + dstX].b, tempRGBA);
 			}
 		}
 	}

@@ -24,13 +24,6 @@
 #include "../utility/internals.hpp"
 #include "../engine/engine.hpp"
 
-/*!
-	@fn KTech::UI::UI(Engine& engine, UPoint resolution, std::string name)
-	@brief Construct a `UI`.
-	@param engine Parent `Engine`.
-	@param resolution Image's resolution.
-	@param name String name.
-*/
 KTech::UI::UI(Engine& p_engine, UPoint p_resolution, std::string p_name)
 	: engine(p_engine), m_res(p_resolution), m_name(std::move(p_name))
 {
@@ -38,21 +31,12 @@ KTech::UI::UI(Engine& p_engine, UPoint p_resolution, std::string p_name)
 	m_image.resize(m_res.y * m_res.x);
 }
 
-/*!
-	@brief Remove all `Widget`s from itself, and itself from `Memory`.
-*/
 KTech::UI::~UI()
 {
 	RemoveAllWidgets();
 	engine.memory.uis.Remove(m_id);
 }
 
-/*!
-	@fn KTech::UI::AddWidget(ID<Widget>& widget)
-	@brief Add a `Widget`.
-	@param widget The `Widget` to add.
-	@return `true` if added `Widget`. `false` if `Widget` doesn't exist in `Memory` or already contained by this `UI`.
-*/
 auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 {
 	if (!engine.memory.widgets.Exists(p_widget))
@@ -71,12 +55,6 @@ auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 	return true;
 }
 
-/*!
-	@fn KTech::UI::RemoveWidget(ID<Widget>& widget)
-	@brief Remove a `Widget`.
-	@param widget The `Widget` to remove.
-	@return `true` if removed `Widget`. `false` if `Widget` is not contained by this `UI`.
-*/
 auto KTech::UI::RemoveWidget(const ID<Widget>& p_widget) -> bool
 {
 	for (size_t i = 0; i < m_widgets.size(); i++)
@@ -94,10 +72,6 @@ auto KTech::UI::RemoveWidget(const ID<Widget>& p_widget) -> bool
 	return false;
 }
 
-/*!
-	@brief Remove all contained `Widget`.
-	@return `true` if removed all `Widget`s. `false` there are no `Widget`s in this `UI`.
-*/
 auto KTech::UI::RemoveAllWidgets() -> bool
 {
 	if (m_widgets.empty())
@@ -115,20 +89,12 @@ auto KTech::UI::RemoveAllWidgets() -> bool
 	return true;
 }
 
-/*!
-	@fn KTech::UI::Resize(UPoint resolution)
-	@brief Resize the image's resolution.
-	@param resolution The new size of the image.
-*/
 void KTech::UI::Resize(UPoint p_resolution)
 {
 	m_res = p_resolution;
 	m_image.resize(m_res.y * m_res.x);
 }
 
-/*!
-	@brief Render all contained `Widget`s.
-*/
 void KTech::UI::Render()
 {
 	RenderBackground();
@@ -158,31 +124,11 @@ void KTech::UI::Render()
 	RenderForeground();
 }
 
-/*!
-	@fn KTech::UI::Draw
-
-	@brief Draw the rendered image (`UI::m_image`) to `Output` so it can be printed to the terminal.
-
-	This function redirects to `Output::Draw()` and passes the given parameters verbatim.
-
-	@see `Output::Draw()` for parameters explanation.
-*/
 void KTech::UI::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
-	return engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
+	engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
 }
 
-/*!
-	@brief Shortcut for `UI::Render()`, `Output::Clear()`, `UI::Draw()` and `Output::Print()`.
-
-	This function calls the above functions with respect to "render on demand" (by checking `Output::ShouldRenderThisTick()` and `Output::ShouldPrintThisTick()`). So, you can use this function in your game loop to avoid boilerplate code while still maintaining good performance, unless you want more functionality in your graphics portion of your game loop. This function is especially convenient for testing in no-game-loop mode.
-
-	@see `UI::Render()`
-	@see `Output::Clear()`
-	@see `UI::Draw()`
-	@see `Output::Print()`
-	@see `Engine::noGameLoopMode`
-*/
 void KTech::UI::RenderClearDrawPrint()
 {
 	if (engine.output.ShouldRenderThisTick())
@@ -203,18 +149,6 @@ void KTech::UI::RenderClearDrawPrint()
 	}
 }
 
-/*!
-	@brief Virtual function called once each tick.
-
-	You can override this in your inherited class to add whatever functionality you want.
-
-	Called by `Memory::CallOnTicks()`.
-
-	@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-	@see `Memory::CallOnTicks()`
-	@see `Output::ShouldRenderThisTick()`
-*/
 auto KTech::UI::OnTick() -> bool
 {
 	return false;
@@ -255,7 +189,7 @@ inline void KTech::UI::RenderSimple(Widget* p_widget, Texture& p_texture)
 		{
 			for (size_t x = start.x; x < end.x; x++)
 			{
-				m_image[m_res.x * y + x].c = charToDraw;
+				m_image[(m_res.x * y) + x].c = charToDraw;
 			}
 		}
 	}
@@ -268,7 +202,7 @@ inline void KTech::UI::RenderSimple(Widget* p_widget, Texture& p_texture)
 		{
 			for (size_t x = start.x; x < end.x; x++)
 			{
-				DrawBakedToRGBA(m_image[m_res.x * y + x].f, tempRGBA);
+				DrawBakedToRGBA(m_image[(m_res.x * y) + x].f, tempRGBA);
 			}
 		}
 	}
@@ -280,7 +214,7 @@ inline void KTech::UI::RenderSimple(Widget* p_widget, Texture& p_texture)
 		{
 			for (size_t x = start.x; x < end.x; x++)
 			{
-				DrawBakedToRGBA(m_image[m_res.x * y + x].b, tempRGBA);
+				DrawBakedToRGBA(m_image[(m_res.x * y) + x].b, tempRGBA);
 			}
 		}
 	}
@@ -312,20 +246,20 @@ inline void KTech::UI::RenderComplex(Widget* p_widget, Texture& p_texture)
 			char charToDraw = p_texture(srcX, srcY).c;
 			if (DetermineCharacter(charToDraw))
 			{
-				m_image[m_res.x * dstY + dstX].c = charToDraw;
+				m_image[(m_res.x * dstY) + dstX].c = charToDraw;
 			}
 
 			// DRAW foreground color
 			RGBA tempRGBA;
 			if (BakeRGBA(tempRGBA, p_texture(srcX, srcY).f))
 			{
-				DrawBakedToRGBA(m_image[m_res.x * dstY + dstX].f, tempRGBA);
+				DrawBakedToRGBA(m_image[(m_res.x * dstY) + dstX].f, tempRGBA);
 			}
 
 			// DRAW background color
 			if (BakeRGBA(tempRGBA, p_texture(srcX, srcY).b))
 			{
-				DrawBakedToRGBA(m_image[m_res.x * dstY + dstX].b, tempRGBA);
+				DrawBakedToRGBA(m_image[(m_res.x * dstY) + dstX].b, tempRGBA);
 			}
 		}
 	}
@@ -341,7 +275,7 @@ inline void KTech::UI::RenderForeground()
 		{
 			for (size_t x = 0; x < m_res.x; x++)
 			{
-				DrawBakedToRGBA(m_image[m_res.x * y + x].f, tempRGBA);
+				DrawBakedToRGBA(m_image[(m_res.x * y) + x].f, tempRGBA);
 			}
 		}
 	}
@@ -353,7 +287,7 @@ inline void KTech::UI::RenderForeground()
 		{
 			for (size_t x = 0; x < m_res.x; x++)
 			{
-				DrawBakedToRGBA(m_image[m_res.x * y + x].b, tempRGBA);
+				DrawBakedToRGBA(m_image[(m_res.x * y) + x].b, tempRGBA);
 			}
 		}
 	}
