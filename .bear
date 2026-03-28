@@ -1,0 +1,5 @@
+schema: "4.0"
+format:
+  paths:
+    directory: absolute
+    file: absolute

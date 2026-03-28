@@ -1,0 +1,12 @@
+CompileFlags:
+  Add: [-std=c++20]
+
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: None
+
+# Note that this is a relatively new setting: https://clangd.llvm.org/config#documentation
+# Supported only in clangd version 22 and above (I genuienly had to upgrade my system right
+# now to get this feature).
+Documentation:
+  CommentFormat: Doxygen

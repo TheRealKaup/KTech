@@ -1,1 +1,13 @@
-Checks: '-*, modernize-*, performance-*, readability-*, -readability-identifier-length, -readability-magic-numbers'
+---
+Checks: [
+  "modernize-*",
+  "performance-*",
+  "readability-*",
+  "bugprone-*",
+  "misc-*",
+  # Remove
+  "-readability-identifier-length",
+  "-misc-non-private-member-variables-in-classes",
+  "-misc-no-recursion",
+]
+...
