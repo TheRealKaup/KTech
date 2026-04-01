@@ -20,11 +20,11 @@
 
 #include "layer.hpp"
 
+#include "../engine/engine.hpp"
+#include "../engine/output.hpp"
 #include "../utility/rgbcolors.hpp"
 #include "map.hpp"
 #include "object.hpp"
-#include "../engine/output.hpp"
-#include "../engine/engine.hpp"
 
 KTech::Layer::Layer(Engine& p_engine, std::string p_name)
 	: engine(p_engine), m_name(std::move(p_name))
@@ -92,7 +92,7 @@ auto KTech::Layer::RemoveAllObjects() -> bool
 	{
 		return false;
 	}
-	for (auto & object : m_objects)
+	for (auto& object : m_objects)
 	{
 		if (engine.memory.objects.Exists(object))
 		{

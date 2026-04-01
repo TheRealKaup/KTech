@@ -24,7 +24,9 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
-//! @brief 24-bit color, able of representing 16,777,216 (2^24) different colors.
+/*!
+	@brief 24-bit color, able of representing 16,777,216 (2^24) different colors.
+*/
 struct KTech::RGB
 {
 	uint8_t r; //!< Red primary color.
@@ -38,7 +40,8 @@ struct KTech::RGB
 		@param [in] blue Blue primary color.
 	*/
 	constexpr RGB(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0)
-		: r(red), g(green), b(blue) {}
+		: r(red), g(green), b(blue)
+	{}
 
 	/*!
 		@brief Compare 2 `RGB`s.

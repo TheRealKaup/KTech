@@ -20,23 +20,40 @@
 
 #include "output.hpp"
 
-#include "../utility/internals.hpp"
-#include "../utility/keys.hpp"
-#include "../utility/rgbcolors.hpp"
 #include "../basic/cell.hpp"
 #include "../basic/upoint.hpp"
 #include "../engine/engine.hpp"
+#include "../utility/internals.hpp"
+#include "../utility/keys.hpp"
+#include "../utility/rgbcolors.hpp"
 
 #include <iostream>
 
 void KTech::Output::Log(const std::string& p_text, RGB p_color)
 {
 	static uint32_t logIndex = 0;
-	std::cout << "\033[38;2;" << std::to_string(p_color.r) << ';' << std::to_string(p_color.g) << ';' << std::to_string(p_color.b) << 'm' << logIndex << "] " << p_text << "\033[m\n" << std::flush;
+	std::cout
+		<< "\033[38;2;"
+		<< std::to_string(p_color.r)
+		<< ';'
+		<< std::to_string(p_color.g)
+		<< ';'
+		<< std::to_string(p_color.b)
+		<< 'm'
+		<< logIndex
+		<< "] "
+		<< p_text
+		<< "\033[m\n"
+		<< std::flush;
 	logIndex++;
 }
 
-void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::string& p_years, const std::string& p_author, const std::string& p_programName) const
+void KTech::Output::PrintStartupNotice(
+	const std::string& p_title,
+	const std::string& p_years,
+	const std::string& p_author,
+	const std::string& p_programName
+) const
 {
 	// Clear the terminal
 	std::cout << "\033[H\033[3J\033[2J";
@@ -61,7 +78,10 @@ void KTech::Output::PrintStartupNotice(const std::string& p_title, const std::st
 
 	// Wait for user input
 	std::cout << "Read the legal notices, and then press the 'return' key (enter) to proceed..." << std::flush;
-	while (engine.input.input != Keys::return_ && engine.running) {}
+	while (engine.input.input != Keys::return_ && engine.running)
+	{
+		// Genius code
+	}
 
 	if (!engine.running)
 	{
@@ -74,7 +94,14 @@ void KTech::Output::Clear()
 	std::ranges::fill(m_image.begin(), m_image.end(), Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)));
 }
 
-void KTech::Output::Draw(const std::vector<Cell>& p_sourceImage, UPoint p_resolution, Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
+void KTech::Output::Draw(
+	const std::vector<Cell>& p_sourceImage,
+	UPoint p_resolution,
+	Point p_position,
+	UPoint p_start,
+	UPoint p_end,
+	uint8_t p_alpha
+)
 {
 	// Default the rectangle
 	if (p_end.x == 0)
@@ -87,9 +114,12 @@ void KTech::Output::Draw(const std::vector<Cell>& p_sourceImage, UPoint p_resolu
 	}
 
 	// ITERATE
-	for (size_t yDst = (p_position.y < 0 ? 0 : p_position.y), ySrc = p_start.y; yDst < resolution.y && ySrc < p_end.y; yDst++, ySrc++)
+	for (size_t yDst = (p_position.y < 0 ? 0 : p_position.y), ySrc = p_start.y; yDst < resolution.y && ySrc < p_end.y;
+		yDst++, ySrc++)
 	{
-		for (size_t xDst = (p_position.x < 0 ? 0 : p_position.x), xSrc = p_start.x; xDst < resolution.x && xSrc < p_end.x; xDst++, xSrc++)
+		for (size_t xDst = (p_position.x < 0 ? 0 : p_position.x), xSrc = p_start.x;
+			xDst < resolution.x && xSrc < p_end.x;
+			xDst++, xSrc++)
 		{
 			// DRAW character
 			m_image[(resolution.x * yDst) + xDst].c = p_sourceImage[(p_resolution.x * ySrc) + xSrc].c;
@@ -118,7 +148,14 @@ void KTech::Output::Draw(const std::vector<Cell>& p_sourceImage, UPoint p_resolu
 	}
 }
 
-void KTech::Output::Draw(const std::vector<CellA>& p_sourceImage, UPoint p_resolution, Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
+void KTech::Output::Draw(
+	const std::vector<CellA>& p_sourceImage,
+	UPoint p_resolution,
+	Point p_position,
+	UPoint p_start,
+	UPoint p_end,
+	uint8_t p_alpha
+)
 {
 	// Default the rectangle
 	if (p_end.x == 0)
@@ -131,9 +168,12 @@ void KTech::Output::Draw(const std::vector<CellA>& p_sourceImage, UPoint p_resol
 	}
 
 	// ITERATE
-	for (size_t yDst = (p_position.y < 0 ? 0 : p_position.y), ySrc = p_start.y; yDst < resolution.y && ySrc < p_end.y; yDst++, ySrc++)
+	for (size_t yDst = (p_position.y < 0 ? 0 : p_position.y), ySrc = p_start.y; yDst < resolution.y && ySrc < p_end.y;
+		yDst++, ySrc++)
 	{
-		for (size_t xDst = (p_position.x < 0 ? 0 : p_position.x), xSrc = p_start.x; xDst < resolution.x && xSrc < p_end.x; xDst++, xSrc++)
+		for (size_t xDst = (p_position.x < 0 ? 0 : p_position.x), xSrc = p_start.x;
+			xDst < resolution.x && xSrc < p_end.x;
+			xDst++, xSrc++)
 		{
 			// DRAW character
 			char charToDraw = p_sourceImage[(p_resolution.x * ySrc) + xSrc].c;
@@ -225,13 +265,13 @@ void KTech::Output::Print()
 	}
 	else
 	{
-		// RESET cursor by moving it to the top-left corner ("\033[H")
-		#if defined(_WIN32) && !defined(DEBUG)
+// RESET cursor by moving it to the top-left corner ("\033[H")
+#if defined(_WIN32) && !defined(DEBUG)
 		// Hide cursor ("ESC[?25l") since it always reappears on resize due to a Windows console bug
 		std::cout << "\033[H\033[?25l" << m_stringImage.substr(0, l) << std::flush;
-		#else
+#else
 		std::cout << "\033[H" << m_stringImage.substr(0, l) << std::flush;
-		#endif
+#endif
 	}
 }
 
@@ -281,18 +321,20 @@ auto KTech::Output::ShouldPrintThisTick() const -> bool
 
 KTech::Output::Output(Engine& p_engine, KTech::UPoint p_imageResolution, bool p_noGameLoopMode)
 	: engine(p_engine),
-	resolution(p_imageResolution),
-	m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),
-	m_stringImage((p_imageResolution.y * 3) + (p_imageResolution.x * p_imageResolution.y * printSequenceLength), ' ')
+	  resolution(p_imageResolution),
+	  m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),
+	  m_stringImage((p_imageResolution.y * 3) + (p_imageResolution.x * p_imageResolution.y * printSequenceLength), ' ')
 {
-	#ifdef _WIN32
+#ifdef _WIN32
 	m_stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleMode(m_stdoutHandle, &m_oldMode);
-	SetConsoleMode(m_stdoutHandle, m_oldMode
-		| ENABLE_VIRTUAL_TERMINAL_PROCESSING // "Virtual processing"
-		| ENABLE_PROCESSED_OUTPUT // "Output processing"
+	SetConsoleMode(
+		m_stdoutHandle,
+		m_oldMode
+			| ENABLE_VIRTUAL_TERMINAL_PROCESSING // "Virtual processing"
+			| ENABLE_PROCESSED_OUTPUT			 // "Output processing"
 	);
-	#endif
+#endif
 
 	if (p_noGameLoopMode)
 	{
@@ -301,10 +343,10 @@ KTech::Output::Output(Engine& p_engine, KTech::UPoint p_imageResolution, bool p_
 	}
 	// SWITCH to alternative buffer and RESET cursor
 	std::cout << "\033[?1049h\033[H";
-	#ifndef DEBUG // DON'T HIDE cursor in debug build for breaking with debuggers
+#ifndef DEBUG // DON'T HIDE cursor in debug build for breaking with debuggers
 	// HIDE cursor in release build
 	std::cout << "\033[?25l";
-	#endif
+#endif
 }
 
 KTech::Output::~Output()

@@ -44,7 +44,7 @@
 
 	@see `KTech::ID`
 */
-template<typename T>
+template <typename T>
 class KTech::CachingRegistry
 {
 public:

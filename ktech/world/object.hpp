@@ -23,8 +23,8 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/id.hpp"
 #include "../basic/point.hpp"
+#include "../utility/id.hpp"
 #include "collider.hpp"
 #include "texture.hpp"
 
@@ -36,13 +36,13 @@
 class KTech::Object
 {
 public:
-	Engine& engine; //!< Parent `Engine`.
+	Engine& engine;								 //!< Parent `Engine`.
 	const ID<Object> m_id{ID<Object>::Unique()}; //!< Personal `ID`.
-	std::string m_name; //!< String name.
-	ID<Layer> m_parentLayer; //!< Parent `Layer`.
+	std::string m_name;							 //!< String name.
+	ID<Layer> m_parentLayer;					 //!< Parent `Layer`.
 
-	Point m_pos; //!< World position.
-	std::vector<Texture> m_textures; //!< `Texture`s.
+	Point m_pos;					   //!< World position.
+	std::vector<Texture> m_textures;   //!< `Texture`s.
 	std::vector<Collider> m_colliders; //!< `Collider`s.
 
 	/*!

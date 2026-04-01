@@ -156,7 +156,7 @@ public:
 		@see `Memory::CallOnTicks()`
 		@see `Time::CallInvocations()`
 	*/
- 	void CallCallbacks();
+	void CallCallbacks();
 
 private:
 	struct Handler;
@@ -190,7 +190,8 @@ private:
 		On the other hand, removing `Callback`s is direct, because `Callbacks` directly unregisters from its `Handler`.
 		This is why `Callback` has just the register function here.
 	*/
-	auto CreateCallback(const std::string& stringKey, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
+	auto CreateCallback(const std::string& stringKey, const std::function<bool()>& callback)
+		-> std::shared_ptr<Callback>;
 	auto CrateRangedCallback(char start, char end, const std::function<bool()>& callback) -> std::shared_ptr<Callback>;
 
 	/*

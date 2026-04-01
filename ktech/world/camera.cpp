@@ -20,14 +20,14 @@
 
 #include "camera.hpp"
 
-#include "texture.hpp"
-#include "object.hpp"
-#include "layer.hpp"
-#include "map.hpp"
+#include "../engine/engine.hpp"
+#include "../engine/output.hpp"
 #include "../utility/internals.hpp"
 #include "../utility/rgbcolors.hpp"
-#include "../engine/output.hpp"
-#include "../engine/engine.hpp"
+#include "layer.hpp"
+#include "map.hpp"
+#include "object.hpp"
+#include "texture.hpp"
 
 KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, const std::string& p_name)
 	: engine(p_engine), m_pos(p_position), m_res(p_resolution)
@@ -36,7 +36,9 @@ KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, c
 	m_image.resize(m_res.y * m_res.x);
 }
 
-KTech::Camera::Camera(Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name)
+KTech::Camera::Camera(
+	Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name
+)
 	: Camera(p_engine, p_position, p_resolution)
 {
 	EnterMap(p_parentMap);
@@ -155,10 +157,7 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 {
 	// PRE-CALCULATE start and end positions for image iterator
 	Point start(p_object->m_pos + p_texture.m_rPos - m_pos);
-	Point end(
-		start.x + static_cast<long>(p_texture.m_size.x),
-		start.y + static_cast<long>(p_texture.m_size.y)
-	);
+	Point end(start.x + static_cast<long>(p_texture.m_size.x), start.y + static_cast<long>(p_texture.m_size.y));
 
 	// DELIMIT positions or return if not in range
 	if (!Delimit(start, end, m_res))
@@ -181,7 +180,8 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 
 	// DRAW foreground color
 	RGBA tempRGBA;
-	if (BakeRGBAWith(tempRGBA, p_texture.m_value.f, p_layerAlpha)) // Returns false if alpha is 0 and thus won't change anything
+	// Returns false if alpha is 0 and thus won't change anything
+	if (BakeRGBAWith(tempRGBA, p_texture.m_value.f, p_layerAlpha))
 	{
 		for (size_t y = start.y; y < end.y; y++) // ITERATE
 		{
@@ -193,7 +193,8 @@ inline void KTech::Camera::RenderSimple(uint8_t p_layerAlpha, Object* p_object, 
 	}
 
 	// DRAW background color
-	if (BakeRGBAWith(tempRGBA, p_texture.m_value.b, p_layerAlpha)) // Returns false if alpha is 0 and thus won't change anything
+	// Returns false if alpha is 0 and thus won't change anything
+	if (BakeRGBAWith(tempRGBA, p_texture.m_value.b, p_layerAlpha))
 	{
 		for (size_t y = start.y; y < end.y; y++) // ITERATE
 		{
@@ -219,13 +220,9 @@ inline void KTech::Camera::RenderComplex(uint8_t p_layerAlpha, Object* p_object,
 	);
 
 	// ITERATE through image and texture at the same time
-	for (size_t dstY = dstStart.y, srcY = srcStart.y;
-		dstY < m_res.y && srcY < p_texture.m_size.y;
-		dstY++, srcY++)
+	for (size_t dstY = dstStart.y, srcY = srcStart.y; dstY < m_res.y && srcY < p_texture.m_size.y; dstY++, srcY++)
 	{
-		for (size_t dstX = dstStart.x, srcX = srcStart.x;
-			dstX < m_res.x && srcX < p_texture.m_size.x;
-			dstX++, srcX++)
+		for (size_t dstX = dstStart.x, srcX = srcStart.x; dstX < m_res.x && srcX < p_texture.m_size.x; dstX++, srcX++)
 		{
 			// DRAW character according to expected behavior
 			char charToDraw = p_texture(srcX, srcY).c;

@@ -20,9 +20,9 @@
 
 #include "widget.hpp"
 
-#include "ui.hpp"
-#include "../engine/input/callbackgroup.hpp"
 #include "../engine/engine.hpp"
+#include "../engine/input/callbackgroup.hpp"
+#include "ui.hpp"
 
 KTech::Widget::Widget(Engine& p_engine, Point p_position, std::string p_name)
 	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbackGroup(engine, false)
@@ -62,7 +62,9 @@ auto KTech::Widget::AddWidget(const ID<Widget>& p_widget) -> bool
 		}
 	}
 	engine.memory.widgets[p_widget]->m_parentWidget = m_id;
-	m_childWidgets.emplace_back(p_widget, engine.memory.widgets[p_widget]->m_selected, engine.memory.widgets[p_widget]->m_shown);
+	m_childWidgets.emplace_back(
+		p_widget, engine.memory.widgets[p_widget]->m_selected, engine.memory.widgets[p_widget]->m_shown
+	);
 	return true;
 }
 
@@ -193,10 +195,14 @@ auto KTech::Widget::OnTick() -> bool
 	return false;
 };
 
-void KTech::Widget::OnSelect() {}
+void KTech::Widget::OnSelect()
+{}
 
-void KTech::Widget::OnDeselect() {}
+void KTech::Widget::OnDeselect()
+{}
 
-void KTech::Widget::OnShow() {}
+void KTech::Widget::OnShow()
+{}
 
-void KTech::Widget::OnHide() {}
+void KTech::Widget::OnHide()
+{}

@@ -28,6 +28,14 @@
 
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#ifdef _WIN32
+#include <Windows.h>
+#undef RGB
+#undef max
+#endif
+
 namespace KTech
 {
 	// Basic structures.
@@ -58,52 +66,48 @@ namespace KTech
 	class Engine;
 	// Defined in `utility/`
 	class Animation;
-	template<typename T>
+	template <typename T>
 	struct ID;
-	template<typename T>
+	template <typename T>
 	constexpr ID<T> nullID;
-	template<typename T>
+	template <typename T>
 	class CachingRegistry;
-	namespace RGBColors {}
-	namespace RGBAColors {}
-	namespace Keys {}
+	namespace RGBColors
+	{}
+	namespace RGBAColors
+	{}
+	namespace Keys
+	{}
 }
 
-#include <cstdint>
-#ifdef _WIN32
-#include <Windows.h>
-#undef RGB
-#undef max
-#endif
-
 #ifndef KTECH_DEFINITION // See `documentation/faq.md#`
-#include "basic/point.hpp"
-#include "basic/upoint.hpp"
-#include "basic/rgb.hpp"
-#include "basic/rgba.hpp"
 #include "basic/cell.hpp"
 #include "basic/cella.hpp"
+#include "basic/point.hpp"
+#include "basic/rgb.hpp"
+#include "basic/rgba.hpp"
+#include "basic/upoint.hpp"
 
-#include "world/collider.hpp"
-#include "world/texture.hpp"
-#include "world/object.hpp"
-#include "world/layer.hpp"
 #include "world/camera.hpp"
+#include "world/collider.hpp"
+#include "world/layer.hpp"
 #include "world/map.hpp"
-#include "world/widget.hpp"
+#include "world/object.hpp"
+#include "world/texture.hpp"
 #include "world/ui.hpp"
+#include "world/widget.hpp"
 
 #include "utility/animation.hpp"
 #include "utility/cachingregistry.hpp"
 #include "utility/id.hpp"
 #include "utility/keys.hpp"
-#include "utility/rgbcolors.hpp"
 #include "utility/rgbacolors.hpp"
+#include "utility/rgbcolors.hpp"
 
 #include "engine/collision.hpp"
-#include "engine/input/input.hpp"
+#include "engine/engine.hpp"
 #include "engine/input/callbackgroup.hpp"
+#include "engine/input/input.hpp"
 #include "engine/memory.hpp"
 #include "engine/time/time.hpp"
-#include "engine/engine.hpp"
 #endif

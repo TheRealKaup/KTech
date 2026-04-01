@@ -24,17 +24,17 @@
 
 void KTech::Collider::Simple(UPoint p_size, uint8_t p_type, Point p_relativePosition)
 {
-    m_simple = true;
-    m_type = p_type;
-    m_rPos = p_relativePosition;
-    m_size = p_size;
+	m_simple = true;
+	m_type = p_type;
+	m_rPos = p_relativePosition;
+	m_size = p_size;
 }
 
 void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint8_t p_type, Point p_relativePosition)
 {
-    m_simple = false;
-    m_type = p_type;
-    m_rPos = p_relativePosition;
+	m_simple = false;
+	m_type = p_type;
+	m_rPos = p_relativePosition;
 	// Get size
 	m_size = UPoint(0, p_stringVector.size());
 	for (const std::string& row : p_stringVector)
@@ -58,9 +58,9 @@ void KTech::Collider::Write(const std::vector<std::string>& p_stringVector, uint
 
 void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_type, char p_excludedCharacter)
 {
-    m_simple = false;
-    m_type = p_type;
-    m_rPos = p_texture.m_rPos;
+	m_simple = false;
+	m_type = p_type;
+	m_rPos = p_texture.m_rPos;
 	// Get size
 	m_size = p_texture.m_size;
 	// Apply size
@@ -74,9 +74,9 @@ void KTech::Collider::ByTextureCharacter(const Texture& p_texture, uint8_t p_typ
 
 void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_type, uint8_t p_alphaThreshold)
 {
-    m_simple = false;
-    m_type = p_type;
-    m_rPos = p_texture.m_rPos;
+	m_simple = false;
+	m_type = p_type;
+	m_rPos = p_texture.m_rPos;
 	// Get size
 	m_size = p_texture.m_size;
 	// Apply size
@@ -90,9 +90,9 @@ void KTech::Collider::ByTextureBackground(const Texture& p_texture, uint8_t p_ty
 
 void KTech::Collider::ByTextureForeground(const Texture& p_texture, uint8_t p_type, uint8_t p_alphaThreshold)
 {
-    m_simple = false;
-    m_type = p_type;
-    m_rPos = p_texture.m_rPos;
+	m_simple = false;
+	m_type = p_type;
+	m_rPos = p_texture.m_rPos;
 	// Get size
 	m_size = p_texture.m_size;
 	// Apply size

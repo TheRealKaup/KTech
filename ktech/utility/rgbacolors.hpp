@@ -49,7 +49,7 @@ namespace KTech::RGBAColors
 	namespace Widgets
 	{
 		constexpr RGBA buttonDownBlue = RGBA(160, 160, 255, 255);
-		constexpr RGBA switchUnselectedOnGreen = RGBA( 90, 160, 90, 255 );
-		constexpr RGBA switchSelectedOnGreen = RGBA( 160, 255, 160, 255 );
+		constexpr RGBA switchUnselectedOnGreen = RGBA(90, 160, 90, 255);
+		constexpr RGBA switchSelectedOnGreen = RGBA(160, 255, 160, 255);
 	}
 }

@@ -121,6 +121,7 @@ public:
 	void Disable();
 
 private:
+	// Why is this an enum?
 	enum class Status : uint8_t
 	{
 		disabled,

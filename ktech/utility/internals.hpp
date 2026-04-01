@@ -24,9 +24,9 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../basic/point.hpp"
-#include "../basic/upoint.hpp"
 #include "../basic/rgb.hpp"
 #include "../basic/rgba.hpp"
+#include "../basic/upoint.hpp"
 
 #include <limits>
 
@@ -107,7 +107,7 @@ static inline auto BakeRGBA(KTech::RGBA& p_dst, const KTech::RGBA& p_src) -> boo
 static inline auto BakeRGBAWith(KTech::RGBA& p_dst, const KTech::RGBA& p_src, uint8_t p_alpha) -> bool
 {
 	p_dst.a = p_src.a * p_alpha / uint8Max; // Take `Layer::m_alpha` into consideration
-	if (p_dst.a == 0) // Won't add anything; return false so no needless drawing will be done
+	if (p_dst.a == 0)						// Won't add anything; return false so no needless drawing will be done
 	{
 		return false;
 	}

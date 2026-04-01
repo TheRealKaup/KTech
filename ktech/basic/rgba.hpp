@@ -25,7 +25,9 @@
 #undef KTECH_DEFINITION
 #include "rgb.hpp"
 
-//! @brief Like `RGB`, but also has an alpha channel representing transparency.
+/*!
+	@brief Like `RGB`, but also has an alpha channel representing transparency.
+*/
 struct KTech::RGBA : RGB
 {
 	uint8_t a; //!< Alpha channel.
@@ -38,7 +40,8 @@ struct KTech::RGBA : RGB
 		@param [in] alpha Alpha channel.
 	*/
 	constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 0)
-		: RGB(red, green, blue), a(alpha) {}
+		: RGB(red, green, blue), a(alpha)
+	{}
 
 	/*!
 		@brief Construct an `RGBA` color from an `RGB` color.
@@ -46,7 +49,8 @@ struct KTech::RGBA : RGB
 		@param [in] alpha Alpha channel.
 	*/
 	constexpr RGBA(RGB rgb, uint8_t alpha)
-		: RGB(rgb), a(alpha) {}
+		: RGB(rgb), a(alpha)
+	{}
 
 	/*!
 		@brief Compare 2 `RGBA`s.

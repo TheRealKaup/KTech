@@ -44,7 +44,8 @@ public:
 		@param [in] selected Foreground color set when `Button` is selected.
 		@param [in] down Foreground color set when `Button` is being pressed.
 	*/
-	Button(KTech::Engine& engine,
+	Button(
+		KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnPress,
 		const std::string& key = KTech::Keys::return_,
@@ -53,13 +54,14 @@ public:
 		bool withFrame = false,
 		KTech::RGBA unselected = KTech::RGBAColors::gray,
 		KTech::RGBA selected = KTech::RGBAColors::white,
-		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue)
+		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue
+	)
 		: Widget(engine, ui, position),
-		m_OnPress(std::move(OnPress)),
-		m_unselectedRGBA(unselected),
-		m_selectedRGBA(selected),
-		m_downRGBA(down),
-		m_downInvocation(engine, [this]() -> bool { return RemovePressColor(); })
+		  m_OnPress(std::move(OnPress)),
+		  m_unselectedRGBA(unselected),
+		  m_selectedRGBA(selected),
+		  m_downRGBA(down),
+		  m_downInvocation(engine, [this]() -> bool { return RemovePressColor(); })
 	{
 		// Texture
 		SetText(text, withFrame);
@@ -93,13 +95,25 @@ public:
 		{
 			m_textures.resize(TEXTURES_SIZE_FRAMED);
 			m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(0, 0));
-			m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(1 + text.length(), 0));
-			m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(0, 2));
-			m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(1 + text.length(), 2));
-			m_textures[ti_topFrame].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', tempColor), KTech::Point(1, 0));
+			m_textures[ti_topRightCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(1 + text.length(), 0)
+			);
+			m_textures[ti_bottomLeftCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(0, 2)
+			);
+			m_textures[ti_bottomRightCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempColor), KTech::Point(1 + text.length(), 2)
+			);
+			m_textures[ti_topFrame].Simple(
+				KTech::UPoint(text.length(), 1), KTech::CellA('-', tempColor), KTech::Point(1, 0)
+			);
 			m_textures[ti_leftFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempColor), KTech::Point(0, 1));
-			m_textures[ti_bottomFrame].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', tempColor), KTech::Point(1, 2));
-			m_textures[ti_rightFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempColor), KTech::Point(1 + text.length(), 1));
+			m_textures[ti_bottomFrame].Simple(
+				KTech::UPoint(text.length(), 1), KTech::CellA('-', tempColor), KTech::Point(1, 2)
+			);
+			m_textures[ti_rightFrame].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('|', tempColor), KTech::Point(1 + text.length(), 1)
+			);
 		}
 		else
 		{
@@ -143,7 +157,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedRGBA; });
 		}
 	}
 
@@ -151,7 +165,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedRGBA; });
 		}
 	}
 
@@ -161,14 +175,14 @@ private:
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedRGBA; });
+				texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedRGBA; });
 			}
 		}
 		else
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedRGBA; });
+				texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedRGBA; });
 			}
 		}
 		return true;
@@ -178,7 +192,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_downRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_downRGBA; });
 		}
 		m_downInvocation.Invoke(pressLength, KTech::Time::Measurement::milliseconds);
 		if (m_OnPress)

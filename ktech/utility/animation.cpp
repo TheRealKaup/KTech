@@ -20,8 +20,14 @@
 
 #include "animation.hpp"
 
-KTech::Animation::Animation(Engine& p_engine, const ID<Object>& p_object, const std::vector<Instruction>& p_instructions)
-	: engine(p_engine), m_object(p_object), m_instructions(p_instructions), m_invocation(engine, [this]() -> bool { return Play(); }) {}
+KTech::Animation::Animation(
+	Engine& p_engine, const ID<Object>& p_object, const std::vector<Instruction>& p_instructions
+)
+	: engine(p_engine),
+	  m_object(p_object),
+	  m_instructions(p_instructions),
+	  m_invocation(engine, [this]() -> bool { return Play(); })
+{}
 
 KTech::Animation::~Animation()
 {
@@ -35,75 +41,77 @@ auto KTech::Animation::Play() -> bool
 	{
 		switch (m_instructions[m_i].type)
 		{
-			case Instruction::Type::ParentSetPosition:
+		case Instruction::Type::ParentSetPosition:
+		{
+			engine.memory.objects[m_object]->m_pos = m_instructions[m_i].pointData;
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::ParentMove:
+		{
+			engine.memory.objects[m_object]->Move(m_instructions[m_i].pointData);
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::TextureSet:
+		{
+			for (Texture& texture : engine.memory.objects[m_object]->m_textures)
 			{
-				engine.memory.objects[m_object]->m_pos = m_instructions[m_i].pointData;
-				changedThisTick = true;
-				break;
+				texture.m_active = false;
 			}
-			case Instruction::Type::ParentMove:
+			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
 			{
-				engine.memory.objects[m_object]->Move(m_instructions[m_i].pointData);
-				changedThisTick = true;
-				break;
+				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
 			}
-			case Instruction::Type::TextureSet:
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::TextureSetPosition:
+		{
+			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
 			{
-				for (Texture& texture : engine.memory.objects[m_object]->m_textures)
-				{
-					texture.m_active = false;
-				}
-				if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
-				{
-					engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
-				}
-				changedThisTick = true;
-				break;
+				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_rPos =
+					m_instructions[m_i].pointData;
 			}
-			case Instruction::Type::TextureSetPosition:
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::TextureMove:
+		{
+			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
 			{
-				if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
-				{
-					engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_rPos = m_instructions[m_i].pointData;
-				}
-				changedThisTick = true;
-				break;
+				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_rPos +=
+					m_instructions[m_i].pointData;
 			}
-			case Instruction::Type::TextureMove:
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::TextureShow:
+		{
+			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
 			{
-				if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
-				{
-					engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_rPos += m_instructions[m_i].pointData;
-				}
-				changedThisTick = true;
-				break;
+				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
 			}
-			case Instruction::Type::TextureShow:
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::TextureHide:
+		{
+			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
 			{
-				if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
-				{
-					engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
-				}
-				changedThisTick = true;
-				break;
+				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = false;
 			}
-			case Instruction::Type::TextureHide:
-			{
-				if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
-				{
-					engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = false;
-				}
-				changedThisTick = true;
-				break;
-			}
-			case Instruction::Type::Delay:
-			{
-				// Delay; invoke the next iteration
-				m_invocation.Invoke(m_instructions[m_i].intData, m_instructions[m_i].timeMeasurement);
-				// Pause iterating
-				m_i++; // Don't reiterate this delay
-				return changedThisTick; // Don't set to true as delay changes nothing
-			}
+			changedThisTick = true;
+			break;
+		}
+		case Instruction::Type::Delay:
+		{
+			// Delay; invoke the next iteration
+			m_invocation.Invoke(m_instructions[m_i].intData, m_instructions[m_i].timeMeasurement);
+			// Pause iterating
+			m_i++;					// Don't reiterate this delay
+			return changedThisTick; // Don't set to true as delay changes nothing
+		}
 		}
 	}
 	return changedThisTick;

@@ -20,8 +20,8 @@
 
 #include "object.hpp"
 
-#include "layer.hpp"
 #include "../engine/engine.hpp"
+#include "layer.hpp"
 
 KTech::Object::Object(Engine& p_engine, Point p_position, std::string p_name)
 	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name))
@@ -71,20 +71,29 @@ auto KTech::Object::OnTick() -> bool
 	return false;
 };
 
-void KTech::Object::OnMove(Point direction) {}
+void KTech::Object::OnMove(Point direction)
+{}
 
-void KTech::Object::OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}
 
-void KTech::Object::OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider) {}
+void KTech::Object::OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+{}

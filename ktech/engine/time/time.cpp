@@ -62,7 +62,9 @@ void KTech::Time::CallInvocations()
 void KTech::Time::WaitUntilNextTick()
 {
 	// Calculate delta of current tick (`deltaTime`)
-	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_currentTickStart).count();
+	deltaTime =
+		std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_currentTickStart)
+			.count();
 	// Calculate `tpsPotential`
 	tpsPotential = 1000000.0F / deltaTime;
 	// Calculate sleep duration according to `tpsLimit`
@@ -73,7 +75,9 @@ void KTech::Time::WaitUntilNextTick()
 		std::this_thread::sleep_for(sleepDuration);
 	}
 	// Calculate (actual) `tps`
-	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_currentTickStart).count();
+	deltaTime =
+		std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_currentTickStart)
+			.count();
 	tps = 1000000.0F / deltaTime;
 	// Set `m_currentTickStart` to now
 	ticksCounter++;
@@ -84,26 +88,27 @@ auto KTech::Time::TimeToMicroseconds(long p_time, Measurement p_measurement) con
 {
 	switch (p_measurement)
 	{
-		case Measurement::ticks:
-		{
-			//     24 -> 24000000 -> 1000000
-			return p_time * 1000000 / tpsLimit;
-		}
-		case Measurement::seconds:
-		{
-			//     1 -> 1000000
-			return p_time * 1000000;
-		}
-		case Measurement::milliseconds:
-		{
-			//     1000 -> 1000000
-			return p_time * 1000;
-		}
-		case Measurement::microseconds: default:
-		{
-			//     1000000
-			return p_time;
-		}
+	case Measurement::ticks:
+	{
+		//     24 -> 24000000 -> 1000000
+		return p_time * 1000000 / tpsLimit;
+	}
+	case Measurement::seconds:
+	{
+		//     1 -> 1000000
+		return p_time * 1000000;
+	}
+	case Measurement::milliseconds:
+	{
+		//     1000 -> 1000000
+		return p_time * 1000;
+	}
+	case Measurement::microseconds:
+	default:
+	{
+		//     1000000
+		return p_time;
+	}
 	}
 }
 

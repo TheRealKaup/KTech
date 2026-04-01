@@ -24,9 +24,9 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
-#include "../world/object.hpp"
 #include "../engine/engine.hpp"
 #include "../engine/time/invocation.hpp"
+#include "../world/object.hpp"
 
 /*!
 	@brief Wrapper for animating an `Object` and its `Texture`s.
@@ -43,13 +43,13 @@ public:
 	{
 		enum class Type : uint8_t
 		{
-			ParentSetPosition, // Set position of the `Object`
-			ParentMove, // Move the `Object` (`Object::Move()`)
-			TextureSet, // Hide all other `Texture`s and show the given one
+			ParentSetPosition,	// Set position of the `Object`
+			ParentMove,			// Move the `Object` (`Object::Move()`)
+			TextureSet,			// Hide all other `Texture`s and show the given one
 			TextureSetPosition, // Set position of the given `Texture`
-			TextureMove, // Add to the position of the given `Texture`
-			TextureShow, // Show the given `Texture` (`Texture::visible = true`)
-			TextureHide, // Hide the given `Texture` (`Texture::visible = false`)
+			TextureMove,		// Add to the position of the given `Texture`
+			TextureShow,		// Show the given `Texture` (`Texture::visible = true`)
+			TextureHide,		// Hide the given `Texture` (`Texture::visible = false`)
 			Delay
 		};
 
@@ -63,15 +63,18 @@ public:
 
 		// TextureSet, TextureSetPosition, TextureShow, TextureHide
 		Instruction(Type type, size_t textureIndex, Point pointData = Point(0, 0))
-			: type(type), intData(textureIndex), pointData(pointData) {}
+			: type(type), intData(textureIndex), pointData(pointData)
+		{}
 
 		// ParentSetPosition, ParentMove
 		Instruction(Type type, Point pointData)
-			: type(type), pointData(pointData) {}
+			: type(type), pointData(pointData)
+		{}
 
 		// Delay
 		Instruction(Type type, size_t time, Time::Measurement timeMeasurement)
-			: type(type), intData(time), timeMeasurement(timeMeasurement) {}
+			: type(type), intData(time), timeMeasurement(timeMeasurement)
+		{}
 	};
 
 	Engine& engine; //!< Parent `Engine`

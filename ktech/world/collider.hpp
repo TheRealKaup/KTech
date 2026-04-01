@@ -44,12 +44,13 @@
 */
 struct KTech::Collider
 {
-	bool m_active = true; //!< Activation status: `true` means enabled. `false` means disabled, and will be ignored in `Object` movement processing.
+	//! Activation status: `true` means enabled. `false` means disabled, and will be ignored in `Object` movement processing.
+	bool m_active = true;
 
-	bool m_simple; //!< `true` means simple, `false` means complex.
-	uint8_t m_type; //!< `Collider` type, which determines collision results based on `Collision::colliderTypes`.
-	Point m_rPos; //!< Relative position to the parent `Object`.
-	UPoint m_size; //!< Rectangle size (used in both simple and complex forms).
+	bool m_simple;		   //!< `true` means simple, `false` means complex.
+	uint8_t m_type;		   //!< `Collider` type, which determines collision results based on `Collision::colliderTypes`.
+	Point m_rPos;		   //!< Relative position to the parent `Object`.
+	UPoint m_size;		   //!< Rectangle size (used in both simple and complex forms).
 	std::vector<bool> m_c; //!< 1D vector of the 2D bitmap (used only in complex form).
 
 	/*!

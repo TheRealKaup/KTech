@@ -23,10 +23,10 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/id.hpp"
 #include "../basic/cell.hpp"
 #include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
+#include "../utility/id.hpp"
 
 #include <limits>
 #include <string>
@@ -40,15 +40,15 @@
 class KTech::Camera
 {
 public:
-	Engine& engine; //!< Parent engine.
+	Engine& engine;								 //!< Parent engine.
 	const ID<Camera> m_id{ID<Camera>::Unique()}; //!< Personal `ID`.
-	std::string m_name; //!< String name, might be useful for debugging.
-	ID<Map> m_parentMap; //!< The map which contains this `Camera`.
+	std::string m_name;							 //!< String name, might be useful for debugging.
+	ID<Map> m_parentMap;						 //!< The map which contains this `Camera`.
 
-	Point m_pos; //!< World position.
-	UPoint m_res; //!< `Camera::m_image`'s resolution (or "size").
+	Point m_pos;											   //!< World position.
+	UPoint m_res;											   //!< `Camera::m_image`'s resolution (or "size").
 	Cell m_background = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)); //!< The background to render upon.
-	std::vector<Cell> m_image; //!< `Cell`-based rendered image.
+	std::vector<Cell> m_image;								   //!< `Cell`-based rendered image.
 
 	/*!
 		@fn Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
@@ -59,7 +59,9 @@ public:
 		@param [in] resolution Image resolution.
 		@param [in] name String name.
 	*/
-	Camera(Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	Camera(
+		Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = ""
+	);
 
 	/*!
 		@fn Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
@@ -73,7 +75,13 @@ public:
 
 		@see `Map::m_activeCameraI`
 	*/
-	Camera(Engine& engine, const ID<Map>& parentMap, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = "");
+	Camera(
+		Engine& engine,
+		const ID<Map>& parentMap,
+		Point position = Point(0, 0),
+		UPoint resolution = UPoint(10, 10),
+		const std::string& name = ""
+	);
 
 	/*!
 		@brief Leave the parent map (if in one) and removed itself from `Memory`.
@@ -130,7 +138,12 @@ public:
 
 		@see `Output::Draw()` for parameters explanation.
 	*/
-	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+	void Draw(
+		Point position = Point(0, 0),
+		UPoint start = UPoint(0, 0),
+		UPoint end = UPoint(0, 0),
+		uint8_t alpha = std::numeric_limits<uint8_t>::max()
+	);
 
 	/*!
 		@brief Shortcut for `Camera::Render()`, `Camera::Draw()` and `Output::Print()`.

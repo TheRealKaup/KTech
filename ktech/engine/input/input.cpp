@@ -20,10 +20,10 @@
 
 #include "input.hpp"
 
+#include "../engine.hpp"
 #include "callback.hpp"
 #include "callbackgroup.hpp"
 #include "handler.hpp"
-#include "../engine.hpp"
 
 #include <algorithm>
 #ifndef _WIN32
@@ -81,19 +81,23 @@ void KTech::Input::CallCallbacks()
 
 void KTech::Input::Update()
 {
-	m_groups.erase(std::ranges::begin(std::ranges::remove_if(m_groups,
-		[](CallbackGroup* group)
-		{
-			// ERASE-REMOVE groups that were set to be removed by `SetCallbackGroupToBeRemoved()`
-			if (group == nullptr)
-			{
-				return true;
-			}
-			// Updates `Callback` statuses
-			group->Update();
-			return false;
-		}
-		)), std::ranges::end(m_groups)
+	m_groups.erase(
+		std::ranges::begin(
+			std::ranges::remove_if(
+				m_groups,
+				[](CallbackGroup* group) {
+					// ERASE-REMOVE groups that were set to be removed by `SetCallbackGroupToBeRemoved()`
+					if (group == nullptr)
+					{
+						return true;
+					}
+					// Updates `Callback` statuses
+					group->Update();
+					return false;
+				}
+			)
+		),
+		std::ranges::end(m_groups)
 	);
 	// Delete any `Callback` that is awaiting deletion
 	for (const std::shared_ptr<Handler>& stringHandler : m_stringHandlers)
@@ -115,7 +119,8 @@ inline void KTech::Input::CallStringHandlers()
 			// Call callbacks
 			for (const std::shared_ptr<Callback>& callback : stringHandler->m_callbacks)
 			{
-				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				// Call if enabled, if returns true update render-on-demand status
+				if (callback->status == Callback::Status::enabled && callback->ptr())
 				{
 					m_changedThisTick = true; // Render-on-demand
 				}
@@ -132,9 +137,10 @@ void KTech::Input::CallRangeHandlers()
 	{
 		if (rangeHandler->m_start <= input[0] && input[0] <= rangeHandler->m_end) // Input matches handler's range
 		{
-			for (const std::shared_ptr<Callback>& callback: rangeHandler->m_callbacks) // Call callbacks
+			for (const std::shared_ptr<Callback>& callback : rangeHandler->m_callbacks) // Call callbacks
 			{
-				if (callback->status == Callback::Status::enabled && callback->ptr()) // Call if enabled, if returns true update render-on-demand status
+				// Call if enabled, if returns true update render-on-demand status
+				if ((callback->status == Callback::Status::enabled) && (callback->ptr()))
 				{
 					m_changedThisTick = true; // Render-on-demand
 				}
@@ -203,27 +209,29 @@ KTech::Input::Input(Engine& p_engine, bool p_noGameLoopMode)
 #ifdef _WIN32
 	m_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
 	GetConsoleMode(m_stdinHandle, &m_oldMode);
-	SetConsoleMode(m_stdinHandle,
+	SetConsoleMode(
+		m_stdinHandle,
 		// Enable:
 		(m_oldMode
-		| ENABLE_VIRTUAL_TERMINAL_INPUT // Receive input as escape sequences
-		| ENABLE_EXTENDED_FLAGS) // Needed to disable selecting text (because it pauses output)
-		// Disable:
-		& ~(ENABLE_ECHO_INPUT // Echo
-		| ENABLE_LINE_INPUT // Canonical mode
-		| ENABLE_PROCESSED_INPUT // System handling of signals (e.g. Ctrl+C)
-		| ENABLE_MOUSE_INPUT // Inputs regarding the mouse
-		| ENABLE_WINDOW_INPUT // Input regarding the window
-		| ENABLE_QUICK_EDIT_MODE) // Selecting text
+			| ENABLE_VIRTUAL_TERMINAL_INPUT // Receive input as escape sequences
+			| ENABLE_EXTENDED_FLAGS)		// Needed to disable selecting text (because it pauses output)
+			// Disable:
+			& ~(ENABLE_ECHO_INPUT		  // Echo
+				| ENABLE_LINE_INPUT		  // Canonical mode
+				| ENABLE_PROCESSED_INPUT  // System handling of signals (e.g. Ctrl+C)
+				| ENABLE_MOUSE_INPUT	  // Inputs regarding the mouse
+				| ENABLE_WINDOW_INPUT	  // Input regarding the window
+				| ENABLE_QUICK_EDIT_MODE) // Selecting text
 	);
-	SetConsoleCP(20127); // us-ascii code page (list of code pages: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
+	// us-ascii code page (list of code pages: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
+	SetConsoleCP(20127);
 #else
 	tcgetattr(0, &m_oldTerminalAttributes);
 	termios terminalAttributes = m_oldTerminalAttributes;
 	terminalAttributes.c_lflag &= ~ICANON; // Disable canonical mode
-	terminalAttributes.c_lflag &= ~ECHO; // Disable echo
-	terminalAttributes.c_lflag &= ~ISIG; // Disable signals
-	terminalAttributes.c_cc[VMIN] = 1; // Blocking read
+	terminalAttributes.c_lflag &= ~ECHO;   // Disable echo
+	terminalAttributes.c_lflag &= ~ISIG;   // Disable signals
+	terminalAttributes.c_cc[VMIN] = 1;	   // Blocking read
 	terminalAttributes.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSANOW, &terminalAttributes);
 #endif
@@ -251,7 +259,8 @@ KTech::Input::~Input()
 	m_inputLoop.detach();
 }
 
-auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
+auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::function<bool()>& p_callback)
+	-> std::shared_ptr<Callback>
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 	{
@@ -269,11 +278,16 @@ auto KTech::Input::CreateCallback(const std::string& p_stringKey, const std::fun
 	// Otherwise, create a new handler
 	m_stringHandlers.push_back(std::make_shared<Handler>(p_stringKey));
 	// And add a callback to it
-	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_stringHandlers[m_stringHandlers.size() - 1]));
-	return m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback of last handler
+	m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.push_back(
+		std::make_shared<Callback>(p_callback, m_stringHandlers[m_stringHandlers.size() - 1])
+	);
+	// Last callback of last handler
+	return m_stringHandlers[m_stringHandlers.size() - 1]
+		->m_callbacks[m_stringHandlers[m_stringHandlers.size() - 1]->m_callbacks.size() - 1];
 }
 
-auto KTech::Input::CrateRangedCallback(char p_start, char p_end, const std::function<bool()>& p_callback) -> std::shared_ptr<Callback>
+auto KTech::Input::CrateRangedCallback(char p_start, char p_end, const std::function<bool()>& p_callback)
+	-> std::shared_ptr<Callback>
 {
 	if (p_callback == nullptr) // Avoid constantly checking later whether callback is null
 	{
@@ -291,8 +305,11 @@ auto KTech::Input::CrateRangedCallback(char p_start, char p_end, const std::func
 	// Otherwise, create a new handler
 	m_rangeHandlers.push_back(std::make_shared<Handler>(p_start, p_end));
 	// And add a callback to it
-	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(std::make_shared<Callback>(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1]));
-	return m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
+	m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.push_back(
+		std::make_shared<Callback>(p_callback, m_rangeHandlers[m_rangeHandlers.size() - 1])
+	);
+	return m_rangeHandlers[m_rangeHandlers.size() - 1]
+		->m_callbacks[m_rangeHandlers[m_rangeHandlers.size() - 1]->m_callbacks.size() - 1]; // Last callback
 }
 
 void KTech::Input::RegisterCallbackGroup(CallbackGroup* const p_callbackGroup)

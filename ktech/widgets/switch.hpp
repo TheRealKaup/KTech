@@ -49,11 +49,12 @@ public:
 		@param [in] selectedOn Foreground color set when `Switch` is selected and on.
 		@param [in] down Foreground color set when `Switch` is being pressed.
 	*/
-	Switch(KTech::Engine& engine,
+	Switch(
+		KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnPress,
 		const std::string& key = KTech::Keys::return_,
-		KTech::Point position = { 0, 0 },
+		KTech::Point position = {0, 0},
 		const std::string& text = "Switch",
 		bool on = false,
 		bool withFrame = false,
@@ -61,16 +62,17 @@ public:
 		KTech::RGBA selectedOff = KTech::RGBAColors::white,
 		KTech::RGBA unselectedOn = KTech::RGBAColors::Widgets::switchUnselectedOnGreen,
 		KTech::RGBA selectedOn = KTech::RGBAColors::Widgets::switchSelectedOnGreen,
-		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue)
+		KTech::RGBA down = KTech::RGBAColors::Widgets::buttonDownBlue
+	)
 		: Widget(engine, ui, position),
-		m_OnPress(std::move(OnPress)),
-		m_on(on),
-		m_unselectedOffRGBA(unselectedOff),
-		m_selectedOffRGBA(selectedOff),
-		m_unselectedOnRGBA(unselectedOn),
-		m_selectedOnRGBA(selectedOn),
-		m_downRGBA(down),
-		m_downInvocation(engine, [this]() -> bool { return RemovePressColor(); })
+		  m_OnPress(std::move(OnPress)),
+		  m_on(on),
+		  m_unselectedOffRGBA(unselectedOff),
+		  m_selectedOffRGBA(selectedOff),
+		  m_unselectedOnRGBA(unselectedOn),
+		  m_selectedOnRGBA(selectedOn),
+		  m_downRGBA(down),
+		  m_downInvocation(engine, [this]() -> bool { return RemovePressColor(); })
 	{
 		// Textures
 		SetText(text, withFrame);
@@ -114,13 +116,25 @@ public:
 		{
 			m_textures.resize(TEXTURES_SIZE_FRAMED);
 			m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
-			m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length(), 0));
-			m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2));
-			m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length(), 2));
-			m_textures[ti_topFrame].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
+			m_textures[ti_topRightCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length(), 0)
+			);
+			m_textures[ti_bottomLeftCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2)
+			);
+			m_textures[ti_bottomRightCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length(), 2)
+			);
+			m_textures[ti_topFrame].Simple(
+				KTech::UPoint(text.length(), 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0)
+			);
 			m_textures[ti_leftFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
-			m_textures[ti_bottomFrame].Simple(KTech::UPoint(text.length(), 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2));
-			m_textures[ti_rightFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length(), 1));
+			m_textures[ti_bottomFrame].Simple(
+				KTech::UPoint(text.length(), 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2)
+			);
+			m_textures[ti_rightFrame].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length(), 1)
+			);
 		}
 		else
 		{
@@ -175,7 +189,7 @@ private:
 
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_downRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_downRGBA; });
 		}
 
 		m_downInvocation.Invoke(pressLength, KTech::Time::Measurement::milliseconds);
@@ -194,14 +208,14 @@ private:
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOnRGBA; });
+				texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedOnRGBA; });
 			}
 		}
 		else
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOffRGBA; });
+				texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedOffRGBA; });
 			}
 		}
 	}
@@ -212,14 +226,14 @@ private:
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOnRGBA; });
+				texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedOnRGBA; });
 			}
 		}
 		else
 		{
 			for (KTech::Texture& texture : m_textures)
 			{
-				texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOffRGBA; });
+				texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedOffRGBA; });
 			}
 		}
 	}
@@ -232,14 +246,14 @@ private:
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOnRGBA; });
+					texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedOnRGBA; });
 				}
 			}
 			else
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedOffRGBA; });
+					texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedOffRGBA; });
 				}
 			}
 		}
@@ -249,14 +263,14 @@ private:
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOnRGBA; });
+					texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedOnRGBA; });
 				}
 			}
 			else
 			{
 				for (KTech::Texture& texture : m_textures)
 				{
-					texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedOffRGBA; });
+					texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedOffRGBA; });
 				}
 			}
 		}

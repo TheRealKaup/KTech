@@ -38,5 +38,6 @@ struct KTech::Input::Callback
 	std::shared_ptr<Handler> const parentHandler;
 
 	Callback(const std::function<bool()>& callback, std::shared_ptr<Handler> parentHandler)
-		: ptr(callback), parentHandler(std::move(parentHandler)) {}
+		: ptr(callback), parentHandler(std::move(parentHandler))
+	{}
 };

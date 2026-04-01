@@ -20,11 +20,11 @@
 
 #include "map.hpp"
 
+#include "../engine/engine.hpp"
+#include "../engine/output.hpp"
 #include "../utility/rgbcolors.hpp"
 #include "camera.hpp"
 #include "layer.hpp"
-#include "../engine/output.hpp"
-#include "../engine/engine.hpp"
 
 KTech::Map::Map(Engine& p_engine, std::string p_name)
 	: engine(p_engine), m_name(std::move(p_name))
@@ -116,7 +116,7 @@ auto KTech::Map::RemoveAllLayers() -> bool
 	{
 		return false;
 	}
-	for (auto & layer : m_layers)
+	for (auto& layer : m_layers)
 	{
 		if (engine.memory.layers.Exists(layer))
 		{
@@ -133,7 +133,7 @@ auto KTech::Map::RemoveAllCameras() -> bool
 	{
 		return false;
 	}
-	for (auto & camera : m_cameras)
+	for (auto& camera : m_cameras)
 	{
 		if (engine.memory.cameras.Exists(camera))
 		{

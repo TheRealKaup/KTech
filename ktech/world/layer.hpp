@@ -23,9 +23,9 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
+#include "../basic/rgba.hpp"
 #include "../utility/id.hpp"
 #include "../utility/rgbacolors.hpp"
-#include "../basic/rgba.hpp"
 
 #include <limits>
 #include <string>
@@ -39,14 +39,15 @@
 class KTech::Layer
 {
 public:
-	Engine& engine; //!< Parent `Engine`
+	Engine& engine;							   //!< Parent `Engine`
 	const ID<Layer> m_id{ID<Layer>::Unique()}; //!< Personal `ID`.
-	std::string m_name; //!< String anme; could be useful in debugging.
-	ID<Map> m_parentMap; //!< Parent `Map`.
-	std::vector<ID<Object>> m_objects; //!< Contained `Object`s.
-	bool m_visible = true; //!< `true`: will be rendered by `Camera`. `false`: won't be.
+	std::string m_name;						   //!< String anme; could be useful in debugging.
+	ID<Map> m_parentMap;					   //!< Parent `Map`.
+	std::vector<ID<Object>> m_objects;		   //!< Contained `Object`s.
+	bool m_visible = true;					   //!< `true`: will be rendered by `Camera`. `false`: won't be.
 
-	uint8_t m_alpha = std::numeric_limits<uint8_t>::max(); //!< Opacity used by `Camera` when rendering contained `Object`s.
+	//! Opacity used by `Camera` when rendering contained `Object`s.
+	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();
 	RGBA m_frgba = RGBAColors::transparent; //!< Foreground color added by `Camera` after rendering contained `Object`s.
 	RGBA m_brgba = RGBAColors::transparent; //!< Background color added by `Camera` after rendering contained `Object`s.
 

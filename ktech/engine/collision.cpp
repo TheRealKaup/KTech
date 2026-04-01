@@ -22,9 +22,9 @@
 
 #include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
+#include "../engine/engine.hpp"
 #include "../world/layer.hpp"
 #include "../world/object.hpp"
-#include "../engine/engine.hpp"
 
 #include <algorithm>
 
@@ -60,21 +60,39 @@ auto KTech::Collision::MoveObject(const ID<Object>& p_object, Point p_direction)
 		// Call push events
 		for (const CollisionData& pushDatum : pushData)
 		{
-			OBJECTS[pushDatum.activeObject]->OnPush(p_direction, pushDatum.activeCollider, pushDatum.passiveObject, pushDatum.passiveCollider);
-			OBJECTS[pushDatum.passiveObject]->OnPushed(p_direction, pushDatum.passiveCollider, pushDatum.activeObject, pushDatum.activeCollider);
+			OBJECTS[pushDatum.activeObject]->OnPush(
+				p_direction, pushDatum.activeCollider, pushDatum.passiveObject, pushDatum.passiveCollider
+			);
+			OBJECTS[pushDatum.passiveObject]->OnPushed(
+				p_direction, pushDatum.passiveCollider, pushDatum.activeObject, pushDatum.activeCollider
+			);
 			OBJECTS[pushDatum.passiveObject]->OnMove(p_direction);
 		}
 		// Call overlap events
 		for (const CollisionData& overlapDatum : overlapData)
 		{
-			OBJECTS[overlapDatum.activeObject]->OnOverlap(p_direction, overlapDatum.activeCollider, overlapDatum.passiveObject, overlapDatum.passiveCollider);
-			OBJECTS[overlapDatum.passiveObject]->OnOverlapped(p_direction, overlapDatum.passiveCollider, overlapDatum.activeObject, overlapDatum.activeCollider);
+			OBJECTS[overlapDatum.activeObject]->OnOverlap(
+				p_direction, overlapDatum.activeCollider, overlapDatum.passiveObject, overlapDatum.passiveCollider
+			);
+			OBJECTS[overlapDatum.passiveObject]->OnOverlapped(
+				p_direction, overlapDatum.passiveCollider, overlapDatum.activeObject, overlapDatum.activeCollider
+			);
 		}
 		// Call overlap exit events
 		for (const CollisionData& exitOverlapDatum : exitOverlapData)
 		{
-			OBJECTS[exitOverlapDatum.activeObject]->OnOverlapExit(p_direction, exitOverlapDatum.activeCollider, exitOverlapDatum.passiveObject, exitOverlapDatum.passiveCollider);
-			OBJECTS[exitOverlapDatum.passiveObject]->OnOverlappedExit(p_direction, exitOverlapDatum.passiveCollider, exitOverlapDatum.activeObject, exitOverlapDatum.activeCollider);
+			OBJECTS[exitOverlapDatum.activeObject]->OnOverlapExit(
+				p_direction,
+				exitOverlapDatum.activeCollider,
+				exitOverlapDatum.passiveObject,
+				exitOverlapDatum.passiveCollider
+			);
+			OBJECTS[exitOverlapDatum.passiveObject]->OnOverlappedExit(
+				p_direction,
+				exitOverlapDatum.passiveCollider,
+				exitOverlapDatum.activeObject,
+				exitOverlapDatum.activeCollider
+			);
 		}
 		OBJECTS[p_object]->OnMove(p_direction);
 		return true;
@@ -82,8 +100,12 @@ auto KTech::Collision::MoveObject(const ID<Object>& p_object, Point p_direction)
 	// Unable to move - there are blocking objects.
 	for (const CollisionData& blockDatum : blockData)
 	{
-		OBJECTS[blockDatum.activeObject]->OnBlocked(p_direction, blockDatum.activeCollider, blockDatum.passiveObject, blockDatum.passiveCollider);
-		OBJECTS[blockDatum.passiveObject]->OnBlock(p_direction, blockDatum.passiveCollider, blockDatum.activeObject, blockDatum.activeCollider);
+		OBJECTS[blockDatum.activeObject]->OnBlocked(
+			p_direction, blockDatum.activeCollider, blockDatum.passiveObject, blockDatum.passiveCollider
+		);
+		OBJECTS[blockDatum.passiveObject]->OnBlock(
+			p_direction, blockDatum.passiveCollider, blockDatum.activeObject, blockDatum.activeCollider
+		);
 	}
 	return false;
 }
@@ -101,7 +123,9 @@ auto KTech::Collision::GetPotentialCollisionResult(uint8_t p_type1, uint8_t p_ty
 	return result;
 }
 
-auto KTech::Collision::AreCollidersOverlapping(const Collider& p_collider1, const Point& p_position1, const Collider& p_collider2, const Point& p_position2) -> bool
+auto KTech::Collision::AreCollidersOverlapping(
+	const Collider& p_collider1, const Point& p_position1, const Collider& p_collider2, const Point& p_position2
+) -> bool
 {
 	// First check for simple overlap
 	if (AreSimpleCollidersOverlapping(p_collider1, p_position1, p_collider2, p_position2))
@@ -128,19 +152,27 @@ auto KTech::Collision::AreCollidersOverlapping(const Collider& p_collider1, cons
 	return false;
 }
 
-auto KTech::Collision::AreSimpleCollidersOverlapping(const Collider& p_collider1, const Point& p_position1, const Collider& p_collider2, const Point& p_position2) -> bool
+auto KTech::Collision::AreSimpleCollidersOverlapping(
+	const Collider& p_collider1, const Point& p_position1, const Collider& p_collider2, const Point& p_position2
+) -> bool
 {
-	return p_position1.x < p_position2.x + p_collider2.m_size.x &&
-		p_position1.x + p_collider1.m_size.x > p_position2.x &&
-		p_position1.y < p_position2.y + p_collider2.m_size.y &&
-		p_position1.y + p_collider1.m_size.y > p_position2.y;
+	return p_position1.x < p_position2.x + p_collider2.m_size.x
+		&& p_position1.x + p_collider1.m_size.x > p_position2.x
+		&& p_position1.y < p_position2.y + p_collider2.m_size.y
+		&& p_position1.y + p_collider1.m_size.y > p_position2.y;
 }
 
-auto KTech::Collision::AreSimpleAndComplexCollidersOverlapping(const Collider& p_complex, const Point& p_complexPosition, const Collider& p_simple, const Point& p_simplePosition) -> bool
+auto KTech::Collision::AreSimpleAndComplexCollidersOverlapping(
+	const Collider& p_complex, const Point& p_complexPosition, const Collider& p_simple, const Point& p_simplePosition
+) -> bool
 {
-	for (size_t y = (p_complexPosition.y < p_simplePosition.y ? p_simplePosition.y - p_complexPosition.y : 0); y < p_complex.m_size.x && p_complexPosition.y + y < p_simplePosition.y + p_simple.m_size.y; y++)
+	for (size_t y = (p_complexPosition.y < p_simplePosition.y ? p_simplePosition.y - p_complexPosition.y : 0);
+		y < p_complex.m_size.x && p_complexPosition.y + y < p_simplePosition.y + p_simple.m_size.y;
+		y++)
 	{
-		for (size_t x = (p_complexPosition.x < p_simplePosition.x ? p_simplePosition.x - p_complexPosition.x : 0); x < p_complex.m_size.x && p_complexPosition.x + x < p_simplePosition.x + p_simple.m_size.x; x++)
+		for (size_t x = (p_complexPosition.x < p_simplePosition.x ? p_simplePosition.x - p_complexPosition.x : 0);
+			x < p_complex.m_size.x && p_complexPosition.x + x < p_simplePosition.x + p_simple.m_size.x;
+			x++)
 		{
 			if (p_complex(x, y))
 			{
@@ -151,7 +183,9 @@ auto KTech::Collision::AreSimpleAndComplexCollidersOverlapping(const Collider& p
 	return false;
 }
 
-auto KTech::Collision::AreComplexCollidersOverlapping(const Collider& p_collider1, const Point& p_position1, const Collider& p_collider2, const Point& p_position2) -> bool
+auto KTech::Collision::AreComplexCollidersOverlapping(
+	const Collider& p_collider1, const Point& p_position1, const Collider& p_collider2, const Point& p_position2
+) -> bool
 {
 	// `p_collider1` and `p_collider2` are complex
 	size_t y1 = 0;
@@ -195,38 +229,48 @@ auto KTech::Collision::AreComplexCollidersOverlapping(const Collider& p_collider
 	return false;
 }
 
-void KTech::Collision::ExpandMovementTree(const ID<Object>& p_thisObject, Point p_direction,
+void KTech::Collision::ExpandMovementTree(
+	const ID<Object>& p_thisObject,
+	Point p_direction,
 	std::vector<CollisionData>& p_pushData,
 	std::vector<CollisionData>& p_blockData,
 	std::vector<CollisionData>& p_overlapData,
-	std::vector<CollisionData>& p_exitOverlapData)
+	std::vector<CollisionData>& p_exitOverlapData
+)
 {
 	for (ID<Object>& otherObject : LAYERS[OBJECTS[p_thisObject]->m_parentLayer]->m_objects) // Other objects
 	{
 		if (otherObject == p_thisObject
-			|| std::ranges::any_of(p_pushData, [&](const CollisionData& pushDatum){ return otherObject == pushDatum.activeObject || otherObject == pushDatum.passiveObject; })) // Filter out pushed/pushing objects (leaving objects outside the movement tree and objects from `blockingObjects`)
+			|| std::ranges::any_of(
+				p_pushData, [&](const CollisionData& pushDatum) {
+					return otherObject == pushDatum.activeObject || otherObject == pushDatum.passiveObject;
+				}
+			)) // Filter out pushed/pushing objects (leaving objects outside the movement tree and objects from `blockingObjects`)
 		{
 			continue;
 		}
 
 		// *Needed in this scope!
-		CR collisionResult = CR::O; // The collision result between this object and this other object. Default - overlap (nothing, ignored).
-		size_t colliderI; // Collider index
-		size_t otherColliderI; // Other collider index
-		size_t originallyBlockedColliderI; // Used if not found a pushable collider
+		CR collisionResult = CR::
+			O; // The collision result between this object and this other object. Default - overlap (nothing, ignored).
+		size_t colliderI;					// Collider index
+		size_t otherColliderI;				// Other collider index
+		size_t originallyBlockedColliderI;	// Used if not found a pushable collider
 		size_t originallyBlockingColliderI; // ^
 
-		for (colliderI = 0; colliderI < OBJECTS[p_thisObject]->m_colliders.size(); colliderI++) // This object's colliders
+		for (colliderI = 0; colliderI < OBJECTS[p_thisObject]->m_colliders.size();
+			colliderI++) // This object's colliders
 		{
 			// Set collider
-	 		const Collider& col = (OBJECTS[p_thisObject]->m_colliders[colliderI]);
+			const Collider& col = (OBJECTS[p_thisObject]->m_colliders[colliderI]);
 			// Skip this one if it is invalid
 			if (!col.m_active || col.m_size.x == 0 || col.m_size.y == 0)
 			{
 				continue;
 			}
 
-			for (otherColliderI = 0; otherColliderI < OBJECTS[otherObject]->m_colliders.size(); otherColliderI++) // Other object's colliders
+			for (otherColliderI = 0; otherColliderI < OBJECTS[otherObject]->m_colliders.size();
+				otherColliderI++) // Other object's colliders
 			{
 				// Set other collider
 				const Collider& otherCol = OBJECTS[otherObject]->m_colliders[otherColliderI];
@@ -247,16 +291,30 @@ void KTech::Collision::ExpandMovementTree(const ID<Object>& p_thisObject, Point 
 				if (potentialCollisionResult == CR::O)
 				{
 					// Compare current and future overlapping according to the types of the colliders
-					bool currentOverlapState = AreCollidersOverlapping(col, OBJECTS[p_thisObject]->m_pos + col.m_rPos, otherCol, OBJECTS[otherObject]->m_pos + otherCol.m_rPos);
-					bool futureOverlapState = AreCollidersOverlapping(col, OBJECTS[p_thisObject]->m_pos + col.m_rPos + p_direction, otherCol, OBJECTS[otherObject]->m_pos);
+					bool currentOverlapState = AreCollidersOverlapping(
+						col,
+						OBJECTS[p_thisObject]->m_pos + col.m_rPos,
+						otherCol,
+						OBJECTS[otherObject]->m_pos + otherCol.m_rPos
+					);
+					bool futureOverlapState = AreCollidersOverlapping(
+						col,
+						OBJECTS[p_thisObject]->m_pos + col.m_rPos + p_direction,
+						otherCol,
+						OBJECTS[otherObject]->m_pos
+					);
 
 					if (!currentOverlapState && futureOverlapState)
 					{
-						p_overlapData.push_back({p_thisObject, otherObject, colliderI, otherColliderI}); // Entered overlap
+						p_overlapData.push_back(
+							{p_thisObject, otherObject, colliderI, otherColliderI}
+						); // Entered overlap
 					}
 					else if (currentOverlapState && !futureOverlapState)
 					{
-						p_exitOverlapData.push_back({p_thisObject, otherObject, colliderI, otherColliderI}); // Exited overlap
+						p_exitOverlapData.push_back(
+							{p_thisObject, otherObject, colliderI, otherColliderI}
+						); // Exited overlap
 					}
 				}
 				// Proceed to checking collision (repositioned overlap) only if the potential collision result is not already known.
@@ -266,7 +324,12 @@ void KTech::Collision::ExpandMovementTree(const ID<Object>& p_thisObject, Point 
 				// Basically, by detecting a block, this part of the code gets locked on a block, until a push is found, which causes this part of the code to get locked on a push and never check for more collisions again in the current `otherObj`'s iteration.
 				else if (collisionResult != potentialCollisionResult)
 				{
-					if (AreCollidersOverlapping(col, OBJECTS[p_thisObject]->m_pos + col.m_rPos + p_direction, otherCol, OBJECTS[otherObject]->m_pos + otherCol.m_rPos))
+					if (AreCollidersOverlapping(
+							col,
+							OBJECTS[p_thisObject]->m_pos + col.m_rPos + p_direction,
+							otherCol,
+							OBJECTS[otherObject]->m_pos + otherCol.m_rPos
+						))
 					{
 						// Collision!
 						collisionResult = potentialCollisionResult;

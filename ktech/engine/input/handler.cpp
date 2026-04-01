@@ -26,10 +26,15 @@
 void KTech::Input::Handler::RemoveCallbacksSetToBeDeleted()
 {
 	// ERASE-REMOVE `Callback`s which were set to `Callback::Status::awaitingDeletion` by its `CallbackGroup`
-	m_callbacks.erase(std::ranges::begin(std::ranges::remove_if(m_callbacks,
-		[](const std::shared_ptr<Callback>& callback)
-		{
-			return callback->status == Callback::Status::awaitingDeletion;
-		})), std::ranges::end(m_callbacks)
+	m_callbacks.erase(
+		std::ranges::begin(
+			std::ranges::remove_if(
+				m_callbacks,
+				[](const std::shared_ptr<Callback>& callback) {
+					return callback->status == Callback::Status::awaitingDeletion;
+				}
+			)
+		),
+		std::ranges::end(m_callbacks)
 	);
 }

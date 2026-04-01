@@ -1,0 +1,61 @@
+---
+## Misc
+BasedOnStyle: Microsoft
+InsertNewlineAtEOF: True
+UseTab: Always
+RemoveEmptyLinesInUnwrappedLines: true
+
+## Braces {}
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: True
+    AfterFunction: True
+    SplitEmptyFunction: False
+    SplitEmptyNamespace: False
+
+## Templates
+BreakTemplateDeclarations: Yes
+
+## Classes
+AccessModifierOffset: -4
+
+## Functions
+# OnePerLine if all don't fit in the same line, because bin packing makes you accidentally miss a parameter when
+# scanning them one-by-line.
+BinPackParameters: OnePerLine
+BinPackArguments: false
+# Even though I believe that disabling these makes parameters look more like parameters (good readability), especially
+# in constructors where disabling helps separate them from the constructor initializers, in some extreme cases (like
+# where the fully-qualified constructor name is really long), it leaves the parameters at the very last columns, which
+# ruins readability completely. Considering these 2 settings, unfortunately, always apply to function definitions,
+# declarations and calls, the above is especially true because calls are more prone to be extremely long, for example,
+# when using the standard algorithm library.
+BreakAfterOpenBracketFunction: true
+BreakBeforeCloseBracketFunction: true
+AlignAfterOpenBracket: false
+# Constructor initializers
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: NextLineOnly
+# Unfortunately, `PenaltyReturnTypeOnItsOwnLine` doesn't cover trailing return types.
+
+## Comments
+# Comments should not be broken according to column limit because Doxygen renders a newline for each of these breaks,
+# messing up how the documentation looks. Maybe there is a better option involving making Doxygen render a newline only
+# on double newline, but I decided to meet halfway for now.
+ReflowComments: IndentOnly
+
+## Namespaces
+NamespaceIndentation: All
+FixNamespaceComments: false
+AllowShortNamespacesOnASingleLine: True
+
+## Operators
+# No bin packing! Respecting precedence is even more readable and saves lines. AlignOperands: DontAlign is an uglier
+# alternative, but admittedly, saves a lot of whitespace before the operators. Will consider changing if I encounter
+# a case that is extreme enough. Also not sure why BreakBeforeBinaryOperators: NonAssignment is not something like
+# "FirstOperator", so it aligns nicely for things like `std::cout <<`.
+AlignOperands: AlignAfterOperator
+BreakBeforeBinaryOperators: NonAssignment
+BreakBinaryOperations: RespectPrecedence
+PointerAlignment: Left
+...

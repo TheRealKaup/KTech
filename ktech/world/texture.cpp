@@ -23,8 +23,8 @@
 #include "../utility/rgbacolors.hpp"
 
 #include <algorithm>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <limits>
 
@@ -89,7 +89,8 @@ auto KTech::Texture::File(const std::filesystem::path& p_filePath, Point p_relat
 	return File(p_filePath);
 }
 
-auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background) -> Texture&
+auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background)
+	-> Texture&
 {
 	m_simple = false;
 	// Get size
@@ -125,7 +126,9 @@ auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 	return *this;
 }
 
-auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background, Point p_relativePosition) -> Texture&
+auto KTech::Texture::Write(
+	const std::vector<std::string>& p_stringVector, RGBA p_foreground, RGBA p_background, Point p_relativePosition
+) -> Texture&
 {
 	m_rPos = p_relativePosition;
 	return Write(p_stringVector, p_foreground, p_background);
@@ -242,19 +245,19 @@ void KTech::Texture::Print() const
 	if (m_simple)
 	{
 		std::string cellString = "\033[38;2;"
-			+ std::to_string(m_value.f.r * m_value.f.a / std::numeric_limits<uint8_t>::max())
-			+ ';'
-			+ std::to_string(m_value.f.g * m_value.f.a / std::numeric_limits<uint8_t>::max())
-			+ ';'
-			+ std::to_string(m_value.f.b * m_value.f.a / std::numeric_limits<uint8_t>::max())
-			+ "m\033[48;2;"
-			+ std::to_string(m_value.b.r * m_value.b.a / std::numeric_limits<uint8_t>::max())
-			+ ';'
-			+ std::to_string(m_value.b.g * m_value.b.a / std::numeric_limits<uint8_t>::max())
-			+ ';'
-			+ std::to_string(m_value.b.b * m_value.b.a / std::numeric_limits<uint8_t>::max())
-			+ 'm'
-			+ (' ' <= m_value.c && m_value.c <= '~' ? m_value.c : ' ');
+							   + std::to_string(m_value.f.r * m_value.f.a / std::numeric_limits<uint8_t>::max())
+							   + ';'
+							   + std::to_string(m_value.f.g * m_value.f.a / std::numeric_limits<uint8_t>::max())
+							   + ';'
+							   + std::to_string(m_value.f.b * m_value.f.a / std::numeric_limits<uint8_t>::max())
+							   + "m\033[48;2;"
+							   + std::to_string(m_value.b.r * m_value.b.a / std::numeric_limits<uint8_t>::max())
+							   + ';'
+							   + std::to_string(m_value.b.g * m_value.b.a / std::numeric_limits<uint8_t>::max())
+							   + ';'
+							   + std::to_string(m_value.b.b * m_value.b.a / std::numeric_limits<uint8_t>::max())
+							   + 'm'
+							   + (' ' <= m_value.c && m_value.c <= '~' ? m_value.c : ' ');
 
 		for (size_t x = 0; x < m_size.x; x++)
 		{
@@ -271,8 +274,9 @@ void KTech::Texture::Print() const
 		{
 			for (size_t x = 0; x < m_size.x; x++, i++)
 			{
-				std::cout << "\033[38;2;"
-				<< std::to_string(m_t[i].f.r * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
+				std::cout
+					<< "\033[38;2;"
+					<< std::to_string(m_t[i].f.r * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
 					<< ';'
 					<< std::to_string(m_t[i].f.g * m_t[i].f.a / std::numeric_limits<uint8_t>::max())
 					<< ';'

@@ -33,7 +33,7 @@
 
 	@see `KTech::CachingRegistry`
 */
-template<typename T>
+template <typename T>
 struct KTech::ID
 {
 	//! @brief Construct a null `ID`.
@@ -52,10 +52,11 @@ struct KTech::ID
 
 private:
 	mutable size_t m_i = 0; // Local cached index
-	uint64_t m_uuid; // Universally unique identifier
+	uint64_t m_uuid;		// Universally unique identifier
 
 	explicit constexpr ID(uint64_t uuid)
-		: m_uuid(uuid) {}
+		: m_uuid(uuid)
+	{}
 
 	// Generate a unique `ID`; can only be used by world structures.
 	static auto Unique() -> ID

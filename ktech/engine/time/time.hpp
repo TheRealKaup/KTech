@@ -45,10 +45,11 @@ public:
 
 	struct Invocation;
 
-	unsigned long tpsLimit; //!< Max ticks allowed to occur in a second. You set this value in `Engine::Engine()`, and you can change it whenever you want.
-	float tps = 0; //!< Actual ticks per second. Corresponds to `Time::deltaTime`.
-	float tpsPotential = 0; //!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
-	long deltaTime = 0; //!< Duration of the last tick, in microseconds.
+	//! Max ticks allowed to occur in a second. You set this value in `Engine::Engine()`, and you can change it whenever you want.
+	unsigned long tpsLimit;
+	float tps = 0;					//!< Actual ticks per second. Corresponds to `Time::deltaTime`.
+	float tpsPotential = 0;			//!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
+	long deltaTime = 0;				//!< Duration of the last tick, in microseconds.
 	unsigned long ticksCounter = 0; //!< Total ticks since game started.
 
 	/*!
@@ -111,7 +112,8 @@ private:
 	std::vector<Invocation*> m_invocations;
 
 	Time(Engine& engine, unsigned long ticksPerSecondLimit)
-		: engine(engine), tpsLimit(ticksPerSecondLimit) {}
+		: engine(engine), tpsLimit(ticksPerSecondLimit)
+	{}
 
 	[[nodiscard]] auto TimeToMicroseconds(long p_time, Measurement p_measurement) const -> long;
 	void RegisterCallback(Invocation* invocation);

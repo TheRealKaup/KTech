@@ -23,10 +23,10 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../basic/point.hpp"
-#include "../basic/upoint.hpp"
-#include "../basic/rgba.hpp"
 #include "../basic/cella.hpp"
+#include "../basic/point.hpp"
+#include "../basic/rgba.hpp"
+#include "../basic/upoint.hpp"
 
 #include <filesystem>
 #include <functional>
@@ -46,12 +46,13 @@
 */
 struct KTech::Texture
 {
-	bool m_active = true; //!< Activation status: `true` means enabled. `false` means disabled, and will be skipped in rendering.
+	//! Activation status: `true` means enabled. `false` means disabled, and will be skipped in rendering.
+	bool m_active = true;
 
-	bool m_simple; //!< `true` means simple, `false` means complex.
-	CellA m_value; //!< Uniform value (applies only to simple `Texture`s).
-	Point m_rPos; //!< Position relative to the parent `Object` or `Widget`.
-	UPoint m_size; //!< Rectangle size (used in both simple and complex `Texture`s).
+	bool m_simple;			//!< `true` means simple, `false` means complex.
+	CellA m_value;			//!< Uniform value (applies only to simple `Texture`s).
+	Point m_rPos;			//!< Position relative to the parent `Object` or `Widget`.
+	UPoint m_size;			//!< Rectangle size (used in both simple and complex `Texture`s).
 	std::vector<CellA> m_t; //!< 1D vector of the 2D bitmap (used only in complex `Texture`s).
 
 	/*!
@@ -159,7 +160,8 @@ struct KTech::Texture
 
 		@return Self-reference for function chaining.
 	*/
-	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition) -> Texture&;
+	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition)
+		-> Texture&;
 
 	/*!
 		@brief Create a complex `Texture` that represents a missing `Texture`.
@@ -235,7 +237,8 @@ struct KTech::Texture
 
 		@return Self-reference for function chaining.
 	*/
-	auto Transform(const std::function<void(CellA&)>& operation, UPoint from = UPoint(0, 0), UPoint to = UPoint(0, 0)) -> Texture&;
+	auto Transform(const std::function<void(CellA&)>& operation, UPoint from = UPoint(0, 0), UPoint to = UPoint(0, 0))
+		-> Texture&;
 
 	/*!
 		@fn KTech::Texture::ExportToFile(const std::filesystem::path& filePath)

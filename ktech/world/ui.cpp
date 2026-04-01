@@ -20,9 +20,9 @@
 
 #include "ui.hpp"
 
-#include "widget.hpp"
-#include "../utility/internals.hpp"
 #include "../engine/engine.hpp"
+#include "../utility/internals.hpp"
+#include "widget.hpp"
 
 KTech::UI::UI(Engine& p_engine, UPoint p_resolution, std::string p_name)
 	: engine(p_engine), m_res(p_resolution), m_name(std::move(p_name))
@@ -166,14 +166,9 @@ inline void KTech::UI::RenderBackground()
 inline void KTech::UI::RenderSimple(Widget* p_widget, Texture& p_texture)
 {
 	// PRE-CALCULATE start and end positions for image iterator
-	Point start(
-		p_widget->m_pos.x + (long)p_texture.m_rPos.x, // `Widget::m_pos` is relative to `UI`, meaning it's also relative to the image
-		p_widget->m_pos.y + (long)p_texture.m_rPos.y
-	);
-	Point end(
-		start.x + static_cast<decltype(start.x)>(p_texture.m_size.x),
-		start.y + (long)p_texture.m_size.y
-	);
+	// `Widget::m_pos` is relative to `UI`, meaning it's also relative to the image
+	Point start(p_widget->m_pos.x + (long)p_texture.m_rPos.x, p_widget->m_pos.y + (long)p_texture.m_rPos.y);
+	Point end(start.x + static_cast<decltype(start.x)>(p_texture.m_size.x), start.y + (long)p_texture.m_size.y);
 
 	// DELIMIT positions or return if not in range
 	if (!Delimit(start, end, m_res))
@@ -234,13 +229,9 @@ inline void KTech::UI::RenderComplex(Widget* p_widget, Texture& p_texture)
 	);
 
 	// ITERATE through image and texture at the same time
-	for (size_t dstY = dstStart.y, srcY = srcStart.y;
-		dstY < m_res.y && srcY < p_texture.m_size.y;
-		dstY++, srcY++)
+	for (size_t dstY = dstStart.y, srcY = srcStart.y; dstY < m_res.y && srcY < p_texture.m_size.y; dstY++, srcY++)
 	{
-		for (size_t dstX = dstStart.x, srcX = srcStart.x;
-			dstX < m_res.x && srcX < p_texture.m_size.x;
-			dstX++, srcX++)
+		for (size_t dstX = dstStart.x, srcX = srcStart.x; dstX < m_res.x && srcX < p_texture.m_size.x; dstX++, srcX++)
 		{
 			// DRAW character according to expected behavior
 			char charToDraw = p_texture(srcX, srcY).c;

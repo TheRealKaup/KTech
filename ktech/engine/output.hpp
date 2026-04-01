@@ -42,7 +42,8 @@ class KTech::Output
 {
 public:
 	const UPoint resolution; //!< The size of the image buffer (viewport).
-	std::vector<std::string> outputOnQuit; //!< Vector of strings to print when the game quits (specifically, in `Output::~Output()`).
+	//! Vector of strings to print when the game quits (specifically, in `Output::~Output()`).
+	std::vector<std::string> outputOnQuit;
 
 	/*!
 		@fn Output::Log
@@ -94,7 +95,9 @@ public:
 		along with this program. If not, see <https://www.gnu.org/licenses/>.
 		@endcode
 	*/
-	void PrintStartupNotice(const std::string& title, const std::string& years, const std::string& author, const std::string& programName) const;
+	void PrintStartupNotice(
+		const std::string& title, const std::string& years, const std::string& author, const std::string& programName
+	) const;
 
 	/*!
 		@brief Clear the image buffer.
@@ -126,7 +129,14 @@ public:
 
 		@see `Output::ShouldRenderThisTick()`
 	*/
-	void Draw(const std::vector<Cell>& sourceImage, UPoint resolution, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+	void Draw(
+		const std::vector<Cell>& sourceImage,
+		UPoint resolution,
+		Point position = Point(0, 0),
+		UPoint start = UPoint(0, 0),
+		UPoint end = UPoint(0, 0),
+		uint8_t alpha = std::numeric_limits<uint8_t>::max()
+	);
 
 	/*!
 		@fn void KTech::Output::Draw(const std::vector<CellA>& sourceImage, UPoint resolution, Point position, UPoint start, UPoint end, uint8_t alpha)
@@ -145,7 +155,14 @@ public:
 
 		@see `Output::ShouldRenderThisTick()`
 	*/
-	void Draw(const std::vector<CellA>& sourceImage, UPoint resolution, Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+	void Draw(
+		const std::vector<CellA>& sourceImage,
+		UPoint resolution,
+		Point position = Point(0, 0),
+		UPoint start = UPoint(0, 0),
+		UPoint end = UPoint(0, 0),
+		uint8_t alpha = std::numeric_limits<uint8_t>::max()
+	);
 
 	/*!
 		@brief Print the internal image buffer.
@@ -214,7 +231,8 @@ private:
 	HANDLE m_stdoutHandle;
 	DWORD m_oldMode;
 	CONSOLE_SCREEN_BUFFER_INFO m_csbi;
-	struct winsize {
+	struct winsize
+	{
 		size_t ws_row;
 		size_t ws_col;
 	} m_terminalSize;

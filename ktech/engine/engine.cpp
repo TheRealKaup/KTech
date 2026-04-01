@@ -21,7 +21,12 @@
 #include "engine.hpp"
 
 KTech::Engine::Engine(UPoint p_imageSize, size_t p_ticksPerSecondLimit, bool p_noGameLoopMode)
-	: noGameLoopMode(p_noGameLoopMode), collision(*this), input(*this, p_noGameLoopMode), output(*this, p_imageSize, p_noGameLoopMode), time(*this, p_ticksPerSecondLimit) {}
+	: noGameLoopMode(p_noGameLoopMode),
+	  collision(*this),
+	  input(*this, p_noGameLoopMode),
+	  output(*this, p_imageSize, p_noGameLoopMode),
+	  time(*this, p_ticksPerSecondLimit)
+{}
 
 void KTech::Engine::Quit()
 {

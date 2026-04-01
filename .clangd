@@ -1,3 +1,4 @@
+---
 CompileFlags:
   Add: [-std=c++20]
 
@@ -10,3 +11,4 @@ Diagnostics:
 # now to get this feature).
 Documentation:
   CommentFormat: Doxygen
+...

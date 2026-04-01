@@ -47,7 +47,8 @@ public:
 		@param [in] unselected Foreground (text and frame) color set when `IntField` is unselected.
 		@param [in] selected Foreground color set when `IntField` is selected.
 	*/
-	IntField(KTech::Engine& engine,
+	IntField(
+		KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		std::function<void()> OnInsert,
 		size_t min,
@@ -57,8 +58,14 @@ public:
 		const std::string& text = "Value = ",
 		bool withFrame = false,
 		KTech::RGBA unselected = KTech::RGBAColors::gray,
-		KTech::RGBA selected = KTech::RGBAColors::white)
-		: Widget(engine, ui, position), m_OnInsert(std::move(OnInsert)), m_min(min), m_max(max), m_unselectedRGBA(unselected), m_selectedRGBA(selected)
+		KTech::RGBA selected = KTech::RGBAColors::white
+	)
+		: Widget(engine, ui, position),
+		  m_OnInsert(std::move(OnInsert)),
+		  m_min(min),
+		  m_max(max),
+		  m_unselectedRGBA(unselected),
+		  m_selectedRGBA(selected)
 	{
 		// Find max allowed digits
 		for (size_t i = 1; max / i > 0; i *= 10)
@@ -93,13 +100,25 @@ public:
 		{
 			m_textures.resize(TEXTURES_SIZE_FRAMED);
 			m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
-			m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 0));
-			m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2));
-			m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 2));
-			m_textures[ti_topFrame].Simple(KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
+			m_textures[ti_topRightCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 0)
+			);
+			m_textures[ti_bottomLeftCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2)
+			);
+			m_textures[ti_bottomRightCorner].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 2)
+			);
+			m_textures[ti_topFrame].Simple(
+				KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0)
+			);
 			m_textures[ti_leftFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
-			m_textures[ti_bottomFrame].Simple(KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2));
-			m_textures[ti_rightFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 1));
+			m_textures[ti_bottomFrame].Simple(
+				KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2)
+			);
+			m_textures[ti_rightFrame].Simple(
+				KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 1)
+			);
 		}
 		else
 		{
@@ -213,7 +232,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedRGBA; });
 		}
 	}
 
@@ -228,7 +247,7 @@ private:
 
 			std::string newTexture = std::to_string(m_min);
 			newTexture.resize(m_maxDigits, ' ');
-			m_textures[ti_input].Write({ newTexture }, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
+			m_textures[ti_input].Write({newTexture}, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
 		}
 		else if (m_visibleNumber > m_max)
 		{
@@ -238,7 +257,7 @@ private:
 
 			std::string newTexture = std::to_string(m_max);
 			newTexture.resize(m_maxDigits, ' ');
-			m_textures[ti_input].Write({ newTexture }, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
+			m_textures[ti_input].Write({newTexture}, m_unselectedRGBA, KTech::RGBA(), m_textures[0].m_rPos);
 		}
 		else if (m_visibleNumber >= m_min && m_visibleNumber <= m_max)
 		{
@@ -248,7 +267,7 @@ private:
 		// Change color
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedRGBA; });
 		}
 	}
 };

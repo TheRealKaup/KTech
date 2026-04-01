@@ -18,8 +18,8 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "time.hpp"
 #include "../engine.hpp"
+#include "time.hpp"
 
 /*!
 	@brief Calls a function after a given time.
@@ -66,11 +66,13 @@
 */
 struct KTech::Time::Invocation
 {
-	Engine& engine; //!< Parent `Engine`.
+	Engine& engine;					  //!< Parent `Engine`.
 	std::function<bool()> m_callback; //!< Function to invoke.
-	bool m_active = false; //!< Whether currently invoked (`true`: invoked, `false`: stationary).
-	long m_timePassed = 0; //!< How much time (in microseconds) actually passed since invocation started until now (if active), or until invocation ended (if inactive).
-	long m_duration = 0; //!< How much time (in microseconds) should pass before your function gets called (if active), or 0 (if inactive).
+	bool m_active = false;			  //!< Whether currently invoked (`true`: invoked, `false`: stationary).
+	//! How much time (in microseconds) actually passed since invocation started until now (if active), or until invocation ended (if inactive).
+	long m_timePassed = 0;
+	//! How much time (in microseconds) should pass before your function gets called (if active), or 0 (if inactive).
+	long m_duration = 0;
 
 	/*!
 		@brief Construct an `Invocation`.

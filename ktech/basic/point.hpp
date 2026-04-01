@@ -25,7 +25,9 @@
 #undef KTECH_DEFINITION
 #include "upoint.hpp"
 
-//! @brief 2D vector, mostly used to store positions and directions.
+/*!
+	@brief 2D vector, mostly used to store positions and directions.
+*/
 struct KTech::Point
 {
 	int32_t x; //!< X axis (+ right, - left).
@@ -37,14 +39,16 @@ struct KTech::Point
 		@param [in] y Y axis.
 	*/
 	constexpr Point(int32_t x = 0, int32_t y = 0)
-		: x(x), y(y) {}
+		: x(x), y(y)
+	{}
 
 	/*!
 		@brief Construct a `Point` from a `UPoint`.
 		@param [in] uPoint Base `UPoint`.
 	*/
 	constexpr Point(const UPoint& uPoint)
-		: x(uPoint.x), y(uPoint.y) {}
+		: x(uPoint.x), y(uPoint.y)
+	{}
 
 	/*!
 		@brief Compare 2 `Point`s.

@@ -23,11 +23,11 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/id.hpp"
 #include "../basic/cella.hpp"
-#include "../basic/rgba.hpp"
 #include "../basic/point.hpp"
+#include "../basic/rgba.hpp"
 #include "../basic/upoint.hpp"
+#include "../utility/id.hpp"
 
 #include <limits>
 #include <string>
@@ -45,17 +45,17 @@
 class KTech::UI
 {
 public:
-	Engine& engine; //!< Parent `Engine`.
+	Engine& engine;						 //!< Parent `Engine`.
 	const ID<UI> m_id{ID<UI>::Unique()}; //!< Personal `ID`.
-	std::string m_name; //!< String name
-	std::vector<ID<Widget>> m_widgets; //!< Contained `Widget`s.
+	std::string m_name;					 //!< String name
+	std::vector<ID<Widget>> m_widgets;	 //!< Contained `Widget`s.
 
-	UPoint m_res; //!< Image's resolution.
+	UPoint m_res;														 //!< Image's resolution.
 	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); //!< The background to render upon.
-	uint8_t m_alpha = std::numeric_limits<uint8_t>::max(); //!< Opacity for all rendered `Widget`s.
+	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();				 //!< Opacity for all rendered `Widget`s.
 	RGBA m_frgba = RGBAColors::transparent; //!< Foreground color added after rendering `Widget`s.
 	RGBA m_brgba = RGBAColors::transparent; //!< Background color added after rendering `Widget`s.
-	std::vector<CellA> m_image; //!< `CellA`-based rendered image.
+	std::vector<CellA> m_image;				//!< `CellA`-based rendered image.
 
 	/*!
 		@fn KTech::UI::UI(Engine& engine, UPoint resolution, std::string name)
@@ -114,7 +114,12 @@ public:
 
 		@see `Output::Draw()` for parameters explanation.
 	*/
-	void Draw(Point position = Point(0, 0), UPoint start = UPoint(0, 0), UPoint end = UPoint(0, 0), uint8_t alpha = std::numeric_limits<uint8_t>::max());
+	void Draw(
+		Point position = Point(0, 0),
+		UPoint start = UPoint(0, 0),
+		UPoint end = UPoint(0, 0),
+		uint8_t alpha = std::numeric_limits<uint8_t>::max()
+	);
 
 	/*!
 		@brief Shortcut for `UI::Render()`, `Output::Clear()`, `UI::Draw()` and `Output::Print()`.

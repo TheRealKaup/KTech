@@ -87,10 +87,10 @@ public:
 	const bool noGameLoopMode;
 
 	Collision collision; //!< `Collision` engine component.
-	Input input; //!< `Input` engine component.
-	Memory memory; //!< `Memory` engine component.
-	Output output; //!< `Output` engine component.
-	Time time; //!< `Time` engine component.
+	Input input;		 //!< `Input` engine component.
+	Memory memory;		 //!< `Memory` engine component.
+	Output output;		 //!< `Output` engine component.
+	Time time;			 //!< `Time` engine component.
 
 	/*!
 		@fn Engine::Engine

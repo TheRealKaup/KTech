@@ -38,12 +38,14 @@ public:
 		@param [in] unselected Foreground (text and frame) color set when `Frame` is unselected.
 		@param [in] selected Foreground color set when `Frame` is selected.
 	*/
-	Frame(KTech::Engine& engine,
+	Frame(
+		KTech::Engine& engine,
 		KTech::ID<KTech::UI> ui,
 		KTech::Point position,
 		KTech::UPoint size,
 		KTech::RGBA unselected = KTech::RGBAColors::gray,
-		KTech::RGBA selected = KTech::RGBAColors::white)
+		KTech::RGBA selected = KTech::RGBAColors::white
+	)
 		: Widget(engine, ui, position), m_unselectedRGBA(unselected), m_selectedRGBA(selected)
 	{
 		// Texture
@@ -60,13 +62,23 @@ public:
 		KTech::RGBA tempRGBA = m_selected ? m_selectedRGBA : m_unselectedRGBA;
 		m_textures.resize(TEXTURES_SIZE);
 		m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
-		m_textures[ti_topRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, 0));
-		m_textures[ti_bottomLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, size.y - 1));
-		m_textures[ti_bottomRightCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, size.y - 1));
+		m_textures[ti_topRightCorner].Simple(
+			KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, 0)
+		);
+		m_textures[ti_bottomLeftCorner].Simple(
+			KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, size.y - 1)
+		);
+		m_textures[ti_bottomRightCorner].Simple(
+			KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, size.y - 1)
+		);
 		m_textures[ti_topFrame].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
 		m_textures[ti_leftFrame].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
-		m_textures[ti_bottomFrame].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, size.y - 1));
-		m_textures[ti_rightFrame].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(size.x - 1, 1));
+		m_textures[ti_bottomFrame].Simple(
+			KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, size.y - 1)
+		);
+		m_textures[ti_rightFrame].Simple(
+			KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(size.x - 1, 1)
+		);
 	}
 
 private:
@@ -99,7 +111,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_selectedRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_selectedRGBA; });
 		}
 	}
 
@@ -107,7 +119,7 @@ private:
 	{
 		for (KTech::Texture& texture : m_textures)
 		{
-			texture.Transform([&](KTech::CellA& cell){ cell.f = m_unselectedRGBA; });
+			texture.Transform([&](KTech::CellA& cell) { cell.f = m_unselectedRGBA; });
 		}
 	}
 };

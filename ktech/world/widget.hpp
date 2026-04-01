@@ -23,11 +23,11 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/id.hpp"
 #include "../basic/point.hpp"
-#include "../world/texture.hpp"
-#include "../engine/input/input.hpp"
 #include "../engine/input/callbackgroup.hpp"
+#include "../engine/input/input.hpp"
+#include "../utility/id.hpp"
+#include "../world/texture.hpp"
 
 /*!
 	@brief World structure that comprises `Texture`s, behaves as a user interface element, and exists within `UI`.
@@ -51,21 +51,25 @@ public:
 		bool oldSelected;
 		bool oldShown;
 		ChildWidget(ID<Widget> widget, bool currentSelected, bool currentShown)
-			: widget(widget), oldSelected(currentSelected), oldShown(currentShown) {}
+			: widget(widget), oldSelected(currentSelected), oldShown(currentShown)
+		{}
 	};
 
-	Engine& engine; //!< Parent `Engine`.
+	Engine& engine;								 //!< Parent `Engine`.
 	const ID<Widget> m_id{ID<Widget>::Unique()}; //!< Personal `ID`.
-	std::string m_name; //!< String name.
-	ID<UI> m_parentUI; //!< The `UI` containing this `Widget`.
-	ID<Widget> m_parentWidget = nullID<Widget>; //!< Undocumented because it's planned to change (see GitHub issue #106).
-	std::vector<ChildWidget> m_childWidgets; //!< Undocumented because it's planned to change (see GitHub issue #106).
+	std::string m_name;							 //!< String name.
+	ID<UI> m_parentUI;							 //!< The `UI` containing this `Widget`.
+	//! Undocumented because it's planned to change (see GitHub issue #106).
+	ID<Widget> m_parentWidget = nullID<Widget>;
+	//! Undocumented because it's planned to change (see GitHub issue #106).
+	std::vector<ChildWidget> m_childWidgets;
 	bool m_selected = false; //!< `true`: player input reaches the `Widget`. `false`: player input doesn't.
-	bool m_shown = true; //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
+	bool m_shown = true;	 //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
 
-	Point m_pos; //!< World position.
+	Point m_pos;					 //!< World position.
 	std::vector<Texture> m_textures; //!< Comprising `Texture`s.
-	Input::CallbackGroup m_callbackGroup; //!< Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
+	//! Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
+	Input::CallbackGroup m_callbackGroup;
 
 	/*!
 		@fn KTech::Widget::Widget(Engine& engine, Point position, std::string name)

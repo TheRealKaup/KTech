@@ -31,10 +31,12 @@ struct KTech::Input::Handler
 	std::vector<std::shared_ptr<Callback>> m_callbacks;
 
 	Handler(std::string input)
-		: m_string(std::move(input)) {}
+		: m_string(std::move(input))
+	{}
 
 	Handler(char key1, char key2)
-		: m_start(key1), m_end(key2) {}
+		: m_start(key1), m_end(key2)
+	{}
 
 	void RemoveCallbacksSetToBeDeleted();
 };
