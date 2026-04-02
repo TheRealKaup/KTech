@@ -181,6 +181,15 @@ Header files should start like this (without the comments):
 ```c++
 /* Copyright notice should go here */
 
+/*!
+	@file
+	@brief Define KTech::ABC class
+	@author Author name
+	@author Another author name...
+	@date 2023-2026
+	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
+*/
+
 #pragma once
 
 #define KTECH_DEFINITION /* KTech namespace */
@@ -203,7 +212,16 @@ Similarly for source files:
 ```c++
 /* Copyright notice should go here */
 
-#include "output.hpp" /* The class of the member functions being defined */
+/*!
+	@file
+	@brief Define KTech::ABC members
+	@author Author name
+	@author Another author name...
+	@date 2023-2026
+	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
+*/
+
+#include "output.hpp" /* The class of the members being defined */
 
 #include "../utility/internals.hpp" /* Internal includes */
 #include "../utility/keys.hpp"
