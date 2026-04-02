@@ -23,10 +23,10 @@
 #include "../../engine/engine.hpp"
 #include "callback.hpp"
 
-KTech::Input::CallbackGroup::CallbackGroup(Engine& engine, bool enabled)
-	: engine(engine), m_status(enabled ? Status::enabled : Status::disabled)
+KTech::Input::CallbackGroup::CallbackGroup(Engine& p_engine, bool p_enabled)
+	: engine(p_engine), m_enabled(p_enabled)
 {
-	engine.input.RegisterCallbackGroup(this);
+	p_engine.input.RegisterCallbackGroup(this);
 }
 
 KTech::Input::CallbackGroup::~CallbackGroup()
@@ -58,13 +58,13 @@ void KTech::Input::CallbackGroup::RegisterRangedCallback(
 
 void KTech::Input::CallbackGroup::Enable()
 {
-	m_status = Status::enabled;
+	m_enabled = true;
 	m_synced = false;
 }
 
 void KTech::Input::CallbackGroup::Disable()
 {
-	m_status = Status::disabled;
+	m_enabled = false;
 	m_synced = false;
 }
 
@@ -74,26 +74,21 @@ void KTech::Input::CallbackGroup::Update()
 	{
 		return;
 	}
-	switch (m_status)
-	{
-	case Status::disabled:
-	{
-		// Disable the callbacks
-		for (const std::shared_ptr<Callback>& callback : m_callbacks)
-		{
-			callback->status = Callback::Status::disabled;
-		}
-		break;
-	}
-	case Status::enabled:
+	if (m_enabled)
 	{
 		// Enable the callbacks
 		for (const std::shared_ptr<Callback>& callback : m_callbacks)
 		{
 			callback->status = Callback::Status::enabled;
 		}
-		break;
 	}
+	else
+	{
+		// Disable the callbacks
+		for (const std::shared_ptr<Callback>& callback : m_callbacks)
+		{
+			callback->status = Callback::Status::disabled;
+		}
 	}
 	m_synced = true;
 }

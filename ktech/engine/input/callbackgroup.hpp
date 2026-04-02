@@ -121,16 +121,9 @@ public:
 	void Disable();
 
 private:
-	// Why is this an enum?
-	enum class Status : uint8_t
-	{
-		disabled,
-		enabled
-	};
-
 	Engine& engine;
 	std::vector<std::shared_ptr<Callback>> m_callbacks;
-	Status m_status;
+	bool m_enabled;
 	bool m_synced = false;
 
 	void Update();
