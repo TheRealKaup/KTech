@@ -25,9 +25,13 @@
 #undef KTECH_DEFINITION
 #include "../basic/rgba.hpp"
 
-//! Predefined `RGBA` colors.
+//! Predefined RGBA colors
 namespace KTech::RGBAColors
 {
+	/*!
+		@{
+		@brief A predefined RGBA color
+	*/
 	constexpr RGBA red = RGBA(255, 0, 0, 255);
 	constexpr RGBA orange = RGBA(255, 128, 0, 255);
 	constexpr RGBA yellow = RGBA(255, 255, 0, 255);
@@ -45,11 +49,16 @@ namespace KTech::RGBAColors
 	constexpr RGBA gray = RGBA(160, 160, 160, 255);
 	constexpr RGBA black = RGBA(0, 0, 0, 255);
 	constexpr RGBA transparent = RGBA(0, 0, 0, 0);
-	//! Special widgets colors
+	//!@}
+
+	//! RGBA Colors used by various widgets
 	namespace Widgets
 	{
+		//! Color of when the widget is pressed down
 		constexpr RGBA buttonDownBlue = RGBA(160, 160, 255, 255);
+		//! Color of when the widget is unselected and on
 		constexpr RGBA switchUnselectedOnGreen = RGBA(90, 160, 90, 255);
+		//! Color of when the widget is selected and on
 		constexpr RGBA switchSelectedOnGreen = RGBA(160, 255, 160, 255);
 	}
 }

@@ -37,23 +37,28 @@ class KTech::Animation
 {
 public:
 	/*!
-		@brief A single animation instruction. This class is undocumented because it's planned to change (see GitHub issue #126).
+		@brief A single animation instruction
+
+		@deprecated See GitHub issue #126
 	*/
 	struct Instruction
 	{
+		//! @deprecated See GitHub issue #126
 		enum class Type : uint8_t
 		{
-			ParentSetPosition,	// Set position of the `Object`
-			ParentMove,			// Move the `Object` (`Object::Move()`)
-			TextureSet,			// Hide all other `Texture`s and show the given one
-			TextureSetPosition, // Set position of the given `Texture`
-			TextureMove,		// Add to the position of the given `Texture`
-			TextureShow,		// Show the given `Texture` (`Texture::visible = true`)
-			TextureHide,		// Hide the given `Texture` (`Texture::visible = false`)
-			Delay
+			ParentSetPosition,	//!< Set position of the `Object`
+			ParentMove,			//!< Move the `Object` (`Object::Move()`)
+			TextureSet,			//!< Hide all other `Texture`s and show the given one
+			TextureSetPosition, //!< Set position of the given `Texture`
+			TextureMove,		//!< Add to the position of the given `Texture`
+			TextureShow,		//!< Show the given `Texture` (`Texture::visible = true`)
+			TextureHide,		//!< Hide the given `Texture` (`Texture::visible = false`)
+			Delay				//!< Wait ticks before next instruction
 		};
 
+		//! @deprecated See GitHub issue #126
 		Type type;
+		//! @deprecated See GitHub issue #126
 		size_t intData;
 		union // In all cases, it may hold only one of these:
 		{
@@ -61,17 +66,40 @@ public:
 			Time::Measurement timeMeasurement;
 		};
 
-		// TextureSet, TextureSetPosition, TextureShow, TextureHide
+		/*!
+			@brief TextureSet, TextureSetPosition, TextureShow, TextureHide
+
+			@deprecated See GitHub issue #126
+
+			@param type
+			@param textureIndex
+			@param pointData
+		*/
 		Instruction(Type type, size_t textureIndex, Point pointData = Point(0, 0))
 			: type(type), intData(textureIndex), pointData(pointData)
 		{}
 
-		// ParentSetPosition, ParentMove
+		/*!
+			@brief ParentSetPosition, ParentMove
+
+			@deprecated See GitHub issue #126
+
+			@param type
+			@param pointData
+		*/
 		Instruction(Type type, Point pointData)
 			: type(type), pointData(pointData)
 		{}
 
-		// Delay
+		/*!
+			@brief Delay
+
+			@deprecated See GitHub issue #126
+
+			@param type
+			@param time
+			@param timeMeasurement
+		*/
 		Instruction(Type type, size_t time, Time::Measurement timeMeasurement)
 			: type(type), intData(time), timeMeasurement(timeMeasurement)
 		{}
@@ -105,6 +133,8 @@ public:
 		Calling this function again does not replay the `Animation`; to do so, call `Animation::Stop()`, and then recall this function.
 
 		This function interprets the instructions, acts upon them, `Time::Invoke()`s itself if there's a delay instruction, and continues interpreting instructions from there.
+
+		@return `true` if changed something and thus should render this tick, `false` otherwise.
 	*/
 	auto Play() -> bool;
 

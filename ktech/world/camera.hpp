@@ -131,10 +131,14 @@ public:
 	void Render(const std::vector<ID<Layer>>& layers);
 
 	/*!
-		@fn Camera::Draw
 		@brief Draw the rendered image (`Camera::m_image`) to `Output` so it can be printed to the terminal.
 
-		This function redirects to `Output::Draw()` and passes the given parameters verbatim.
+		@details This function redirects to `Output::Draw()` and passes the given parameters verbatim.
+
+		@param [in] position Position to draw on Output's image
+		@param [in] start Top-left corner of the Camera image rectangle to draw
+		@param [in] end Bottom-right corner of the Camera image rectangle to draw
+		@param [in] alpha Alpha (opacity) to apply on the image while drawing it
 
 		@see `Output::Draw()` for parameters explanation.
 	*/

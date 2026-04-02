@@ -50,9 +50,9 @@ struct KTech::CellA
 
 	/*!
 		@brief Construct a `CellA` from a `Cell`.
+
 		@param [in] cell Base `Cell`.
-		@param [in] foregroundAlpha Alpha to add to the foreground (character)
-	color.
+		@param [in] foregroundAlpha Alpha to add to the foreground (character) color.
 		@param [in] backgroundAlpha Alpha to add to the background color.
 	*/
 	constexpr CellA(Cell cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)

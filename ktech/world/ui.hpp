@@ -106,11 +106,14 @@ public:
 	void Render();
 
 	/*!
-		@fn KTech::UI::Draw
+		@brief Draw the rendered image (`UI::m_image`) to `Output` so it can be printed to the terminal
 
-		@brief Draw the rendered image (`UI::m_image`) to `Output` so it can be printed to the terminal.
+		@details This function redirects to `Output::Draw()` and passes the given parameters verbatim.
 
-		This function redirects to `Output::Draw()` and passes the given parameters verbatim.
+		@param [in] position Position to draw on Output's image
+		@param [in] start Top-left corner of the UI image rectangle to draw
+		@param [in] end Bottom-right corner of the UI image rectangle to draw
+		@param [in] alpha Alpha (opacity) to apply on the image while drawing it
 
 		@see `Output::Draw()` for parameters explanation.
 	*/

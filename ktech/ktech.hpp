@@ -36,6 +36,9 @@
 #undef max
 #endif
 
+/*!
+	@brief All core things
+*/
 namespace KTech
 {
 	// Basic structures.
@@ -69,7 +72,7 @@ namespace KTech
 	template <typename T>
 	struct ID;
 	template <typename T>
-	constexpr ID<T> nullID;
+	constexpr ID<T> nullID; //!< The ID equivalent of NULL.
 	template <typename T>
 	class CachingRegistry;
 	namespace RGBColors

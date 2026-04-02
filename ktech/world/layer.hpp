@@ -76,8 +76,10 @@ public:
 	virtual ~Layer();
 
 	/*!
-		@fn Layer::operator[](size_t index)
 		@brief Retrieve `Object` `ID` at given index.
+
+		@param index The index of the Object ID in m_objects
+
 		@return Reference to the `ID<Object>` at the given index.
 	*/
 	auto operator[](size_t index) -> ID<Object>&;

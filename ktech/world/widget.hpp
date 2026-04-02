@@ -44,25 +44,33 @@
 class KTech::Widget
 {
 public:
-	//! This class is undocumented because it's planned to change (see GitHub issue #106).
+	//! @deprecated See GitHub issue #106
 	struct ChildWidget
 	{
+		/*!
+			@{
+			@deprecated See GitHub issue #106
+		*/
 		ID<Widget> widget;
 		bool oldSelected;
 		bool oldShown;
+		/*!
+			@param widget
+			@param currentSelected
+			@param currentShown
+		*/
 		ChildWidget(ID<Widget> widget, bool currentSelected, bool currentShown)
 			: widget(widget), oldSelected(currentSelected), oldShown(currentShown)
 		{}
+		//! @}
 	};
 
 	Engine& engine;								 //!< Parent `Engine`.
 	const ID<Widget> m_id{ID<Widget>::Unique()}; //!< Personal `ID`.
 	std::string m_name;							 //!< String name.
 	ID<UI> m_parentUI;							 //!< The `UI` containing this `Widget`.
-	//! Undocumented because it's planned to change (see GitHub issue #106).
-	ID<Widget> m_parentWidget = nullID<Widget>;
-	//! Undocumented because it's planned to change (see GitHub issue #106).
-	std::vector<ChildWidget> m_childWidgets;
+	ID<Widget> m_parentWidget = nullID<Widget>;	 //!< @deprecated See GitHub issue #106
+	std::vector<ChildWidget> m_childWidgets;	 //!< @deprecated See GitHub issue #106
 	bool m_selected = false; //!< `true`: player input reaches the `Widget`. `false`: player input doesn't.
 	bool m_shown = true;	 //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
 
@@ -93,27 +101,34 @@ public:
 	/*!
 		@brief Leave parent `UI` (if in one) and remove itself from `Memory`.
 
-		Additional behavior is undocumented due to planned changes (see GitHub issue #106)
+		Additional behavior is undocumented due to planned changes (See GitHub issue #106)
 	*/
 	virtual ~Widget();
 
 	/*!
-		@brief Undocumented due to planned changes (see GitHub issue #106).
+		@deprecated See GitHub issue #106
+		@param widget
+		@return
 	*/
 	auto AddWidget(const ID<Widget>& widget) -> bool;
 
 	/*!
-		@brief Undocumented due to planned changes (see GitHub issue #106).
+		@deprecated See GitHub issue #106
+		@param widget
+		@return
 	*/
 	auto RemoveWidget(const ID<Widget>& widget) -> bool;
 
 	/*!
-		@brief Undocumented due to planned changes (see GitHub issue #106).
+		@deprecated See GitHub issue #106
+		@return
 	*/
 	auto RemoveAllWidgets() -> bool;
 
 	/*!
-		@brief Undocumented due to planned changes (see GitHub issue #106).
+		@deprecated See GitHub issue #106
+		@param widget
+		@return
 	*/
 	auto EnterWidget(const ID<Widget>& widget) -> bool;
 
@@ -126,7 +141,8 @@ public:
 	auto EnterUI(const ID<UI>& ui) -> bool;
 
 	/*!
-		@brief Undocumented due to planned changes (see GitHub issue #106).
+		@deprecated See GitHub issue #106
+		@return
 	*/
 	auto LeaveWidget() -> bool;
 
@@ -139,7 +155,7 @@ public:
 	/*!
 		@brief Enable input callbacks, and call `Widget::OnSelect()`.
 
-		Additional behavior is undocumented due to planned changes (see GitHub issue #106).
+		Additional behavior is undocumented due to planned changes (See GitHub issue #106).
 
 		@see `Widget::OnSelect()`.
 	*/
@@ -148,7 +164,7 @@ public:
 	/*!
 		@brief Disable input callbacks, and call `Widget::OnDisable()`.
 
-		Additional behavior is undocumented due to planned changes (see GitHub issue #106).
+		Additional behavior is undocumented due to planned changes (See GitHub issue #106).
 
 		@see `Widget::OnDisable()`.
 	*/
@@ -157,7 +173,7 @@ public:
 	/*!
 		@brief Let `UI` render this `Widget`, and call `Widget::OnShow()`.
 
-		Additional behavior is undocumented due to planned changes (see GitHub issue #106).
+		Additional behavior is undocumented due to planned changes (See GitHub issue #106).
 
 		@see `Widget::OnShow()`.
 	*/
@@ -166,7 +182,7 @@ public:
 	/*!
 		@brief Don't let `UI` render this `Widget`, and call `Widget::OnHide()`.
 
-		Additional behavior is undocumented due to planned changes (see GitHub issue #106).
+		Additional behavior is undocumented due to planned changes (See GitHub issue #106).
 
 		@see `Widget::OnHide()`.
 	*/
@@ -199,7 +215,6 @@ protected:
 		@brief Virtual function called by `Widget::Deselect()`.
 
 		Usually, you would override this function in your `Widget`-inherited class to make the `Texture`s (`Widget::m_textures`) seem unselected in contrast to the one selected `Widget` in your user interface.
-
 
 		@see `Widget::Deselect()`
 		@see `Button::OnDeselect()` for example.

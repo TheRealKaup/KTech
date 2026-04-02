@@ -98,7 +98,10 @@ public:
 		- `Object::OnOverlapped()` for `Object`s that were overlapped into by another `Object`.
 		- `Object::OnOverlappedExit()` for `Object`s that were left from overlapping by another `Object`.
 
-		@see `Object`
+		@param [in] object The object to move
+		@param [in] direction How many cells to move
+
+		@return `true` if was able to move and thus should render this tick, `false` otherwise.
 	*/
 	auto MoveObject(const ID<Object>& object, Point direction) -> bool;
 

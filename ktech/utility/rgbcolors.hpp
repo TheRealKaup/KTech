@@ -25,9 +25,13 @@
 #undef KTECH_DEFINITION
 #include "../basic/rgb.hpp"
 
-//! Predefined `RGB` colors.
+//! Predefined RGB colors
 namespace KTech::RGBColors
 {
+	/*!
+		@{
+		@brief A predefined RGB color
+	*/
 	constexpr RGB red = RGB(255, 0, 0);
 	constexpr RGB orange = RGB(255, 128, 0);
 	constexpr RGB yellow = RGB(255, 255, 0);

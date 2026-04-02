@@ -219,6 +219,26 @@ Similarly for source files:
 
 Note that Clang-Format takes responsibility of ordering the includes lexicographically.
 
+# Documentation
+
+Document everything using Doxygen.
+
+If possible, always place the Doxygen comment next to (in front of) the object being documented. This applies to functions, data members, classes, and more. This is contrary to placing the comment somewhere else and using a structural command to specify what it is you are documenting, which is only allowed when documenting things that must be documented in this way.
+
+The comment style is:
+
+```cpp
+/*!
+	@brief Like this.
+*/
+```
+
+- `/*!` instead of `/**` because it's clearer this way that this is a Doxygen comment.
+- `@` instead of `\` because it looks better.
+- No preceding `*` in each line because it's easier to write the comment without.
+
+And generally speaking, keep the structure of new comments similar in that of existing comments.
+
 # Other
 
 - Enumerations should typically be based on `uint8_t`, unless 1 byte isn't sufficient.

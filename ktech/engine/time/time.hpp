@@ -37,10 +37,10 @@ public:
 	//! @brief Time measurement.
 	enum class Measurement : uint8_t
 	{
-		ticks,
-		seconds,
-		milliseconds,
-		microseconds
+		ticks,		  //!< Ticks, independent of real time
+		seconds,	  //!< Seconds
+		milliseconds, //!< One thousandths of a second
+		microseconds  //!< One millionths of a second
 	};
 
 	struct Invocation;

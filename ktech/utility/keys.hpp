@@ -21,12 +21,18 @@
 #pragma once
 
 /*!
-	@brief Various terminal input escape sequences.
+	@brief Various terminal input escape sequences
+
+	@note F11 is not defined as it usually used for toggling fullscreen.
 
 	Very useful for `CallbackGroup::RegisterCallback()`.
 */
 namespace KTech::Keys
 {
+	/*!
+		@{
+		@brief Predefiend terminal input escape sequence string
+	*/
 	constexpr char const* up = "\x1b[A";
 	constexpr char const* down = "\x1b[B";
 	constexpr char const* right = "\x1b[C";
@@ -54,21 +60,30 @@ namespace KTech::Keys
 	constexpr char const* f8 = "\x1b[19~";
 	constexpr char const* f9 = "\x1b[20~";
 	constexpr char const* f10 = "\x1b[21~";
-	// No F11 because of fullscreen
 	constexpr char const* f12 = "\x1b[24~";
 	constexpr char const* tab = "\x09";
+	//! @}
 
 	//! Inputs triggered with the "shift" modifier key.
 	namespace Shift
 	{
+		/*!
+			@{
+			@brief Predefiend terminal input escape sequence string, triggered with the "shift" modifier key
+		*/
 		constexpr char const* return_ = "\x1bOM";
 		constexpr char const* delete_ = "\x1b[3;2~";
 		constexpr char const* tab = "\x1b[Z";
+		//! @}
 	}
 
 	//! Inputs triggered with the "control" modifier key.
 	namespace Ctrl
 	{
+		/*!
+			@{
+			@brief Predefiend terminal input escape sequence string, triggered with the "control" modifier key
+		*/
 		constexpr char const* up = "\33[1;5A";
 		constexpr char const* down = "\33[1;5B";
 		constexpr char const* right = "\33[1;5C";
@@ -79,11 +94,16 @@ namespace KTech::Keys
 		constexpr char const* end = "\x1b[1;5F";
 		constexpr char const* delete_ = "\x1b[3;5~";
 		constexpr char const* backspace = "\x08";
+		//! @}
 	}
 
 	//! Inputs triggered with the "alt" modifier key.
 	namespace Alt
 	{
+		/*!
+			@{
+			@brief Predefiend terminal input escape sequence string, triggered with the "alt" modifier key
+		*/
 		constexpr char const* up = "\33[1;3A";
 		constexpr char const* down = "\33[1;3B";
 		constexpr char const* right = "\33[1;3C";
@@ -97,11 +117,16 @@ namespace KTech::Keys
 		constexpr char const* end = "\x1b[1;3F";
 		constexpr char const* insert = "\x1b[2;3~";
 		constexpr char const* delete_ = "\x1b[3;3~";
+		//! @}
 	}
 
 	//! Inputs triggered with the "contorl" and "alt" modifier key.
 	namespace CtrlAlt
 	{
+		/*!
+			@{
+			@brief Predefiend terminal input escape sequence string, triggered with the "control" and "alt" modifier keys
+		*/
 		constexpr char const* up = "\33[1;7A";
 		constexpr char const* down = "\33[1;7B";
 		constexpr char const* right = "\33[1;7C";
@@ -111,14 +136,20 @@ namespace KTech::Keys
 		constexpr char const* home = "\x1b[1;7H";
 		constexpr char const* end = "\x1b[1;7F";
 		constexpr char const* insert = "\x1b[2;7~";
+		//! @}
 	}
 
 	//! Inputs triggered with the "contorl" and "shift" modifier key.
 	namespace CtrlShift
 	{
+		/*!
+			@{
+			@brief Predefiend terminal input escape sequence string, triggered with the "control" and "shift" modifier keys
+		*/
 		constexpr char const* up = "\33[1;6A";
 		constexpr char const* down = "\33[1;6B";
 		constexpr char const* right = "\33[1;6C";
 		constexpr char const* left = "\33[1;6D";
+		//! @}
 	}
 }

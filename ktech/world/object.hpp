@@ -84,10 +84,11 @@ public:
 	auto LeaveLayer() -> bool;
 
 	/*!
-		@fn Object::Move
 		@brief Move in relation to other `Object`s in the `Layer` and their `Collider`s.
 
-		This function calls `Collision::MoveObject()` on itself (on the calling `Object`; `this`).
+		@details This function calls `Collision::MoveObject()` on itself (on the calling `Object`; `this`).
+
+		@param [in] direction Amount of cells to move the object. For example, Point(2, 3) attempts to move 2 cells right and 3 cells down
 
 		@return `true` if moved. `false` if blocked.
 
