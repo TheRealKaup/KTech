@@ -1,6 +1,6 @@
 /*
 	widgetstest, a user interface example based on KTech.
-	Copyright (C) 2023-2025 Ethan Kaufman (AKA Kaup)
+	Copyright (C) 2023-2026 Ethan Kaufman (AKA Kaup)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ struct UITest
 				"example based",
 				"on KTech.",
 				"Copyright (C)",
-				"2023-2024 Kaup",
+				"2023-2026 Kaup",
 				"",
 				"GPLv3-or-later.",
 				"NO WARRANTY",
