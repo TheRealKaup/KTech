@@ -2,21 +2,24 @@
 
 This document contains answers for ~~frequently~~ potentially asked questions.
 
-- [How to build KTech (with Premake)?](#how-to-build-ktech-with-premake)
-- [How to build your own KTech game (with Premake)?](#how-to-build-your-own-ktech-game-with-premake)
-- [How to run the game examples?](#how-to-run-the-game-examples)
-- [How does the licensing work?](#how-does-the-licensing-work)
-- [Is KTech Stable?](#is-ktech-stable)
-- [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
-- [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
-- [How does the file system work?](#how-does-the-file-system-work)
-- [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
-- [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
-- [Will there be a software development kit?](#will-there-be-a-software-development-kit)
-- [Is KTech GPU-accelerated?](#is-ktech-gpu-accelerated)
-- [What is the `KTECH_DEFINITION` macro?](#what-is-the-ktech_definition-macro)
-- [Why is the library named "KTech"?](#why-is-the-library-named-ktech)
-- [What is the Git workflow here?](#what-is-the-git-workflow-here)
+- [Outline](#outline)
+- [Q\&A](#qa)
+	- [How to build KTech (with Premake)?](#how-to-build-ktech-with-premake)
+	- [How to build your own KTech game (with Premake)?](#how-to-build-your-own-ktech-game-with-premake)
+	- [How to run the game examples?](#how-to-run-the-game-examples)
+	- [How do the development configurations work?](#how-do-the-development-configurations-work)
+	- [How does the licensing work?](#how-does-the-licensing-work)
+	- [Is KTech Stable?](#is-ktech-stable)
+	- [Why are `Collider`'s and `Texture`'s constructors normal functions?](#why-are-colliders-and-textures-constructors-normal-functions)
+	- [Why is there no predefined game loop?](#why-is-there-no-predefined-game-loop)
+	- [How does the file system work?](#how-does-the-file-system-work)
+	- [How does `CachingRegistry` work?](#how-does-cachingregistry-work)
+	- [KTech's history with the Windows Console and the POSIX terminal](#ktechs-history-with-the-windows-console-and-the-posix-terminal)
+	- [Will there be a software development kit?](#will-there-be-a-software-development-kit)
+	- [Is KTech GPU-accelerated?](#is-ktech-gpu-accelerated)
+	- [What is the `KTECH_DEFINITION` macro?](#what-is-the-ktech_definition-macro)
+	- [Why is the library named "KTech"?](#why-is-the-library-named-ktech)
+	- [What is the Git workflow here?](#what-is-the-git-workflow-here)
 
 # Q&A
 
@@ -79,6 +82,30 @@ Running the Premake script, as described in "[How to build KTech (with Premake)?
 
 For an example of a purposed UI program made with KTech, see [TextureCreator](https://github.com/TheRealKaup/TextureCreator).
 
+## How do the development configurations work?
+
+KTech is configured with configuration files included in the repository. For example, `.vscode/`, `.clangd`, `premake5.lua` and more, are files/directories used to configure KTech development. These configure the behavior of the IDE, linter, compiler, etc.
+
+This is a tricky topic because it involves many tools (language servers, IDEs, documentation generators...), but because I can't provide a configuration that matches the project's needs for every single IDE on the planet, I have to select a specific set of tools (like VSCode and clangd), and include the configuration files for just those. Something is better than nothing, especially if we go for the more popular tool choices. For example, by recommending VSCode and including the `.vscode/settings.json` config file, we easily deal with trimming trailing whitespaces, so it's less likely that we will see a PR getting rejected for that. It makes the development experience smoother, at least for the people who use the recommended tools. You can use other tools, and you are also welcome to contribute configuration files, as long as the they help enforce the project's [conventions](conventions.md), don't clash with other configurations, and configure a tool that is popular enough.
+
+Here are the selected/recommended tools. They vary in terms of how necessary they are for using or contributing:
+
+- Build configuration file generator: [Premake](https://premake.github.io/)
+	- Note: it does not matter what underlying build system you use (such as GNU make or Visual Studio)
+- IDE: VScode
+	- Configuration files: `.vscode/`
+	- Why: popular, integrates well with the other tools, and I personally use it. Yes, it's ironic because KTech is a terminal game engine and part of what's cool about it is the fact you can make your game with it, while only using the terminal.
+- Language server: [clangd](https://clangd.llvm.org/) (and the [vscode-clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) extension)
+	- Configuration files: `.clangd`
+	- Note: you can generate the clangd compilation database, for example, using [Bear](https://github.com/rizsotto/bear?tab=readme-ov-file); place the `compile_commands.json` file it generates in `build/`, and vscode-clangd should recognize it immediately. Considering I already added to `.clangd` the C++ 20 flag (KTech's standard), looking at the `compile_commands.json` Bear generated for me, I don't think you should bother generating the compilation database, unless you aim to use something like `run-clang-tidy`, or somehow still encounter accuracy issues with the language server.
+	- Why: this, and the other C++-related tools by LLVM are the most sophisticated open-source tools out there, there are hardly any alternatives.
+- Linter: clang-tidy
+	- Configuration files: `.clangd`
+	- Note: according to [the conventions](conventions.md), you will have to comply with its checks whether you run it locally not. Also, we are not using a `.clang-tidy` config file because `.clangd` offers conditional configuration, which KTech uses.
+- Formatter: clang-format
+	- Configuration files: `.clang-format`
+	- Note: also according to [the conventions](conventions.md), you must comply with it. For the record, I found ClangFormat to be on the weaker side of Clang tools, because even with a relatively simple configuration I encountered bugs and poorly documented settings. I am not aware of a better alternative yet.
+
 ## How does the licensing work?
 
 KTech is licensed under the [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (GPLv3) or any later version. Read the article "[A Quick Guide to GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html)" from GNU's website to learn about it. You are completely allowed to sell copies of your game (for example, via Steam), and so does anyone else. How significantly this affects sales in practice is unclear.
@@ -87,7 +114,7 @@ The Steamworks API might be compatible with KTech (to utilize Steam achievements
 
 ## Is KTech Stable?
 
-KTech is reasonably uncomplicated and is written under pretty rigid code conventions (see [style.md](style.md)). Despite so, I frequently encounter bugs. This is very much not to be unexpected, as KTech has seen much more coding done on it than actual usage. Parallel to the last time I've worked on my game _netset_, I've composed what would seem a worryingly long list of overlooked parts (see [issue #58](https://github.com/TheRealKaup/KTech/issues/58)). Solving most of them was as easy as finding them. The answer to the question: no. But, what I'm propounding is that evidently, KTech is not fundamentally faulty, and rather it needs more testing and feedback.
+KTech is reasonably uncomplicated and is written under pretty rigid code conventions (see [conventions.md](conventions.md)). Despite so, I frequently encounter bugs. This is very much not to be unexpected, as KTech has seen much more coding done on it than actual usage. Parallel to the last time I've worked on my game _netset_, I've composed what would seem a worryingly long list of overlooked parts (see [issue #58](https://github.com/TheRealKaup/KTech/issues/58)). Solving most of them was as easy as finding them. The answer to the question: no. But, what I'm propounding is that evidently, KTech is not fundamentally faulty, and rather it needs more testing and feedback.
 
 ## Why are `Collider`'s and `Texture`'s constructors normal functions?
 
