@@ -88,7 +88,6 @@ public:
 	Input::CallbackGroup m_callbackGroup;
 
 	/*!
-		@fn KTech::Widget::Widget(Engine& engine, Point position, std::string name)
 		@brief Construct a `Widget`.
 		@param engine Parent `Engine`.
 		@param position World position.
@@ -97,7 +96,6 @@ public:
 	Widget(Engine& engine, Point position = Point(0, 0), std::string name = "");
 
 	/*!
-		@fn KTech::Widget::Widget(Engine& engine, const ID<UI>& parentUI, Point position = Point(0, 0), std::string name = "");
 		@brief Construct a `Widget` and immediately enter a `UI`.
 		@param engine Parent `Engine`.
 		@param parentUI The `UI` to enter.
@@ -141,7 +139,6 @@ public:
 	auto EnterWidget(const ID<Widget>& widget) -> bool;
 
 	/*!
-		@fn KTech::Widget::EnterUI(ID<UI> ui)
 		@brief Enter a `UI`.
 		@param ui The `UI` to enter.
 		@return `true` if entered the given `UI`. `false` if the given `UI` is already the parent `UI`, doesn't exist in `Memory`, or failed to add this `Widget`.

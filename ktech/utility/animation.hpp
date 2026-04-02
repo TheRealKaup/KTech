@@ -116,8 +116,6 @@ public:
 	Engine& engine; //!< Parent `Engine`
 
 	/*!
-		@fn `Animation::Animation`
-
 		@brief Construct an `Animation`, that will not play just yet.
 
 		To start playing the `Animation`, call `Animation::Play()`.

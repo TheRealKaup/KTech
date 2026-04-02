@@ -66,7 +66,6 @@ public:
 	std::vector<CellA> m_image;				//!< `CellA`-based rendered image.
 
 	/*!
-		@fn KTech::UI::UI(Engine& engine, UPoint resolution, std::string name)
 		@brief Construct a `UI`.
 		@param engine Parent `Engine`.
 		@param resolution Image's resolution.
@@ -80,7 +79,6 @@ public:
 	virtual ~UI();
 
 	/*!
-		@fn KTech::UI::AddWidget(ID<Widget>& widget)
 		@brief Add a `Widget`.
 		@param widget The `Widget` to add.
 		@return `true` if added `Widget`. `false` if `Widget` doesn't exist in `Memory` or already contained by this `UI`.
@@ -88,7 +86,6 @@ public:
 	auto AddWidget(const ID<Widget>& widget) -> bool;
 
 	/*!
-		@fn KTech::UI::RemoveWidget(ID<Widget>& widget)
 		@brief Remove a `Widget`.
 		@param widget The `Widget` to remove.
 		@return `true` if removed `Widget`. `false` if `Widget` is not contained by this `UI`.
@@ -102,7 +99,6 @@ public:
 	auto RemoveAllWidgets() -> bool;
 
 	/*!
-		@fn KTech::UI::Resize(UPoint resolution)
 		@brief Resize the image's resolution.
 		@param resolution The new size of the image.
 	*/

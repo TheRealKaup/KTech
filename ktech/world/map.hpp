@@ -49,7 +49,6 @@ public:
 	std::vector<ID<Layer>> m_layers;	   //!< Contained `Layer`s
 
 	/*!
-		@fn Map::Map
 		@brief Construct a `Map`.
 		@param engine Parent `Engine`.
 		@param name String name.
@@ -62,7 +61,6 @@ public:
 	virtual ~Map();
 
 	/*!
-		@fn Map::AddLayer
 		@brief Add a `Layer`.
 		@param layer The `ID` of the `Layer` to add.
 		@return `true` if added the `Layer`. `false` if given `Layer` doesn't exist in `Memory`, or already in this `Map`.
@@ -70,7 +68,6 @@ public:
 	auto AddLayer(const ID<Layer>& layer) -> bool;
 
 	/*!
-		@fn Map::AddCamera
 		@brief Add a `Camera`.
 		@param camera The `ID` of the `Camera` to add.
 		@return `true` if added the `Camera`. `false` if given `Camera` doesn't exist in `Memory`, or already in this `Map`.
@@ -78,7 +75,6 @@ public:
 	auto AddCamera(const ID<Camera>& camera) -> bool;
 
 	/*!
-		@fn Map::RemoveLayer
 		@brief Remove a `Layer`.
 		@param layer The `ID` of the `Layer` to remove.
 		@return `true` if removed the `Layer`. `false` if the given `Layer` isn't contained by this `Map`.
@@ -86,7 +82,6 @@ public:
 	auto RemoveLayer(const ID<Layer>& layer) -> bool;
 
 	/*!
-		@fn Map::RemoveCamera
 		@brief Remove a `Camera`.
 		@param camera The `ID` of the `Camera` to remove.
 		@return `true` if removed the `Camera`. `false` if the given `Camera` isn't contained by this `Map`.

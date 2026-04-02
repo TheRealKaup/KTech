@@ -42,8 +42,6 @@ class KTech::Collision
 {
 public:
 	/*!
-		@var `Collision::CR`
-
 		@brief Collision result.
 
 		There are 3 possible collision results: `CR::B` (block), `CR::P` (push), and `CR::O` (overlap).
@@ -58,8 +56,6 @@ public:
 	};
 
 	/*!
-		@var `Collision::colliderTypes`
-
 		@brief Matrix representing collider types and their potential collision results.
 
 		An `Object`'s `Collider` (each of `Object::m_colliders`) can have a distinct "collider type" (`Collider::m_type`). Collider types are defined in this 2D vector.

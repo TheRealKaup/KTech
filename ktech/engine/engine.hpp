@@ -49,7 +49,6 @@ class KTech::Engine
 {
 public:
 	/*!
-		@var Engine::running
 		@brief States whether the game loop should be running or not.
 
 		Your game loop should continue iterating as long as this variable is true, and should exit if it's false. For example:
@@ -67,7 +66,6 @@ public:
 	bool running = true;
 
 	/*!
-		@var Engine::noGameLoopMode
 		@brief States whether the engine is in "no-game-loop mode" or not.
 
 		You can optionally set this mode to true in `Engine::Engine()`.
@@ -101,7 +99,6 @@ public:
 	Time time;			 //!< `Time` engine component.
 
 	/*!
-		@fn Engine::Engine
 		@brief Construct the engine components.
 
 		The engine components are your game's dependencies. For example, without `Memory`, you don't have anywhere to register your world structures at.

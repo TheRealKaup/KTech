@@ -54,7 +54,6 @@ public:
 	std::vector<std::string> outputOnQuit;
 
 	/*!
-		@fn Output::Log
 		@brief Print colored log text to the terminal.
 
 		Simply `std::cout`'s and `std::flash`'s the given text. It has no unique functionality, and doesn't integrate with the output system.
@@ -67,7 +66,6 @@ public:
 	static void Log(const std::string& text, RGB color);
 
 	/*!
-		@fn Output::PrintStartupNotice
 		@brief Print a copyright notice.
 
 		The GPLv3 requires your "interactive user interface" (your game) to display "Appropriate Legal Notices", which are defined in the following excerpt:
@@ -121,7 +119,6 @@ public:
 	void Clear();
 
 	/*!
-		@fn void KTech::Output::Draw(const std::vector<Cell>& sourceImage, UPoint resolution, Point position, UPoint start, UPoint end, uint8_t alpha)
 		@brief Draw a `Cell`-based image .
 
 		This function is used for `Camera` images. It is supposed to completely override old image buffer cells, unless `alpha` is not set to max (255).
@@ -147,7 +144,6 @@ public:
 	);
 
 	/*!
-		@fn void KTech::Output::Draw(const std::vector<CellA>& sourceImage, UPoint resolution, Point position, UPoint start, UPoint end, uint8_t alpha)
 		@brief Draw a `CellA`-based image .
 
 		This function is used for `UI` images. It is supposed to draw over old image buffer cells rather than completely override them (like `Camera` images do). This behavior is desired so a `UI` image can be drawn like a heads-up display, for example, on top of a fully-opaque `Camera` image.

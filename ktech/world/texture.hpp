@@ -64,7 +64,6 @@ struct KTech::Texture
 	std::vector<CellA> m_t; //!< 1D vector of the 2D bitmap (used only in complex `Texture`s).
 
 	/*!
-		@fn KTech::Texture::Simple(UPoint size, CellA value)
 		@brief Create a simple `Texture` (uniform rectangle).
 		@param size Rectangle's size.
 		@param value Rectangle's `CellA` value.
@@ -73,7 +72,6 @@ struct KTech::Texture
 	auto Simple(UPoint size, CellA value) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Simple(UPoint size, CellA value, Point relativePosition)
 		@brief Create a simple `Texture` (uniform rectangle), and set its relative position.
 		@param relativePosition Relative position to set.
 		@param size Rectangle's size.
@@ -83,7 +81,6 @@ struct KTech::Texture
 	auto Simple(UPoint size, CellA value, Point relativePosition) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Rectangle(UPoint size, CellA value)
 		@brief Create a complex `Texture` that is a uniform rectangle.
 
 		Even though a simple `Texture` (created using `Texture::Simple()`) is capable of the same result at first glance, you can use this function to create a base for further modifications.
@@ -95,7 +92,6 @@ struct KTech::Texture
 	auto Rectangle(UPoint size, CellA value) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Rectangle(UPoint size, CellA value, Point relativePosition)
 		@brief Create a complex `Texture` that is a uniform rectangle, and set its relative position.
 
 		@param relativePosition Relative position to set.
@@ -108,7 +104,6 @@ struct KTech::Texture
 	auto Rectangle(UPoint size, CellA value, Point relativePosition) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::File(const std::filesystem::path& filePath)
 		@brief Import a complex `Texture` from file.
 
 		Such files can be created with <a href="https://github.com/TheRealKaup/TextureCreator">TextureCreator</a>, or with `Texture::Export()`.
@@ -122,7 +117,6 @@ struct KTech::Texture
 	auto File(const std::filesystem::path& filePath) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::File(const std::filesystem::path& filePath, Point relativePosition)
 		@brief Import a complex `Texture` from file, and set its relative position.
 
 		@param relativePosition Relative position to set.
@@ -134,7 +128,6 @@ struct KTech::Texture
 	auto File(const std::filesystem::path& filePath, Point relativePosition) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background)
 		@brief Write a complex `Texture` from a vector of strings.
 
 		Creates a complex `Texture` with different characters but uniform foreground and background colors. For example:
@@ -158,7 +151,6 @@ struct KTech::Texture
 	auto Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Write(const std::vector<std::string>& stringVector, RGBA foreground, RGBA background, Point relativePosition)
 		@brief Write a complex `Texture` from a vector of strings, and set its relative position.
 
 		@param relativePosition Relative position to set.
@@ -181,7 +173,6 @@ struct KTech::Texture
 	auto Null() -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Null(Point relativePosition)
 		@brief Create a complex `Texture` that represents a missing `Texture`, and set its relative position.
 
 		@param relativePosition Relative position to set.
@@ -192,8 +183,6 @@ struct KTech::Texture
 	auto Null(Point relativePosition) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::operator()(size_t x, size_t y)
-
 		@brief Get a value from the 2D bitmap by-reference (complex `Texture`s only).
 
 		Useful if you don't want to convert the 2D position into the corresponding index on the bitmap vector (`Texture::m_t`).
@@ -205,8 +194,6 @@ struct KTech::Texture
 	auto operator()(size_t x, size_t y) -> CellA&;
 
 	/*!
-		@fn KTech::Texture::operator()(size_t x, size_t y) const
-
 		@brief Get a value from the 2D bitmap by-reference (complex `Texture`s only).
 
 		Useful if you don't want to convert the 2D position into the corresponding index on the bitmap vector (`Texture::m_t`).
@@ -219,7 +206,6 @@ struct KTech::Texture
 	auto operator()(size_t x, size_t y) const -> const CellA&;
 
 	/*!
-		@fn KTech::Texture::Resize
 		@brief Resize the `Texture` (whether simple or complex).
 
 		@param size The new size.
@@ -230,7 +216,6 @@ struct KTech::Texture
 	auto Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0))) -> Texture&;
 
 	/*!
-		@fn KTech::Texture::Transform
 		@brief Transform the `Texture` using a operation callback function (whether simple or complex).
 
 		@param[in] operation	Callback function that receives a `CellA` (old value) and returns a `CellA` (new value).
@@ -249,7 +234,6 @@ struct KTech::Texture
 		-> Texture&;
 
 	/*!
-		@fn KTech::Texture::ExportToFile(const std::filesystem::path& filePath)
 		@brief Export `Texture` to a file (complex `Texture`s only).
 
 		@param filePath Path to output the texture file (`.ktecht`).

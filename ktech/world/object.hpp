@@ -54,7 +54,6 @@ public:
 	std::vector<Collider> m_colliders; //!< `Collider`s.
 
 	/*!
-		@fn Object::Object(Engine& engine, Point position, std::string name)
 		@brief Construct an `Object`.
 		@param engine Parent `Engine`.
 		@param position World position.
@@ -63,7 +62,6 @@ public:
 	Object(Engine& engine, Point position = Point(0, 0), std::string name = "");
 
 	/*!
-		@fn Object::Object(Engine& engine, const ID<Layer>& parentLayer, Point position, std::string name)
 		@brief Construct an `Object` and immediately enter a `Layer`.
 		@param engine Parent `Engine`.
 		@param parentLayer `Layer` to enter.
@@ -78,7 +76,6 @@ public:
 	virtual ~Object();
 
 	/*!
-		@fn Object::EnterLayer
 		@brief Enter a `Layer`.
 		@param layer The `Layer` to enter.
 		@return `true` if entered `Layer`. `false` if the given `Layer` is already the parent `Layer`, doesn't exist in `Memory`, or failed to add this `Object`.
@@ -118,14 +115,12 @@ protected:
 	virtual auto OnTick() -> bool;
 
 	/*!
-		@fn KTech::Object::OnMove
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` moving (voluntarily or passively).
 		@param direction The movement's direction.
 	*/
 	virtual void OnMove(Point direction);
 
 	/*!
-		@fn KTech::Object::OnPushed
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` getting pushed.
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -135,7 +130,6 @@ protected:
 	virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnPush
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` pushing another `Object`.
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -145,7 +139,6 @@ protected:
 	virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnBlocked
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` getting blocked by another `Object`.
 		@param direction The attempted movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -155,7 +148,6 @@ protected:
 	virtual void OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnBlock
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` blocking another `Object`.
 		@param direction The attempted movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -165,7 +157,6 @@ protected:
 	virtual void OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnOverlap
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` overlapping into another `Object`.
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -175,7 +166,6 @@ protected:
 	virtual void OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnOverlapExit
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` leaving an overlap with another `Object`.
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -185,7 +175,6 @@ protected:
 	virtual void OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnOverlapped
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` getting overlapped into by another `Object`.
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
@@ -195,7 +184,6 @@ protected:
 	virtual void OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	/*!
-		@fn KTech::Object::OnOverlappedExit
 		@brief Called by `Collision::MoveObject()` as a result of **another** `Object` leaving an overlap with **this** `Object`.
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).

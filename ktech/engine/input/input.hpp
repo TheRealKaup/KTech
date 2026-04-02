@@ -54,7 +54,6 @@ public:
 	class CallbackGroup;
 
 	/*!
-		@var `Input::input`
 		@brief Input for the last-called callback function.
 
 		Before `Input` calls your function, it will set this string to the exact input which lead to the calling of your function. It's especially useful if you have a function that can be triggered by different inputs, like a ranged callback function (created with `CallbackGroup::RegisterRangedCallback()`): use this variable to evaluate the actual user input.
@@ -62,7 +61,6 @@ public:
 	std::string input;
 
 	/*!
-		@var `Input::quitKey`
 		@brief Input that if received, breaks the input loop and sets `Engine::running` to false.
 
 		By default, it's "\x03" (Ctrl+C), which is a common quit key among terminal applications. You may change it, but don't go Vim on your players.
@@ -70,7 +68,6 @@ public:
 	std::string quitKey{"\x03"};
 
 	/*!
-		@fn auto KTech::Input::Is(const std::string &stringKey) const -> bool
 		@brief Checks if input equals given string.
 
 		@param stringKey String to compare with `Input::input`.
@@ -80,7 +77,6 @@ public:
 	[[nodiscard]] auto Is(const std::string& stringKey) const -> bool;
 
 	/*!
-		@fn auto KTech::Input::Is(char charKey) const -> bool
 		@brief Checks if input equals given character.
 
 		@param charKey Character to compare with `Input::input`.
@@ -90,7 +86,6 @@ public:
 	[[nodiscard]] auto Is(char charKey) const -> bool;
 
 	/*!
-		@fn Input::Bigger(char charKey)
 		@brief Checks if given character is bigger than input.
 
 		@param charKey Character to compare with `Input::input`.
@@ -100,7 +95,6 @@ public:
 	[[nodiscard]] auto Bigger(char charKey) const -> bool;
 
 	/*!
-		@fn auto KTech::Input::Smaller(char charKey) const -> bool
 		@brief Checks if given character is smaller than input.
 
 		@param charKey Character to compare with `Input::input`.
@@ -110,7 +104,6 @@ public:
 	[[nodiscard]] auto Smaller(char charKey) const -> bool;
 
 	/*!
-		@fn auto KTech::Input::Between(char start, char end) const -> bool
 		@brief Checks if input is between range of characters.
 
 		@param start Start of (ASCII) character range.

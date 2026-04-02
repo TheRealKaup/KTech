@@ -56,7 +56,6 @@ public:
 	~CallbackGroup();
 
 	/*!
-		@fn CallbackGroup::RegisterCallback
 		@brief Register a function to be called back when an input is received.
 
 		Input is received in escape sequences. `KTech::Keys` includes such values that you can give to the `stringKey` parameter.
@@ -74,7 +73,6 @@ public:
 	void RegisterCallback(const std::string& stringKey, const std::function<bool()>& callback);
 
 	/*!
-		@fn CallbackGroup::RegisterRangedCallback
 		@brief Register a function to be called back when an input within a characters range is received.
 
 		Any input received within the range will call your callback function. Because it's a range, the inputs are limited in length to 1 character. Anyway, this function is mostly useful when 1-character-long inputs are needed. For example:

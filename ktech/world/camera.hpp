@@ -59,7 +59,6 @@ public:
 	std::vector<Cell> m_image;								   //!< `Cell`-based rendered image.
 
 	/*!
-		@fn Camera::Camera(Engine &engine, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
 		@brief Prepare `Camera` for rendering.
 
 		@param [in] engine Parent engine.
@@ -72,7 +71,6 @@ public:
 	);
 
 	/*!
-		@fn Camera::Camera(Engine& engine, const ID<Map>& parentMap, Point position=Point(0, 0), UPoint resolution=UPoint(10, 10), const std::string &name="")
 		@brief Prepare `Camera` for rendering and immediately enter a `Map`.
 
 		@param [in] engine Parent engine.
@@ -97,7 +95,6 @@ public:
 	virtual ~Camera();
 
 	/*!
-		@fn Camera::EnterMap
 		@brief Enter a parent `Map`.
 
 		@param map Parent map to enter.
@@ -118,7 +115,6 @@ public:
 	auto LeaveMap() -> bool;
 
 	/*!
-		@fn Camera::Resize
 		@brief Resize the image resolution (or "size").
 
 		@param resolution The new resolution.
@@ -131,7 +127,6 @@ public:
 	void Render();
 
 	/*!
-		@fn Camera::Render(const std::vector<ID<Layer>>& layers)
 		@brief Render all `Object`s of the given `Layer`s.
 
 		@param layers The `Layer`s containing the `Object`s to render.

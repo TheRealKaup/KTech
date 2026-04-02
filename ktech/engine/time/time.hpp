@@ -61,8 +61,6 @@ public:
 	unsigned long ticksCounter = 0; //!< Total ticks since game started.
 
 	/*!
-		@fn `Time::CallInvocations`
-
 		@brief Call callback functions of finished `Invocation`s.
 
 		Progresses all `Invocation`s by `Time::deltaTime`, and calls those which waited their time.
@@ -87,8 +85,6 @@ public:
 	void CallInvocations();
 
 	/*!
-		@fn `Time::WaitUntilNextTick`
-
 		@brief Sleeps and returns when the next tick should start.
 
 		Calculates how long to sleep (based on how long the current tick is, and `Time::tpsLimit`). It enters sleep and returns when the following tick should occur. This function also updates `Time::tpsPotential`, `Time::deltaTime`, `Time::tps`, and `Time::ticksCounter`.
