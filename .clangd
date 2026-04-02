@@ -4,11 +4,85 @@ CompileFlags:
 
 Diagnostics:
   ClangTidy:
+    Add:
+      ["modernize-*", "performance-*", "readability-*", "bugprone-*", "misc-*"]
+    Remove:
+      [
+        "readability-identifier-length",
+        "misc-non-private-member-variables-in-classes",
+        "misc-no-recursion",
+      ]
+    CheckOptions:
+      ## Name casing
+      readability-identifier-naming.FunctionCase: "PascalCase"
+      readability-identifier-naming.ClassCase: "PascalCase"
+      readability-identifier-naming.NamespaceCase: "PascalCase"
+      readability-identifier-naming.EnumCase: "PascalCase"
+      readability-identifier-naming.VariableCase: "camelCase"
+      readability-identifier-naming.EnumConstantCase: "camelCase"
+      readability-identifier-naming.ParameterCase: "camelCase"
+      ## Name prefixes
+      readability-identifier-naming.MemberPrefix: "m_"
+      # Historically in KTech, member references and pointers to `Engine` were exempt from the "m_" prefix because they
+      # link world structures with the running engine (and the engine itself is more of a public/global structure, than
+      # a non-static data member of a specific world structure).
+      readability-identifier-naming.MemberIgnoredRegexp: "engine"
+    # Makes more checks appear in IDE
     FastCheckFilter: None
 
 # Note that this is a relatively new setting: https://clangd.llvm.org/config#documentation
-# Supported only in clangd version 22 and above (I genuienly had to upgrade my system right
+# Supported only in clangd version 22 and above (I genuinely had to upgrade my system right
 # now to get this feature).
 Documentation:
   CommentFormat: Doxygen
+
+---
+## Source files
+If:
+  PathMatch: .*\.cpp
+
+Diagnostics:
+  ClangTidy:
+    CheckOptions:
+      # The "p_" prefix is only useful in function definitions (which are usually located in source files). However, in
+      # function declarations, from which parameter names are used to render documentation, adding "p_" would be ugly
+      # and not useful; we already know it's a parameter.
+      readability-identifier-naming.ParameterPrefix: "p_"
+
+---
+## Engine components
+If:
+  # Not just specifying `ktech/engine/.*`, because that directory specifies other classes that aren't engine
+  # components, like `Time::Invocation`.
+  PathMatch:
+    [
+      ktech/engine/input/input.hpp,
+      ktech/engine/time/time.hpp,
+      ktech/engine/collision.hpp,
+      ktech/engine/engine.hpp,
+      ktech/engine/memory.hpp,
+      ktech/engine/output.hpp,
+    ]
+
+Diagnostics:
+  ClangTidy:
+    CheckOptions:
+      # Also historically in KTech, public members of engine components were exempt from the "m_" prefix because these
+      # data members were "user-oriented", that is, it would look ugly if KTech users had to write "m_" when accessing
+      # these "global engine settings" (engine component data members).
+      readability-identifier-naming.PublicMemberPrefix: ""
+
+---
+## Basic structures/aggregates
+If:
+  # Files defining such basic structures (classes) should be listed here.
+  PathMatch: [ktech/basic/.*, ktech/engine/input/callback.hpp]
+
+Diagnostics:
+  ClangTidy:
+    CheckOptions:
+      # Once more historically in KTech, all data members of basic structures were exempt from the "m_" prefix because
+      # for a generally-similar reason as mentioned above. More specifically, these basic structures barely have
+      # internal functions, so the benefit of the "m_" prefix (clarity within internal functions) is not utilized.
+      readability-identifier-naming.MemberPrefix: ""
 ...
