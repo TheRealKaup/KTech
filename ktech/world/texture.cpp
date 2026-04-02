@@ -18,6 +18,14 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
+/*!
+	@file
+	@brief Define KTech::Texture members
+	@author Ethan Kaufman (AKA Kaup)
+	@date 2023-2026
+	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
+*/
+
 #include "texture.hpp"
 
 #include "../utility/rgbacolors.hpp"

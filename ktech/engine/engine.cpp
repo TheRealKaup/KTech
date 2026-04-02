@@ -18,6 +18,14 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
+/*!
+	@file
+	@brief Define KTech::Engine members
+	@author Ethan Kaufman (AKA Kaup)
+	@date 2023-2026
+	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
+*/
+
 #include "engine.hpp"
 
 KTech::Engine::Engine(UPoint p_imageSize, size_t p_ticksPerSecondLimit, bool p_noGameLoopMode)

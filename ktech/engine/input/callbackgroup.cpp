@@ -18,6 +18,14 @@
 	along with KTech. If not, see <https://www.gnu.org/licenses/>.
 */
 
+/*!
+	@file
+	@brief Define KTech::Input::CallbackGroup members
+	@author Ethan Kaufman (AKA Kaup)
+	@date 2023-2026
+	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
+*/
+
 #include "callbackgroup.hpp"
 
 #include "../../engine/engine.hpp"
