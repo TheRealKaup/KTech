@@ -29,7 +29,7 @@ auto main() -> int
 	// Create an `Engine` instance:
 	KTech::Engine engine(
 		KTech::UPoint(20, 20), // The game's viewport size, in terminal cells.
-		24 // The ticks-per-second (TPS) limit; we'll cover this soon.
+		24					   // The ticks-per-second (TPS) limit; we'll cover this soon.
 	);
 	// You might find it convenient to instantiate `Engine` outside `main()`, especially when working on a larger-scale game. Feel free to do so; it doesn't matter to `Engine`. Beware, though, not to unintentionally create multiple `Engine` instances, as doing so would make some of the duplicate engine components fight each other and cause random and unexpected behavior.
 
@@ -50,8 +50,8 @@ auto main() -> int
 	// Let's start with the easiest one to explain: `Object`.
 	// All world structures' constructors require a reference to an `Engine` instance, which is why you have to create an `Engine` first. `Object` is no exception:
 	KTech::Object object1(
-		engine,				// Parent `Engine` reference.
-		KTech::Point(5, 5) 	// Position the `Object` at X=5, Y=5.
+		engine,			   // Parent `Engine` reference.
+		KTech::Point(5, 5) // Position the `Object` at X=5, Y=5.
 	);
 
 	/*
@@ -72,14 +72,14 @@ auto main() -> int
 	object1.m_textures.resize(1);
 
 	// Now access `Object:m_textures[0]` (that is, its first `Texture`), and make it a simple rectangle:
-	object1.m_textures[0].Simple(			// (1)
-		KTech::UPoint(3, 3),				// (2)
-		KTech::CellA(						// (3)
-			'@',							// (4)
-			KTech::RGBA(255, 0, 255, 255),	// (5)
-			KTech::RGBAColors::blue			// (6)
-		),
-		KTech::Point(0, 0)					// (7)
+	object1.m_textures[0].Simple(				// (1)
+		KTech::UPoint(3, 3),					// (2)
+		KTech::CellA{							// (3)
+			.b=KTech::RGBAColors::blue,			// (4)
+			.c='@',								// (5)
+			.f=KTech::RGBA(255, 0, 255, 255)	// (6)
+		},
+		KTech::Point(0, 0)						// (7)
 	);
 
 	/*
@@ -91,11 +91,11 @@ auto main() -> int
 
 		3:	As we've said, this "`CellA`" is the structure `Texture`s are based on. `Texture::Simple()` accepts a single `CellA` value, because it creates a uniform rectangle.
 
-		4:	Character.
+		4:	Blue background color (the cell's color behind the character). The `KTech::RGBAColors` namespace includes some predefined `RGBA` values.
 
-		5:	Pink foreground color (the character's color).
+		5:	Character.
 
-		6:	Blue background color (the cell's color behind the character). The `KTech::RGBAColors` namespace includes some predefined `RGBA` values.
+		6:	Pink foreground color (the character's color).
 
 		7:	Position, relative to the `Texture`'s parent `Object`. Extremely useful when adding multiple `Texture`s to an `Object`.
 
@@ -124,7 +124,8 @@ auto main() -> int
 
 	// And add `object1` to it:
 	layer1.AddObject(
-		object1.m_id // All world structures store their personal `ID` in a member named `m_id` (e.g. `Object::m_id`, `Layer::m_id`, `Camera::m_id`...).
+		object1
+			.m_id // All world structures store their personal `ID` in a member named `m_id` (e.g. `Object::m_id`, `Layer::m_id`, `Camera::m_id`...).
 	);
 
 	/*
@@ -161,9 +162,10 @@ auto main() -> int
 	// Create a `Camera`:
 	KTech::Camera camera1(
 		engine,
-		map1.m_id, 					// Add `camera1` to `map1`.
-		KTech::Point(0, 0),			// Position the `Camera` at X=0, Y=0 (world's origin).
-		engine.output.resolution	// `Engine::output` is the output engine component instance, and `Output::resolution` is the same viewport size we gave to `Engine`'s constructor earlier.
+		map1.m_id,			// Add `camera1` to `map1`.
+		KTech::Point(0, 0), // Position the `Camera` at X=0, Y=0 (world's origin).
+		engine.output
+			.resolution // `Engine::output` is the output engine component instance, and `Output::resolution` is the same viewport size we gave to `Engine`'s constructor earlier.
 	);
 
 	// Add `layer1` to `map1`:

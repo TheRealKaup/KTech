@@ -79,9 +79,16 @@ auto main() -> int
 			" @@@ ",
 			"@@@@@",
 			"@@@@@",
-		}, RGBA(0, 100, 0), RGBAColors::transparent, Point(0, 0)
+		},
+		RGBA(0, 100, 0),
+		RGBAColors::transparent,
+		Point(0, 0)
 	);
-	object.m_textures[1].Simple(UPoint(1, 2), CellA('|', KTech::RGBA(80, 40, 15, 255), KTech::RGBAColors::transparent), KTech::Point(2, 3));
+	object.m_textures[1].Simple(
+		UPoint(1, 2),
+		CellA{.b = KTech::RGBAColors::transparent, .c = '|', .f = KTech::RGBA(80, 40, 15, 255)},
+		KTech::Point(2, 3)
+	);
 
 	while (engine.running)
 	{

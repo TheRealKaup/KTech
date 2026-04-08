@@ -35,6 +35,7 @@
 #include "../basic/point.hpp"
 #include "../basic/upoint.hpp"
 #include "../utility/id.hpp"
+#include "../utility/rgbcolors.hpp"
 
 #include <limits>
 #include <string>
@@ -53,10 +54,10 @@ public:
 	std::string m_name;							 //!< String name, might be useful for debugging.
 	ID<Map> m_parentMap;						 //!< The map which contains this `Camera`.
 
-	Point m_pos;											   //!< World position.
-	UPoint m_res;											   //!< `Camera::m_image`'s resolution (or "size").
-	Cell m_background = Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)); //!< The background to render upon.
-	std::vector<Cell> m_image;								   //!< `Cell`-based rendered image.
+	Point m_pos;  //!< World position.
+	UPoint m_res; //!< `Camera::m_image`'s resolution (or "size").
+	Cell m_background = {.b = RGBColors::black, .c = ' ', .f = RGBColors::black}; //!< The background to render upon.
+	std::vector<Cell> m_image;													  //!< `Cell`-based rendered image.
 
 	/*!
 		@brief Prepare `Camera` for rendering.
@@ -67,7 +68,10 @@ public:
 		@param [in] name String name.
 	*/
 	Camera(
-		Engine& engine, Point position = Point(0, 0), UPoint resolution = UPoint(10, 10), const std::string& name = ""
+		Engine& engine,
+		Point position = {.x = 0, .y = 0},
+		UPoint resolution = {.x = 10, .y = 10},
+		const std::string& name = ""
 	);
 
 	/*!
@@ -85,7 +89,7 @@ public:
 		Engine& engine,
 		const ID<Map>& parentMap,
 		Point position = Point(0, 0),
-		UPoint resolution = UPoint(10, 10),
+		UPoint resolution = {.x = 10, .y = 10},
 		const std::string& name = ""
 	);
 

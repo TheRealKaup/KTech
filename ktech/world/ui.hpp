@@ -36,6 +36,7 @@
 #include "../basic/rgba.hpp"
 #include "../basic/upoint.hpp"
 #include "../utility/id.hpp"
+#include "../utility/rgbacolors.hpp"
 
 #include <limits>
 #include <string>
@@ -58,12 +59,13 @@ public:
 	std::string m_name;					 //!< String name
 	std::vector<ID<Widget>> m_widgets;	 //!< Contained `Widget`s.
 
-	UPoint m_res;														 //!< Image's resolution.
-	CellA m_background = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0)); //!< The background to render upon.
-	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();				 //!< Opacity for all rendered `Widget`s.
-	RGBA m_frgba = RGBAColors::transparent; //!< Foreground color added after rendering `Widget`s.
-	RGBA m_brgba = RGBAColors::transparent; //!< Background color added after rendering `Widget`s.
-	std::vector<CellA> m_image;				//!< `CellA`-based rendered image.
+	UPoint m_res; //!< Image's resolution.
+	//! The background to render upon.
+	CellA m_background = {.b = RGBAColors::transparent, .c = ' ', .f = RGBAColors::transparent};
+	uint8_t m_alpha = std::numeric_limits<uint8_t>::max(); //!< Opacity for all rendered `Widget`s.
+	RGBA m_frgba = RGBAColors::transparent;				   //!< Foreground color added after rendering `Widget`s.
+	RGBA m_brgba = RGBAColors::transparent;				   //!< Background color added after rendering `Widget`s.
+	std::vector<CellA> m_image;							   //!< `CellA`-based rendered image.
 
 	/*!
 		@brief Construct a `UI`.
@@ -71,7 +73,7 @@ public:
 		@param resolution Image's resolution.
 		@param name String name.
 	*/
-	UI(Engine& engine, UPoint resolution = UPoint(10, 10), std::string name = "");
+	UI(Engine& engine, UPoint resolution = {.x = 10, .y = 10}, std::string name = "");
 
 	/*!
 		@brief Remove all `Widget`s from itself, and itself from `Memory`.

@@ -76,41 +76,43 @@ public:
 			})
 			.Transform([&](KTech::CellA& cell) { cell.b = m_backgroundRGBA; });
 		m_textures[ti_topLeftCorner].Simple(
-			KTech::UPoint(1, 1), KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA), KTech::Point(0, 0)
+			KTech::UPoint(1, 1),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '#', .f = m_foregroundRGBA},
+			KTech::Point(0, 0)
 		);
 		m_textures[ti_topRightCorner].Simple(
 			KTech::UPoint(1, 1),
-			KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '#', .f = m_foregroundRGBA},
 			KTech::Point(m_textures[0].m_size.x + 1, 0)
 		);
 		m_textures[ti_bottomLeftCorner].Simple(
 			KTech::UPoint(1, 1),
-			KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '#', .f = m_foregroundRGBA},
 			KTech::Point(0, m_textures[0].m_size.y + 1)
 		);
 		m_textures[ti_bottomRightCorner].Simple(
 			KTech::UPoint(1, 1),
-			KTech::CellA('#', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '#', .f = m_foregroundRGBA},
 			KTech::Point(m_textures[0].m_size.x + 1, m_textures[0].m_size.y + 1)
 		);
 		m_textures[ti_topFrame].Simple(
 			KTech::UPoint(m_textures[0].m_size.x, 1),
-			KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '|', .f = m_foregroundRGBA},
 			KTech::Point(1, 0)
 		);
 		m_textures[ti_leftFrame].Simple(
 			KTech::UPoint(1, m_textures[0].m_size.y),
-			KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '|', .f = m_foregroundRGBA},
 			KTech::Point(0, 1)
 		);
 		m_textures[ti_bottomFrame].Simple(
 			KTech::UPoint(m_textures[0].m_size.x, 1),
-			KTech::CellA('-', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '-', .f = m_foregroundRGBA},
 			KTech::Point(1, m_textures[0].m_size.y + 1)
 		);
 		m_textures[ti_rightFrame].Simple(
 			KTech::UPoint(1, m_textures[0].m_size.y),
-			KTech::CellA('|', m_foregroundRGBA, m_backgroundRGBA),
+			KTech::CellA{.b = m_backgroundRGBA, .c = '|', .f = m_foregroundRGBA},
 			KTech::Point(m_textures[0].m_size.x + 1, 1)
 		);
 	}

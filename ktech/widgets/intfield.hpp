@@ -107,25 +107,45 @@ public:
 		if (withFrame)
 		{
 			m_textures.resize(TEXTURES_SIZE_FRAMED);
-			m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
+			m_textures[ti_topLeftCorner].Simple(
+				KTech::UPoint(1, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+				KTech::Point(0, 0)
+			);
 			m_textures[ti_topRightCorner].Simple(
-				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 0)
+				KTech::UPoint(1, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+				KTech::Point(1 + text.length() + m_maxDigits, 0)
 			);
 			m_textures[ti_bottomLeftCorner].Simple(
-				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 2)
+				KTech::UPoint(1, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+				KTech::Point(0, 2)
 			);
 			m_textures[ti_bottomRightCorner].Simple(
-				KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 2)
+				KTech::UPoint(1, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+				KTech::Point(1 + text.length() + m_maxDigits, 2)
 			);
 			m_textures[ti_topFrame].Simple(
-				KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0)
+				KTech::UPoint(text.length() + m_maxDigits, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '-', .f = tempRGBA},
+				KTech::Point(1, 0)
 			);
-			m_textures[ti_leftFrame].Simple(KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
+			m_textures[ti_leftFrame].Simple(
+				KTech::UPoint(1, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '|', .f = tempRGBA},
+				KTech::Point(0, 1)
+			);
 			m_textures[ti_bottomFrame].Simple(
-				KTech::UPoint(text.length() + m_maxDigits, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 2)
+				KTech::UPoint(text.length() + m_maxDigits, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '-', .f = tempRGBA},
+				KTech::Point(1, 2)
 			);
 			m_textures[ti_rightFrame].Simple(
-				KTech::UPoint(1, 1), KTech::CellA('|', tempRGBA), KTech::Point(1 + text.length() + m_maxDigits, 1)
+				KTech::UPoint(1, 1),
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '|', .f = tempRGBA},
+				KTech::Point(1 + text.length() + m_maxDigits, 1)
 			);
 		}
 		else
@@ -145,13 +165,16 @@ public:
 		m_currentDigit = 0;
 		m_number = 0;
 		KTech::RGBA tempRGBA = (m_selected ? m_selectedRGBA : m_unselectedRGBA);
-		m_textures[ti_input].Rectangle(KTech::UPoint(m_maxDigits, 1), KTech::CellA(' ', tempRGBA));
+		m_textures[ti_input].Rectangle(
+			KTech::UPoint(m_maxDigits, 1), KTech::CellA{.b = KTech::RGBAColors::transparent, .c = ' ', .f = tempRGBA}
+		);
 		for (size_t x = 0; x < m_maxDigits && x < number.length(); x++)
 		{
 			m_currentDigit++;
 			m_number *= 10;
 			m_number += number[x] - '0';
-			m_textures[ti_input](x, 0) = KTech::CellA(number[x], tempRGBA);
+			m_textures[ti_input](x, 0) =
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = number[x], .f = tempRGBA};
 		}
 		m_visibleNumber = m_number;
 	}

@@ -99,7 +99,7 @@ void KTech::Output::PrintStartupNotice(
 
 void KTech::Output::Clear()
 {
-	std::ranges::fill(m_image.begin(), m_image.end(), Cell(' ', RGB(0, 0, 0), RGB(0, 0, 0)));
+	std::ranges::fill(m_image.begin(), m_image.end(), Cell{.b = RGBColors::black, .c = ' ', .f = RGBColors::black});
 }
 
 void KTech::Output::Draw(
@@ -134,7 +134,7 @@ void KTech::Output::Draw(
 
 			// DRAW foreground
 			RGBA tempRGBA;
-			if (BakeRGBA(tempRGBA, RGBA(p_sourceImage[(p_resolution.x * ySrc) + xSrc].f, p_alpha)))
+			if (BakeRGBA(tempRGBA, p_sourceImage[(p_resolution.x * ySrc) + xSrc].f | p_alpha))
 			{
 				DrawBakedToRGB(m_image[(resolution.x * yDst) + xDst].f, tempRGBA); // Draw given color if alpha isn't 0
 			}
@@ -144,7 +144,7 @@ void KTech::Output::Draw(
 			}
 
 			// DRAW foreground
-			if (BakeRGBA(tempRGBA, RGBA(p_sourceImage[(p_resolution.x * ySrc) + xSrc].b, p_alpha)))
+			if (BakeRGBA(tempRGBA, p_sourceImage[(p_resolution.x * ySrc) + xSrc].b | p_alpha))
 			{
 				DrawBakedToRGB(m_image[(resolution.x * yDst) + xDst].b, tempRGBA); // Draw given color if alpha isn't 0
 			}
@@ -330,7 +330,7 @@ auto KTech::Output::ShouldPrintThisTick() const -> bool
 KTech::Output::Output(Engine& p_engine, KTech::UPoint p_imageResolution, bool p_noGameLoopMode)
 	: engine(p_engine),
 	  resolution(p_imageResolution),
-	  m_image(p_imageResolution.x * p_imageResolution.y, Cell(' ', RGBColors::black, RGBColors::black)),
+	  m_image(p_imageResolution.x * p_imageResolution.y, Cell{.b = RGBColors::black, .c = ' ', .f = RGBColors::black}),
 	  m_stringImage((p_imageResolution.y * 3) + (p_imageResolution.x * p_imageResolution.y * printSequenceLength), ' ')
 {
 #ifdef _WIN32

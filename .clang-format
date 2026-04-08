@@ -37,6 +37,7 @@ AlignAfterOpenBracket: false
 BreakConstructorInitializers: BeforeColon
 PackConstructorInitializers: NextLineOnly
 # Unfortunately, `PenaltyReturnTypeOnItsOwnLine` doesn't cover trailing return types.
+PenaltyReturnTypeOnItsOwnLine: 9999
 
 ## Comments
 # Comments should not be broken according to column limit because Doxygen renders a newline for each of these breaks,

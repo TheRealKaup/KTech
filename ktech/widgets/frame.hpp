@@ -69,23 +69,45 @@ public:
 	{
 		KTech::RGBA tempRGBA = m_selected ? m_selectedRGBA : m_unselectedRGBA;
 		m_textures.resize(TEXTURES_SIZE);
-		m_textures[ti_topLeftCorner].Simple(KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, 0));
+		m_textures[ti_topLeftCorner].Simple(
+			KTech::UPoint(1, 1),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+			KTech::Point(0, 0)
+		);
 		m_textures[ti_topRightCorner].Simple(
-			KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, 0)
+			KTech::UPoint(1, 1),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+			KTech::Point(size.x - 1, 0)
 		);
 		m_textures[ti_bottomLeftCorner].Simple(
-			KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(0, size.y - 1)
+			KTech::UPoint(1, 1),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+			KTech::Point(0, size.y - 1)
 		);
 		m_textures[ti_bottomRightCorner].Simple(
-			KTech::UPoint(1, 1), KTech::CellA('#', tempRGBA), KTech::Point(size.x - 1, size.y - 1)
+			KTech::UPoint(1, 1),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '#', .f = tempRGBA},
+			KTech::Point(size.x - 1, size.y - 1)
 		);
-		m_textures[ti_topFrame].Simple(KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, 0));
-		m_textures[ti_leftFrame].Simple(KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(0, 1));
+		m_textures[ti_topFrame].Simple(
+			KTech::UPoint(size.x - 2, 1),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '-', .f = tempRGBA},
+			KTech::Point(1, 0)
+		);
+		m_textures[ti_leftFrame].Simple(
+			KTech::UPoint(1, size.y - 2),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '|', .f = tempRGBA},
+			KTech::Point(0, 1)
+		);
 		m_textures[ti_bottomFrame].Simple(
-			KTech::UPoint(size.x - 2, 1), KTech::CellA('-', tempRGBA), KTech::Point(1, size.y - 1)
+			KTech::UPoint(size.x - 2, 1),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '-', .f = tempRGBA},
+			KTech::Point(1, size.y - 1)
 		);
 		m_textures[ti_rightFrame].Simple(
-			KTech::UPoint(1, size.y - 2), KTech::CellA('|', tempRGBA), KTech::Point(size.x - 1, 1)
+			KTech::UPoint(1, size.y - 2),
+			KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '|', .f = tempRGBA},
+			KTech::Point(size.x - 1, 1)
 		);
 	}
 

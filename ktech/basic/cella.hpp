@@ -31,8 +31,6 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/rgbacolors.hpp"
-#include "cell.hpp"
 #include "rgba.hpp"
 
 /*!
@@ -40,32 +38,9 @@
 */
 struct KTech::CellA
 {
-	RGBA f; //!< Foreground (character) color.
 	RGBA b; //!< Background color.
 	char c; //!< ASCII character.
-
-	/*!
-		@brief Construct a `CellA`.
-		@param [in] character ASCII character.
-		@param [in] foreground Foreground (character) color.
-		@param [in] background Background color.
-	*/
-	constexpr CellA(
-		char character = ' ', RGBA foreground = RGBAColors::transparent, RGBA background = RGBAColors::transparent
-	)
-		: c(character), f(foreground), b(background)
-	{}
-
-	/*!
-		@brief Construct a `CellA` from a `Cell`.
-
-		@param [in] cell Base `Cell`.
-		@param [in] foregroundAlpha Alpha to add to the foreground (character) color.
-		@param [in] backgroundAlpha Alpha to add to the background color.
-	*/
-	constexpr CellA(Cell cell, uint8_t foregroundAlpha, uint8_t backgroundAlpha)
-		: c(cell.c), f(cell.f, foregroundAlpha), b(cell.b, backgroundAlpha)
-	{}
+	RGBA f; //!< Foreground (character) color.
 
 	/*!
 		@brief Compare 2 `CellA`s.
@@ -73,8 +48,5 @@ struct KTech::CellA
 		@return `true`: the foreground colors, background colors, and
 	   characters are equal. `false`: they are unequal.
 	*/
-	constexpr auto operator==(const CellA& cellA) const -> bool
-	{
-		return (c == cellA.c) && (f == cellA.f) && (b == cellA.b);
-	}
+	constexpr auto operator==(const CellA& cellA) const -> bool = default;
 };

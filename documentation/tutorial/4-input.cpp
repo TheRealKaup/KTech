@@ -118,7 +118,7 @@ auto main() -> int
 	// Camera: add it to `Map`
 	KTech::Camera camera{engine, map.m_id, KTech::Point(0, 0), engine.output.resolution};
 	// Give the camera a background color (`Camera::m_background` is a `CellA`, and `CellA::b` is the `RGBA` background color).
-	camera.m_background.b = KTech::RGBAColors::blue;
+	camera.m_background.b = KTech::RGBColors::blue;
 
 	// Enter game loop:
 	while (engine.running)

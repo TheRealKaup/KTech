@@ -47,19 +47,19 @@ auto main() -> int
 	object.m_textures.resize(2);
 	object.m_textures[0].Simple(
 		KTech::UPoint(3, 3),
-		KTech::CellA('a', KTech::RGBAColors::black, KTech::RGBAColors::white)
+		KTech::CellA{.b=KTech::RGBAColors::white, .c='a', .f=KTech::RGBAColors::black}
 		// Relative position not given: (0, 0) by default.
 	);
 	object.m_textures[1].Simple(
 		KTech::UPoint(3, 3),
-		KTech::CellA('b', KTech::RGBAColors::white, KTech::RGBAColors::black),
+		KTech::CellA{.b=KTech::RGBAColors::black, .c='b', .f=KTech::RGBAColors::white},
 		KTech::Point(1, 1)
 	);
 
 	// Camera: add it to `Map`
 	KTech::Camera camera{engine, map.m_id, KTech::Point(0, 0), engine.output.resolution};
 	// Give the camera a background color (`Camera::m_background` is a `CellA`, and `CellA::b` is the `RGBA` background color).
-	camera.m_background.b = KTech::RGBAColors::blue;
+	camera.m_background.b = KTech::RGBColors::blue;
 
 	/*
 		In KTech, you (the user) create your own game loop.

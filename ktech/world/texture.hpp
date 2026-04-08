@@ -213,7 +213,10 @@ struct KTech::Texture
 
 		@return Self-reference for function chaining.
 	*/
-	auto Resize(UPoint size, CellA newValue = CellA(' ', RGBA(0, 0, 0, 0), RGBA(0, 0, 0, 0))) -> Texture&;
+	auto Resize(
+		UPoint size,
+		CellA newValue = {.b = {.r = 0, .g = 0, .b = 0, .a = 0}, .c = ' ', .f = {.r = 0, .g = 0, .b = 0, .a = 0}}
+	) -> Texture&;
 
 	/*!
 		@brief Transform the `Texture` using a operation callback function (whether simple or complex).

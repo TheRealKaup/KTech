@@ -39,18 +39,25 @@ struct Character : KTech::Object
 		camera.m_pos = m_pos + KTech::Point(-18, -8);
 	}
 
-	Character(KTech::Engine& engine, const KTech::ID<KTech::Layer>& layer, const KTech::ID<KTech::Map>& map, KTech::Point pos)
-		: Object(engine, layer, pos, "character"), // Inherit `Object::Object()`, since `Object` has no default constructor. The fourth name parameter can be useful for debugging if so interests you, though it bears no additional functionality.
-		camera(engine, KTech::Point(pos.x - 18, pos.y - 8), KTech::UPoint(40, 20)),  callbackGroup(engine, true)
+	Character(
+		KTech::Engine& engine, const KTech::ID<KTech::Layer>& layer, const KTech::ID<KTech::Map>& map, KTech::Point pos
+	)
+		: Object(
+			  engine, layer, pos, "character"
+		  ), // Inherit `Object::Object()`, since `Object` has no default constructor. The fourth name parameter can be useful for debugging if so interests you, though it bears no additional functionality.
+		  camera(engine, KTech::Point(pos.x - 18, pos.y - 8), KTech::UPoint(40, 20)),
+		  callbackGroup(engine, true)
 	{
 		// Add a singular texture.
 		m_textures.resize(1);
 		m_textures[0].Write(
-			{ // Stick figure.
+			{// Stick figure.
 				" O ",
 				"/|\\",
-				"/ \\"
-			}, KTech::RGBA(200, 0, 0, 255) /*Red*/, KTech::RGBAColors::transparent /*No background*/, KTech::Point(0, 0) /*No additional relative position*/
+				"/ \\"},
+			KTech::RGBA(200, 0, 0, 255) /*Red*/,
+			KTech::RGBAColors::transparent /*No background*/,
+			KTech::Point(0, 0) /*No additional relative position*/
 		);
 		// Add a singular collider.
 		m_colliders.resize(1);
@@ -65,16 +72,21 @@ struct Character : KTech::Object
 				this, // Bind this object to the function.
 				KTech::Point(0, 1) // `Move()` has one `Point` parameter which represents where to attempt moving relatively (direction), so bind +1 on the Y axis (which means down) to it.
 			));
-		callbackGroup.RegisterCallback(KTech::Keys::up, std::bind(&Character::Move, this, KTech::Point(0, -1))); // Move up.
-		callbackGroup.RegisterCallback(KTech::Keys::right, std::bind(&Character::Move, this, KTech::Point(1, 0))); // Move right.
-		callbackGroup.RegisterCallback(KTech::Keys::left, std::bind(&Character::Move, this, KTech::Point(-1, 0))); // Move left.
+		callbackGroup.RegisterCallback(
+			KTech::Keys::up, std::bind(&Character::Move, this, KTech::Point(0, -1))
+		); // Move up.
+		callbackGroup.RegisterCallback(
+			KTech::Keys::right, std::bind(&Character::Move, this, KTech::Point(1, 0))
+		); // Move right.
+		callbackGroup.RegisterCallback(
+			KTech::Keys::left, std::bind(&Character::Move, this, KTech::Point(-1, 0))
+		); // Move left.
 
 		camera.m_background.b = KTech::RGB(180, 230, 240);
 		// Add `camera` to `map`. World structures communicate with each other using their `ID`s (the `m_id` member). The second parameter sets `camera` to be active one in `map`.
 		camera.EnterMap(map);
 
 		// Challenge: currently there is nothing for the character instance to be pushed by (which is allowed by collider type we set a moment ago). So, copy this class, change its keybindings and create an instance of it along with the original character (but pass it a different initial position). Now you have two characters controlled by different sets of keys; try making them push each other.
-
 	}
 };
 
@@ -111,23 +123,30 @@ int main()
 	tree.m_textures.resize(2);
 	// For the first texture, which will be the canopy, use `Texture::Write()`.
 	tree.m_textures[0].Write(
-		{ // Vector of strings for the characters of the texture.
+		{
+			// Vector of strings for the characters of the texture.
 			" @@@ ",
 			"@@@@@",
 			"@@@@@",
 		},
-		KTech::RGBA(0, 100, 0), // Foreground color (green). The alpha channel is an optional parameter that defaults to 255 (completely opaque).
-		KTech::RGBAColors::transparent, // Background color. The `KTech::RGBAColors` and `KTech::RGBColors` namespaces contain some predefined `RGBA` and `RGB` values, respectively. Transparent (alpha value of 0, i.e. `RGBA(0, 0, 0, 0)`) here means no background, just character.
+		KTech::RGBA(
+			0, 100, 0
+		), // Foreground color (green). The alpha channel is an optional parameter that defaults to 255 (completely opaque).
+		KTech::RGBAColors::
+			transparent, // Background color. The `KTech::RGBAColors` and `KTech::RGBColors` namespaces contain some predefined `RGBA` and `RGB` values, respectively. Transparent (alpha value of 0, i.e. `RGBA(0, 0, 0, 0)`) here means no background, just character.
 		KTech::Point(0, 0) // Position, relative to the parent object.
 	);
 	// For the second texture, which will be the trunk, use `Texture::Simple()`.
 	tree.m_textures[1].Simple(
 		KTech::UPoint(1, 30), // Size.
-		KTech::CellA( // Texture value.
-			'|', // Character.
-			KTech::RGBA(80, 40, 15, 255), // Foreground color (brown). This time we also specify the alpha channel, though we don't actually need to because 255 is the default value anyway.
-			KTech::RGBAColors::transparent // Background. Once again, none of that.
-		),
+		KTech::CellA{
+			// Texture value.
+			.b = KTech::RGBAColors::transparent, // Background. Once again, none of that.
+			.c = '|',							 // Character.
+			.f = KTech::RGBA(
+				80, 40, 15, 255
+			) // Foreground color (brown). This time we also specify the alpha channel, though we don't actually need to because 255 is the default value anyway.
+		},
 		KTech::Point(2, 3) // Relative position.
 	);
 
@@ -137,7 +156,7 @@ int main()
 	tree.m_colliders[0].ByTextureCharacter(
 		tree.m_textures[0], // Reference to the canopy texture.
 		0 // Collider type. According to the default `Collision::colliderTypes` values, 0 means a collider that can push but can't be pushed.
-		// The relative position is copied from the given texture, so no need to specify it here again.
+		  // The relative position is copied from the given texture, so no need to specify it here again.
 	);
 	// For the second collider, which will be the trunk, use `Collider::Simple`.
 	tree.m_colliders[1].Simple(
@@ -157,9 +176,9 @@ int main()
 	while (engine.running)
 	{
 		// Call...
-		engine.input.CallCallbacks(); // ...synchronized input callbacks (as were registered by `character`).
+		engine.input.CallCallbacks();  // ...synchronized input callbacks (as were registered by `character`).
 		engine.time.CallInvocations(); // ...timed invocations (though none were made here).
-		engine.memory.CallOnTicks(); // ...on-tick functions (also left unutilized in this example).
+		engine.memory.CallOnTicks();   // ...on-tick functions (also left unutilized in this example).
 
 		// Render-on-demand (when things have changed).
 		if (engine.output.ShouldRenderThisTick()) // `Output::ShouldRenderThisTick()` reports whether the game changed.
@@ -176,7 +195,9 @@ int main()
 			// Print the final image.
 			engine.output.Print();
 		}
-		else if (engine.output.ShouldPrintThisTick()) // `Output::ShouldPrintThisTick()` reports whether the terminal changed (which might require reprinting)
+		else if (
+			engine.output
+				.ShouldPrintThisTick()) // `Output::ShouldPrintThisTick()` reports whether the terminal changed (which might require reprinting)
 			engine.output.Print(); // Reprint the final image. It is already drawn; that hasn't changed.
 
 		// Cause the thread to sleep until the moment the next tick should start.

@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <cstdint>
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
@@ -36,37 +37,38 @@
 /*!
 	@brief Like `RGB`, but also has an alpha channel representing transparency.
 */
-struct KTech::RGBA : RGB
+struct KTech::RGBA
 {
+	uint8_t r; //!< Red primary color.
+	uint8_t g; //!< Green primary color.
+	uint8_t b; //!< Blue primary color.
 	uint8_t a; //!< Alpha channel.
-
-	/*!
-		@brief Construct an `RGBA` color.
-		@param [in] red Red primary color.
-		@param [in] green Green primary color.
-		@param [in] blue Blue primary color.
-		@param [in] alpha Alpha channel.
-	*/
-	constexpr RGBA(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 0)
-		: RGB(red, green, blue), a(alpha)
-	{}
-
-	/*!
-		@brief Construct an `RGBA` color from an `RGB` color.
-		@param [in] rgb `RGB` base.
-		@param [in] alpha Alpha channel.
-	*/
-	constexpr RGBA(RGB rgb, uint8_t alpha)
-		: RGB(rgb), a(alpha)
-	{}
 
 	/*!
 		@brief Compare 2 `RGBA`s.
 		@param [in] rgba The `RGBA` to compare with this `RGBA`.
 		@return `true`: the alpha channel, red, green and blue primary colors are equal. `false`: they are unequal.
 	*/
-	constexpr auto operator==(const RGBA& rgba) const -> bool
+	constexpr auto operator==(const RGBA& rgba) const -> bool = default;
+
+	/*!
+		@brief Narrow an RGBA into an RGB.
+		@return KTech::RGB whose red, green and blue values are equal to those of the original RGBA (the alpha channel is discarded).
+	*/
+	explicit constexpr operator RGB() const
 	{
-		return (r == rgba.r) && (g == rgba.g) && (b == rgba.b) && (a == rgba.a);
+		return RGB{.r = r, .g = g, .b = b};
 	}
 };
+
+/*!
+	@brief Widen an RGB into an RGBA.
+
+	@param [in] rgb RGB to widen.
+	@param [in] alpha Alpha channel to add to the RGB
+	@return KTech::RGBA whose red, green and blue values are equal to those of the original RGB, and alpha channel is equal to the given alpha value.
+*/
+auto constexpr operator|(const KTech::RGB& rgb, uint8_t alpha) -> KTech::RGBA
+{
+	return {.r = rgb.r, .g = rgb.g, .b = rgb.b, .a = alpha};
+}

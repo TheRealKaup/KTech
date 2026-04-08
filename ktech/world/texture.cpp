@@ -79,7 +79,7 @@ auto KTech::Texture::File(const std::filesystem::path& p_filePath) -> Texture&
 	}
 	// Get size
 	UPoint newSize;
-	file.read((char*)&newSize, sizeof(UPoint));
+	file.read(reinterpret_cast<char*>(&newSize), sizeof(UPoint));
 	if (newSize.x * newSize.y * sizeof(CellA) != std::filesystem::file_size(p_filePath) - sizeof(UPoint))
 	{
 		return Null(); // Size doesn't match real size
@@ -87,7 +87,15 @@ auto KTech::Texture::File(const std::filesystem::path& p_filePath) -> Texture&
 	// Apply size
 	Resize(newSize);
 	// Read from file
-	file.read((char*)m_t.data(), m_t.size() * sizeof(CellA));
+	for (CellA& cell : m_t)
+	{
+		// Foreground
+		file.read(reinterpret_cast<char*>(&cell.f), sizeof(cell.f));
+		// Background
+		file.read(reinterpret_cast<char*>(&cell.b), sizeof(cell.b));
+		// Character
+		file.read(&cell.c, sizeof(cell.c));
+	}
 	return *this;
 }
 
@@ -118,16 +126,17 @@ auto KTech::Texture::Write(const std::vector<std::string>& p_stringVector, RGBA 
 			{
 				if (p_stringVector[y][x] == ' ')
 				{
-					operator()(x, y) = CellA(p_stringVector[y][x], RGBAColors::transparent, RGBAColors::transparent);
+					operator()(x, y) =
+						CellA{.b = RGBAColors::transparent, .c = p_stringVector[y][x], .f = RGBAColors::transparent};
 				}
 				else
 				{
-					operator()(x, y) = CellA(p_stringVector[y][x], p_foreground, p_background);
+					operator()(x, y) = CellA{.b = p_background, .c = p_stringVector[y][x], .f = p_foreground};
 				}
 			}
 			else
 			{
-				operator()(x, y) = CellA(' ', RGBAColors::transparent, RGBAColors::transparent);
+				operator()(x, y) = CellA{.b = RGBAColors::transparent, .c = ' ', .f = RGBAColors::transparent};
 			}
 		}
 	}
@@ -145,10 +154,10 @@ auto KTech::Texture::Write(
 auto KTech::Texture::Null() -> Texture&
 {
 	Resize(UPoint(2, 2));
-	m_t[0] = CellA(' ', RGBAColors::transparent, RGBAColors::black);
-	m_t[1] = CellA(' ', RGBAColors::transparent, RGBAColors::magenta);
-	m_t[2] = CellA(' ', RGBAColors::transparent, RGBAColors::magenta);
-	m_t[3] = CellA(' ', RGBAColors::transparent, RGBAColors::black);
+	m_t[0] = CellA{.b = RGBAColors::black, .c = ' ', .f = RGBAColors::transparent};
+	m_t[1] = CellA{.b = RGBAColors::magenta, .c = ' ', .f = RGBAColors::transparent};
+	m_t[2] = CellA{.b = RGBAColors::magenta, .c = ' ', .f = RGBAColors::transparent};
+	m_t[3] = CellA{.b = RGBAColors::black, .c = ' ', .f = RGBAColors::transparent};
 	return *this;
 }
 
@@ -239,12 +248,18 @@ void KTech::Texture::ExportToFile(const std::filesystem::path& p_filePath) const
 	std::ofstream file(p_filePath);
 	if (file.is_open())
 	{
-		constexpr size_t sizeNBytes = 8;
-		constexpr size_t cellNBytes = 9;
 		// Write size
-		file.write((char*)&m_size, sizeNBytes);
+		file.write(reinterpret_cast<const char*>(&m_size), sizeof(m_size));
 		// Write texture
-		file.write((char*)m_t.data(), m_t.size() * cellNBytes);
+		for (const CellA& cell : m_t)
+		{
+			// Foreground
+			file.write(reinterpret_cast<const char*>(&cell.f), sizeof(cell.f));
+			// Background
+			file.write(reinterpret_cast<const char*>(&cell.b), sizeof(cell.b));
+			// Character
+			file.write(&cell.c, sizeof(cell.c));
+		}
 	}
 }
 
