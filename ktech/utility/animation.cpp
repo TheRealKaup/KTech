@@ -31,10 +31,10 @@
 KTech::Animation::Animation(
 	Engine& p_engine, const ID<Object>& p_object, const std::vector<Instruction>& p_instructions
 )
-	: engine(p_engine),
+	: m_engine(p_engine),
 	  m_object(p_object),
 	  m_instructions(p_instructions),
-	  m_invocation(engine, [this]() -> bool { return Play(); })
+	  m_invocation(m_engine, [this]() -> bool { return Play(); })
 {}
 
 KTech::Animation::~Animation()
@@ -51,34 +51,34 @@ auto KTech::Animation::Play() -> bool
 		{
 		case Instruction::Type::ParentSetPosition:
 		{
-			engine.memory.objects[m_object]->m_pos = m_instructions[m_i].pointData;
+			m_engine.memory[m_object]->m_pos = m_instructions[m_i].pointData;
 			changedThisTick = true;
 			break;
 		}
 		case Instruction::Type::ParentMove:
 		{
-			engine.memory.objects[m_object]->Move(m_instructions[m_i].pointData);
+			m_engine.memory[m_object]->Move(m_instructions[m_i].pointData);
 			changedThisTick = true;
 			break;
 		}
 		case Instruction::Type::TextureSet:
 		{
-			for (Texture& texture : engine.memory.objects[m_object]->m_textures)
+			for (Texture& texture : m_engine.memory[m_object]->m_textures)
 			{
 				texture.m_active = false;
 			}
-			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
+			if (m_instructions[m_i].intData < m_engine.memory[m_object]->m_textures.size())
 			{
-				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
+				m_engine.memory[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
 			}
 			changedThisTick = true;
 			break;
 		}
 		case Instruction::Type::TextureSetPosition:
 		{
-			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
+			if (m_instructions[m_i].intData < m_engine.memory[m_object]->m_textures.size())
 			{
-				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_rPos =
+				m_engine.memory[m_object]->m_textures[m_instructions[m_i].intData].m_rPos =
 					m_instructions[m_i].pointData;
 			}
 			changedThisTick = true;
@@ -86,9 +86,9 @@ auto KTech::Animation::Play() -> bool
 		}
 		case Instruction::Type::TextureMove:
 		{
-			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
+			if (m_instructions[m_i].intData < m_engine.memory[m_object]->m_textures.size())
 			{
-				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_rPos +=
+				m_engine.memory[m_object]->m_textures[m_instructions[m_i].intData].m_rPos +=
 					m_instructions[m_i].pointData;
 			}
 			changedThisTick = true;
@@ -96,18 +96,18 @@ auto KTech::Animation::Play() -> bool
 		}
 		case Instruction::Type::TextureShow:
 		{
-			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
+			if (m_instructions[m_i].intData < m_engine.memory[m_object]->m_textures.size())
 			{
-				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
+				m_engine.memory[m_object]->m_textures[m_instructions[m_i].intData].m_active = true;
 			}
 			changedThisTick = true;
 			break;
 		}
 		case Instruction::Type::TextureHide:
 		{
-			if (m_instructions[m_i].intData < engine.memory.objects[m_object]->m_textures.size())
+			if (m_instructions[m_i].intData < m_engine.memory[m_object]->m_textures.size())
 			{
-				engine.memory.objects[m_object]->m_textures[m_instructions[m_i].intData].m_active = false;
+				m_engine.memory[m_object]->m_textures[m_instructions[m_i].intData].m_active = false;
 			}
 			changedThisTick = true;
 			break;

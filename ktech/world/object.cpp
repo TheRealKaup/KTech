@@ -32,9 +32,9 @@
 #include "layer.hpp"
 
 KTech::Object::Object(Engine& p_engine, Point p_position, std::string p_name)
-	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name))
+	: m_engine(p_engine), m_pos(p_position), m_name(std::move(p_name))
 {
-	engine.memory.objects.Add(this);
+	m_engine.memory.Add(this);
 }
 
 KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_position, std::string p_name)
@@ -46,23 +46,23 @@ KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_
 KTech::Object::~Object()
 {
 	LeaveLayer();
-	engine.memory.objects.Remove(m_id);
+	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Object::EnterLayer(const ID<Layer>& p_layer) -> bool
 {
-	if (p_layer == m_parentLayer || !engine.memory.layers.Exists(p_layer))
+	if (p_layer == m_parentLayer || !m_engine.memory.Exists(p_layer))
 	{
 		return false;
 	}
-	return engine.memory.layers[p_layer]->AddObject(m_id);
+	return m_engine.memory[p_layer]->AddObject(m_id);
 }
 
 auto KTech::Object::LeaveLayer() -> bool
 {
-	if (engine.memory.layers.Exists(m_parentLayer))
+	if (m_engine.memory.Exists(m_parentLayer))
 	{
-		return engine.memory.layers[m_parentLayer]->RemoveObject(m_id);
+		return m_engine.memory[m_parentLayer]->RemoveObject(m_id);
 	}
 	m_parentLayer = nullID<Layer>;
 	return true;
@@ -71,7 +71,7 @@ auto KTech::Object::LeaveLayer() -> bool
 auto KTech::Object::Move(Point p_direction) -> bool
 {
 	// Request the collision manager of the engine to move this object.
-	return engine.collision.MoveObject(m_id, p_direction);
+	return m_engine.collision.MoveObject(m_id, p_direction);
 }
 
 auto KTech::Object::OnTick() -> bool

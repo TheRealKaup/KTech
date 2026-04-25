@@ -55,7 +55,9 @@
 template <typename T>
 class KTech::CachingRegistry
 {
-public:
+private:
+	std::vector<T*> m_vec;
+
 	/*!
 		@brief Retrieve structure using its `ID`.
 
@@ -98,31 +100,25 @@ public:
 		return IDToIndex(id) != m_vec.size();
 	}
 
-private:
-	std::vector<T*> m_vec;
-
 	// Adds the pointer to the container.
 	// Automatically called by objects, layers, cameras and maps for themselves.
 	// You shouldn't call this manually on a structure.
-	auto Add(T* structure) -> ID<T>
+	auto Add(T* structure) -> void
 	{
 		structure->m_id.m_i = m_vec.size();
 		m_vec.push_back(structure);
-		return m_vec[m_vec.size() - 1]->m_id;
 	}
 
 	// Remove a structure from storage (doesn't delete it's memory).
 	// Returns true if the structure was found and removed.
 	// Returns false if the structure is missing.
-	auto Remove(const ID<T>& id) -> bool
+	auto Remove(const ID<T>& id) -> void
 	{
 		size_t toRemove = IDToIndex(id);
-		if (toRemove == m_vec.size())
+		if (toRemove != m_vec.size())
 		{
-			return false;
+			m_vec.erase(m_vec.begin() + toRemove);
 		}
-		m_vec.erase(m_vec.begin() + toRemove);
-		return true;
 	}
 
 	// Returns the valid index of the ID.
@@ -148,6 +144,5 @@ private:
 		return m_vec.size();
 	}
 
-	friend T;
 	friend class Memory;
 };

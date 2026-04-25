@@ -38,9 +38,9 @@
 #include "texture.hpp"
 
 KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, const std::string& p_name)
-	: engine(p_engine), m_pos(p_position), m_res(p_resolution)
+	: m_engine(p_engine), m_pos(p_position), m_res(p_resolution)
 {
-	engine.memory.cameras.Add(this);
+	m_engine.memory.Add(this);
 	m_image.resize(m_res.y * m_res.x);
 }
 
@@ -56,23 +56,23 @@ KTech::Camera::~Camera()
 {
 	Output::Log("<Camera[" + m_name + "]::~Camera()>", RGBColors::red);
 	LeaveMap();
-	engine.memory.cameras.Remove(m_id);
+	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
 {
-	if (p_map == m_parentMap || !engine.memory.maps.Exists(p_map))
+	if (p_map == m_parentMap || !m_engine.memory.Exists(p_map))
 	{
 		return false;
 	}
-	return engine.memory.maps[p_map]->AddCamera(m_id);
+	return m_engine.memory[p_map]->AddCamera(m_id);
 }
 
 auto KTech::Camera::LeaveMap() -> bool
 {
-	if (engine.memory.maps.Exists(m_parentMap))
+	if (m_engine.memory.Exists(m_parentMap))
 	{
-		return engine.memory.maps[m_parentMap]->RemoveCamera(m_id);
+		return m_engine.memory[m_parentMap]->RemoveCamera(m_id);
 	}
 	m_parentMap = ID<Map>();
 	return true;
@@ -86,9 +86,9 @@ void KTech::Camera::Resize(UPoint p_resolution)
 
 void KTech::Camera::Render()
 {
-	if (engine.memory.maps.Exists(m_parentMap))
+	if (m_engine.memory.Exists(m_parentMap))
 	{
-		Render(engine.memory.maps[m_parentMap]->m_layers);
+		Render(m_engine.memory[m_parentMap]->m_layers);
 	}
 }
 
@@ -98,12 +98,12 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 
 	for (const KTech::ID<KTech::Layer>& layerID : p_layers)
 	{
-		KTech::Layer* layer = engine.memory.layers[layerID];
+		KTech::Layer* layer = m_engine.memory[layerID];
 		if (layer->m_visible)
 		{
 			for (const KTech::ID<KTech::Object>& ObjectID : layer->m_objects)
 			{
-				KTech::Object* object = engine.memory.objects[ObjectID];
+				KTech::Object* object = m_engine.memory[ObjectID];
 				for (KTech::Texture& texture : object->m_textures)
 				{
 					if (texture.m_active)
@@ -129,24 +129,24 @@ void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)
 
 void KTech::Camera::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
-	engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
+	m_engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
 }
 
 void KTech::Camera::RenderDrawPrint()
 {
-	if (engine.output.ShouldRenderThisTick())
+	if (m_engine.output.ShouldRenderThisTick())
 	{
 		// RENDER `Layer`s of parent `Map`
 		Render();
 		// DRAW the rendered image to `Output`'s image
 		Draw();
 		// PRINT the drawn `Output` image
-		engine.output.Print();
+		m_engine.output.Print();
 	}
-	else if (engine.output.ShouldPrintThisTick())
+	else if (m_engine.output.ShouldPrintThisTick())
 	{
 		// PRINT the drawn `Output` image
-		engine.output.Print();
+		m_engine.output.Print();
 	}
 }
 

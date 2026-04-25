@@ -113,7 +113,7 @@ public:
 		{}
 	};
 
-	Engine& engine; //!< Parent `Engine`
+	Engine& m_engine; //!< Parent `Engine`
 
 	/*!
 		@brief Construct an `Animation`, that will not play just yet.

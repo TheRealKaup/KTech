@@ -33,9 +33,9 @@
 #include "ui.hpp"
 
 KTech::Widget::Widget(Engine& p_engine, Point p_position, std::string p_name)
-	: engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbackGroup(engine, false)
+	: m_engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbackGroup(m_engine, false)
 {
-	engine.memory.widgets.Add(this);
+	m_engine.memory.Add(this);
 }
 
 KTech::Widget::Widget(Engine& p_engine, const ID<UI>& p_parentUI, Point p_position, std::string p_name)
@@ -49,12 +49,12 @@ KTech::Widget::~Widget()
 	RemoveAllWidgets();
 	LeaveUI();
 	LeaveWidget();
-	engine.memory.widgets.Remove(m_id);
+	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Widget::AddWidget(const ID<Widget>& p_widget) -> bool
 {
-	if (!engine.memory.widgets.Exists(p_widget))
+	if (!m_engine.memory.Exists(p_widget))
 	{
 		return false;
 	}
@@ -69,9 +69,9 @@ auto KTech::Widget::AddWidget(const ID<Widget>& p_widget) -> bool
 			return false;
 		}
 	}
-	engine.memory.widgets[p_widget]->m_parentWidget = m_id;
+	m_engine.memory[p_widget]->m_parentWidget = m_id;
 	m_childWidgets.emplace_back(
-		p_widget, engine.memory.widgets[p_widget]->m_selected, engine.memory.widgets[p_widget]->m_shown
+		p_widget, m_engine.memory[p_widget]->m_selected, m_engine.memory[p_widget]->m_shown
 	);
 	return true;
 }
@@ -82,9 +82,9 @@ auto KTech::Widget::RemoveWidget(const ID<Widget>& p_widget) -> bool
 	{
 		if (m_childWidgets[i].widget == p_widget)
 		{
-			if (engine.memory.widgets.Exists(m_childWidgets[i].widget))
+			if (m_engine.memory.Exists(m_childWidgets[i].widget))
 			{
-				engine.memory.widgets[m_childWidgets[i].widget]->m_parentWidget = nullID<Widget>;
+				m_engine.memory[m_childWidgets[i].widget]->m_parentWidget = nullID<Widget>;
 			}
 			m_childWidgets.erase(m_childWidgets.begin() + i);
 			return true;
@@ -101,9 +101,9 @@ auto KTech::Widget::RemoveAllWidgets() -> bool
 	}
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
-		if (engine.memory.widgets.Exists(childWidget.widget))
+		if (m_engine.memory.Exists(childWidget.widget))
 		{
-			engine.memory.widgets[childWidget.widget]->m_parentWidget = nullID<Widget>;
+			m_engine.memory[childWidget.widget]->m_parentWidget = nullID<Widget>;
 		}
 	}
 	m_childWidgets.clear();
@@ -112,18 +112,18 @@ auto KTech::Widget::RemoveAllWidgets() -> bool
 
 auto KTech::Widget::EnterWidget(const ID<Widget>& p_widget) -> bool
 {
-	if (p_widget == m_parentWidget || p_widget == m_id || !engine.memory.widgets.Exists(p_widget))
+	if (p_widget == m_parentWidget || p_widget == m_id || !m_engine.memory.Exists(p_widget))
 	{
 		return false;
 	}
-	return engine.memory.widgets[p_widget]->AddWidget(m_id);
+	return m_engine.memory[p_widget]->AddWidget(m_id);
 }
 
 auto KTech::Widget::LeaveWidget() -> bool
 {
-	if (engine.memory.widgets.Exists(m_parentWidget))
+	if (m_engine.memory.Exists(m_parentWidget))
 	{
-		return engine.memory.widgets[m_parentWidget]->RemoveWidget(m_id);
+		return m_engine.memory[m_parentWidget]->RemoveWidget(m_id);
 	}
 	m_parentWidget = nullID<Widget>;
 	return true;
@@ -131,18 +131,18 @@ auto KTech::Widget::LeaveWidget() -> bool
 
 auto KTech::Widget::EnterUI(const ID<UI>& p_ui) -> bool
 {
-	if (p_ui == m_parentUI || !engine.memory.uis.Exists(p_ui))
+	if (p_ui == m_parentUI || !m_engine.memory.Exists(p_ui))
 	{
 		return false;
 	}
-	return engine.memory.uis[p_ui]->AddWidget(m_id);
+	return m_engine.memory[p_ui]->AddWidget(m_id);
 }
 
 auto KTech::Widget::LeaveUI() -> bool
 {
-	if (engine.memory.uis.Exists(m_parentUI))
+	if (m_engine.memory.Exists(m_parentUI))
 	{
-		return engine.memory.uis[m_parentUI]->RemoveWidget(m_id);
+		return m_engine.memory[m_parentUI]->RemoveWidget(m_id);
 	}
 	m_parentUI = nullID<UI>;
 	return true;
@@ -156,7 +156,7 @@ void KTech::Widget::Select()
 	{
 		if (childWidget.oldSelected)
 		{
-			engine.memory.widgets[childWidget.widget]->Select();
+			m_engine.memory[childWidget.widget]->Select();
 		}
 	}
 	OnSelect();
@@ -168,8 +168,8 @@ void KTech::Widget::Deselect()
 	m_callbackGroup.Disable();
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
-		childWidget.oldSelected = engine.memory.widgets[childWidget.widget]->m_selected;
-		engine.memory.widgets[childWidget.widget]->Deselect();
+		childWidget.oldSelected = m_engine.memory[childWidget.widget]->m_selected;
+		m_engine.memory[childWidget.widget]->Deselect();
 	}
 	OnDeselect();
 }
@@ -181,7 +181,7 @@ void KTech::Widget::Show()
 	{
 		if (childWidget.oldShown)
 		{
-			engine.memory.widgets[childWidget.widget]->Show();
+			m_engine.memory[childWidget.widget]->Show();
 		}
 	}
 	void OnShow();
@@ -192,8 +192,8 @@ void KTech::Widget::Hide()
 	m_shown = false;
 	for (ChildWidget& childWidget : m_childWidgets)
 	{
-		childWidget.oldShown = engine.memory.widgets[childWidget.widget]->m_shown;
-		engine.memory.widgets[childWidget.widget]->Hide();
+		childWidget.oldShown = m_engine.memory[childWidget.widget]->m_shown;
+		m_engine.memory[childWidget.widget]->Hide();
 	}
 	void OnHide();
 }

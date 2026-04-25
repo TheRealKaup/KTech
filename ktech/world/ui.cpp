@@ -33,21 +33,21 @@
 #include "widget.hpp"
 
 KTech::UI::UI(Engine& p_engine, UPoint p_resolution, std::string p_name)
-	: engine(p_engine), m_res(p_resolution), m_name(std::move(p_name))
+	: m_engine(p_engine), m_res(p_resolution), m_name(std::move(p_name))
 {
-	engine.memory.uis.Add(this);
+	m_engine.memory.Add(this);
 	m_image.resize(m_res.y * m_res.x);
 }
 
 KTech::UI::~UI()
 {
 	RemoveAllWidgets();
-	engine.memory.uis.Remove(m_id);
+	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 {
-	if (!engine.memory.widgets.Exists(p_widget))
+	if (!m_engine.memory.Exists(p_widget))
 	{
 		return false;
 	}
@@ -58,7 +58,7 @@ auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 			return false;
 		}
 	}
-	engine.memory.widgets[p_widget]->m_parentUI = m_id;
+	m_engine.memory[p_widget]->m_parentUI = m_id;
 	m_widgets.push_back(p_widget);
 	return true;
 }
@@ -69,9 +69,9 @@ auto KTech::UI::RemoveWidget(const ID<Widget>& p_widget) -> bool
 	{
 		if (m_widgets[i] == p_widget)
 		{
-			if (engine.memory.widgets.Exists(m_widgets[i]))
+			if (m_engine.memory.Exists(m_widgets[i]))
 			{
-				engine.memory.widgets[m_widgets[i]]->m_parentUI = nullID<UI>;
+				m_engine.memory[m_widgets[i]]->m_parentUI = nullID<UI>;
 			}
 			m_widgets.erase(m_widgets.begin() + i);
 			return true;
@@ -88,9 +88,9 @@ auto KTech::UI::RemoveAllWidgets() -> bool
 	}
 	for (ID<Widget>& widget : m_widgets)
 	{
-		if (engine.memory.widgets.Exists(widget))
+		if (m_engine.memory.Exists(widget))
 		{
-			engine.memory.widgets[widget]->m_parentUI = nullID<UI>;
+			m_engine.memory[widget]->m_parentUI = nullID<UI>;
 		}
 	}
 	m_widgets.clear();
@@ -109,7 +109,7 @@ void KTech::UI::Render()
 
 	for (ID<Widget>& widgetID : m_widgets)
 	{
-		KTech::Widget* widget = engine.memory.widgets[widgetID];
+		KTech::Widget* widget = m_engine.memory[widgetID];
 		if (widget != nullptr && widget->m_shown)
 		{
 			for (KTech::Texture& texture : widget->m_textures)
@@ -134,26 +134,26 @@ void KTech::UI::Render()
 
 void KTech::UI::Draw(Point p_position, UPoint p_start, UPoint p_end, uint8_t p_alpha)
 {
-	engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
+	m_engine.output.Draw(m_image, m_res, p_position, p_start, p_end, p_alpha);
 }
 
 void KTech::UI::RenderClearDrawPrint()
 {
-	if (engine.output.ShouldRenderThisTick())
+	if (m_engine.output.ShouldRenderThisTick())
 	{
 		// RENDER `Layer`s of parent `Map`
 		Render();
 		// CLEAR the previous `Output` image.
-		engine.output.Clear();
+		m_engine.output.Clear();
 		// DRAW the rendered image to `Output`'s image
 		Draw();
 		// PRINT the drawn `Output` image
-		engine.output.Print();
+		m_engine.output.Print();
 	}
-	else if (engine.output.ShouldPrintThisTick())
+	else if (m_engine.output.ShouldPrintThisTick())
 	{
 		// PRINT the drawn `Output` image
-		engine.output.Print();
+		m_engine.output.Print();
 	}
 }
 

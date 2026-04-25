@@ -42,7 +42,7 @@
 class KTech::Map
 {
 public:
-	Engine& engine;						   //!< Parent `Engine`.
+	Engine& m_engine;						   //!< Parent `Engine`.
 	const ID<Map> m_id{ID<Map>::Unique()}; //!< Personal `ID`.
 	std::string m_name;					   //!< String name.
 	std::vector<ID<Camera>> m_cameras;	   //!< Contained `Camera`s

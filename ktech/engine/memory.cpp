@@ -29,55 +29,30 @@
 #include "memory.hpp"
 
 #include "../utility/cachingregistry.hpp"
+// IWYU pragma: begin_keep
+// clangd fails to recognize that call to `entity->OnTick()` depends on these definitions
 #include "../world/camera.hpp"
 #include "../world/layer.hpp"
 #include "../world/map.hpp"
 #include "../world/object.hpp"
 #include "../world/ui.hpp"
 #include "../world/widget.hpp"
+// IWYU pragma: end_keep
 
 void KTech::Memory::CallOnTicks()
 {
-	for (UI* ui : uis.m_vec)
-	{
-		if (ui->OnTick() && !m_changedThisTick)
-		{
-			m_changedThisTick = true;
-		}
-	}
-	for (Widget* widget : widgets.m_vec)
-	{
-		if (widget->OnTick() && !m_changedThisTick)
-		{
-			m_changedThisTick = true;
-		}
-	}
-	for (Map* map : maps.m_vec)
-	{
-		if (map->OnTick() && !m_changedThisTick)
-		{
-			m_changedThisTick = true;
-		}
-	}
-	for (Camera* camera : cameras.m_vec)
-	{
-		if (camera->OnTick() && !m_changedThisTick)
-		{
-			m_changedThisTick = true;
-		}
-	}
-	for (Layer* layer : layers.m_vec)
-	{
-		if (layer->OnTick() && !m_changedThisTick)
-		{
-			m_changedThisTick = true;
-		}
-	}
-	for (Object* object : objects.m_vec)
-	{
-		if (object->OnTick() && !m_changedThisTick)
-		{
-			m_changedThisTick = true;
-		}
-	}
+	std::apply(
+		[this](auto&... p_registries) -> void {
+			(..., [this]<class T>(CachingRegistry<T>& p_registry) -> void {
+				for (T* entity : p_registry.m_vec)
+				{
+					if (entity->OnTick())
+					{
+						this->m_changedThisTick = true;
+					}
+				}
+			}(p_registries));
+		},
+		m_registries
+	);
 }

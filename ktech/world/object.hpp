@@ -44,7 +44,7 @@
 class KTech::Object
 {
 public:
-	Engine& engine;								 //!< Parent `Engine`.
+	Engine& m_engine;								 //!< Parent `Engine`.
 	const ID<Object> m_id{ID<Object>::Unique()}; //!< Personal `ID`.
 	std::string m_name;							 //!< String name.
 	ID<Layer> m_parentLayer;					 //!< Parent `Layer`.
@@ -125,7 +125,7 @@ protected:
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -134,7 +134,7 @@ protected:
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -143,7 +143,7 @@ protected:
 		@param direction The attempted movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -152,7 +152,7 @@ protected:
 		@param direction The attempted movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -161,7 +161,7 @@ protected:
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -170,7 +170,7 @@ protected:
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -179,7 +179,7 @@ protected:
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
@@ -188,7 +188,7 @@ protected:
 		@param direction The movement's direction.
 		@param collider The index of this `Object`'s collider that collided (`this->Object::m_colliders[collider]`).
 		@param otherObject The `Object` that collided with this `Object`.
-		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory.objects[otherObject]->Object::m_colliders[otherCollider]`).
+		@param otherCollider The index of `otherObject`'s collider that collided (`engine.memory[otherObject]->Object::m_colliders[otherCollider]`).
 	*/
 	virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 

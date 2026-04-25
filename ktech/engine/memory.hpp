@@ -72,8 +72,47 @@ public:
 	*/
 	void CallOnTicks();
 
+	template <class T>
+	auto operator[](const ID<T>& id) -> T*
+	{
+		return std::get<CachingRegistry<T>>(m_registries)[id];
+	}
+
+	template <class T>
+	auto Exists(const ID<T>& id) -> bool
+	{
+		return std::get<CachingRegistry<T>>(m_registries).Exists(id);
+	}
+
 private:
+	template <class T>
+	auto Add(T* structure) -> void
+	{
+		std::get<CachingRegistry<T>>(m_registries).Add(structure);
+	}
+
+	template <class T>
+	auto Remove(const ID<T>& id) -> void
+	{
+		std::get<CachingRegistry<T>>(m_registries).Remove(id);
+	}
+
+	std::tuple<
+		CachingRegistry<Object>,
+		CachingRegistry<Layer>,
+		CachingRegistry<Camera>,
+		CachingRegistry<Map>,
+		CachingRegistry<Widget>,
+		CachingRegistry<UI>>
+		m_registries;
+
 	bool m_changedThisTick = false;
 
 	friend class Output;
+	friend class Object;
+	friend class Layer;
+	friend class Camera;
+	friend class Map;
+	friend class Widget;
+	friend class UI;
 };

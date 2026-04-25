@@ -203,7 +203,7 @@ private:
 
 	auto Insert() -> bool
 	{
-		if (engine.input.Is(KTech::Keys::backspace) || engine.input.Is(KTech::Keys::delete_))
+		if (m_engine.input.Is(KTech::Keys::backspace) || m_engine.input.Is(KTech::Keys::delete_))
 		{
 			if (m_currentChar == 0)
 			{
@@ -221,8 +221,8 @@ private:
 		}
 		else
 		{
-			m_textures[ti_input](m_currentChar, 0).c = engine.input.input.at(0);
-			m_string.push_back(engine.input.input.at(0));
+			m_textures[ti_input](m_currentChar, 0).c = m_engine.input.input.at(0);
+			m_string.push_back(m_engine.input.input.at(0));
 			m_currentChar++;
 		}
 		if (m_OnInsert)

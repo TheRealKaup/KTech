@@ -73,7 +73,7 @@ public:
 		//! @}
 	};
 
-	Engine& engine;								 //!< Parent `Engine`.
+	Engine& m_engine;								 //!< Parent `Engine`.
 	const ID<Widget> m_id{ID<Widget>::Unique()}; //!< Personal `ID`.
 	std::string m_name;							 //!< String name.
 	ID<UI> m_parentUI;							 //!< The `UI` containing this `Widget`.

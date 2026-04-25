@@ -54,7 +54,7 @@
 class KTech::UI
 {
 public:
-	Engine& engine;						 //!< Parent `Engine`.
+	Engine& m_engine;						 //!< Parent `Engine`.
 	const ID<UI> m_id{ID<UI>::Unique()}; //!< Personal `ID`.
 	std::string m_name;					 //!< String name
 	std::vector<ID<Widget>> m_widgets;	 //!< Contained `Widget`s.

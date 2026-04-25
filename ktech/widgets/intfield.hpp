@@ -214,7 +214,7 @@ private:
 
 	auto Insert() -> bool
 	{
-		if (engine.input.Is(KTech::Keys::backspace) || engine.input.Is(KTech::Keys::delete_))
+		if (m_engine.input.Is(KTech::Keys::backspace) || m_engine.input.Is(KTech::Keys::delete_))
 		{
 			if (m_currentDigit == 0)
 			{
@@ -226,17 +226,17 @@ private:
 			m_currentDigit--;
 			m_textures[ti_input](m_currentDigit, 0).c = ' ';
 		}
-		else if (engine.input.Between('0', '9'))
+		else if (m_engine.input.Between('0', '9'))
 		{
 			if (m_currentDigit == m_maxDigits)
 			{
 				return false;
 			}
 
-			m_textures[ti_input](m_currentDigit, 0).c = engine.input.input.at(0);
+			m_textures[ti_input](m_currentDigit, 0).c = m_engine.input.input.at(0);
 			m_currentDigit++;
 
-			m_visibleNumber = m_visibleNumber * 10 + engine.input.GetInt();
+			m_visibleNumber = m_visibleNumber * 10 + m_engine.input.GetInt();
 		}
 
 		if (m_visibleNumber < m_min)

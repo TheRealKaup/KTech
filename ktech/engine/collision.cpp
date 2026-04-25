@@ -36,8 +36,8 @@
 
 #include <algorithm>
 
-#define OBJECTS engine.memory.objects
-#define LAYERS engine.memory.layers
+#define OBJECTS engine.memory
+#define LAYERS engine.memory
 
 auto KTech::Collision::MoveObject(const ID<Object>& p_object, Point p_direction) -> bool
 {

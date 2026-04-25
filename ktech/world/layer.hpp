@@ -47,7 +47,7 @@
 class KTech::Layer
 {
 public:
-	Engine& engine;							   //!< Parent `Engine`
+	Engine& m_engine;							   //!< Parent `Engine`
 	const ID<Layer> m_id{ID<Layer>::Unique()}; //!< Personal `ID`.
 	std::string m_name;						   //!< String anme; could be useful in debugging.
 	ID<Map> m_parentMap;					   //!< Parent `Map`.

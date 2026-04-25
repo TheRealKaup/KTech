@@ -116,7 +116,7 @@ namespace
 
 		void OnOverlap(Point /*p_dir*/, size_t /*p_collider*/, ID<Object> p_otherObject, size_t p_otherCollider) final
 		{
-			if (engine.memory.objects[p_otherObject]->m_colliders[p_otherCollider].m_type == 2)
+			if (m_engine.memory[p_otherObject]->m_colliders[p_otherCollider].m_type == 2)
 				m_box = p_otherObject;
 		}
 
@@ -160,11 +160,11 @@ namespace
 
 		auto PushBoxToDifferentLayer() -> bool
 		{
-			engine.output.Log("<Character::PushBoxToDifferentLayer()> Start of function...", RGBColors::red);
-			if (engine.memory.objects.Exists(m_box))
+			m_engine.output.Log("<Character::PushBoxToDifferentLayer()> Start of function...", RGBColors::red);
+			if (m_engine.memory.Exists(m_box))
 			{
-				engine.output.Log("<Character::PushBoxToDifferentLayer()> Moving object to voidLayer", RGBColors::red);
-				engine.memory.objects[m_box]->EnterLayer(m_voidLayer);
+				m_engine.output.Log("<Character::PushBoxToDifferentLayer()> Moving object to voidLayer", RGBColors::red);
+				m_engine.memory[m_box]->EnterLayer(m_voidLayer);
 				m_box = ID<Object>();
 				return true;
 			}

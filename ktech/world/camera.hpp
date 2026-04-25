@@ -49,7 +49,7 @@
 class KTech::Camera
 {
 public:
-	Engine& engine;								 //!< Parent engine.
+	Engine& m_engine;								 //!< Parent engine.
 	const ID<Camera> m_id{ID<Camera>::Unique()}; //!< Personal `ID`.
 	std::string m_name;							 //!< String name, might be useful for debugging.
 	ID<Map> m_parentMap;						 //!< The map which contains this `Camera`.

@@ -11,6 +11,7 @@ Diagnostics:
         "readability-identifier-length",
         "misc-non-private-member-variables-in-classes",
         "misc-no-recursion",
+        "misc-multiple-inheritance"
       ]
     CheckOptions:
       ## Name casing
@@ -23,10 +24,6 @@ Diagnostics:
       readability-identifier-naming.ParameterCase: "camelCase"
       ## Name prefixes
       readability-identifier-naming.MemberPrefix: "m_"
-      # Historically in KTech, member references and pointers to `Engine` were exempt from the "m_" prefix because they
-      # link world structures with the running engine (and the engine itself is more of a public/global structure, than
-      # a non-static data member of a specific world structure).
-      readability-identifier-naming.MemberIgnoredRegexp: "engine"
     # Makes more checks appear in IDE
     FastCheckFilter: None
 
