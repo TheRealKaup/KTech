@@ -32,9 +32,8 @@
 #include "layer.hpp"
 
 KTech::Object::Object(Engine& p_engine, Point p_position, std::string p_name)
-	: m_engine(p_engine), m_pos(p_position), m_name(std::move(p_name))
+	: Entity(p_engine, std::move(p_name)), m_pos(p_position)
 {
-	m_engine.memory.Add(this);
 }
 
 KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_position, std::string p_name)
@@ -46,7 +45,6 @@ KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_
 KTech::Object::~Object()
 {
 	LeaveLayer();
-	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Object::EnterLayer(const ID<Layer>& p_layer) -> bool
@@ -73,11 +71,6 @@ auto KTech::Object::Move(Point p_direction) -> bool
 	// Request the collision manager of the engine to move this object.
 	return m_engine.collision.MoveObject(m_id, p_direction);
 }
-
-auto KTech::Object::OnTick() -> bool
-{
-	return false;
-};
 
 void KTech::Object::OnMove(Point direction)
 {}

@@ -66,26 +66,7 @@ private:
 		@return Pointer to the structure.
 		@return `nullptr` if the structure was not found.
 	*/
-	auto operator[](const ID<T>& id) -> T*
-	{
-		if (!m_vec.empty())
-		{
-			for (size_t i = (id.m_i < m_vec.size() ? id.m_i : m_vec.size() - 1);; i--)
-			{
-				if (m_vec[i]->m_id == id)
-				{
-					id.m_i = i;
-					return m_vec[i];
-				}
-				if (i == 0)
-				{
-					break;
-				}
-			}
-		}
-		id.m_i = 0;
-		return nullptr;
-	}
+	auto operator[](const KTech::ID<T>& id) -> T*;
 
 	/*!
 		@brief Check if an `ID` matches a registered structure.
@@ -95,54 +76,21 @@ private:
 		@return `true`: the structure exists.
 		@return `false`: ther structure doesn't exist.
 	*/
-	auto Exists(const ID<T>& id) -> bool
-	{
-		return IDToIndex(id) != m_vec.size();
-	}
+	auto Exists(const KTech::ID<T>& id) -> bool;
 
 	// Adds the pointer to the container.
 	// Automatically called by objects, layers, cameras and maps for themselves.
 	// You shouldn't call this manually on a structure.
-	auto Add(T* structure) -> void
-	{
-		structure->m_id.m_i = m_vec.size();
-		m_vec.push_back(structure);
-	}
+	auto Add(T* structure) -> void;
 
 	// Remove a structure from storage (doesn't delete it's memory).
 	// Returns true if the structure was found and removed.
 	// Returns false if the structure is missing.
-	auto Remove(const ID<T>& id) -> void
-	{
-		size_t toRemove = IDToIndex(id);
-		if (toRemove != m_vec.size())
-		{
-			m_vec.erase(m_vec.begin() + toRemove);
-		}
-	}
+	auto Remove(const KTech::ID<T>& id) -> void;
 
 	// Returns the valid index of the ID.
 	// If the UUID is missing, return the size of the array making the index invalid.
-	auto IDToIndex(const ID<T>& id) -> size_t
-	{
-		if (!m_vec.empty())
-		{
-			for (size_t i = (id.m_i < m_vec.size() ? id.m_i : m_vec.size() - 1);; i--)
-			{
-				if (m_vec[i]->m_id == id)
-				{
-					id.m_i = i;
-					return i;
-				}
-				if (i == 0)
-				{
-					break;
-				}
-			}
-		}
-		id.m_i = 0;
-		return m_vec.size();
-	}
+	auto IDToIndex(const KTech::ID<T>& id) -> size_t;
 
 	friend class Memory;
 };

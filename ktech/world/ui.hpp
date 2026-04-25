@@ -37,6 +37,7 @@
 #include "../basic/upoint.hpp"
 #include "../utility/id.hpp"
 #include "../utility/rgbacolors.hpp"
+#include "entity.hpp"
 
 #include <limits>
 #include <string>
@@ -51,12 +52,9 @@
 
 	Also, `UI`'s image is `CellA`-based in contrary to `Camera`'s `Cell`-based image. The alpha channels maintain the total opacity of the rendered image. This allows `UI`'s image to be drawn like a HUD on top of `Camera`'s image in `Output::Draw()`.
 */
-class KTech::UI
+class KTech::UI : public Entity<UI>
 {
 public:
-	Engine& m_engine;						 //!< Parent `Engine`.
-	const ID<UI> m_id{ID<UI>::Unique()}; //!< Personal `ID`.
-	std::string m_name;					 //!< String name
 	std::vector<ID<Widget>> m_widgets;	 //!< Contained `Widget`s.
 
 	UPoint m_res; //!< Image's resolution.
@@ -142,23 +140,6 @@ public:
 		@see `Engine::noGameLoopMode`
 	*/
 	void RenderClearDrawPrint();
-
-protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		You can override this in your inherited class to add whatever functionality you want.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
-	friend class KTech::Memory;
 
 private:
 	inline void RenderBackground();

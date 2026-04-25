@@ -37,17 +37,16 @@
 #include "object.hpp"
 #include "texture.hpp"
 
-KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, const std::string& p_name)
-	: m_engine(p_engine), m_pos(p_position), m_res(p_resolution)
+KTech::Camera::Camera(Engine& p_engine, Point p_position, UPoint p_resolution, std::string p_name)
+	: Entity(p_engine, std::move(p_name)), m_pos(p_position), m_res(p_resolution)
 {
-	m_engine.memory.Add(this);
 	m_image.resize(m_res.y * m_res.x);
 }
 
 KTech::Camera::Camera(
-	Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, const std::string& p_name
+	Engine& p_engine, const ID<Map>& p_parentMap, Point p_position, UPoint p_resolution, std::string p_name
 )
-	: Camera(p_engine, p_position, p_resolution)
+	: Camera(p_engine, p_position, p_resolution, std::move(p_name))
 {
 	EnterMap(p_parentMap);
 }
@@ -56,7 +55,6 @@ KTech::Camera::~Camera()
 {
 	Output::Log("<Camera[" + m_name + "]::~Camera()>", RGBColors::red);
 	LeaveMap();
-	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
@@ -149,11 +147,6 @@ void KTech::Camera::RenderDrawPrint()
 		m_engine.output.Print();
 	}
 }
-
-auto KTech::Camera::OnTick() -> bool
-{
-	return false;
-};
 
 inline void KTech::Camera::RenderBackground()
 {

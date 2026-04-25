@@ -35,17 +35,14 @@
 #include "layer.hpp"
 
 KTech::Map::Map(Engine& p_engine, std::string p_name)
-	: m_engine(p_engine), m_name(std::move(p_name))
-{
-	m_engine.memory.Add(this);
-};
+	: Entity(p_engine, std::move(p_name))
+{}
 
 KTech::Map::~Map()
 {
 	Output::Log("<Map[" + m_name + "]::~Map()>", RGBColors::red);
 	RemoveAllLayers();
 	RemoveAllCameras();
-	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Map::AddLayer(const ID<Layer>& p_layer) -> bool
@@ -151,8 +148,3 @@ auto KTech::Map::RemoveAllCameras() -> bool
 	m_cameras.clear();
 	return true;
 }
-
-auto KTech::Map::OnTick() -> bool
-{
-	return false;
-};

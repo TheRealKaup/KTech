@@ -34,6 +34,7 @@
 #include "../basic/point.hpp"
 #include "../utility/id.hpp"
 #include "collider.hpp"
+#include "entity.hpp"
 #include "texture.hpp"
 
 /*!
@@ -41,13 +42,10 @@
 
 	This and `Widget` are the most commonly inherited-from world structures. It differs from `Widget` because it can contain `Collider`s, while `Widget` is limited to `Texture`s. `Widget` also has some additional features which are useful for user-interfaces. You can conveniently make player-controlled classes based on `Object`, such as walking characters (see "simpleplatform" game example).
 */
-class KTech::Object
+class KTech::Object : public Entity<Object>
 {
 public:
-	Engine& m_engine;								 //!< Parent `Engine`.
-	const ID<Object> m_id{ID<Object>::Unique()}; //!< Personal `ID`.
-	std::string m_name;							 //!< String name.
-	ID<Layer> m_parentLayer;					 //!< Parent `Layer`.
+	ID<Layer> m_parentLayer; //!< Parent `Layer`.
 
 	Point m_pos;					   //!< World position.
 	std::vector<Texture> m_textures;   //!< `Texture`s.
@@ -102,18 +100,6 @@ public:
 	auto Move(Point direction) -> bool;
 
 protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
 	/*!
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` moving (voluntarily or passively).
 		@param direction The movement's direction.
@@ -193,5 +179,4 @@ protected:
 	virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	friend class KTech::Collision;
-	friend class KTech::Memory;
 };

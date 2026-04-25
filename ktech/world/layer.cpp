@@ -35,9 +35,8 @@
 #include "object.hpp"
 
 KTech::Layer::Layer(Engine& p_engine, std::string p_name)
-	: m_engine(p_engine), m_name(std::move(p_name))
+	: Entity(p_engine, std::move(p_name))
 {
-	m_engine.memory.Add(this);
 }
 
 KTech::Layer::Layer(Engine& p_engine, const ID<Map>& p_parentMap, std::string p_name)
@@ -51,7 +50,6 @@ KTech::Layer::~Layer()
 	Output::Log("<Layer[" + m_name + "]::~Layer()>", RGBColors::red);
 	RemoveAllObjects();
 	LeaveMap();
-	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Layer::operator[](size_t p_index) -> ID<Object>&
@@ -129,8 +127,3 @@ auto KTech::Layer::LeaveMap() -> bool
 	m_parentMap = nullID<Map>;
 	return true;
 }
-
-auto KTech::Layer::OnTick() -> bool
-{
-	return false;
-};

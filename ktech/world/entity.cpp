@@ -20,38 +20,37 @@
 
 /*!
 	@file
-	@brief Define KTech::Memory members
+	@brief Define KTech::Entity class member functions
 	@author Ethan Kaufman (AKA Kaup)
 	@date 2023-2026
 	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
 */
 
-#include "memory.hpp"
+#include "../engine/engine.hpp"
+#include "entity.hpp"
 
-// IWYU pragma: begin_keep
-// clangd fails to recognize that call to `entity->OnTick()` depends on these definitions
-#include "../world/camera.hpp"
-#include "../world/layer.hpp"
-#include "../world/map.hpp"
-#include "../world/object.hpp"
-#include "../world/ui.hpp"
-#include "../world/widget.hpp"
-// IWYU pragma: end_keep
-
-void KTech::Memory::CallOnTicks()
+template <class This>
+KTech::Entity<This>::Entity(Engine& p_engine, std::string p_name)
+	: m_engine(p_engine), m_name(std::move(p_name))
 {
-	std::apply(
-		[this](auto&... p_registries) -> void {
-			(..., [this]<class T>(CachingRegistry<T>& p_registry) -> void {
-				for (T* entity : p_registry.m_vec)
-				{
-					if (entity->OnTick())
-					{
-						this->m_changedThisTick = true;
-					}
-				}
-			}(p_registries));
-		},
-		m_registries
-	);
+	m_engine.memory.Add(reinterpret_cast<This*>(this));
 }
+
+template <class This>
+KTech::Entity<This>::~Entity()
+{
+	m_engine.memory.Remove(m_id);
+}
+
+template <class This>
+auto KTech::Entity<This>::OnTick() -> bool
+{
+	return false;
+}
+
+template class KTech::Entity<KTech::Camera>;
+template class KTech::Entity<KTech::Layer>;
+template class KTech::Entity<KTech::Map>;
+template class KTech::Entity<KTech::Object>;
+template class KTech::Entity<KTech::UI>;
+template class KTech::Entity<KTech::Widget>;

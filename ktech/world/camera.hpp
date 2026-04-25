@@ -36,6 +36,7 @@
 #include "../basic/upoint.hpp"
 #include "../utility/id.hpp"
 #include "../utility/rgbcolors.hpp"
+#include "entity.hpp"
 
 #include <limits>
 #include <string>
@@ -46,12 +47,9 @@
 
 	`Camera` is able to render a `Cell`-based image (`Camera::Render()`), which can be drawn to `Output`'s image buffer (`Camera::Draw()` or `Output::Draw()`), and printed to the terminal (`Output::Print()`).
 */
-class KTech::Camera
+class KTech::Camera : public Entity<Camera>
 {
 public:
-	Engine& m_engine;								 //!< Parent engine.
-	const ID<Camera> m_id{ID<Camera>::Unique()}; //!< Personal `ID`.
-	std::string m_name;							 //!< String name, might be useful for debugging.
 	ID<Map> m_parentMap;						 //!< The map which contains this `Camera`.
 
 	Point m_pos;  //!< World position.
@@ -71,7 +69,7 @@ public:
 		Engine& engine,
 		Point position = {.x = 0, .y = 0},
 		UPoint resolution = {.x = 10, .y = 10},
-		const std::string& name = ""
+		std::string name = ""
 	);
 
 	/*!
@@ -90,7 +88,7 @@ public:
 		const ID<Map>& parentMap,
 		Point position = Point(0, 0),
 		UPoint resolution = {.x = 10, .y = 10},
-		const std::string& name = ""
+		std::string name = ""
 	);
 
 	/*!
@@ -169,26 +167,9 @@ public:
 	*/
 	void RenderDrawPrint();
 
-protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		You can override this in your inherited class to add whatever functionality you want.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
 private:
 	inline void RenderBackground();
 	inline void RenderSimple(uint8_t layerAlpha, Object* object, Texture& texture);
 	inline void RenderComplex(uint8_t layerAlpha, Object* object, Texture& texture);
 	inline void RenderForeground(const RGBA& frgba, const RGBA& brgba);
-
-	friend class KTech::Memory;
 };

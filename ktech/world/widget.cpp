@@ -33,9 +33,8 @@
 #include "ui.hpp"
 
 KTech::Widget::Widget(Engine& p_engine, Point p_position, std::string p_name)
-	: m_engine(p_engine), m_pos(p_position), m_name(std::move(p_name)), m_callbackGroup(m_engine, false)
+	: Entity(p_engine, std::move(p_name)), m_pos(p_position), m_callbackGroup(m_engine, false)
 {
-	m_engine.memory.Add(this);
 }
 
 KTech::Widget::Widget(Engine& p_engine, const ID<UI>& p_parentUI, Point p_position, std::string p_name)
@@ -49,7 +48,6 @@ KTech::Widget::~Widget()
 	RemoveAllWidgets();
 	LeaveUI();
 	LeaveWidget();
-	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::Widget::AddWidget(const ID<Widget>& p_widget) -> bool
@@ -197,11 +195,6 @@ void KTech::Widget::Hide()
 	}
 	void OnHide();
 }
-
-auto KTech::Widget::OnTick() -> bool
-{
-	return false;
-};
 
 void KTech::Widget::OnSelect()
 {}

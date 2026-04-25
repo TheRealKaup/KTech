@@ -57,10 +57,12 @@ namespace KTech
 	struct UPoint;
 	struct Cell;
 	struct CellA;
-	// World structures.
+	// Entities (world structures).
 	// Definitions in `world/`
 	struct Texture;
 	struct Collider;
+	template <class This>
+	class Entity;
 	class Object;
 	class Layer;
 	class Camera;

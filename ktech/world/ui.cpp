@@ -33,16 +33,14 @@
 #include "widget.hpp"
 
 KTech::UI::UI(Engine& p_engine, UPoint p_resolution, std::string p_name)
-	: m_engine(p_engine), m_res(p_resolution), m_name(std::move(p_name))
+	: Entity(p_engine, std::move(p_name)), m_res(p_resolution)
 {
-	m_engine.memory.Add(this);
 	m_image.resize(m_res.y * m_res.x);
 }
 
 KTech::UI::~UI()
 {
 	RemoveAllWidgets();
-	m_engine.memory.Remove(m_id);
 }
 
 auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
@@ -156,11 +154,6 @@ void KTech::UI::RenderClearDrawPrint()
 		m_engine.output.Print();
 	}
 }
-
-auto KTech::UI::OnTick() -> bool
-{
-	return false;
-};
 
 inline void KTech::UI::RenderBackground()
 {

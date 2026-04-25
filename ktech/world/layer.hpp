@@ -34,6 +34,7 @@
 #include "../basic/rgba.hpp"
 #include "../utility/id.hpp"
 #include "../utility/rgbacolors.hpp"
+#include "entity.hpp"
 
 #include <limits>
 #include <string>
@@ -44,12 +45,9 @@
 
 	Separates `Object`s in collision (only `Object`s from the same `Layer` can collide), and orders `Object`s in rendering (`Object`s in the first `Layer` added to a `Map` will be covered by `Object`s from the following `Layer`, and so on).
 */
-class KTech::Layer
+class KTech::Layer : public Entity<Layer>
 {
 public:
-	Engine& m_engine;							   //!< Parent `Engine`
-	const ID<Layer> m_id{ID<Layer>::Unique()}; //!< Personal `ID`.
-	std::string m_name;						   //!< String anme; could be useful in debugging.
 	ID<Map> m_parentMap;					   //!< Parent `Map`.
 	std::vector<ID<Object>> m_objects;		   //!< Contained `Object`s.
 	bool m_visible = true;					   //!< `true`: will be rendered by `Camera`. `false`: won't be.
@@ -122,21 +120,4 @@ public:
 		@return `true` if left parent `Map` (`Layer::m_parentMap`). `false` if there's no parent `Map`, or the parent `Map` doesn't exist in `Memory`.
 	*/
 	auto LeaveMap() -> bool;
-
-protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		You can override this in your inherited class to add whatever functionality you want.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
-	friend class KTech::Memory;
 };

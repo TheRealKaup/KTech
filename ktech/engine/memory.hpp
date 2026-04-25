@@ -43,13 +43,6 @@
 class KTech::Memory
 {
 public:
-	CachingRegistry<Object> objects; //!< `Object`s registry.
-	CachingRegistry<Layer> layers;	 //!< `Layer`s registry.
-	CachingRegistry<Camera> cameras; //!< `Camera`s registry.
-	CachingRegistry<Map> maps;		 //!< `Map`s registry.
-	CachingRegistry<Widget> widgets; //!< `Widget`s registry.
-	CachingRegistry<UI> uis;		 //!< `UI`s registry.
-
 	/*!
 		@brief Call the virtual `OnTick()` functions of all registered world structures.
 
@@ -72,6 +65,7 @@ public:
 	*/
 	void CallOnTicks();
 
+	// Note: these are defined here in the header file because I can't bother explicitly instantiating these.
 	template <class T>
 	auto operator[](const ID<T>& id) -> T*
 	{
@@ -109,10 +103,6 @@ private:
 	bool m_changedThisTick = false;
 
 	friend class Output;
-	friend class Object;
-	friend class Layer;
-	friend class Camera;
-	friend class Map;
-	friend class Widget;
-	friend class UI;
+	template <class Temp>
+	friend class Entity;
 };
