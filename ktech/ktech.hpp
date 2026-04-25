@@ -61,6 +61,14 @@ namespace KTech
 	// Definitions in `world/`
 	struct Texture;
 	struct Collider;
+	template <class Derived>
+	class Entity;
+	template <class T, class... Children>
+	class ParentEntity;
+	template <class T, class Parent>
+	class ChildEntity;
+	template <class This, class Parent, class... Children>
+	class ParentChildEntity;
 	class Object;
 	class Layer;
 	class Camera;

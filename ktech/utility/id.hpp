@@ -74,6 +74,7 @@ private:
 		return ID(uuid);
 	}
 
-	friend T; // Allow only world structures to call `Unique()`.
-	friend class CachingRegistry<T>;
+	friend class Entity<T>;
+	template <class Temp>
+	friend class CachingRegistry;
 };

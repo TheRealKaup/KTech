@@ -31,22 +31,15 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../utility/id.hpp"
-
-#include <string>
-#include <vector>
+#include "entity.hpp"
 
 /*!
 	@brief World structure that contains `Layer`s and `Camera`s.
 */
-class KTech::Map
+class KTech::Map : public KTech::ParentEntity<Map, Camera, Layer>
 {
 public:
-	Engine& m_engine;						   //!< Parent `Engine`.
-	const ID<Map> m_id{ID<Map>::Unique()}; //!< Personal `ID`.
-	std::string m_name;					   //!< String name.
-	std::vector<ID<Camera>> m_cameras;	   //!< Contained `Camera`s
-	std::vector<ID<Layer>> m_layers;	   //!< Contained `Layer`s
+	using ParentEntity::ParentEntity;
 
 	/*!
 		@brief Construct a `Map`.
@@ -54,11 +47,6 @@ public:
 		@param name String name.
 	*/
 	Map(Engine& engine, std::string name = "");
-
-	/*!
-		@brief Remove all `Layer`s and `Camera`s, then remove itself from `Memory`.
-	*/
-	virtual ~Map();
 
 	/*!
 		@brief Add a `Layer`.
@@ -87,33 +75,4 @@ public:
 		@return `true` if removed the `Camera`. `false` if the given `Camera` isn't contained by this `Map`.
 	*/
 	auto RemoveCamera(const ID<Camera>& camera) -> bool;
-
-	/*!
-		@brief Remove all contained `Layer`s.
-		@return `true` if removed all `Layer`s. `false` if there are no `Layer`s in this `Map`.
-	*/
-	auto RemoveAllLayers() -> bool;
-
-	/*!
-		@brief Remove all contained `Camera`s.
-		@return `true` if removed all `Camera`s. `false` if there are no `Camera`s in this `Map`.
-	*/
-	auto RemoveAllCameras() -> bool;
-
-protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		You can override this in your inherited class to add whatever functionality you want.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
-	friend class KTech::Memory;
 };

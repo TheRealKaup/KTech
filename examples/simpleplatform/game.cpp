@@ -320,8 +320,7 @@ auto main() -> int
 	map.m_name = "map";
 
 	Output::Log("<main()> Creating layer", RGBColors::blue);
-	Layer layer(engine, map.m_id);
-	layer.m_name = "layer";
+	Layer layer(engine, map.m_id, "layer");
 	Output::Log("<main()> Creating voidLayer", RGBColors::blue);
 	Layer voidLayer(engine, map.m_id);
 	voidLayer.m_name = "voidLayer";
@@ -443,7 +442,7 @@ auto main() -> int
 				engine.output.Clear(); // Allows to make foreground darker
 				camera.Render({layer.m_id, voidLayer.m_id, darkLayer.m_id});
 				engine.output.Draw(camera.m_image, camera.m_res, Point(0, 0), UPoint(0, 0), UPoint(0, 0), 100);
-				character.m_cam.Render(map.m_layers);
+				character.m_cam.Render(map.GetChildren<Layer>());
 				engine.output.Draw(
 					character.m_cam.m_image,
 					character.m_cam.m_res,
@@ -467,7 +466,7 @@ auto main() -> int
 			}
 			else
 			{
-				camera.Render(map.m_layers);
+				camera.Render(map.GetChildren<Layer>());
 				camera.Draw();
 			}
 			quitUI.Render();

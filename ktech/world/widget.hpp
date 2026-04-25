@@ -36,6 +36,7 @@
 #include "../engine/input/input.hpp"
 #include "../utility/id.hpp"
 #include "../world/texture.hpp"
+#include "entity.hpp"
 
 /*!
 	@brief World structure that comprises `Texture`s, behaves as a user interface element, and exists within `UI`.
@@ -49,7 +50,7 @@
 	@see `StringField`
 	@see `Switch`
 */
-class KTech::Widget
+class KTech::Widget : public ChildEntity<Widget, UI>
 {
 public:
 	//! @deprecated See GitHub issue #106
@@ -73,19 +74,15 @@ public:
 		//! @}
 	};
 
-	Engine& m_engine;								 //!< Parent `Engine`.
-	const ID<Widget> m_id{ID<Widget>::Unique()}; //!< Personal `ID`.
-	std::string m_name;							 //!< String name.
-	ID<UI> m_parentUI;							 //!< The `UI` containing this `Widget`.
-	ID<Widget> m_parentWidget = nullID<Widget>;	 //!< @deprecated See GitHub issue #106
-	std::vector<ChildWidget> m_childWidgets;	 //!< @deprecated See GitHub issue #106
+	ID<Widget> m_parentWidget = nullID<Widget>; //!< @deprecated See GitHub issue #106
+	std::vector<ChildWidget> m_childWidgets;	//!< @deprecated See GitHub issue #106
 	bool m_selected = false; //!< `true`: player input reaches the `Widget`. `false`: player input doesn't.
 	bool m_shown = true;	 //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
 
 	Point m_pos;					 //!< World position.
 	std::vector<Texture> m_textures; //!< Comprising `Texture`s.
 	//! Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.
-	Input::CallbackGroup m_callbackGroup;
+	Input::CallbackGroup m_callbackGroup{m_engine, false};
 
 	/*!
 		@brief Construct a `Widget`.
@@ -103,13 +100,6 @@ public:
 		@param name String name.
 	*/
 	Widget(Engine& engine, const ID<UI>& parentUI, Point position = Point(0, 0), std::string name = "");
-
-	/*!
-		@brief Leave parent `UI` (if in one) and remove itself from `Memory`.
-
-		Additional behavior is undocumented due to planned changes (See GitHub issue #106)
-	*/
-	virtual ~Widget();
 
 	/*!
 		@deprecated See GitHub issue #106
@@ -195,18 +185,6 @@ public:
 
 protected:
 	/*!
-		@brief Virtual function called once each tick.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
-	/*!
 		@brief Virtual function called by `Widget::Select()`.
 
 		Usually, you would override this function in your `Widget`-inherited class to make the `Texture`s (`Widget::m_textures`) seem selected in contrast to the other, unselected, `Widget`s in your user interface.
@@ -243,6 +221,4 @@ protected:
 		@see `Widget::Show()`
 	*/
 	virtual void OnHide();
-
-	friend class KTech::Memory;
 };

@@ -246,7 +246,7 @@ void KTech::Collision::ExpandMovementTree(
 	std::vector<CollisionData>& p_exitOverlapData
 )
 {
-	for (ID<Object>& otherObject : LAYERS[OBJECTS[p_thisObject]->m_parentLayer]->m_objects) // Other objects
+	for (ID<Object>& otherObject : LAYERS[OBJECTS[p_thisObject]->m_parent]->GetChildren<Object>()) // Other objects
 	{
 		if (otherObject == p_thisObject
 			|| std::ranges::any_of(

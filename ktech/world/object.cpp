@@ -29,13 +29,12 @@
 #include "object.hpp"
 
 #include "../engine/engine.hpp"
+#include "entity.hpp"
 #include "layer.hpp"
 
 KTech::Object::Object(Engine& p_engine, Point p_position, std::string p_name)
-	: m_engine(p_engine), m_pos(p_position), m_name(std::move(p_name))
-{
-	m_engine.memory.Add(this);
-}
+	: KTech::ChildEntity<Object, Layer>(p_engine, std::move(p_name)), m_pos(p_position)
+{}
 
 KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_position, std::string p_name)
 	: Object(p_engine, p_position, std::move(p_name))
@@ -43,65 +42,48 @@ KTech::Object::Object(Engine& p_engine, const ID<Layer>& p_parentLayer, Point p_
 	EnterLayer(p_parentLayer);
 }
 
-KTech::Object::~Object()
-{
-	LeaveLayer();
-	m_engine.memory.Remove(m_id);
-}
-
 auto KTech::Object::EnterLayer(const ID<Layer>& p_layer) -> bool
 {
-	if (p_layer == m_parentLayer || !m_engine.memory.Exists(p_layer))
-	{
-		return false;
-	}
-	return m_engine.memory[p_layer]->AddObject(m_id);
+	return Enter(p_layer);
 }
 
 auto KTech::Object::LeaveLayer() -> bool
 {
-	if (m_engine.memory.Exists(m_parentLayer))
-	{
-		return m_engine.memory[m_parentLayer]->RemoveObject(m_id);
-	}
-	m_parentLayer = nullID<Layer>;
-	return true;
+	return Leave();
 }
 
 auto KTech::Object::Move(Point p_direction) -> bool
 {
-	// Request the collision manager of the engine to move this object.
 	return m_engine.collision.MoveObject(m_id, p_direction);
 }
 
-auto KTech::Object::OnTick() -> bool
-{
-	return false;
-};
-
-void KTech::Object::OnMove(Point direction)
+void KTech::Object::OnMove(Point p_direction)
 {}
 
-void KTech::Object::OnPushed(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnPushed(Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 {}
 
-void KTech::Object::OnPush(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnPush(Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 {}
 
-void KTech::Object::OnBlocked(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnBlocked(Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 {}
 
-void KTech::Object::OnBlock(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnBlock(Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 {}
 
-void KTech::Object::OnOverlap(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnOverlap(Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 {}
 
-void KTech::Object::OnOverlapExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnOverlapExit(
+	Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider
+)
 {}
 
-void KTech::Object::OnOverlapped(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnOverlapped(Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider)
 {}
 
-void KTech::Object::OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider)
+void KTech::Object::OnOverlappedExit(
+	Point p_direction, size_t p_collider, ID<Object> p_otherObject, size_t p_otherCollider
+)
 {}

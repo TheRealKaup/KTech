@@ -28,109 +28,37 @@
 
 #include "layer.hpp"
 
-#include "../engine/engine.hpp"
-#include "../engine/output.hpp"
-#include "../utility/rgbcolors.hpp"
-#include "map.hpp"
 #include "object.hpp"
 
 KTech::Layer::Layer(Engine& p_engine, std::string p_name)
-	: m_engine(p_engine), m_name(std::move(p_name))
-{
-	m_engine.memory.Add(this);
-}
+	: ParentChildEntity<Layer, Map, Object>(p_engine, std::move(p_name))
+{}
 
 KTech::Layer::Layer(Engine& p_engine, const ID<Map>& p_parentMap, std::string p_name)
-	: Layer(p_engine, std::move(p_name))
-{
-	EnterMap(p_parentMap);
-}
-
-KTech::Layer::~Layer()
-{
-	Output::Log("<Layer[" + m_name + "]::~Layer()>", RGBColors::red);
-	RemoveAllObjects();
-	LeaveMap();
-	m_engine.memory.Remove(m_id);
-}
+	: ParentChildEntity<Layer, Map, Object>(p_engine, p_parentMap, std::move(p_name))
+{}
 
 auto KTech::Layer::operator[](size_t p_index) -> ID<Object>&
 {
-	return m_objects[p_index];
+	return GetChildren<Object>()[p_index];
 }
 
 auto KTech::Layer::AddObject(const ID<Object>& p_object) -> bool
 {
-	if (!m_engine.memory.Exists(p_object))
-	{
-		return false;
-	}
-	for (ID<Object>& object : m_objects)
-	{
-		if (object == p_object)
-		{
-			return false;
-		}
-	}
-	m_engine.memory[p_object]->m_parentLayer = m_id;
-	m_objects.push_back(p_object);
-	return true;
+	return Add(p_object);
 }
 
 auto KTech::Layer::RemoveObject(const ID<Object>& p_object) -> bool
 {
-	for (size_t i = 0; i < m_objects.size(); i++)
-	{
-		if (m_objects[i] == p_object)
-		{
-			if (m_engine.memory.Exists(m_objects[i]))
-			{
-				m_engine.memory[m_objects[i]]->m_parentLayer = nullID<Layer>;
-			}
-			m_objects.erase(m_objects.begin() + i);
-			return true;
-		}
-	}
-	return false;
-}
-
-auto KTech::Layer::RemoveAllObjects() -> bool
-{
-	if (m_objects.empty())
-	{
-		return false;
-	}
-	for (auto& object : m_objects)
-	{
-		if (m_engine.memory.Exists(object))
-		{
-			m_engine.memory[object]->m_parentLayer = nullID<Layer>;
-		}
-	}
-	m_objects.clear();
-	return true;
+	return Remove(p_object);
 }
 
 auto KTech::Layer::EnterMap(const ID<Map>& p_map) -> bool
 {
-	if (p_map == m_parentMap || !m_engine.memory.Exists(p_map))
-	{
-		return false;
-	}
-	return m_engine.memory[p_map]->AddLayer(m_id);
+	return Enter(p_map);
 }
 
 auto KTech::Layer::LeaveMap() -> bool
 {
-	if (m_engine.memory.Exists(m_parentMap))
-	{
-		return m_engine.memory[m_parentMap]->RemoveLayer(m_id);
-	}
-	m_parentMap = nullID<Map>;
-	return true;
+	return Leave();
 }
-
-auto KTech::Layer::OnTick() -> bool
-{
-	return false;
-};

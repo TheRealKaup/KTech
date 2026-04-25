@@ -33,68 +33,19 @@
 #include "widget.hpp"
 
 KTech::UI::UI(Engine& p_engine, UPoint p_resolution, std::string p_name)
-	: m_engine(p_engine), m_res(p_resolution), m_name(std::move(p_name))
-{
-	m_engine.memory.Add(this);
-	m_image.resize(m_res.y * m_res.x);
-}
-
-KTech::UI::~UI()
-{
-	RemoveAllWidgets();
-	m_engine.memory.Remove(m_id);
-}
+	: ParentEntity(p_engine, std::move(p_name)),
+	  m_res(p_resolution),
+	  m_image(static_cast<size_t>(p_resolution.y * p_resolution.x))
+{}
 
 auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 {
-	if (!m_engine.memory.Exists(p_widget))
-	{
-		return false;
-	}
-	for (ID<Widget>& widget : m_widgets)
-	{
-		if (widget == p_widget)
-		{
-			return false;
-		}
-	}
-	m_engine.memory[p_widget]->m_parentUI = m_id;
-	m_widgets.push_back(p_widget);
-	return true;
+	return Add(p_widget);
 }
 
 auto KTech::UI::RemoveWidget(const ID<Widget>& p_widget) -> bool
 {
-	for (size_t i = 0; i < m_widgets.size(); i++)
-	{
-		if (m_widgets[i] == p_widget)
-		{
-			if (m_engine.memory.Exists(m_widgets[i]))
-			{
-				m_engine.memory[m_widgets[i]]->m_parentUI = nullID<UI>;
-			}
-			m_widgets.erase(m_widgets.begin() + i);
-			return true;
-		}
-	}
-	return false;
-}
-
-auto KTech::UI::RemoveAllWidgets() -> bool
-{
-	if (m_widgets.empty())
-	{
-		return false;
-	}
-	for (ID<Widget>& widget : m_widgets)
-	{
-		if (m_engine.memory.Exists(widget))
-		{
-			m_engine.memory[widget]->m_parentUI = nullID<UI>;
-		}
-	}
-	m_widgets.clear();
-	return true;
+	return Remove(p_widget);
 }
 
 void KTech::UI::Resize(UPoint p_resolution)
@@ -107,7 +58,7 @@ void KTech::UI::Render()
 {
 	RenderBackground();
 
-	for (ID<Widget>& widgetID : m_widgets)
+	for (const ID<Widget>& widgetID : GetChildren<Widget>())
 	{
 		KTech::Widget* widget = m_engine.memory[widgetID];
 		if (widget != nullptr && widget->m_shown)
@@ -156,11 +107,6 @@ void KTech::UI::RenderClearDrawPrint()
 		m_engine.output.Print();
 	}
 }
-
-auto KTech::UI::OnTick() -> bool
-{
-	return false;
-};
 
 inline void KTech::UI::RenderBackground()
 {

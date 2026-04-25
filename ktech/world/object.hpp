@@ -35,20 +35,18 @@
 #include "../utility/id.hpp"
 #include "collider.hpp"
 #include "texture.hpp"
+#include "entity.hpp"
 
 /*!
 	@brief World structure that comprises `Texture`s and `Collider`s, and exists within `Layer`.
 
 	This and `Widget` are the most commonly inherited-from world structures. It differs from `Widget` because it can contain `Collider`s, while `Widget` is limited to `Texture`s. `Widget` also has some additional features which are useful for user-interfaces. You can conveniently make player-controlled classes based on `Object`, such as walking characters (see "simpleplatform" game example).
+
+	A note about the name of the class: in the English, an "object" is usually a thing that can be seen or touched, which is exactly what a `KTech::Object` is; it has textures and colliders. In contrast, an "entity" is usually a thing that exists separately from other things and has its own identity, which is once again, exactly what `KTech::Entity` is; it is separate from other entities, and has a `KTech::ID`.
 */
-class KTech::Object
+class KTech::Object : public ChildEntity<Object, Layer>
 {
 public:
-	Engine& m_engine;								 //!< Parent `Engine`.
-	const ID<Object> m_id{ID<Object>::Unique()}; //!< Personal `ID`.
-	std::string m_name;							 //!< String name.
-	ID<Layer> m_parentLayer;					 //!< Parent `Layer`.
-
 	Point m_pos;					   //!< World position.
 	std::vector<Texture> m_textures;   //!< `Texture`s.
 	std::vector<Collider> m_colliders; //!< `Collider`s.
@@ -69,11 +67,6 @@ public:
 		@param name String name.
 	*/
 	Object(Engine& engine, const ID<Layer>& parentLayer, Point position = Point(0, 0), std::string name = "");
-
-	/*!
-		@brief  Leave parent `Layer` (if in one) and remove itself from `Memory`.
-	*/
-	virtual ~Object();
 
 	/*!
 		@brief Enter a `Layer`.
@@ -102,18 +95,6 @@ public:
 	auto Move(Point direction) -> bool;
 
 protected:
-	/*!
-		@brief Virtual function called once each tick.
-
-		Called by `Memory::CallOnTicks()`.
-
-		@return `bool` value, which is explained in `Output::ShouldRenderThisTick()`.
-
-		@see `Memory::CallOnTicks()`
-		@see `Output::ShouldRenderThisTick()`
-	*/
-	virtual auto OnTick() -> bool;
-
 	/*!
 		@brief Called by `Collision::MoveObject()` as a result of this `Object` moving (voluntarily or passively).
 		@param direction The movement's direction.
@@ -193,5 +174,4 @@ protected:
 	virtual void OnOverlappedExit(Point direction, size_t collider, ID<Object> otherObject, size_t otherCollider);
 
 	friend class KTech::Collision;
-	friend class KTech::Memory;
 };
