@@ -32,10 +32,10 @@
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../utility/id.hpp"
+#include "../utility/sub.hpp"
 #include "entity.hpp"
 
 #include <string>
-#include <vector>
 
 /*!
 	@brief World structure that contains `Layer`s and `Camera`s.
@@ -43,8 +43,8 @@
 class KTech::Map : public Entity<Map>
 {
 public:
-	std::vector<ID<Camera>> m_cameras;	   //!< Contained `Camera`s
-	std::vector<ID<Layer>> m_layers;	   //!< Contained `Layer`s
+	Sub<Map, Camera> m_cameras; //!< Contained `Camera`s
+	Sub<Map, Layer> m_layers;	  //!< Contained `Layer`s
 
 	/*!
 		@brief Construct a `Map`.

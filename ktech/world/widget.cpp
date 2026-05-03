@@ -129,21 +129,16 @@ auto KTech::Widget::LeaveWidget() -> bool
 
 auto KTech::Widget::EnterUI(const ID<UI>& p_ui) -> bool
 {
-	if (p_ui == m_parentUI || !m_engine.memory.Exists(p_ui))
-	{
-		return false;
-	}
 	return m_engine.memory[p_ui]->AddWidget(m_id);
 }
 
 auto KTech::Widget::LeaveUI() -> bool
 {
-	if (m_engine.memory.Exists(m_parentUI))
+	if (m_parentUI == nullID<UI>)
 	{
-		return m_engine.memory[m_parentUI]->RemoveWidget(m_id);
+		return false;
 	}
-	m_parentUI = nullID<UI>;
-	return true;
+	return m_engine.memory[m_parentUI]->RemoveWidget(m_id);
 }
 
 void KTech::Widget::Select()

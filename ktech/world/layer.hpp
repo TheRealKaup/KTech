@@ -28,17 +28,19 @@
 
 #pragma once
 
+#include <cstddef>
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
 #include "../basic/rgba.hpp"
 #include "../utility/id.hpp"
 #include "../utility/rgbacolors.hpp"
+#include "../utility/sub.hpp"
 #include "entity.hpp"
+#include "object.hpp"
 
 #include <limits>
 #include <string>
-#include <vector>
 
 /*!
 	@brief World structure that contains `Object`s, and exists within `Map`.
@@ -48,10 +50,9 @@
 class KTech::Layer : public Entity<Layer>
 {
 public:
-	ID<Map> m_parentMap;					   //!< Parent `Map`.
-	std::vector<ID<Object>> m_objects;		   //!< Contained `Object`s.
-	bool m_visible = true;					   //!< `true`: will be rendered by `Camera`. `false`: won't be.
-
+	ID<Map> m_parentMap;		  //!< Parent `Map`.
+	Sub<Layer, Object> m_objects; //!< Contained `Object`s.
+	bool m_visible = true;		  //!< `true`: will be rendered by `Camera`. `false`: won't be.
 	//! Opacity used by `Camera` when rendering contained `Object`s.
 	uint8_t m_alpha = std::numeric_limits<uint8_t>::max();
 	RGBA m_frgba = RGBAColors::transparent; //!< Foreground color added by `Camera` after rendering contained `Object`s.

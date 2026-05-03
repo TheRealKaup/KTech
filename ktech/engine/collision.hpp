@@ -31,7 +31,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
-#include "../world/object.hpp"
+#include "../utility/id.hpp"
 
 #include <vector>
 

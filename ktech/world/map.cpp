@@ -47,104 +47,30 @@ KTech::Map::~Map()
 
 auto KTech::Map::AddLayer(const ID<Layer>& p_layer) -> bool
 {
-	if (!m_engine.memory.Exists(p_layer))
-	{
-		return false;
-	}
-	for (ID<Layer>& layer : m_layers)
-	{
-		if (layer == p_layer)
-		{
-			return false;
-		}
-	}
-	m_engine.memory[p_layer]->m_parentMap = m_id;
-	m_layers.push_back(p_layer);
-	return true;
+	return m_layers.Add(m_engine, m_id, p_layer, &Layer::m_parentMap, &Layer::LeaveMap);
 }
 
 auto KTech::Map::AddCamera(const ID<Camera>& p_camera) -> bool
 {
-	if (!m_engine.memory.Exists(p_camera))
-	{
-		return false;
-	}
-	for (ID<Camera>& camera : m_cameras)
-	{
-		if (camera == p_camera)
-		{
-			return false;
-		}
-	}
-	m_engine.memory[p_camera]->m_parentMap = m_id;
-	m_cameras.push_back(p_camera);
-	return true;
+	return m_cameras.Add(m_engine, m_id, p_camera, &Camera::m_parentMap, &Camera::LeaveMap);
 }
 
 auto KTech::Map::RemoveLayer(const ID<Layer>& p_layer) -> bool
 {
-	for (size_t i = 0; i < m_layers.size(); i++)
-	{
-		if (m_layers[i] == p_layer)
-		{
-			if (m_engine.memory.Exists(m_layers[i]))
-			{
-				m_engine.memory[m_layers[i]]->m_parentMap = nullID<Map>;
-			}
-			m_layers.erase(m_layers.begin() + i);
-			return true;
-		}
-	}
-	return false;
+	return m_layers.Remove(m_engine, p_layer, &Layer::m_parentMap);
 }
 
 auto KTech::Map::RemoveCamera(const ID<Camera>& p_camera) -> bool
 {
-	for (size_t i = 0; i < m_cameras.size(); i++)
-	{
-		if (m_cameras[i] == p_camera)
-		{
-			if (m_engine.memory.Exists(m_cameras[i]))
-			{
-				m_engine.memory[m_cameras[i]]->m_parentMap = nullID<Map>;
-			}
-			m_cameras.erase(m_cameras.begin() + i);
-			return true;
-		}
-	}
-	return false;
+	return m_cameras.Remove(m_engine, p_camera, &Camera::m_parentMap);
 }
 
 auto KTech::Map::RemoveAllLayers() -> bool
 {
-	if (m_layers.empty())
-	{
-		return false;
-	}
-	for (auto& layer : m_layers)
-	{
-		if (m_engine.memory.Exists(layer))
-		{
-			m_engine.memory[layer]->m_parentMap = nullID<Map>;
-		}
-	}
-	m_layers.clear();
-	return true;
+	return m_layers.RemoveAll(m_engine, &Layer::m_parentMap);
 }
 
 auto KTech::Map::RemoveAllCameras() -> bool
 {
-	if (m_cameras.empty())
-	{
-		return false;
-	}
-	for (auto& camera : m_cameras)
-	{
-		if (m_engine.memory.Exists(camera))
-		{
-			m_engine.memory[camera]->m_parentMap = nullID<Map>;
-		}
-	}
-	m_cameras.clear();
-	return true;
+	return m_cameras.RemoveAll(m_engine, &Camera::m_parentMap);
 }

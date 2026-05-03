@@ -45,54 +45,17 @@ KTech::UI::~UI()
 
 auto KTech::UI::AddWidget(const ID<Widget>& p_widget) -> bool
 {
-	if (!m_engine.memory.Exists(p_widget))
-	{
-		return false;
-	}
-	for (ID<Widget>& widget : m_widgets)
-	{
-		if (widget == p_widget)
-		{
-			return false;
-		}
-	}
-	m_engine.memory[p_widget]->m_parentUI = m_id;
-	m_widgets.push_back(p_widget);
-	return true;
+	return m_widgets.Add(m_engine, m_id, p_widget, &Widget::m_parentUI, &Widget::LeaveWidget);
 }
 
 auto KTech::UI::RemoveWidget(const ID<Widget>& p_widget) -> bool
 {
-	for (size_t i = 0; i < m_widgets.size(); i++)
-	{
-		if (m_widgets[i] == p_widget)
-		{
-			if (m_engine.memory.Exists(m_widgets[i]))
-			{
-				m_engine.memory[m_widgets[i]]->m_parentUI = nullID<UI>;
-			}
-			m_widgets.erase(m_widgets.begin() + i);
-			return true;
-		}
-	}
-	return false;
+	return m_widgets.Remove(m_engine, p_widget, &Widget::m_parentUI);
 }
 
 auto KTech::UI::RemoveAllWidgets() -> bool
 {
-	if (m_widgets.empty())
-	{
-		return false;
-	}
-	for (ID<Widget>& widget : m_widgets)
-	{
-		if (m_engine.memory.Exists(widget))
-		{
-			m_engine.memory[widget]->m_parentUI = nullID<UI>;
-		}
-	}
-	m_widgets.clear();
-	return true;
+	return m_widgets.RemoveAll(m_engine, &Widget::m_parentUI);
 }
 
 void KTech::UI::Resize(UPoint p_resolution)

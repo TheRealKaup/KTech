@@ -59,21 +59,16 @@ KTech::Camera::~Camera()
 
 auto KTech::Camera::EnterMap(const ID<Map>& p_map) -> bool
 {
-	if (p_map == m_parentMap || !m_engine.memory.Exists(p_map))
-	{
-		return false;
-	}
 	return m_engine.memory[p_map]->AddCamera(m_id);
 }
 
 auto KTech::Camera::LeaveMap() -> bool
 {
-	if (m_engine.memory.Exists(m_parentMap))
+	if (m_parentMap == nullID<Map>)
 	{
-		return m_engine.memory[m_parentMap]->RemoveCamera(m_id);
+		return false;
 	}
-	m_parentMap = ID<Map>();
-	return true;
+	return m_engine.memory[m_parentMap]->RemoveCamera(m_id);
 }
 
 void KTech::Camera::Resize(UPoint p_resolution)
@@ -88,6 +83,11 @@ void KTech::Camera::Render()
 	{
 		Render(m_engine.memory[m_parentMap]->m_layers);
 	}
+}
+
+void KTech::Camera::Render(const Sub<Map, Layer>& p_layers)
+{
+	Render(p_layers.m_subs);
 }
 
 void KTech::Camera::Render(const std::vector<ID<Layer>>& p_layers)

@@ -49,21 +49,16 @@ KTech::Object::~Object()
 
 auto KTech::Object::EnterLayer(const ID<Layer>& p_layer) -> bool
 {
-	if (p_layer == m_parentLayer || !m_engine.memory.Exists(p_layer))
-	{
-		return false;
-	}
 	return m_engine.memory[p_layer]->AddObject(m_id);
 }
 
 auto KTech::Object::LeaveLayer() -> bool
 {
-	if (m_engine.memory.Exists(m_parentLayer))
+	if (m_parentLayer == nullID<Layer>)
 	{
-		return m_engine.memory[m_parentLayer]->RemoveObject(m_id);
+		return false;
 	}
-	m_parentLayer = nullID<Layer>;
-	return true;
+	return m_engine.memory[m_parentLayer]->RemoveObject(m_id);
 }
 
 auto KTech::Object::Move(Point p_direction) -> bool

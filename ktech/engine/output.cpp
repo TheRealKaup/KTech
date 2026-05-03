@@ -29,6 +29,7 @@
 #include "output.hpp"
 
 #include "../basic/cell.hpp"
+#include "../basic/cella.hpp"
 #include "../basic/upoint.hpp"
 #include "../engine/engine.hpp"
 #include "../utility/internals.hpp"

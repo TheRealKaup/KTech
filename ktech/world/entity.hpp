@@ -40,12 +40,12 @@
 
 	@tparam This The entity.
 */
-template <class This>
+template <class ThisType>
 class KTech::Entity
 {
 public:
 	Engine& m_engine;
-	const ID<This> m_id{ID<This>::Unique()};
+	const ID<ThisType> m_id{ID<ThisType>::Unique()};
 	std::string m_name;
 
 	/*!

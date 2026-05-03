@@ -74,12 +74,11 @@ public:
 		//! @}
 	};
 
-	ID<UI> m_parentUI;							 //!< The `UI` containing this `Widget`.
-	ID<Widget> m_parentWidget = nullID<Widget>;	 //!< @deprecated See GitHub issue #106
-	std::vector<ChildWidget> m_childWidgets;	 //!< @deprecated See GitHub issue #106
-	bool m_selected = false; //!< `true`: player input reaches the `Widget`. `false`: player input doesn't.
-	bool m_shown = true;	 //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
-
+	ID<UI> m_parentUI;							//!< The `UI` containing this `Widget`.
+	ID<Widget> m_parentWidget = nullID<Widget>; //!< @deprecated See GitHub issue #106
+	std::vector<ChildWidget> m_childWidgets;	//!< @deprecated See GitHub issue #106
+	bool m_selected = false;		 //!< `true`: player input reaches the `Widget`. `false`: player input doesn't.
+	bool m_shown = true;			 //!< `true`: will be rendered by `UI`. `false:` will be ignored by `UI`.
 	Point m_pos;					 //!< World position.
 	std::vector<Texture> m_textures; //!< Comprising `Texture`s.
 	//! Group of all input callbacks, which are enabled and disabled in correspondence to `Widget::m_selected`.

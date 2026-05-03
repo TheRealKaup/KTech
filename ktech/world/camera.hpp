@@ -50,10 +50,9 @@
 class KTech::Camera : public Entity<Camera>
 {
 public:
-	ID<Map> m_parentMap;						 //!< The map which contains this `Camera`.
-
-	Point m_pos;  //!< World position.
-	UPoint m_res; //!< `Camera::m_image`'s resolution (or "size").
+	ID<Map> m_parentMap; //!< The map which contains this `Camera`.
+	Point m_pos;		 //!< World position.
+	UPoint m_res;		 //!< `Camera::m_image`'s resolution (or "size").
 	Cell m_background = {.b = RGBColors::black, .c = ' ', .f = RGBColors::black}; //!< The background to render upon.
 	std::vector<Cell> m_image;													  //!< `Cell`-based rendered image.
 
@@ -66,10 +65,7 @@ public:
 		@param [in] name String name.
 	*/
 	Camera(
-		Engine& engine,
-		Point position = {.x = 0, .y = 0},
-		UPoint resolution = {.x = 10, .y = 10},
-		std::string name = ""
+		Engine& engine, Point position = {.x = 0, .y = 0}, UPoint resolution = {.x = 10, .y = 10}, std::string name = ""
 	);
 
 	/*!
@@ -127,6 +123,15 @@ public:
 		@brief Render all `Object`s of all `Layer`s of the parent `Map`.
 	*/
 	void Render();
+
+	/*!
+		@brief Render all `Object`s of a `Map`'s sub-`Layer`s.
+
+		Small convenience overload intended for backward-compatibility post the introduction of `KTech::Sub`.
+
+		@param layers The `Sub` object containing the `Layer`s containing the `Object`s to render.
+	*/
+	void Render(const Sub<Map, Layer>& layers);
 
 	/*!
 		@brief Render all `Object`s of the given `Layer`s.

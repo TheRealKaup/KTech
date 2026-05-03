@@ -37,6 +37,7 @@
 #include "../basic/upoint.hpp"
 #include "../utility/id.hpp"
 #include "../utility/rgbacolors.hpp"
+#include "../utility/sub.hpp"
 #include "entity.hpp"
 
 #include <limits>
@@ -55,9 +56,8 @@
 class KTech::UI : public Entity<UI>
 {
 public:
-	std::vector<ID<Widget>> m_widgets;	 //!< Contained `Widget`s.
-
-	UPoint m_res; //!< Image's resolution.
+	Sub<UI, Widget> m_widgets; //!< Contained `Widget`s.
+	UPoint m_res;			   //!< Image's resolution.
 	//! The background to render upon.
 	CellA m_background = {.b = RGBAColors::transparent, .c = ' ', .f = RGBAColors::transparent};
 	uint8_t m_alpha = std::numeric_limits<uint8_t>::max(); //!< Opacity for all rendered `Widget`s.

@@ -31,6 +31,7 @@
 #define KTECH_DEFINITION
 #include "../ktech.hpp"
 #undef KTECH_DEFINITION
+// Note: engine.hpp must not include the definition of entities, hence the header files of engine components must not either.
 #include "../basic/upoint.hpp"
 #include "collision.hpp"
 #include "input/input.hpp"

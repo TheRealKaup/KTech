@@ -82,87 +82,23 @@ If any the following constructor parameters exist, they should go in the followi
 
 ## Expected behavior of adder, remover, enterer and leaver functions
 
-Note that this section will hopefully be removed or shortened with the closing of [issue #127](https://github.com/TheRealKaup/KTech/issues/127), by means of generic programming/class inheritance.
+Entities (`Map`, `Camera`, `Layer`, `Object`, `UI` and `Widget`) add and remove from themselves sub (child) entities, and enter and leave super (parent) entities. The functions that do these actions are called "adders", "removers", "enterers" and "leavers", respectively. This section used to specify the exact behavior of these functions, as warranted by issue [issue #84](https://github.com/TheRealKaup/KTech/issues/84). But because [issue #127](https://github.com/TheRealKaup/KTech/issues/127) covered a lot of the behavior, this section has been minimized to cover what the adder and remover wrappers to `KTech::Sub` and the usual enterers and leavers should do, and the exact behavior was moved to the Doxygen documentation of `KTech::Sub`.
 
-World structures (`Map`, `Camera`, `Layer`, `Object`, `UI` and `Widget`) add and remove from themselves child structures, and enter and leave parent structures. The functions that do these actions are called "adders", "removers", "enterers" and "leavers", respectively. This section specifies the expected behavior of these functions, as warranted by issue #84.
+Enterers and leavers (of sub entities) call the adders and removers (of parent entities) to do the actual adding and removing. The library user may choose either calling the functions of the sub entity or parent entity based on their preference, and expect similar behavior.
 
-Enterers and leavers (of child structures) call the adders and removers (of parent structures) to do the actual adding and removing. The library user may choose either directions based on preference, and expect similar behavior.
+Entities are passed around as `KTech::ID`s. Unless required explicitly, do not add anymore argument validations (like ensuring the parent ID is in memory).
 
-The "given structure" is provided as a `KTech::ID<T>`.
+### Parent entity
 
-### Add
+- The adder, remover, and remove-all functions, should call and return the value of the appropriate member `Sub`'s `Add()`, `Remove()` and `RemoveAll()`, respectively.
+- The destructor should call its entity's remove-all function. If there are multiple member `Sub`s, then all remove-all functions must be called.
 
-- If the given structure does not exist in `Engine::Memory`:
-    - Return false.
-- If the given structure is this structure itself:
-     - Return false.
-- If the given structure is already within this structure:
-    - Return false.
-- Call the leaver function of the given structure.
-- Set the parent ID of the given structure to this structure's ID.
-- Add the given structure to this child structures vector.
-- Return true.
+### Sub entity
 
-### Remove
-
-- If the given structure is not within this structure:
-    - Return false.
-- If the given structure exists in `Engine::Memory`:
-    - Set the parent ID of the given structure to `KTech::nullID`.
-- Erase the given structure from this child structures vector.
-- Return true.
-
-### RemoveAll
-
-- If there are no child structures:
-    - Return false.
-- For all child structures:
-    - If the child structure exists in `Engine::Memory`:
-        - Set the parent ID of the child structure to `KTech::nullID`.
-- Clear child structures vector.
-- Return true.
-
-### Enter
-
-- If the given structure does not exist in `Engine::Memory`:
-    - Return false:
-- If the given structure is this structure itself:
-     - Return false.
-- If the given structure is already the current parent:
-    - Return false.
-- Call this structure's leaver function, and return its returned value.
-
-### Leave
-
-- If the current parent exits in `Engine::Memory`:
-    - Call the remove function of current parent, and return its returned value.
-- Set the parent ID to `KTech::nullID`.
-- Return true.
-
-## Expected behavior of constructors and destructors of world structures
-
-Note that this section will hopefully be removed or shortened with the closing of [issue #127](https://github.com/TheRealKaup/KTech/issues/127), by means of generic programming/class inheritance.
-
-### Constructor
-
-When constructed, world structures are responsible for registering themselves at `Engine::Memory`, and sometimes also for entering other world structures.
-
-If the constructor does not accept a parent structure to enter:
-
-- Add this structure to `Engine::Memory` (i.e. `engine.memory.container.Add(this);`).
-
-Otherwise:
-
-- Call the constructor that doesn't accept a parent to enter, if such overload exists.
-- Enter the given parent.
-
-### Destructor
-
-When destructed, world structures are responsible for removing themselves from `Engine::Memory`, and sometimes for leaving their parents and removing their child structures.
-
-- Call this `RemoveAll` function, if this can have child structures.
-- Call this `Leave` function, if this can have a parent structure.
-- Remove this from `Engine::Memory`.
+- The enterer should get the given parent ID from memory, and call its adder.
+- The leaver should check that its member parent ID is not `nullID`. If it isn't, then it should get the parent from memory and call its remover.
+- There should be a constructor that accepts a parent entity and one that doesn't. The constructor that does should be based on the one that doesn't, and it should call the entity's enterer.
+- The destructor should call the entity's leaver.
 
 ## Engine components
 

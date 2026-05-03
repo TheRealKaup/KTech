@@ -85,6 +85,8 @@ namespace KTech
 	constexpr ID<T> nullID; //!< The ID equivalent of NULL.
 	template <typename T>
 	class CachingRegistry;
+	template <class ThisType, class SubType>
+	class Sub;
 	namespace RGBColors
 	{}
 	namespace RGBAColors

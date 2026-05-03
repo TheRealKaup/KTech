@@ -45,8 +45,7 @@
 class KTech::Object : public Entity<Object>
 {
 public:
-	ID<Layer> m_parentLayer; //!< Parent `Layer`.
-
+	ID<Layer> m_parentLayer;		   //!< Parent `Layer`.
 	Point m_pos;					   //!< World position.
 	std::vector<Texture> m_textures;   //!< `Texture`s.
 	std::vector<Collider> m_colliders; //!< `Collider`s.

@@ -36,8 +36,7 @@
 
 KTech::Layer::Layer(Engine& p_engine, std::string p_name)
 	: Entity(p_engine, std::move(p_name))
-{
-}
+{}
 
 KTech::Layer::Layer(Engine& p_engine, const ID<Map>& p_parentMap, std::string p_name)
 	: Layer(p_engine, std::move(p_name))
@@ -54,76 +53,34 @@ KTech::Layer::~Layer()
 
 auto KTech::Layer::operator[](size_t p_index) -> ID<Object>&
 {
-	return m_objects[p_index];
+	return m_objects.m_subs[p_index];
 }
 
 auto KTech::Layer::AddObject(const ID<Object>& p_object) -> bool
 {
-	if (!m_engine.memory.Exists(p_object))
-	{
-		return false;
-	}
-	for (ID<Object>& object : m_objects)
-	{
-		if (object == p_object)
-		{
-			return false;
-		}
-	}
-	m_engine.memory[p_object]->m_parentLayer = m_id;
-	m_objects.push_back(p_object);
-	return true;
+	return m_objects.Add(m_engine, m_id, p_object, &Object::m_parentLayer, &Object::LeaveLayer);
 }
 
 auto KTech::Layer::RemoveObject(const ID<Object>& p_object) -> bool
 {
-	for (size_t i = 0; i < m_objects.size(); i++)
-	{
-		if (m_objects[i] == p_object)
-		{
-			if (m_engine.memory.Exists(m_objects[i]))
-			{
-				m_engine.memory[m_objects[i]]->m_parentLayer = nullID<Layer>;
-			}
-			m_objects.erase(m_objects.begin() + i);
-			return true;
-		}
-	}
-	return false;
+	return m_objects.Remove(m_engine, p_object, &Object::m_parentLayer);
 }
 
 auto KTech::Layer::RemoveAllObjects() -> bool
 {
-	if (m_objects.empty())
-	{
-		return false;
-	}
-	for (auto& object : m_objects)
-	{
-		if (m_engine.memory.Exists(object))
-		{
-			m_engine.memory[object]->m_parentLayer = nullID<Layer>;
-		}
-	}
-	m_objects.clear();
-	return true;
+	return m_objects.RemoveAll(m_engine, &Object::m_parentLayer);
 }
 
 auto KTech::Layer::EnterMap(const ID<Map>& p_map) -> bool
 {
-	if (p_map == m_parentMap || !m_engine.memory.Exists(p_map))
-	{
-		return false;
-	}
 	return m_engine.memory[p_map]->AddLayer(m_id);
 }
 
 auto KTech::Layer::LeaveMap() -> bool
 {
-	if (m_engine.memory.Exists(m_parentMap))
+	if (m_parentMap == nullID<Map>)
 	{
-		return m_engine.memory[m_parentMap]->RemoveLayer(m_id);
+		return false;
 	}
-	m_parentMap = nullID<Map>;
-	return true;
+	return m_engine.memory[m_parentMap]->RemoveLayer(m_id);
 }
