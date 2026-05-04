@@ -44,15 +44,15 @@ class KTech::Memory
 {
 public:
 	/*!
-		@brief Call the virtual `OnTick()` functions of all registered world structures.
+		@brief Call the virtual `OnTick()` functions of all registered entities.
 
-		Normally placed at the start of tick, with the other callback-calling functions of engine components. For example:
+		Normally placed at the start of a tick, with the other callback-calling functions of engine components. For example:
 
 		@code{.cpp}
 		// Game loop
 		while (engine.running)
 		{
-			// Call various callback-functions
+			// Call various callback functions
 			engine.input.CallCallbacks();
 			engine.time.CallInvocations();
 			engine.memory.CallOnTicks(); // <- Call `OnTick()` functions of all world structures
@@ -61,7 +61,9 @@ public:
 		}
 		@endcode
 
-		This function was placed in `Memory`, because this engine component has the most direct access to all of the world structures. Although, this function could have been technically placed easily anywhere else.
+		This function was placed in `Memory`, because this engine component has the most direct access to all of the entities. Although, this function could have been technically placed easily anywhere else.
+
+		`CachingRegistry::Prune` is called for all registries.
 	*/
 	void CallOnTicks();
 
@@ -75,7 +77,7 @@ public:
 	template <class T>
 	auto Exists(const ID<T>& id) -> bool
 	{
-		return std::get<CachingRegistry<T>>(m_registries).Exists(id);
+		return std::get<CachingRegistry<T>>(m_registries).UpdateID(id);
 	}
 
 private:

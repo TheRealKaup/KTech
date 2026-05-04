@@ -56,6 +56,13 @@ template <typename T>
 class KTech::CachingRegistry
 {
 private:
+	/*!
+		@brief Pointers of the registered entities.
+
+		Note that it is usually not safe to iterate over this vector using a ranged-based for loop, because entities may be added as a result of calling OnTick of other functions (and if enough entities are added, the vector is reallocated to increase the capacity). Hence, `Memory::CallOnTicks()` is ought to iterate over this vector using an index.
+
+		Entities are removed from a `CachingRegistry` in 2 steps, first by setting the pointers to null (`CachingRegistry::Remove()`), and then by removing all null pointers (`CachingRegistry::Prune()`). This is done to prevent iterator invalidation in `Memory::CallOnTicks()`.
+	*/
 	std::vector<T*> m_vec;
 
 	/*!
@@ -68,29 +75,32 @@ private:
 	*/
 	auto operator[](const KTech::ID<T>& id) -> T*;
 
-	/*!
-		@brief Check if an `ID` matches a registered structure.
-
-		@param [in,out] id The structure's `ID`. Updates its cached index if it's stale.
-
-		@return `true`: the structure exists.
-		@return `false`: ther structure doesn't exist.
-	*/
-	auto Exists(const KTech::ID<T>& id) -> bool;
-
 	// Adds the pointer to the container.
 	// Automatically called by objects, layers, cameras and maps for themselves.
 	// You shouldn't call this manually on a structure.
-	auto Add(T* structure) -> void;
+	void Add(T* structure);
 
-	// Remove a structure from storage (doesn't delete it's memory).
-	// Returns true if the structure was found and removed.
-	// Returns false if the structure is missing.
-	auto Remove(const KTech::ID<T>& id) -> void;
+	/*!
+		@brief Causes the removal of an entity by replacing its pointer in `CachingRegistry::m_vec` with `nullptr`.
 
-	// Returns the valid index of the ID.
-	// If the UUID is missing, return the size of the array making the index invalid.
-	auto IDToIndex(const KTech::ID<T>& id) -> size_t;
+		@param id ID of the entity.
+	*/
+	void Remove(const KTech::ID<T>& id);
+
+	/*!
+		@brief Update the cached index of an `ID`.
+
+		Can be used to check if an entity exists in memory.
+
+		@param id `ID` to update, which may have a stale index.
+		@return `true` on success, `false` on failure (because ID was not found, e.g., was removed).
+	*/
+	auto UpdateID(const KTech::ID<T>& id) -> bool;
+
+	/*!
+		@brief Erase `nullptr` elements from `CachingRegistry::m_vec`.
+	*/
+	void Prune();
 
 	friend class Memory;
 };

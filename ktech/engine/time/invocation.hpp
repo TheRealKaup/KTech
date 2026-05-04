@@ -100,6 +100,8 @@ struct KTech::Time::Invocation
 	/*!
 		@brief Invoke your callback function.
 
+		@note This documentation is awful.
+
 		Can be invoked once at a time. Meaning, invoking while already invoked will restart the current invocation (rather than ). For example:
 
 		@code{.cpp}

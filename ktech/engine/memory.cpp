@@ -43,13 +43,15 @@ void KTech::Memory::CallOnTicks()
 	std::apply(
 		[this](auto&... p_registries) -> void {
 			(..., [this]<class T>(CachingRegistry<T>& p_registry) -> void {
-				for (T* entity : p_registry.m_vec)
+				// Note that this must be an index-based for loop (see `CachingRegistry::m_vec`).
+				for (size_t i = 0; i < p_registry.m_vec.size(); i++)
 				{
-					if (entity->OnTick())
+					if (p_registry.m_vec[i]->OnTick())
 					{
 						this->m_changedThisTick = true;
 					}
 				}
+				p_registry.Prune();
 			}(p_registries));
 		},
 		m_registries

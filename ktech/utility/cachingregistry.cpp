@@ -38,68 +38,49 @@
 template <typename T>
 auto KTech::CachingRegistry<T>::operator[](const ID<T>& p_id) -> T*
 {
-	if (!m_vec.empty())
-	{
-		for (size_t i = (p_id.m_i < m_vec.size() ? p_id.m_i : m_vec.size() - 1);; i--)
-		{
-			if (m_vec[i]->m_id == p_id)
-			{
-				p_id.m_i = i;
-				return m_vec[i];
-			}
-			if (i == 0)
-			{
-				break;
-			}
-		}
-	}
-	p_id.m_i = 0;
-	return nullptr;
+	return UpdateID(p_id) ? m_vec[p_id.m_i] : nullptr;
 }
 
 template <typename T>
-auto KTech::CachingRegistry<T>::Exists(const ID<T>& p_id) -> bool
-{
-	return IDToIndex(p_id) != m_vec.size();
-}
-
-template <typename T>
-auto KTech::CachingRegistry<T>::Add(T* p_structure) -> void
+void KTech::CachingRegistry<T>::Add(T* p_structure)
 {
 	p_structure->m_id.m_i = m_vec.size();
 	m_vec.push_back(p_structure);
 }
 
 template <typename T>
-auto KTech::CachingRegistry<T>::Remove(const ID<T>& p_id) -> void
+void KTech::CachingRegistry<T>::Remove(const ID<T>& p_id)
 {
-	const size_t toRemove = IDToIndex(p_id);
-	if (toRemove != m_vec.size())
+	if (UpdateID(p_id))
 	{
-		m_vec.erase(m_vec.begin() + toRemove);
+		m_vec[p_id.m_i] = nullptr;
 	}
 }
 
 template <typename T>
-auto KTech::CachingRegistry<T>::IDToIndex(const ID<T>& p_id) -> size_t
+auto KTech::CachingRegistry<T>::UpdateID(const ID<T>& p_id) -> bool
 {
 	if (!m_vec.empty())
 	{
-		for (size_t i = (p_id.m_i < m_vec.size() ? p_id.m_i : m_vec.size() - 1);; i--)
+		for (p_id.m_i = std::min(p_id.m_i, m_vec.size() - 1);; p_id.m_i--)
 		{
-			if (m_vec[i]->m_id == p_id)
+			if ((m_vec[p_id.m_i] != nullptr) && (m_vec[p_id.m_i]->m_id == p_id))
 			{
-				p_id.m_i = i;
-				return i;
+				return true;
 			}
-			if (i == 0)
+			if (p_id.m_i == 0)
 			{
 				break;
 			}
 		}
 	}
-	p_id.m_i = 0;
-	return m_vec.size();
+	return false;
+}
+
+template <typename T>
+void KTech::CachingRegistry<T>::Prune()
+{
+	std::erase(m_vec, nullptr);
 }
 
 template class KTech::CachingRegistry<KTech::Camera>;
