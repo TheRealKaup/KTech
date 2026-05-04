@@ -59,7 +59,7 @@ struct UITest
 	ID<UI> ui;
 	Input::CallbackGroup callbackGroup;
 
-	Time::Invocation countdownInvocation;
+	Invocation countdownInvocation;
 
 	uint8_t countdown;
 	// Countdown iteration
@@ -196,7 +196,6 @@ int main()
 	{
 		// Calls
 		engine.input.CallCallbacks();
-		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 
 		if (engine.output.ShouldRenderThisTick())

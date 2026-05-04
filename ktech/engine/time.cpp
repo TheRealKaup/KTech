@@ -27,45 +27,8 @@
 */
 
 #include "time.hpp"
-#include "invocation.hpp"
 
-#include <algorithm>
 #include <thread>
-
-void KTech::Time::CallInvocations()
-{
-	// ERASE-REMOVE `Invocation`s which were set to `nullptr` by `Time::DeregisterInvocation()` (which was called by `Invocation::~Invocation()`).
-	m_invocations.erase(std::ranges::begin(std::ranges::remove(m_invocations, nullptr)), m_invocations.end());
-
-	// ADVANCE all invocations:
-	// NOLINTNEXTLINE(modernize-loop-convert) // Avoid iterator invalidation (`Invocation::Advance()` can insert into `m_invocations`).
-	for (size_t i = 0; i < m_invocations.size(); i++)
-	{
-		// SKIP invocations deleted meanwhile
-		if (m_invocations[i] == nullptr)
-		{
-			continue;
-		}
-
-		if (m_invocations[i]->m_active)
-		{
-			// ADVANCE invocation:
-			m_invocations[i]->m_timePassed += engine.time.deltaTime;
-
-			if (m_invocations[i]->m_timePassed >= m_invocations[i]->m_duration) // Invocation is due.
-			{
-				// PREVENT from calling again (and INFORM user that the invocation is inactive):
-				m_invocations[i]->m_active = false;
-				// CALL invoked function:
-				if (m_invocations[i]->m_callback())
-				{
-					// INFORM `Output` to render-on-demand:
-					m_changedThisTick = true;
-				}
-			}
-		}
-	}
-}
 
 void KTech::Time::WaitUntilNextTick()
 {
@@ -118,14 +81,4 @@ auto KTech::Time::TimeToMicroseconds(long p_time, Measurement p_measurement) con
 		return p_time;
 	}
 	}
-}
-
-void KTech::Time::RegisterCallback(Invocation* p_invocation)
-{
-	m_invocations.push_back(p_invocation);
-}
-
-void KTech::Time::DeregisterCallback(Invocation* p_invocation)
-{
-	std::replace(m_invocations.begin(), m_invocations.end(), p_invocation, static_cast<Invocation*>(nullptr));
 }

@@ -177,7 +177,6 @@ int main()
 	{
 		// Call...
 		engine.input.CallCallbacks();  // ...synchronized input callbacks (as were registered by `character`).
-		engine.time.CallInvocations(); // ...timed invocations (though none were made here).
 		engine.memory.CallOnTicks();   // ...on-tick functions (also left unutilized in this example).
 
 		// Render-on-demand (when things have changed).

@@ -199,7 +199,7 @@ private:
 
 	KTech::RGBA m_unselectedOffRGBA, m_selectedOffRGBA, m_unselectedOnRGBA, m_selectedOnRGBA, m_downRGBA;
 	static constexpr size_t pressLength = 100;
-	KTech::Time::Invocation m_downInvocation;
+	KTech::Invocation m_downInvocation;
 
 	void OnSelect() override
 	{

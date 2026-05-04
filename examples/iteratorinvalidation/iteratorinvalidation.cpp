@@ -125,10 +125,42 @@ auto main() -> int
 	const Object023 object2{engine, {.x = 0, .y = 0}, "2"};
 	const Object023 object3{engine, {.x = 0, .y = 0}, "3"};
 
+	/*
+	Iterator invalidation of Invocation:
+	*/
+
+	auto* const invocation0 = new Invocation(engine, []() -> bool {
+		Output::Log("Invocation 0", RGBColors::cyan);
+		return false;
+	});
+	Invocation invocation1(engine, [invocation0]() -> bool {
+		Output::Log("Invocation 1, deleting invocation 0", RGBColors::cyan);
+		delete invocation0;
+		return false;
+	});
+	Invocation invocation2(engine, [&engine]() -> bool {
+		Output::Log("Invocation 2, creating 20 invocations", RGBColors::cyan);
+		for (size_t i = 0; i < 20; i++)
+		{
+			new Invocation(engine, []() -> bool { return false; });
+		}
+		return false;
+	});
+	Invocation invocation3(engine, []() -> bool {
+		Output::Log("Invocation 3", RGBColors::cyan);
+		return false;
+	});
+
+	invocation0->Invoke(1, Time::Measurement::seconds);
+	invocation1.Invoke(1, Time::Measurement::seconds);
+	invocation2.Invoke(1, Time::Measurement::seconds);
+	invocation3.Invoke(1, Time::Measurement::seconds);
+
+	Output::Log(std::to_string(engine.time.tpsLimit), RGBColors::red);
+
 	while (engine.running)
 	{
 		engine.input.CallCallbacks();
-		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 
 		engine.time.WaitUntilNextTick();

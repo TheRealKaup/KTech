@@ -36,6 +36,7 @@
 #include "../world/object.hpp"
 #include "../world/ui.hpp"
 #include "../world/widget.hpp"
+#include "../world/invocation.hpp"
 // IWYU pragma: end_keep
 
 void KTech::Memory::CallOnTicks()

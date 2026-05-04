@@ -54,7 +54,6 @@ public:
 		{
 			// Call various callback functions
 			engine.input.CallCallbacks();
-			engine.time.CallInvocations();
 			engine.memory.CallOnTicks(); // <- Call `OnTick()` functions of all world structures
 
 			// Graphics...
@@ -99,7 +98,8 @@ private:
 		CachingRegistry<Camera>,
 		CachingRegistry<Map>,
 		CachingRegistry<Widget>,
-		CachingRegistry<UI>>
+		CachingRegistry<UI>,
+		CachingRegistry<Invocation>>
 		m_registries;
 
 	bool m_changedThisTick = false;

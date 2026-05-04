@@ -29,7 +29,7 @@
 #pragma once
 
 #define KTECH_DEFINITION
-#include "../../ktech.hpp"
+#include "../ktech.hpp"
 #undef KTECH_DEFINITION
 
 #include <chrono>
@@ -51,38 +51,12 @@ public:
 		microseconds  //!< One millionths of a second
 	};
 
-	struct Invocation;
-
 	//! Max ticks allowed to occur in a second. You set this value in `Engine::Engine()`, and you can change it whenever you want.
 	unsigned long tpsLimit;
 	float tps = 0;					//!< Actual ticks per second. Corresponds to `Time::deltaTime`.
 	float tpsPotential = 0;			//!< Ticks per second if it wasn't limited by `Time::tpsLimit`.
 	long deltaTime = 0;				//!< Duration of the last tick, in microseconds.
 	unsigned long ticksCounter = 0; //!< Total ticks since game started.
-
-	/*!
-		@brief Call callback functions of finished `Invocation`s.
-
-		Progresses all `Invocation`s by `Time::deltaTime`, and calls those which waited their time.
-
-		Normally placed at the start of your game loop, among the other callback-calling functions. For example:
-
-		@code{.cpp}
-		// Game loop
-		while (engine.running)
-		{
-			// Call various callback-functions
-			engine.input.CallCallbacks();
-			engine.time.CallInvocations(); // <- Call due invocations.
-			engine.memory.CallOnTicks();
-
-			// Graphics...
-		}
-		@endcode
-
-		@see `Time::Invoke()`
-	*/
-	void CallInvocations();
 
 	/*!
 		@brief Sleeps and returns when the next tick should start.
@@ -110,20 +84,15 @@ public:
 	void WaitUntilNextTick();
 
 private:
-	bool m_changedThisTick = false;
-	Engine& engine;
-	std::chrono::steady_clock::time_point m_currentTickStart;
-	std::vector<Invocation*> m_invocations;
+	Engine& m_engine;
+	std::chrono::steady_clock::time_point m_currentTickStart = std::chrono::steady_clock::now();
 
 	Time(Engine& engine, unsigned long ticksPerSecondLimit)
-		: engine(engine), tpsLimit(ticksPerSecondLimit)
+		: m_engine(engine), tpsLimit(ticksPerSecondLimit)
 	{}
 
 	[[nodiscard]] auto TimeToMicroseconds(long p_time, Measurement p_measurement) const -> long;
-	void RegisterCallback(Invocation* invocation);
-	void DeregisterCallback(Invocation* invocation);
 
 	friend class Invocation;
-	friend class Output;
 	friend class Engine;
 };

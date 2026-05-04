@@ -28,26 +28,35 @@
 
 #include "invocation.hpp"
 
-KTech::Time::Invocation::Invocation(Engine& engine, const std::function<bool()>& callback)
-	: engine(engine), m_callback(callback)
-{
-	engine.time.RegisterCallback(this);
-}
+#include "../engine/engine.hpp"
 
-KTech::Time::Invocation::~Invocation()
-{
-	engine.time.DeregisterCallback(nullptr);
-}
+KTech::Invocation::Invocation(Engine& p_engine, const std::function<bool()>& p_callback)
+	: Entity(p_engine), m_callback(p_callback)
+{}
 
-void KTech::Time::Invocation::Invoke(long time, Measurement measurement)
+void KTech::Invocation::Invoke(long p_time, Time::Measurement p_measurement)
 {
-	m_duration = engine.time.TimeToMicroseconds(time, measurement);
+	m_duration = m_engine.time.TimeToMicroseconds(p_time, p_measurement);
 	m_timePassed = 0;
 	m_active = true;
 }
 
-void KTech::Time::Invocation::Cancel()
+void KTech::Invocation::Cancel()
 {
 	m_active = false;
 	m_duration = 0;
+}
+
+auto KTech::Invocation::OnTick() -> bool
+{
+	if (m_active)
+	{
+		m_timePassed += m_engine.time.deltaTime;
+		if (m_timePassed >= m_duration)
+		{
+			m_active = false;
+			return m_callback();
+		}
+	}
+	return false;
 }

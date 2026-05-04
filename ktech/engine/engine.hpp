@@ -37,7 +37,7 @@
 #include "input/input.hpp"
 #include "memory.hpp"
 #include "output.hpp"
-#include "time/time.hpp"
+#include "time.hpp"
 
 /*!
 	@brief Complete engine containing all engine components.

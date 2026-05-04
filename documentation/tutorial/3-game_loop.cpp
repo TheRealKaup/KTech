@@ -88,7 +88,6 @@ auto main() -> int
 	{
 		// Call functions, that call other functions, that change things in your game:
 		engine.input.CallCallbacks();					// (2)
-		engine.time.CallInvocations();					// (3)
 		engine.memory.CallOnTicks();					// (4)
 
 		if (engine.output.ShouldRenderThisTick())		// (5)
@@ -117,8 +116,6 @@ auto main() -> int
 		1:	`Engine::running` is a simple `bool` variable that states whether the game loop should keep iterating, or exit. It's `true` by default, and can be set to `false` from anywhere to safely exit the game. For example, it is automatically set to `false` when the input engine component receives the quit key (Control+C by default). This leads to your game loop exiting, allowing you to prepare before the game actually quits when `main()` reaches its end (for example, by saving player progress).
 
 		2:	`Engine::input` is the input engine component. `Input::CallCallbacks()` distributes player inputs to your functions, which we will try later.
-
-		3:	`Engine::time` is the time engine component. `Time::CallInvocations()` calls functions that were invoked (by you directly or indirectly) to be called in this tick. We will also invoke functions in a later chapter.
 
 		4:	`Engine::memory` is the memory engine component. `Memory::CallOnTicks()` calls the `OnTick()` function of all world structures. Of course, we will utilize this functionality as well, but later.
 

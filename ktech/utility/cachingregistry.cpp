@@ -29,6 +29,7 @@
 #include "cachingregistry.hpp"
 
 #include "../world/camera.hpp"
+#include "../world/invocation.hpp"
 #include "../world/layer.hpp"
 #include "../world/map.hpp"
 #include "../world/object.hpp"
@@ -84,6 +85,7 @@ void KTech::CachingRegistry<T>::Prune()
 }
 
 template class KTech::CachingRegistry<KTech::Camera>;
+template class KTech::CachingRegistry<KTech::Invocation>;
 template class KTech::CachingRegistry<KTech::Layer>;
 template class KTech::CachingRegistry<KTech::Map>;
 template class KTech::CachingRegistry<KTech::Object>;

@@ -293,12 +293,10 @@ auto KTech::Output::ShouldRenderThisTick() -> bool
 	}
 	if (engine.input.m_changedThisTick
 		|| engine.memory.m_changedThisTick
-		|| engine.time.m_changedThisTick
 		|| engine.time.ticksCounter == 0)
 	{
 		engine.input.m_changedThisTick = false;
 		engine.memory.m_changedThisTick = false;
-		engine.time.m_changedThisTick = false;
 		return true;
 	}
 	return false;

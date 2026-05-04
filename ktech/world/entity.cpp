@@ -26,8 +26,9 @@
 	@copyright Licensed under GPLv3 or later. Copyright notice in @fileinfo.
 */
 
-#include "../engine/engine.hpp"
 #include "entity.hpp"
+
+#include "../engine/engine.hpp"
 
 template <class This>
 KTech::Entity<This>::Entity(Engine& p_engine, std::string p_name)
@@ -54,3 +55,4 @@ template class KTech::Entity<KTech::Map>;
 template class KTech::Entity<KTech::Object>;
 template class KTech::Entity<KTech::UI>;
 template class KTech::Entity<KTech::Widget>;
+template class KTech::Entity<KTech::Invocation>;

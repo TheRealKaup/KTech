@@ -125,7 +125,6 @@ auto main() -> int
 	{
 		// Update game
 		engine.input.CallCallbacks();
-		engine.time.CallInvocations();
 		engine.memory.CallOnTicks();
 
 		if (engine.output.ShouldRenderThisTick())

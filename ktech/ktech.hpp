@@ -63,6 +63,7 @@ namespace KTech
 	struct Collider;
 	template <class This>
 	class Entity;
+	class Invocation;
 	class Object;
 	class Layer;
 	class Camera;
@@ -124,5 +125,5 @@ namespace KTech
 #include "engine/input/callbackgroup.hpp"
 #include "engine/input/input.hpp"
 #include "engine/memory.hpp"
-#include "engine/time/time.hpp"
+#include "engine/time.hpp"
 #endif

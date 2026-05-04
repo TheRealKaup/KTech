@@ -33,7 +33,7 @@
 #undef KTECH_DEFINITION
 
 #include "../engine/engine.hpp"
-#include "../engine/time/invocation.hpp"
+#include "../world/invocation.hpp"
 #include "../world/object.hpp"
 
 /*!
@@ -153,5 +153,5 @@ private:
 	ID<Object> m_object;
 	std::vector<Instruction> m_instructions;
 	size_t m_i = 0;
-	Time::Invocation m_invocation;
+	Invocation m_invocation;
 };

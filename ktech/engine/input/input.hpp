@@ -127,7 +127,7 @@ public:
 
 		`Input` queues received inputs until this function is called. This very function is what calls your input callback functions.
 
-		Normally placed at the start of each game loop's iteration, with the other callback-calling functions of engine components (right now `Memory::CallOnTicks()` and `Time::CallInvocations()`, though this may change). For example:
+		Normally placed at the start of each game loop's iteration, with the other callback-calling functions of engine components (right now `Memory::CallOnTicks()`). For example:
 
 		@code{.cpp}
 		// Game loop
@@ -135,7 +135,6 @@ public:
 		{
 			// Call various callback-functions
 			engine.input.CallCallbacks(); // <- Distribute inputs to input callback functions
-			engine.time.CallInvocations();
 			engine.memory.CallOnTicks();
 
 			// Graphics (render-on-demand)
@@ -155,7 +154,6 @@ public:
 		@endcode
 
 		@see `Memory::CallOnTicks()`
-		@see `Time::CallInvocations()`
 	*/
 	void CallCallbacks();
 
