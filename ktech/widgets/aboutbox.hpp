@@ -97,7 +97,7 @@ public:
 		);
 		m_textures[ti_topFrame].Simple(
 			KTech::UPoint(m_textures[0].m_size.x, 1),
-			KTech::CellA{.b = m_backgroundRGBA, .c = '|', .f = m_foregroundRGBA},
+			KTech::CellA{.b = m_backgroundRGBA, .c = '-', .f = m_foregroundRGBA},
 			KTech::Point(1, 0)
 		);
 		m_textures[ti_leftFrame].Simple(

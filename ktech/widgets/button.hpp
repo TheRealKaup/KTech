@@ -129,7 +129,7 @@ public:
 			);
 			m_textures[ti_leftFrame].Simple(
 				KTech::UPoint(1, 1),
-				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '-', .f = tempColor},
+				KTech::CellA{.b = KTech::RGBAColors::transparent, .c = '|', .f = tempColor},
 				KTech::Point(0, 1)
 			);
 			m_textures[ti_bottomFrame].Simple(
