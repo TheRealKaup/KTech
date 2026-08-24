@@ -13,3 +13,5 @@ for i,dir in ipairs(os.matchfiles("examples/*/premake5.lua")) do
 end
 
 include("documentation/tutorial/")
+
+include("tests/")
